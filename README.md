@@ -16,6 +16,8 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Access rules V1](docs/access_rules_v1.md)
 - [API route map](docs/api_route_map.md)
 - [Service interfaces](docs/service_interfaces.md)
+- [Error and audit conventions](docs/error_audit_conventions.md)
+- [Storage and attachment rules](docs/storage_attachment_rules.md)
 - [MVP to-do list](docs/mvp_todo.md)
 - [MVP timeline](docs/mvp_timeline.md)
 - [Decision log](docs/decision_log.md)
@@ -35,7 +37,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - Next.js app scaffold is now present at repo root.
 - Initial Supabase schema migration has been applied to the hosted Supabase project from `supabase/migrations/20260310_000001_initial_schema.sql`.
 - Initial RLS policy migration has been applied to the hosted Supabase project from `supabase/migrations/20260310_000002_access_rules_and_rls.sql`.
-- Backend contract docs now define the first API route surface and service boundaries.
+- Backend contract docs now define the API route surface, service boundaries, error/audit rules, and storage rules.
 - The next recommended execution step is Phase `A0.1` through `A1.3` in [the MVP to-do list](docs/mvp_todo.md).
 
 ## Working Conventions

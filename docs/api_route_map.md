@@ -1,6 +1,6 @@
 # API Route Map
 
-Related: [README](../README.md) | [Access rules V1](access_rules_v1.md) | [Supabase schema V1](supabase_schema_v1.md) | [Service interfaces](service_interfaces.md) | [MVP to-do list](mvp_todo.md)
+Related: [README](../README.md) | [Access rules V1](access_rules_v1.md) | [Supabase schema V1](supabase_schema_v1.md) | [Service interfaces](service_interfaces.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md)
 
 ## Purpose
 
@@ -19,7 +19,7 @@ It exists to prevent accidental drift between:
 - Do not place billing, moderation, prompt orchestration, or multi-table business logic directly in route handlers.
 - Sensitive writes must be server-side even if RLS could theoretically allow them.
 - Treat client-supplied role or link context as untrusted; derive authorization from the server session and database.
-- Log privileged operations and unusual failures through the audit layer once `A1.3.3` lands.
+- Log privileged operations and unusual failures according to [error_audit_conventions.md](error_audit_conventions.md).
 
 ## Route Families
 
@@ -45,6 +45,7 @@ These routes reserve storage locations, confirm uploaded files, and trigger extr
 | `/api/uploads/create` | `POST` | student | create an upload record + signed upload target | route owns file limits and bucket choice |
 | `/api/uploads/confirm` | `POST` | student | mark upload complete and attach to conversation | validates ownership + upload metadata |
 | `/api/uploads/extract` | `POST` | server-triggered or student | request text extraction for an attachment | should enqueue or async-trigger later |
+| `/api/attachments/[attachmentId]/access` | `GET` | visible role | mint short-lived read access for an attachment | required because buckets stay private |
 
 ### Conversations And Workspace
 

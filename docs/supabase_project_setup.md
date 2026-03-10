@@ -1,6 +1,6 @@
 # Supabase Project Setup Notes
 
-Related: [README](../README.md) | [Environment matrix](environment_matrix.md) | [Minors privacy baseline](minors_privacy_baseline.md) | [Supabase schema V1](supabase_schema_v1.md)
+Related: [README](../README.md) | [Environment matrix](environment_matrix.md) | [Storage and attachment rules](storage_attachment_rules.md) | [Minors privacy baseline](minors_privacy_baseline.md) | [Supabase schema V1](supabase_schema_v1.md)
 
 ## Recommended Project Settings
 
@@ -39,6 +39,7 @@ This matters because Supabase auth emails and OTP flows redirect to the configur
 ### 5. Storage
 
 - create private buckets, not public ones, for homework files
+- use the bucket plan in [storage_attachment_rules.md](storage_attachment_rules.md)
 - set bucket MIME restrictions and file-size limits when the upload slice is built
 
 ### 6. Database Security

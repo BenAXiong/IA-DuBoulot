@@ -1,6 +1,6 @@
 # Environment Matrix
 
-Related: [README](../README.md) | [Implementation plan](implementation_plan.md) | [MVP to-do list](mvp_todo.md) | [Decision log](decision_log.md)
+Related: [README](../README.md) | [Implementation plan](implementation_plan.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md) | [Decision log](decision_log.md)
 
 ## Goal
 
@@ -27,9 +27,16 @@ Keep environment configuration explicit so local development, Vercel, and provid
 | `LEMON_SQUEEZY_API_KEY` | server | Lemon Squeezy | billing API calls | local `.env.local`, Vercel |
 | `LEMON_SQUEEZY_WEBHOOK_SECRET` | server | Lemon Squeezy | webhook verification | local `.env.local`, Vercel |
 
+## Storage Constants
+
+- storage bucket names are not environment variables in MVP
+- use stable bucket names across environments and document them in [storage_attachment_rules.md](storage_attachment_rules.md)
+- if this changes later, update this file before adding storage bucket env vars to code
+
 ## Current Gaps
 
 - Supabase project exists at `https://dfiiujkhbuvltrlqrerd.supabase.co`, but its keys still need to be copied into local env files and Vercel
+- planned storage buckets still need to be created in Supabase when upload work starts
 - Gemini key still needs to be provisioned
 - PostHog and Resend values still need to be provisioned
 - Lemon Squeezy webhook secret arrives only after webhook setup

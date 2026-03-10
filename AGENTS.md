@@ -32,12 +32,14 @@ Read these in order before any substantial implementation work:
 9. [docs/access_rules_v1.md](docs/access_rules_v1.md)
 10. [docs/api_route_map.md](docs/api_route_map.md)
 11. [docs/service_interfaces.md](docs/service_interfaces.md)
-12. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
-13. [docs/mvp_todo.md](docs/mvp_todo.md)
-14. [docs/mvp_timeline.md](docs/mvp_timeline.md)
-15. [docs/decision_log.md](docs/decision_log.md)
-16. [docs/work_sessions.md](docs/work_sessions.md)
-17. The relevant code, SQL, prompt, or UI files for the task being worked on
+12. [docs/error_audit_conventions.md](docs/error_audit_conventions.md)
+13. [docs/storage_attachment_rules.md](docs/storage_attachment_rules.md)
+14. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
+15. [docs/mvp_todo.md](docs/mvp_todo.md)
+16. [docs/mvp_timeline.md](docs/mvp_timeline.md)
+17. [docs/decision_log.md](docs/decision_log.md)
+18. [docs/work_sessions.md](docs/work_sessions.md)
+19. The relevant code, SQL, prompt, or UI files for the task being worked on
 
 If a file above is outdated, update it before or alongside the code change that depends on it.
 

@@ -188,6 +188,26 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Why: This preserves modularity, keeps provider integrations swappable, and aligns server behavior with the conservative RLS model.
 - Follow-up: Implement shared server authorization helpers and the first `AccountService` and `ConversationService` slices next.
 
+### D-20260310-19 - Routes Use A Shared Error Envelope And Explicit Audit Boundaries
+
+- Date: 2026-03-10
+- Status: accepted
+- Related tasks: `A1.3.3`, `A1.2.3`
+- Context: Without a fixed error contract, future route handlers will leak provider details, expose inconsistent statuses, and bury sensitive actions in ad hoc logging.
+- Decision: Use one shared API error envelope with stable error codes, request IDs, and retryability hints. Keep `audit_logs` for sensitive access and business events only, keep `moderation_events` for safety outcomes, and keep general debug/runtime traces in application logs instead of database tables.
+- Why: This keeps client behavior predictable, preserves trust boundaries, and prevents the audit table from becoming noisy or unusable.
+- Follow-up: Implement shared route error helpers and an explicit audit service before sensitive route work expands.
+
+### D-20260310-20 - Student File Storage Uses Private Canonical Buckets With Deterministic Paths
+
+- Date: 2026-03-10
+- Status: accepted
+- Related tasks: `A1.3.4`, `A3.2`, `A4.3`
+- Context: Upload work will break traceability quickly if bucket names, file limits, and metadata keys are scattered across route handlers or UI code.
+- Decision: Use private Supabase buckets with `homework-attachments` as the canonical source bucket and `processing-artifacts` as the internal derived bucket. Use deterministic ID-based paths, short-lived signed read URLs, and documented `attachments.metadata` keys. Bucket names are source-controlled constants, not env vars.
+- Why: This keeps storage access safe for minors, avoids hidden path logic, and makes future upload/extraction work easier to reason about.
+- Follow-up: Create the buckets when upload implementation begins and centralize the constants in server code instead of hardcoding them across routes.
+
 ### D-20260310-11 - Personal AI Subscriptions Are Not Backend Fallback Providers
 
 - Date: 2026-03-10

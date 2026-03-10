@@ -1,6 +1,6 @@
 # Supabase Schema V1
 
-Related: [README](../README.md) | [Implementation plan](implementation_plan.md) | [Role and access matrix](role_access_matrix.md) | [Access rules V1](access_rules_v1.md) | [Minors privacy baseline](minors_privacy_baseline.md) | [Initial schema SQL](../supabase/migrations/20260310_000001_initial_schema.sql)
+Related: [README](../README.md) | [Implementation plan](implementation_plan.md) | [Role and access matrix](role_access_matrix.md) | [Access rules V1](access_rules_v1.md) | [Storage and attachment rules](storage_attachment_rules.md) | [Minors privacy baseline](minors_privacy_baseline.md) | [Initial schema SQL](../supabase/migrations/20260310_000001_initial_schema.sql)
 
 ## Purpose
 
@@ -83,5 +83,5 @@ This draft was reviewed against:
 
 - write RLS table-by-table before exposing any table through the app
 - decide whether `parent` should see tutor notes in any narrow admin or escalation case later
-- add storage bucket definitions and file policies alongside upload work
+- implement the bucket plan and route/service rules documented in [storage_attachment_rules.md](storage_attachment_rules.md)
 - add seed fixtures covering student, parent, tutor, and admin flows

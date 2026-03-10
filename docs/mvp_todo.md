@@ -8,9 +8,9 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 
-- Overall: `[#######.......................]` `28/128` complete (`22%`)
+- Overall: `[#######.......................]` `30/128` complete (`23%`)
 - A0: `[xxxxxxxxxxxxxxxx.....]` `16/21`
-- A1: `[xxxxxxxxx.......]` `9/16`
+- A1: `[xxxxxxxxxxx.....]` `11/16`
 - A2: `[xxx..............]` `3/17`
 - A3: `[.................]` `0/17`
 - A4: `[...................]` `0/19`
@@ -103,10 +103,10 @@ Status note: the RLS migration SQL has been applied successfully in the hosted S
 
 - [x] A1.3.1 Write the API route map for auth, uploads, conversations, summaries, memory, parent, tutor, billing, and admin.
 - [x] A1.3.2 Define service interfaces for AI, uploads, translation, moderation, and billing.
-- [ ] A1.3.3 Define error handling and audit logging conventions.
-- [ ] A1.3.4 Define file storage buckets and attachment metadata rules.
+- [x] A1.3.3 Define error handling and audit logging conventions.
+- [x] A1.3.4 Define file storage buckets and attachment metadata rules.
 
-Reference: [API route map](api_route_map.md) and [Service interfaces](service_interfaces.md)
+Reference: [API route map](api_route_map.md) | [Service interfaces](service_interfaces.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md)
 
 ### A1.4 Seed Data And Smoke Fixtures
 

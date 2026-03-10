@@ -1,6 +1,6 @@
 # Service Interfaces
 
-Related: [README](../README.md) | [API route map](api_route_map.md) | [Environment matrix](environment_matrix.md) | [MVP to-do list](mvp_todo.md)
+Related: [README](../README.md) | [API route map](api_route_map.md) | [Environment matrix](environment_matrix.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md)
 
 ## Purpose
 
@@ -52,6 +52,7 @@ Owns storage target reservation and metadata verification.
 interface UploadStorageService {
   createUploadTarget(input: CreateUploadTargetInput): Promise<CreateUploadTargetResult>;
   confirmUpload(input: ConfirmUploadInput): Promise<ConfirmUploadResult>;
+  createReadUrl(input: CreateAttachmentReadUrlInput): Promise<CreateAttachmentReadUrlResult>;
   deleteUpload(input: DeleteUploadInput): Promise<void>;
 }
 ```
@@ -60,6 +61,7 @@ Rules:
 
 - bucket/path strategy lives here
 - MIME, byte-size, and extension rules are enforced here
+- signed read URL issuance lives here
 - storage cleanup should be callable from deletion flows and failure recovery
 
 ### Translation Service
@@ -167,6 +169,20 @@ interface MemoryService {
   applyMemoryUpdate(input: ApplyMemoryUpdateInput): Promise<ApplyMemoryUpdateResult>;
 }
 ```
+
+### Audit Service
+
+```ts
+interface AuditService {
+  recordEvent(input: RecordAuditEventInput): Promise<void>;
+}
+```
+
+Rules:
+
+- audit writes should be explicit, not hidden in generic helpers
+- event names and metadata should follow `error_audit_conventions.md`
+- do not use the audit service as a dumping ground for general debug logs
 
 ## Placement Guidance
 
