@@ -4,6 +4,20 @@ Related: [README](../README.md) | [Implementation plan](implementation_plan.md) 
 
 Use these task IDs everywhere: session log, decision log, commits, reviews, and release notes.
 
+## Progress Snapshot
+
+Overall progress uses a scaled bar. Phase bars use one unit per subtask.
+
+- Overall: `[######..........................]` `25/128` complete (`20%`)
+- A0: `[xxxxxxxxxxxxxxxx.....]` `16/21`
+- A1: `[xxxxxx..........]` `6/16`
+- A2: `[xxx..............]` `3/17`
+- A3: `[.................]` `0/17`
+- A4: `[...................]` `0/19`
+- A5: `[.............]` `0/13`
+- A6: `[.............]` `0/13`
+- A7: `[............]` `0/12`
+
 ## Phase A0 - Bootstrap And Governance
 
 Outcome: the repo is real, the operating rules are in place, and future implementation has a stable source of truth.
