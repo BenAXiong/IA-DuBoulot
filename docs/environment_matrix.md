@@ -19,7 +19,7 @@ Keep environment configuration explicit so local development, Vercel, and provid
 | `NEXT_PUBLIC_APP_URL` | public | app | canonical app URL | local `.env.local`, Vercel |
 | `NEXT_PUBLIC_SUPABASE_URL` | public | Supabase | browser and server client bootstrap | local `.env.local`, Vercel |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | public | Supabase | browser and server client bootstrap | local `.env.local`, Vercel |
-| `SUPABASE_SERVICE_ROLE_KEY` | server | Supabase | admin jobs, secure server actions | local `.env.local`, Vercel |
+| `SUPABASE_SERVICE_ROLE_KEY` | server | Supabase | admin jobs, secure server actions, audit writes, profile bootstrap repair | local `.env.local`, Vercel |
 | `GEMINI_API_KEY` | server | Google Gemini | AI provider calls | local `.env.local`, Vercel |
 | `NEXT_PUBLIC_POSTHOG_KEY` | public | PostHog | product analytics | local `.env.local`, Vercel |
 | `NEXT_PUBLIC_POSTHOG_HOST` | public | PostHog | product analytics host | local `.env.local`, Vercel |

@@ -38,6 +38,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - Initial Supabase schema migration has been applied to the hosted Supabase project from `supabase/migrations/20260310_000001_initial_schema.sql`.
 - Initial RLS policy migration has been applied to the hosted Supabase project from `supabase/migrations/20260310_000002_access_rules_and_rls.sql`.
 - Backend contract docs now define the API route surface, service boundaries, error/audit rules, and storage rules.
+- Supabase SSR auth helpers, `proxy.ts`, and the first authenticated API routes are now implemented in code.
 - The next recommended execution step is Phase `A0.1` through `A1.3` in [the MVP to-do list](docs/mvp_todo.md).
 
 ## Working Conventions

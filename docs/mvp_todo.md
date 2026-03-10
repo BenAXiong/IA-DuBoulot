@@ -8,9 +8,9 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 
-- Overall: `[#######.......................]` `30/128` complete (`23%`)
+- Overall: `[#######.......................]` `31/128` complete (`24%`)
 - A0: `[xxxxxxxxxxxxxxxx.....]` `16/21`
-- A1: `[xxxxxxxxxxx.....]` `11/16`
+- A1: `[xxxxxxxxxxxx....]` `12/16`
 - A2: `[xxx..............]` `3/17`
 - A3: `[.................]` `0/17`
 - A4: `[...................]` `0/19`
@@ -93,11 +93,12 @@ Status note: the initial schema SQL has been applied successfully in the hosted 
 
 - [x] A1.2.1 Write table-by-table access rules before coding policies.
 - [x] A1.2.2 Implement RLS policies for each role relationship.
-- [ ] A1.2.3 Add server-side authorization checks for all sensitive routes.
+- [x] A1.2.3 Add server-side authorization checks for all sensitive routes.
 - [ ] A1.2.4 Verify student, parent, tutor, and admin visibility with seeded test accounts.
 
 Reference: [Access rules V1](access_rules_v1.md) and [RLS migration draft](../supabase/migrations/20260310_000002_access_rules_and_rls.sql)
 Status note: the RLS migration SQL has been applied successfully in the hosted Supabase project.
+Status note: shared server authorization helpers now back the first authenticated routes in `app/api/auth/...`.
 
 ### A1.3 Backend Contracts
 
@@ -133,6 +134,8 @@ Outcome: the application shell supports real role-aware development instead of i
 - [ ] A2.2.2 Implement role-aware signup/invite flows.
 - [ ] A2.2.3 Persist user profile and role metadata.
 - [ ] A2.2.4 Implement protected routes and session refresh handling.
+
+Status note: the SSR auth foundation is in place with `proxy.ts`, Supabase server/admin helpers, and the first `GET /api/auth/me` plus `POST /api/auth/profile/bootstrap` routes, but user-facing onboarding flows are still pending.
 
 ### A2.3 Shared Layouts And Navigation
 

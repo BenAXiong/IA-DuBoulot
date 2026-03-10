@@ -23,10 +23,22 @@ export function hasSupabaseEnv() {
   );
 }
 
+export function hasSupabaseServiceRoleEnv() {
+  return hasSupabaseEnv() && Boolean(env.SUPABASE_SERVICE_ROLE_KEY);
+}
+
 export function assertSupabaseEnv() {
   if (!hasSupabaseEnv()) {
     throw new Error(
       "Missing Supabase environment variables. Fill NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY first.",
+    );
+  }
+}
+
+export function assertSupabaseServiceRoleEnv() {
+  if (!hasSupabaseServiceRoleEnv()) {
+    throw new Error(
+      "Missing Supabase server environment variables. Fill SUPABASE_SERVICE_ROLE_KEY for privileged server routes.",
     );
   }
 }

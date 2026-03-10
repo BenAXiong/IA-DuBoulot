@@ -6,6 +6,11 @@ Related: [README](../README.md) | [Access rules V1](access_rules_v1.md) | [Supab
 
 This document defines the first server route surface for the MVP.
 
+Current implemented routes:
+
+- `GET /api/auth/me`
+- `POST /api/auth/profile/bootstrap`
+
 It exists to prevent accidental drift between:
 
 - direct browser table access allowed by RLS

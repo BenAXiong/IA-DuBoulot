@@ -208,6 +208,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Why: This keeps storage access safe for minors, avoids hidden path logic, and makes future upload/extraction work easier to reason about.
 - Follow-up: Create the buckets when upload implementation begins and centralize the constants in server code instead of hardcoding them across routes.
 
+### D-20260310-21 - Auth Bootstrap Uses SSR Session Reads And Service-Role Profile Writes
+
+- Date: 2026-03-10
+- Status: accepted
+- Related tasks: `A1.2.3`, `A2.2.1`, `A2.2.3`
+- Context: `public.users` is protected by RLS, and self-service route handlers need a clean way to read the authenticated session, create or repair the caller profile, and write audit events without leaking privileged credentials to the client.
+- Decision: Use Supabase SSR cookie-based clients for session reads, a repository-local `proxy.ts` to refresh auth cookies, and service-role server helpers only for privileged server writes such as profile bootstrap repair and audit logging. The first implemented auth slice is `GET /api/auth/me` and `POST /api/auth/profile/bootstrap`.
+- Why: This keeps session validation tied to the user cookie while preserving a clean server-only path for writes that should not depend on client-side table mutations or relaxed RLS.
+- Follow-up: Reuse the same split for future sensitive routes and extend the auth slice into protected UI onboarding next.
+
 ### D-20260310-11 - Personal AI Subscriptions Are Not Backend Fallback Providers
 
 - Date: 2026-03-10

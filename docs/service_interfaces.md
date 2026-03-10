@@ -217,6 +217,6 @@ Inside each domain:
 
 ## Immediate Next Implementations
 
-- `AccountService` plus `/api/auth/me` and `/api/auth/profile/bootstrap`
 - `ConversationService` plus `/api/conversations` and `/api/conversations/[conversationId]/messages`
 - shared authorization helpers for route handlers in support of `A1.2.3`
+- protected UI onboarding and profile update routes on top of the existing `AccountService`
