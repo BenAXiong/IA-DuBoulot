@@ -1,5 +1,6 @@
 import "server-only";
 
+import { isAuthSessionMissingError } from "@supabase/supabase-js";
 import { AppError } from "@/lib/server/errors/app-error";
 import { APP_USER_SELECT } from "@/lib/server/auth/account-service";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -17,6 +18,13 @@ export async function getAuthenticatedUserContext(): Promise<AuthenticatedUserCo
   } = await supabase.auth.getUser();
 
   if (error) {
+    if (
+      isAuthSessionMissingError(error) ||
+      error.name === "AuthSessionMissingError"
+    ) {
+      return null;
+    }
+
     throw new AppError({
       code: "unauthenticated",
       message: "Authentication is required.",

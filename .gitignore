@@ -29,3 +29,6 @@ Thumbs.db
 .vscode/
 .idea/
 next-tmp-bootstrap/
+.tmp/
+.tmp_next_start*.pid
+test-results/

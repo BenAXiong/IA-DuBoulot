@@ -278,6 +278,26 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Why: This creates stable chrome boundaries now, keeps future route work easier to reason about, and reduces the chance of role-specific behavior getting buried inside a generic layout file.
 - Follow-up: Manually validate the shell on iPad portrait and landscape widths, then extend the student dashboard into the real homework intake flow in phase A3.
 
+### D-20260311-28 - Shared Client Env Access Must Use Direct NEXT_PUBLIC References
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A2.2.2`, `A2.3.4`
+- Context: The shared env helper originally read variables through dynamic `process.env[name]` access. In Next.js client bundles, that pattern prevented `NEXT_PUBLIC_*` values from being inlined, which broke the browser Supabase client during hydration even though the env vars existed locally and in deployment config.
+- Decision: Keep shared env access on direct `process.env.NEXT_PUBLIC_*` property reads instead of dynamic lookup for any value needed by client code.
+- Why: This keeps browser auth and other public client integrations reliable across build and runtime environments.
+- Follow-up: Keep server-only secrets out of client modules, and avoid reintroducing dynamic env-name lookup in files imported by client components.
+
+### D-20260311-29 - Same-Browser Invite Recovery Uses A Pending Cookie Plus Post-Confirm Bridge
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A2.2.2`, `A2.3.4`
+- Context: The generic Supabase confirm-signup email template does not preserve invite-specific `next` redirects. Without an explicit recovery path, invited users would confirm their email and lose the pending invitation context.
+- Decision: Persist the invite token in a short-lived `ia_pending_invite` browser cookie before signup, recover it inside `/auth/confirm`, and redirect through `/auth/complete` before returning to `/invite/[token]`.
+- Why: This restores the pending invite automatically for the same browser session without depending on provider-specific email-link customization.
+- Follow-up: If cross-device invite recovery becomes important, add a server-tracked pending-invite recovery token instead of relying only on a browser-local cookie.
+
 ### D-20260310-11 - Personal AI Subscriptions Are Not Backend Fallback Providers
 
 - Date: 2026-03-10

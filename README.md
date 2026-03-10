@@ -49,9 +49,11 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - A source-controlled sample attachment corpus now exists under `fixtures/homework-samples/` for upload and extraction work.
 - The user-facing auth slice is now live with `/auth`, `/auth/confirm`, `/onboarding`, and a protected `/app` entry wired to Supabase SSR plus profile bootstrap.
 - The auth slice now supports role-prefilled signup intent, profile editing through `PATCH /api/auth/profile`, canonical invitation records, `/invite/[token]` acceptance, and auth metadata sync from the canonical app profile.
+- Same-browser invite confirmation now recovers pending invitation context through the `ia_pending_invite` cookie plus `/auth/complete`, even when the Supabase email template does not preserve `next`.
 - The public site now has a shared shell for landing, pricing, auth, onboarding, and invite pages.
 - The protected app now has a shared responsive shell plus separate student, parent, tutor, and admin dashboard variants.
-- The next recommended execution step is `A2.3.4`: validate the shell on iPad portrait and landscape widths, then move into `A2.4` or `A3.1`.
+- The shell has been checked on 2026-03-11 at emulated iPad portrait and landscape widths with no horizontal overflow on `/auth`, `/app`, or the recovered invite surface.
+- The next recommended execution step is `A3.1`: turn the student dashboard into the real homework intake entry, then branch into `A3.2` and `A3.3`. `A2.4` can be added opportunistically around that work.
 
 ## Working Conventions
 

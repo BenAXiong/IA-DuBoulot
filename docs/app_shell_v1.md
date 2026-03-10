@@ -86,7 +86,7 @@ Why:
 - real sub-routes for sessions, billing, notes, and student lists do not exist yet
 - anchor navigation still gives the shell a stable structure without inventing fake routes
 
-## iPad Intent
+## iPad Validation
 
 The shell is designed for:
 
@@ -94,14 +94,22 @@ The shell is designed for:
 - sidebar navigation from `lg` upward
 - card grids that expand from 1 to 2 to 3 columns across breakpoints
 
-Important:
+Recorded check:
 
-- this is implementation intent, not a recorded manual device validation yet
-- `A2.3.4` remains open until the shell is checked explicitly on iPad portrait and landscape widths
+- date: 2026-03-11
+- method: browser-emulated tablet pass with Playwright screenshots
+- widths checked: `820x1180` portrait and `1180x820` landscape
+- routes checked: `/auth`, `/app`, `/invite/[token]` recovered state
+- result: no horizontal overflow detected on the checked shell surfaces
+
+Scope boundary:
+
+- this closes `A2.3.4` for shell-width validation
+- actual iPad Safari behavior, keyboard behavior, and upload/chat ergonomics still belong to phase `A7.1`
 
 ## Known Follow-Ups
 
 - convert anchor sections into real route destinations as dashboards grow
 - add localized copy structure instead of hardcoded strings
-- validate the shell on actual iPad portrait and landscape widths
+- validate the shell on actual iPad Safari during `A7.1`
 - add role-specific empty states that consume real data rather than static MVP guidance copy

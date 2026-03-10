@@ -55,6 +55,7 @@ Pages:
 
 - `/invite/[token]`
 - `/auth`
+- `/auth/complete`
 - `/onboarding`
 - `/app`
 
@@ -121,7 +122,7 @@ Follow-up:
 
 - wire provider-backed delivery later through Resend or another dedicated mail path
 
-## Auth Template Caveat
+## Auth Template And Recovery Behavior
 
 The baseline Supabase confirm-signup email template that points to:
 
@@ -129,12 +130,20 @@ The baseline Supabase confirm-signup email template that points to:
 
 is correct for the current SSR confirmation route.
 
-However:
+Current recovery behavior:
 
-- it does not preserve invite-specific `next` redirects by itself
-- invited users may need to reopen the original `/invite/[token]` link after email confirmation if the email template does not forward the redirect target
+- the email template still does not preserve invite-specific `next` redirects by itself
+- the product now stores the pending invite token in the browser before signup and uses `/auth/complete` as a post-confirm bridge
+- this means same-browser confirmation can recover back to `/invite/[token]` automatically even when the email template is generic
 
-This is acceptable for V1, but future polish should preserve the post-confirm invite path more directly.
+Remaining caveat:
+
+- cross-browser or cross-device confirmation still loses the local pending-invite cookie
+- in that case the recipient may still need to reopen the original `/invite/[token]` link after confirming email
+
+Validation note:
+
+- same-browser recovery was verified on 2026-03-11 in a local browser pass against the live auth flow using a real tutor invitation and confirmation-token handoff
 
 ## Audit Expectations
 
@@ -152,4 +161,5 @@ Runtime logs may include invite domain and status metadata, but should not log r
 - add provider-backed invite email delivery
 - add parent dashboard issuance for tutor invites against linked children
 - add invitation cleanup jobs for expired and stale pending rows
+- decide whether cross-device invite recovery is worth adding before beta
 - decide whether future parent-link flows should reuse `parent_link` or stay inside dedicated parent dashboards only

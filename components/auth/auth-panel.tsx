@@ -2,6 +2,10 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import {
+  clearPendingInviteCookie,
+  persistPendingInviteCookie,
+} from "@/lib/auth/pending-invite";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type AuthMode = "sign_in" | "sign_up";
@@ -52,6 +56,10 @@ export function AuthPanel({
     resetMessages();
 
     startTransition(async () => {
+      if (!inviteToken) {
+        clearPendingInviteCookie();
+      }
+
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -72,6 +80,12 @@ export function AuthPanel({
     resetMessages();
 
     startTransition(async () => {
+      if (inviteToken) {
+        persistPendingInviteCookie(inviteToken);
+      } else {
+        clearPendingInviteCookie();
+      }
+
       const confirmUrl = new URL("/auth/confirm", window.location.origin);
       confirmUrl.searchParams.set(
         "next",
@@ -99,7 +113,7 @@ export function AuthPanel({
 
       setInfoMessage(
         inviteToken
-          ? "Compte cree. Confirme l'adresse email depuis le message Supabase, puis reouvre le lien d'invitation pour continuer."
+          ? "Compte cree. Confirme l'adresse email depuis le message Supabase. Le produit reprendra automatiquement l'invitation dans ce navigateur."
           : "Compte cree. Confirme l'adresse email depuis le message Supabase avant de continuer.",
       );
       setMode("sign_in");

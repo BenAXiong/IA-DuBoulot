@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { EmailOtpType } from "@supabase/supabase-js";
+import {
+  PENDING_INVITE_COOKIE_NAME,
+  sanitizePendingInviteToken,
+} from "@/lib/auth/pending-invite";
+import { sanitizeRelativeRedirectPath } from "@/lib/auth/redirect-path";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function buildAuthRedirect(request: NextRequest, messageType: "error", message: string) {
@@ -11,7 +16,16 @@ function buildAuthRedirect(request: NextRequest, messageType: "error", message: 
 export async function GET(request: NextRequest) {
   const tokenHash = request.nextUrl.searchParams.get("token_hash");
   const type = request.nextUrl.searchParams.get("type") as EmailOtpType | null;
-  const next = request.nextUrl.searchParams.get("next") ?? "/onboarding";
+  const nextFromQuery = sanitizeRelativeRedirectPath(
+    request.nextUrl.searchParams.get("next"),
+    "",
+  );
+  const pendingInviteToken = sanitizePendingInviteToken(
+    request.cookies.get(PENDING_INVITE_COOKIE_NAME)?.value,
+  );
+  const next =
+    nextFromQuery ||
+    (pendingInviteToken ? `/invite/${pendingInviteToken}` : "/onboarding");
 
   if (!tokenHash || !type) {
     return NextResponse.redirect(
@@ -39,5 +53,14 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  return NextResponse.redirect(new URL(next, request.url));
+  const completeUrl = new URL("/auth/complete", request.url);
+  completeUrl.searchParams.set("next", next);
+
+  const response = NextResponse.redirect(completeUrl);
+  response.cookies.set(PENDING_INVITE_COOKIE_NAME, "", {
+    maxAge: 0,
+    path: "/",
+    sameSite: "lax",
+  });
+  return response;
 }

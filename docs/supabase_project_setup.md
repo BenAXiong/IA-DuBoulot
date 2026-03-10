@@ -23,6 +23,7 @@ Changing region later is possible, but it is avoidable migration work.
 - set `SITE_URL` to the production Vercel URL once the domain is stable
 - add local development redirect URLs for `http://localhost:3000/*`
 - add Vercel preview redirect URLs if auth flows need preview deployments
+- use one hostname consistently during local browser auth testing; `localhost` and `127.0.0.1` do not share cookies
 
 This matters because Supabase auth emails and OTP flows redirect to the configured site and redirect URLs.
 
@@ -68,7 +69,9 @@ This matters because Supabase auth emails and OTP flows redirect to the configur
 - when auth wiring starts, use the Supabase SSR path for Next.js instead of old auth helpers
 - that is the current Supabase direction for server-side auth with cookies
 - if email confirmation is enabled, wire the project through the repo's `/auth/confirm` route and update the Supabase confirm-signup email template to use `token_hash` + `type=email` instead of relying on the older client-side confirmation flow
-- the current baseline confirm-signup template is valid for generic signup confirmation, but invite-specific `next` redirects are not fully preserved unless the recipient reopens the original `/invite/[token]` link after confirmation
+- the current baseline confirm-signup template is valid for generic signup confirmation
+- same-browser invite recovery is now handled by the pending-invite cookie plus `/auth/complete`, even when the email template does not preserve `next`
+- cross-browser or cross-device invite recovery still requires reopening the original `/invite/[token]` link
 
 ## Official References
 

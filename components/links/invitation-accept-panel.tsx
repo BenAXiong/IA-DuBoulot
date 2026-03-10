@@ -153,13 +153,13 @@ export function InvitationAcceptPanel({
             </p>
             <div className="flex flex-wrap gap-3">
               <Link
-                className="rounded-full bg-[color:var(--foreground)] px-5 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5"
+                className="inline-flex w-fit self-start items-center justify-center whitespace-nowrap rounded-full bg-[color:var(--foreground)] px-5 py-3 text-sm font-medium !text-white transition hover:-translate-y-0.5"
                 href={authSignInHref}
               >
                 Se connecter
               </Link>
               <Link
-                className="rounded-full border border-[color:var(--line)] bg-white px-5 py-3 text-sm font-medium text-[color:var(--foreground)] transition hover:-translate-y-0.5"
+                className="inline-flex w-fit self-start items-center justify-center whitespace-nowrap rounded-full border border-[color:var(--line)] bg-white px-5 py-3 text-sm font-medium !text-[color:var(--foreground)] transition hover:-translate-y-0.5"
                 href={authSignUpHref}
               >
                 Creer le compte
@@ -175,7 +175,7 @@ export function InvitationAcceptPanel({
               profil applicatif n&apos;est pas encore cree.
             </p>
             <Link
-              className="justify-self-start rounded-full bg-[color:var(--foreground)] px-5 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5"
+              className="inline-flex w-fit self-start items-center justify-center whitespace-nowrap rounded-full bg-[color:var(--foreground)] px-5 py-3 text-sm font-medium !text-white transition hover:-translate-y-0.5"
               href={onboardingHref}
             >
               Terminer l&apos;onboarding
@@ -212,7 +212,7 @@ export function InvitationAcceptPanel({
             ) : null}
 
             <Link
-              className="rounded-full border border-[color:var(--line)] bg-white px-5 py-3 text-sm font-medium text-[color:var(--foreground)] transition hover:-translate-y-0.5"
+              className="inline-flex w-fit self-start items-center justify-center whitespace-nowrap rounded-full border border-[color:var(--line)] bg-white px-5 py-3 text-sm font-medium !text-[color:var(--foreground)] transition hover:-translate-y-0.5"
               href="/app"
             >
               Aller a l&apos;app
