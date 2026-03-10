@@ -479,6 +479,23 @@ create trigger ensure_student_memory_item_role_trigger
 before insert or update on public.student_memory_items
 for each row execute function public.ensure_student_memory_item_role();
 
+alter table public.users enable row level security;
+alter table public.student_profiles enable row level security;
+alter table public.parent_student_links enable row level security;
+alter table public.tutor_student_links enable row level security;
+alter table public.conversations enable row level security;
+alter table public.messages enable row level security;
+alter table public.attachments enable row level security;
+alter table public.workspace_states enable row level security;
+alter table public.session_summaries enable row level security;
+alter table public.tutor_notes enable row level security;
+alter table public.subscriptions enable row level security;
+alter table public.usage_counters enable row level security;
+alter table public.moderation_events enable row level security;
+alter table public.audit_logs enable row level security;
+alter table public.student_memory_profiles enable row level security;
+alter table public.student_memory_items enable row level security;
+
 create index idx_users_role_status
   on public.users (role, account_status);
 

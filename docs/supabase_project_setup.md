@@ -6,6 +6,10 @@ Related: [README](../README.md) | [Environment matrix](environment_matrix.md) | 
 
 These are the settings worth paying attention to for the first Supabase project.
 
+Current project URL:
+
+- `https://dfiiujkhbuvltrlqrerd.supabase.co`
+
 ### 1. Region
 
 - pick the region closest to the expected first real users
@@ -39,10 +43,24 @@ This matters because Supabase auth emails and OTP flows redirect to the configur
 
 ### 6. Database Security
 
-- every app table in `public` created via raw SQL must have RLS enabled later
-- do not assume raw SQL tables are protected just because dashboard-created tables often enable RLS automatically
+- there is no single project-wide RLS switch that fixes all future tables
+- RLS is enforced per table
+- dashboard-created tables often enable RLS automatically
+- raw SQL tables do not necessarily do that, so we enable RLS directly in the migration
+- if you did not check an RLS-related box during project setup, that does not break the project; it just means table-level RLS must still be handled explicitly
 
-### 7. Next.js Auth Integration
+### 7. Immediate Next Steps In The Supabase Dashboard
+
+1. Open `Project Settings` -> `API` or the `Connect` dialog.
+2. Copy:
+- project URL
+- publishable key or anon key
+- service-role or secret key for backend-only use
+3. Put them in local `.env.local`.
+4. Mirror the same values into Vercel environment variables.
+5. Keep the service-role or secret key server-only; never expose it in browser code.
+
+### 8. Next.js Auth Integration
 
 - when auth wiring starts, use the Supabase SSR path for Next.js instead of old auth helpers
 - that is the current Supabase direction for server-side auth with cookies

@@ -158,6 +158,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Why: This keeps product authorization, role logic, and lifecycle state explicit and queryable without coupling the whole app to auth internals.
 - Follow-up: Define the onboarding flow that creates and maintains `public.users` rows during `A2.2`.
 
+### D-20260310-16 - Enable RLS In The Raw SQL Migration Before Writing Policies
+
+- Date: 2026-03-10
+- Status: accepted
+- Related tasks: `A1.1`, `A1.2`
+- Context: The first schema draft is written in raw SQL, and Supabase documents that raw SQL tables in `public` do not automatically get RLS protection the same way dashboard-created tables often do.
+- Decision: Enable RLS on every app table directly in the initial migration, then add policies in `A1.2`.
+- Why: It is safer to have locked tables with missing policies than exposed tables with forgotten RLS.
+- Follow-up: Write table-by-table policies next and do not expose any browser data flow before that pass is complete.
+
 ### D-20260310-11 - Personal AI Subscriptions Are Not Backend Fallback Providers
 
 - Date: 2026-03-10

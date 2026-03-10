@@ -46,6 +46,16 @@ This avoids a single giant session table and keeps later policy logic easier to 
 - learning-content tables cascade from student-owned roots, so purge jobs can delete account content cleanly
 - `subscriptions`, `audit_logs`, and `moderation_events` are structured so limited operational records can survive separately when necessary
 
+### RLS Is Enabled Immediately
+
+- the migration enables Row Level Security on every app table in `public`
+- no policies are created yet, so browser access remains effectively closed until `A1.2`
+
+Why:
+
+- raw SQL tables in Supabase do not auto-enable RLS the way dashboard-created tables often do
+- enabling RLS now is safer than trying to remember it later
+
 ### Memory Is Split Into Profile And Items
 
 - `student_memory_profiles` keeps compact rollups
