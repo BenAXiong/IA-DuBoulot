@@ -1,8 +1,35 @@
 import { OnboardingForm } from "@/components/auth/onboarding-form";
 import { requireOnboardingPageContext } from "@/lib/server/auth/page-guards";
 
-export default async function OnboardingPage() {
+type SearchParamsValue = string | string[] | undefined;
+type SearchParamsRecord = Record<string, SearchParamsValue>;
+
+function readFirstValue(value: SearchParamsValue) {
+  if (Array.isArray(value)) {
+    return value[0] ?? null;
+  }
+
+  return value ?? null;
+}
+
+function parseDefaultRole(value: string | null) {
+  if (value === "parent" || value === "tutor") {
+    return value;
+  }
+
+  return "student" as const;
+}
+
+export default async function OnboardingPage({
+  searchParams,
+}: {
+  searchParams?: Promise<SearchParamsRecord> | SearchParamsRecord;
+}) {
   const context = await requireOnboardingPageContext();
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const defaultRole = parseDefaultRole(
+    readFirstValue(resolvedSearchParams.role),
+  );
 
   return (
     <main className="px-5 py-6 sm:px-8 lg:px-12">
@@ -22,7 +49,10 @@ export default async function OnboardingPage() {
           </article>
 
           <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5">
-            <OnboardingForm email={context.email} />
+            <OnboardingForm
+              defaultRole={defaultRole}
+              email={context.email}
+            />
           </article>
         </section>
       </div>

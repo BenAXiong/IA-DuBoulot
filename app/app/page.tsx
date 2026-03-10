@@ -1,3 +1,4 @@
+import { AccountSettingsForm } from "@/components/auth/account-settings-form";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { requireAppPageContext } from "@/lib/server/auth/page-guards";
 
@@ -87,6 +88,25 @@ export default async function AppHomePage() {
               </li>
             ))}
           </ul>
+        </section>
+
+        <section className="grid gap-6 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] md:grid-cols-[0.7fr_1.3fr]">
+          <article className="space-y-3">
+            <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
+              Account settings
+            </p>
+            <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
+              Les champs editables passent maintenant par `PATCH /api/auth/profile`.
+            </h2>
+            <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
+              Cette surface reste simple, mais elle exerce deja la persistence
+              du profil applicatif et la synchronisation de metadata cote auth.
+            </p>
+          </article>
+
+          <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5">
+            <AccountSettingsForm appUser={appUser} />
+          </article>
         </section>
       </div>
     </main>

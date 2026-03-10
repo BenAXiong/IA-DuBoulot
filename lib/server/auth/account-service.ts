@@ -12,6 +12,7 @@ import {
   type UiLanguageCode,
   type AiLanguageCode,
   type AgeBand,
+  type UpdateProfileInput,
 } from "@/lib/server/auth/types";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { recordAuditEvent } from "@/lib/server/audit/audit-service";
@@ -31,6 +32,13 @@ type BootstrapProfileResult = {
   appUser: AppUserRecord;
   created: boolean;
 };
+
+type UpdateProfilePayload = Partial<{
+  displayName: string;
+  preferredUiLanguage: string;
+  aiHelpLanguage: string;
+  ageBand: string | null;
+}>;
 
 function isStringInArray<T extends readonly string[]>(
   value: string,
@@ -148,6 +156,54 @@ function parseAgeBand(value: string | null | undefined): AgeBand | null {
   return value;
 }
 
+function requireUpdateBodyObject(body: unknown): UpdateProfilePayload {
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    throw new AppError({
+      code: "bad_request",
+      message: "Expected a JSON object body.",
+      status: 400,
+    });
+  }
+
+  return body as UpdateProfilePayload;
+}
+
+function buildAuthMetadata(appUser: AppUserRecord) {
+  return {
+    app_role: appUser.role,
+    display_name: appUser.display_name,
+    preferred_ui_language: appUser.preferred_ui_language,
+    ai_help_language: appUser.ai_help_language,
+    age_band: appUser.age_band,
+    is_under_13: appUser.is_under_13,
+    account_status: appUser.account_status,
+    onboarding_completed: true,
+    app_profile_version: 1,
+  };
+}
+
+async function syncAuthUserMetadata(input: {
+  authUserId: string;
+  appUser: AppUserRecord;
+  requestId: string;
+  route: string;
+}) {
+  const supabase = createSupabaseAdminClient();
+  const { error } = await supabase.auth.admin.updateUserById(input.authUserId, {
+    user_metadata: buildAuthMetadata(input.appUser),
+  });
+
+  if (error) {
+    throw new AppError({
+      code: "service_unavailable",
+      message: "Unable to sync auth profile metadata.",
+      status: 503,
+      retryable: true,
+      cause: error,
+    });
+  }
+}
+
 export async function parseBootstrapProfileInput(
   request: Request,
 ): Promise<BootstrapProfileInput> {
@@ -213,6 +269,62 @@ export async function parseBootstrapProfileInput(
     aiHelpLanguage,
     ageBand,
     isUnder13,
+  };
+}
+
+export async function parseUpdateProfileInput(
+  request: Request,
+  appUser: AppUserRecord,
+): Promise<UpdateProfileInput> {
+  let body: unknown;
+
+  try {
+    body = await request.json();
+  } catch (error) {
+    throw new AppError({
+      code: "bad_request",
+      message: "Invalid JSON body.",
+      status: 400,
+      cause: error,
+    });
+  }
+
+  const payload = requireUpdateBodyObject(body);
+  const displayName = parseDisplayName(payload.displayName);
+  const preferredUiLanguage = parseUiLanguage(payload.preferredUiLanguage);
+  const aiHelpLanguage = parseAiLanguage(payload.aiHelpLanguage);
+  const ageBand = parseAgeBand(payload.ageBand);
+
+  if (appUser.role !== "student" && ageBand) {
+    throw new AppError({
+      code: "validation_error",
+      message: "One or more fields are invalid.",
+      status: 400,
+      fieldErrors: {
+        ageBand: "Only student accounts can store an age band.",
+      },
+    });
+  }
+
+  if (appUser.role === "student" && appUser.is_under_13) {
+    if (!ageBand || !isUnder13AgeBand(ageBand)) {
+      throw new AppError({
+        code: "validation_error",
+        message: "One or more fields are invalid.",
+        status: 400,
+        fieldErrors: {
+          ageBand:
+            "Under-13 student accounts must use six_eight, nine_ten, or eleven_twelve.",
+        },
+      });
+    }
+  }
+
+  return {
+    displayName,
+    preferredUiLanguage,
+    aiHelpLanguage,
+    ageBand: appUser.role === "student" ? ageBand : null,
   };
 }
 
@@ -319,6 +431,13 @@ export async function bootstrapProfile(
     });
   }
 
+  await syncAuthUserMetadata({
+    authUserId: context.authUserId,
+    appUser: upsertedUser,
+    requestId,
+    route: "/api/auth/profile/bootstrap",
+  });
+
   logRuntimeInfo({
     message: "Bootstrapped app profile",
     requestId,
@@ -358,4 +477,79 @@ export async function bootstrapProfile(
     appUser: upsertedUser,
     created: !existingUser,
   };
+}
+
+export async function updateProfile(
+  context: AuthenticatedUserContext,
+  appUser: AppUserRecord,
+  input: UpdateProfileInput,
+  requestId: string,
+) {
+  const supabase = createSupabaseAdminClient();
+  const { data: updatedUser, error } = await supabase
+    .from("users")
+    .update({
+      display_name: input.displayName,
+      preferred_ui_language: input.preferredUiLanguage,
+      ai_help_language: input.aiHelpLanguage,
+      age_band: appUser.role === "student" ? input.ageBand : null,
+    })
+    .eq("id", context.authUserId)
+    .select(
+      "id, role, account_status, display_name, preferred_ui_language, ai_help_language, age_band, is_under_13, deletion_requested_at, created_at, updated_at",
+    )
+    .single<AppUserRecord>();
+
+  if (error) {
+    throw new AppError({
+      code: "service_unavailable",
+      message: "Unable to update the app profile.",
+      status: 503,
+      retryable: true,
+      cause: error,
+    });
+  }
+
+  await syncAuthUserMetadata({
+    authUserId: context.authUserId,
+    appUser: updatedUser,
+    requestId,
+    route: "/api/auth/profile",
+  });
+
+  logRuntimeInfo({
+    message: "Updated app profile",
+    requestId,
+    route: "/api/auth/profile",
+    method: "PATCH",
+    actorUserId: context.authUserId,
+    actorRole: appUser.role,
+    targetStudentUserId: appUser.role === "student" ? context.authUserId : null,
+    details: {
+      preferredUiLanguage: input.preferredUiLanguage,
+      aiHelpLanguage: input.aiHelpLanguage,
+      ageBand: input.ageBand,
+    },
+  });
+
+  try {
+    await recordAuditEvent({
+      actorUserId: context.authUserId,
+      actorRole: appUser.role,
+      action: "profile_update",
+      targetTable: "users",
+      targetId: context.authUserId,
+      studentUserId: appUser.role === "student" ? context.authUserId : null,
+      metadata: {
+        request_id: requestId,
+        route: "/api/auth/profile",
+        role: appUser.role,
+      },
+      requestId,
+    });
+  } catch {
+    // Audit failures are logged inside the audit service and should not block profile updates.
+  }
+
+  return updatedUser;
 }

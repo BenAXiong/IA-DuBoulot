@@ -9,10 +9,10 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 Legend: `🟩` complete | `🟨` in progress | `⬜` pending
 
-- Overall: `[########......................]` `36/128` complete (`28%`)
+- Overall: `[#########.....................]` `38/128` complete (`30%`)
 - A0: `[xxxxxxxxxxxxxxxx.....]` `16/21`
 - A1: `[xxxxxxxxxxxxxxxx]` `16/16`
-- A2: `[xxxx.............]` `4/17`
+- A2: `[xxxxxx...........]` `6/17`
 - A3: `[.................]` `0/17`
 - A4: `[...................]` `0/19`
 - A5: `[.............]` `0/13`
@@ -139,11 +139,12 @@ Outcome: the application shell supports real role-aware development instead of i
 
 - [x] A2.2.1 Connect Supabase auth to the app.
 - [ ] A2.2.2 Implement role-aware signup/invite flows.
-- [ ] A2.2.3 Persist user profile and role metadata.
-- [ ] A2.2.4 Implement protected routes and session refresh handling.
+- [x] A2.2.3 Persist user profile and role metadata.
+- [x] A2.2.4 Implement protected routes and session refresh handling.
 
 Status note: the SSR auth foundation is now wired into `/auth`, `/auth/confirm`, `/onboarding`, and a protected `/app` page.
-Status note: role-aware invites and full onboarding edge cases are still pending even though the bootstrap-backed happy path is connected.
+Status note: safe app-profile fields now sync into Supabase auth metadata on bootstrap and profile updates.
+Status note: role-prefilled signup intent exists, but real invite acceptance and approval flows are still pending.
 
 ### A2.3 Shared Layouts And Navigation
 

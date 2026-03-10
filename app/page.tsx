@@ -65,6 +65,24 @@ export default function Home() {
               >
                 Open auth flow
               </Link>
+              <Link
+                className="rounded-full border border-[color:var(--line)] bg-white/70 px-5 py-3 text-sm font-medium transition hover:-translate-y-0.5"
+                href="/auth?mode=sign_up&role=student"
+              >
+                Start as student
+              </Link>
+              <Link
+                className="rounded-full border border-[color:var(--line)] bg-white/70 px-5 py-3 text-sm font-medium transition hover:-translate-y-0.5"
+                href="/auth?mode=sign_up&role=parent&intent=parent_link"
+              >
+                Start as parent
+              </Link>
+              <Link
+                className="rounded-full border border-[color:var(--line)] bg-white/70 px-5 py-3 text-sm font-medium transition hover:-translate-y-0.5"
+                href="/auth?mode=sign_up&role=tutor&intent=tutor_link"
+              >
+                Start as tutor
+              </Link>
               <a
                 className="rounded-full bg-[color:var(--foreground)] px-5 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5"
                 href="https://github.com/BenAXiong/IA-DuBoulot"

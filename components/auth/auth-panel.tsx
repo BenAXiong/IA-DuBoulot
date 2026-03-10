@@ -5,10 +5,14 @@ import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type AuthMode = "sign_in" | "sign_up";
+type SignupRole = "student" | "parent" | "tutor";
 
 type AuthPanelProps = {
   initialError?: string | null;
   initialMessage?: string | null;
+  initialMode?: AuthMode;
+  initialRole?: SignupRole;
+  intentLabel?: string | null;
 };
 
 function getAuthErrorMessage(error: unknown) {
@@ -22,12 +26,16 @@ function getAuthErrorMessage(error: unknown) {
 export function AuthPanel({
   initialError = null,
   initialMessage = null,
+  initialMode = "sign_in",
+  initialRole = "student",
+  intentLabel = null,
 }: AuthPanelProps) {
   const router = useRouter();
   const supabase = createSupabaseBrowserClient();
-  const [mode, setMode] = useState<AuthMode>("sign_in");
+  const [mode, setMode] = useState<AuthMode>(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [signupRole, setSignupRole] = useState<SignupRole>(initialRole);
   const [errorMessage, setErrorMessage] = useState<string | null>(initialError);
   const [infoMessage, setInfoMessage] = useState<string | null>(initialMessage);
   const [isPending, startTransition] = useTransition();
@@ -62,11 +70,14 @@ export function AuthPanel({
     resetMessages();
 
     startTransition(async () => {
+      const confirmUrl = new URL("/auth/confirm", window.location.origin);
+      confirmUrl.searchParams.set("next", `/onboarding?role=${signupRole}`);
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/confirm`,
+          emailRedirectTo: confirmUrl.toString(),
         },
       });
 
@@ -76,7 +87,7 @@ export function AuthPanel({
       }
 
       if (data.session) {
-        router.push("/onboarding");
+        router.push(`/onboarding?role=${signupRole}`);
         router.refresh();
         return;
       }
@@ -145,6 +156,12 @@ export function AuthPanel({
           </button>
         </div>
 
+        {intentLabel ? (
+          <p className="mt-5 rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-3 text-sm text-[color:var(--ink-soft)]">
+            {intentLabel}
+          </p>
+        ) : null}
+
         {errorMessage ? (
           <p className="mt-5 rounded-2xl border border-[#d07c5b] bg-[#fff0ea] px-4 py-3 text-sm text-[#8d3b1f]">
             {errorMessage}
@@ -161,6 +178,49 @@ export function AuthPanel({
           className="mt-6 grid gap-4"
           onSubmit={mode === "sign_in" ? handleSignIn : handleSignUp}
         >
+          {mode === "sign_up" ? (
+            <fieldset className="grid gap-3">
+              <legend className="text-sm font-medium">Type de compte</legend>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {[
+                  {
+                    value: "student" as const,
+                    title: "Eleve",
+                    body: "Aide aux devoirs et espace de travail.",
+                  },
+                  {
+                    value: "parent" as const,
+                    title: "Parent",
+                    body: "Supervision et suivis des sessions.",
+                  },
+                  {
+                    value: "tutor" as const,
+                    title: "Tuteur",
+                    body: "Accompagnement pedagogique cible.",
+                  },
+                ].map((option) => (
+                  <button
+                    className={`rounded-[1.25rem] border p-4 text-left transition ${
+                      signupRole === option.value
+                        ? "border-[color:var(--accent)] bg-[#fff1e8]"
+                        : "border-[color:var(--line)] bg-white/70"
+                    }`}
+                    key={option.value}
+                    onClick={() => setSignupRole(option.value)}
+                    type="button"
+                  >
+                    <p className="font-[family-name:var(--font-heading)] text-base">
+                      {option.title}
+                    </p>
+                    <p className="mt-2 text-xs leading-5 text-[color:var(--ink-soft)]">
+                      {option.body}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+          ) : null}
+
           <label className="grid gap-2 text-sm">
             <span className="font-medium">Email</span>
             <input

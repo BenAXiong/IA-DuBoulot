@@ -248,6 +248,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Why: This connects the real Supabase session lifecycle to the existing bootstrap/backend contracts without waiting for the full role-aware dashboard work.
 - Follow-up: Extend this into parent/tutor invite flows and richer protected shells during `A2.2.2`, `A2.2.3`, and `A2.3`.
 
+### D-20260310-25 - public.users Stays Canonical While Safe Fields Mirror Into Auth Metadata
+
+- Date: 2026-03-10
+- Status: accepted
+- Related tasks: `A2.2.3`, `A2.2.4`
+- Context: The app already treats `public.users` as the canonical profile record, but user-facing auth flows and later invite/link logic still benefit from lightweight auth metadata carrying the current role and profile status.
+- Decision: Keep `public.users` as the source of truth, and mirror only safe profile fields into Supabase auth `user_metadata` during bootstrap and profile updates: role, display name, UI language, AI help language, age band, under-13 flag, account status, and onboarding completion state.
+- Why: This preserves a clean canonical data model while giving the auth layer enough context for redirects, operator inspection, and future flow hardening.
+- Follow-up: Reuse the same sync rule for invite acceptance and parent-approval flows instead of adding a second canonical profile source.
+
 ### D-20260310-11 - Personal AI Subscriptions Are Not Backend Fallback Providers
 
 - Date: 2026-03-10

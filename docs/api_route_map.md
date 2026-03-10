@@ -10,6 +10,7 @@ Current implemented routes:
 
 - `GET /api/auth/me`
 - `POST /api/auth/profile/bootstrap`
+- `PATCH /api/auth/profile`
 
 It exists to prevent accidental drift between:
 

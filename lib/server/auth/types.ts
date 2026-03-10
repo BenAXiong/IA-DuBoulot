@@ -56,3 +56,10 @@ export type BootstrapProfileInput = {
   ageBand: AgeBand | null;
   isUnder13: boolean;
 };
+
+export type UpdateProfileInput = {
+  displayName: string;
+  preferredUiLanguage: UiLanguageCode;
+  aiHelpLanguage: AiLanguageCode;
+  ageBand: AgeBand | null;
+};

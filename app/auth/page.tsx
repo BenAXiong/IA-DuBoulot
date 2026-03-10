@@ -3,6 +3,8 @@ import { redirectAuthenticatedUserFromAuthPage } from "@/lib/server/auth/page-gu
 
 type SearchParamsValue = string | string[] | undefined;
 type SearchParamsRecord = Record<string, SearchParamsValue>;
+type AuthMode = "sign_in" | "sign_up";
+type SignupRole = "student" | "parent" | "tutor";
 
 function readFirstValue(value: SearchParamsValue) {
   if (Array.isArray(value)) {
@@ -10,6 +12,34 @@ function readFirstValue(value: SearchParamsValue) {
   }
 
   return value ?? null;
+}
+
+function parseMode(value: string | null): AuthMode {
+  return value === "sign_up" ? "sign_up" : "sign_in";
+}
+
+function parseRole(value: string | null): SignupRole {
+  if (value === "parent" || value === "tutor") {
+    return value;
+  }
+
+  return "student";
+}
+
+function buildIntentLabel(role: SignupRole, intent: string | null) {
+  if (intent === "parent_link") {
+    return role === "parent"
+      ? "Flux parent preselectionne pour creer puis lier un compte supervise."
+      : "Flux parent-link detecte. Le role parent est recommande pour continuer.";
+  }
+
+  if (intent === "tutor_link") {
+    return role === "tutor"
+      ? "Flux tuteur preselectionne pour une future liaison eleve-tuteur."
+      : "Flux tuteur-link detecte. Le role tuteur est recommande pour continuer.";
+  }
+
+  return null;
 }
 
 export default async function AuthPage({
@@ -22,6 +52,12 @@ export default async function AuthPage({
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const initialError = readFirstValue(resolvedSearchParams.error);
   const initialMessage = readFirstValue(resolvedSearchParams.message);
+  const initialMode = parseMode(readFirstValue(resolvedSearchParams.mode));
+  const initialRole = parseRole(readFirstValue(resolvedSearchParams.role));
+  const intentLabel = buildIntentLabel(
+    initialRole,
+    readFirstValue(resolvedSearchParams.intent),
+  );
 
   return (
     <main className="px-5 py-6 sm:px-8 lg:px-12">
@@ -29,6 +65,9 @@ export default async function AuthPage({
         <AuthPanel
           initialError={initialError}
           initialMessage={initialMessage}
+          initialMode={initialMode}
+          initialRole={initialRole}
+          intentLabel={intentLabel}
         />
       </div>
     </main>

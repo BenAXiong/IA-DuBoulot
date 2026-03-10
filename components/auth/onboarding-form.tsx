@@ -13,6 +13,7 @@ type BootstrapErrorPayload = {
 
 type OnboardingFormProps = {
   email: string | null;
+  defaultRole?: "student" | "parent" | "tutor";
 };
 
 const uiLanguageOptions = [
@@ -48,9 +49,12 @@ function getFieldError(
   return fieldErrors[fieldName] ?? null;
 }
 
-export function OnboardingForm({ email }: OnboardingFormProps) {
+export function OnboardingForm({
+  email,
+  defaultRole = "student",
+}: OnboardingFormProps) {
   const router = useRouter();
-  const [role, setRole] = useState<"student" | "parent" | "tutor">("student");
+  const [role, setRole] = useState<"student" | "parent" | "tutor">(defaultRole);
   const [displayName, setDisplayName] = useState("");
   const [preferredUiLanguage, setPreferredUiLanguage] = useState("fr");
   const [aiHelpLanguage, setAiHelpLanguage] = useState("fr");
