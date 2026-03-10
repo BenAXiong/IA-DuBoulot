@@ -1,0 +1,700 @@
+# AI Devoirs — Codex Build Brief
+
+## 1. Project summary
+
+AI Devoirs is a web app for students doing homework with AI under adult supervision.
+
+This is **not** a generic homework-answer bot.
+The product is designed to feel like a **pedagogical homework coach** that:
+
+* helps students think step by step
+* asks for attempts before helping too much
+* comments on learning behavior and method
+* lets parents and tutors review what happened
+* supports multilingual families through translation
+
+The initial business target is:
+
+* independent tutors
+* tutoring centers
+* serious parents
+* international-school families
+
+The likely first users are children/teens doing homework on **iPad or laptop**, often by uploading photos/screenshots/PDF instructions.
+
+---
+
+## 2. Product positioning
+
+### Core positioning
+
+> A supervised AI homework coach with parent translation and tutor oversight.
+
+### What the product should feel like
+
+* simple
+* trustworthy
+* structured
+* useful on real homework
+* anti-shortcut / anti-copying by default
+
+### What it should **not** feel like
+
+* answer vending machine
+* chaotic student chat toy
+* LMS clone
+* school ERP
+* heavy enterprise platform
+
+---
+
+## 3. MVP goals
+
+The MVP should be strong enough that a serious parent can say:
+
+* “I can see what my child did.”
+* “This helps without just doing the homework for them.”
+* “The tutor can review it.”
+* “It works on the iPad.”
+* “I understand the summaries even if the child works in another language.”
+
+The MVP should be strong enough that a student can say:
+
+* “I can upload my homework quickly.”
+* “The AI helps me understand what to do.”
+* “It doesn’t feel like school software.”
+* “I can use it on my normal device.”
+
+---
+
+## 4. Scope boundaries
+
+## In scope for MVP
+
+* student account
+* parent account
+* tutor account
+* chat-based homework sessions
+* image/PDF upload
+* extracted text preview/edit
+* workspace side panel
+* subject tagging
+* session history
+* parent/tutor visibility into sessions
+* tutor private notes
+* automatic summaries
+* translation for parents
+* free trial + paid subscription hooks
+* responsive web app with strong iPad usability
+* installable PWA if convenient
+
+## Explicitly out of scope for MVP
+
+* native iOS app
+* native Android app
+* rich collaborative canvas / Notion-like editor
+* LMS integrations
+* textbook RAG pipeline
+* live tutor chat inside thread
+* class rosters
+* school admin features
+* advanced handwriting recognition pipeline
+* voice mode
+* social/community features
+
+---
+
+## 5. Primary user roles
+
+## Student
+
+Needs:
+
+* very fast start
+* upload homework and ask questions
+* receive hints, steps, and feedback
+* save and return to sessions
+
+Restrictions:
+
+* should not see tutor private notes
+* should not easily extract a full final answer on graded work
+
+## Parent
+
+Needs:
+
+* visibility
+* translated summaries
+* reassurance that the product teaches rather than cheats
+* simple billing
+
+## Tutor
+
+Needs:
+
+* review student sessions
+* understand where the student struggled
+* leave private notes
+* spot over-reliance or weak patterns
+
+## Admin
+
+Needs:
+
+* manage roles, access, flags, and plans
+
+---
+
+## 6. Core UX principles
+
+1. **Fast intake**
+
+   * a student should be able to start from a photo, screenshot, or pasted prompt in seconds.
+
+2. **Pedagogical friction, not generic friction**
+
+   * the product should slow down copying, not slow down real learning.
+
+3. **Adult trust by design**
+
+   * parent/tutor visibility is a first-class feature, not an afterthought.
+
+4. **Mobile-web first enough for iPad**
+
+   * the product does not need a native app, but it must feel good on iPad Safari.
+
+5. **Simple and lightweight**
+
+   * minimal interface, no clutter, no enterprise feeling.
+
+---
+
+## 7. Recommended initial tech stack
+
+## Frontend
+
+* Next.js
+* React
+* TypeScript
+* Tailwind CSS
+* shadcn/ui
+
+## Backend
+
+* Next.js route handlers / server actions for MVP
+
+## Database / Auth / Storage
+
+* Supabase
+
+  * Postgres
+  * Auth
+  * Storage
+  * Row Level Security
+
+## Analytics
+
+* PostHog
+
+## Email
+
+* Resend
+
+## Payments
+
+* start with a provider that is realistically usable in the founder’s geography and entity situation
+* keep billing provider abstracted behind a server-side service
+
+## AI provider
+
+* start with a model provider that supports:
+
+  * text + images
+  * cheap inference
+  * stable API
+
+Recommended default build strategy:
+
+* keep model provider swappable through a provider interface
+* do **not** hardwire the whole architecture to one vendor’s proprietary abstractions
+
+---
+
+## 8. AI system design
+
+## Core principle
+
+The AI should behave as a **coach**, not an answer bot.
+
+## Minimum AI capabilities needed
+
+1. read text prompts
+2. interpret uploaded homework images/PDFs
+3. extract visible assignment text
+4. reason through step-by-step help
+5. translate parent summaries
+6. generate session summaries and learning signals
+
+## AI modes
+
+### Mode 1 — Student coach mode
+
+Behavior:
+
+* ask what the student has already tried
+* prefer hints and next steps over final answers
+* encourage a first attempt
+* explain simply and age-appropriately
+* avoid directly completing obviously active graded assignments unless policy allows it
+
+### Mode 2 — Parent summary mode
+
+Behavior:
+
+* concise
+* reassuring
+* translated when requested
+* focused on what the child worked on, what they understood, and where they struggled
+
+### Mode 3 — Tutor insight mode
+
+Behavior:
+
+* summarize misconceptions
+* summarize effort pattern
+* highlight likely over-reliance if present
+* recommend what the tutor should address next
+
+---
+
+## 9. Memory design
+
+The product should support **explicit student memory**, not hidden magical memory.
+
+## What memory should store
+
+Only learning-relevant information, such as:
+
+* preferred language
+* current grade level
+* recurring subjects
+* common mistakes
+* preferred help style
+* weak steps in algebra / writing / grammar / etc.
+* recent topics practiced
+
+## What memory should avoid storing automatically
+
+* sensitive personal profiling
+* medical/psychological labeling
+* unnecessary family/private details
+* vague or speculative claims about the child
+
+## Memory architecture
+
+### Layer 1 — Conversation history
+
+Store each homework session and message sequence.
+
+### Layer 2 — Session summaries
+
+After each session, generate:
+
+* student-facing summary
+* parent-facing summary
+* tutor-facing summary
+* weakness tags
+* next-step recommendation
+
+### Layer 3 — Student memory profile
+
+Maintain a compact structured profile used in prompts:
+
+* strengths
+* weaknesses
+* preferences
+* recurring topics
+* learning notes
+
+Memory should be:
+
+* editable
+* deletable
+* limited to educational relevance
+* reviewed through product rules, not blindly generated forever
+
+---
+
+## 10. Main screens to build
+
+## Public screens
+
+1. Landing page
+2. Pricing page
+3. Login / signup
+
+## Student screens
+
+4. Student dashboard
+5. New homework intake
+6. Homework chat
+7. Session summary
+8. Student settings
+
+## Parent screens
+
+9. Parent dashboard
+10. Parent session detail
+
+## Tutor screens
+
+11. Tutor dashboard
+12. Tutor student detail
+
+## Shared/account screens
+
+13. Billing/settings
+14. Privacy/data controls
+
+---
+
+## 11. Student flow
+
+1. Student logs in.
+2. Student taps “New homework”.
+3. Student chooses subject.
+4. Student uploads photo/PDF or pastes assignment text.
+5. System extracts visible text and shows editable preview.
+6. Student starts session.
+7. AI helps using coaching behavior.
+8. Student uses workspace side panel to keep plan/draft/steps.
+9. Student marks session done.
+10. System generates summaries and updates student memory.
+11. Linked parent/tutor can review session.
+
+---
+
+## 12. Tutor sharing recommendation
+
+The core workflow should be:
+
+> tutor account + linked student + shared session history + tutor private notes
+
+This should be the primary implementation.
+
+### Secondary/fallback sharing
+
+* export session summary
+* email digest
+
+### Not recommended as core workflow
+
+* copy-paste into Google Docs
+* email as the main review system
+* in-app live chat with tutor during MVP
+
+---
+
+## 13. iPad requirement
+
+The MVP should explicitly support **iPad use**.
+
+That does **not** mean building a native iPad app.
+It means:
+
+* responsive layout for tablet screens
+* large tap targets
+* reliable file/image upload on Safari
+* decent keyboard behavior on iPad
+* drag/drop or photo picker support where possible
+* workspace and chat layout that feels natural in landscape mode
+* no desktop-only assumptions
+
+Treat iPad support as an MVP requirement because many students do homework there.
+
+---
+
+## 14. UX specifics
+
+## Student dashboard
+
+Must show:
+
+* “New homework” CTA
+* recent sessions
+* subject tags
+* quota/trial info
+* linked tutor/parent status
+
+## New homework intake
+
+Must allow:
+
+* assignment title
+* subject picker
+* upload image/PDF
+* paste text
+* editable extracted text
+* graded-homework toggle
+
+## Homework chat layout
+
+Main area:
+
+* chat messages
+* upload control
+* hint button
+* summarize button
+
+Side workspace:
+
+* assignment text
+* extracted text
+* plan/steps
+* draft answer
+
+## Parent dashboard
+
+Must show:
+
+* recent sessions
+* weekly summaries
+* translation toggle
+* billing status
+* alerts/flags if any
+
+## Tutor dashboard
+
+Must show:
+
+* linked students
+* recent sessions to review
+* weak-spot summaries
+* private note access
+
+---
+
+## 15. Database model (high-level)
+
+Core tables to create:
+
+* users
+* student_profiles
+* parent_student_links
+* tutor_student_links
+* conversations
+* messages
+* attachments
+* workspace_states
+* session_summaries
+* tutor_notes
+* subscriptions
+* usage_counters
+* moderation_events
+* audit_logs
+* student_memory_profiles
+* student_memory_items
+
+The product should be coded so these tables remain central and understandable.
+Avoid overengineering with too many meta-tables too early.
+
+---
+
+## 16. API/backend responsibilities
+
+Expected server responsibilities:
+
+* auth and role enforcement
+* file upload handling
+* AI request orchestration
+* moderation calls
+* session persistence
+* summary generation
+* memory updates
+* billing webhooks
+* access checks for parent/tutor viewing
+
+Recommended route groups:
+
+* `/api/auth/*`
+* `/api/conversations/*`
+* `/api/messages/*`
+* `/api/uploads/*`
+* `/api/summaries/*`
+* `/api/memory/*`
+* `/api/parent/*`
+* `/api/tutor/*`
+* `/api/billing/*`
+* `/api/admin/*`
+
+---
+
+## 17. Safety/product rules
+
+This app is for minors or school-age users, so safety is not optional.
+
+## Required product rules
+
+* role-based access control
+* moderation for user inputs and risky outputs
+* clear privacy messaging
+* parent/tutor linking rules
+* audit logging for sensitive access
+* conservative memory storage
+* clear data deletion path
+
+## Pedagogical rules
+
+* avoid direct full-answer dumping by default
+* ask for an attempt first when appropriate
+* nudge toward explanation and process
+* allow examples, hints, decomposition, and feedback
+* do not shame the student
+
+---
+
+## 18. Performance and cost constraints
+
+This product should be built under tight budget constraints.
+
+### Cost philosophy
+
+* free tiers first
+* hard API spend caps
+* low fixed costs
+* no unnecessary paid infra before validation
+
+### Engineering consequence
+
+* keep architecture simple
+* avoid premature microservices
+* avoid expensive long-running jobs unless necessary
+* cache/summarize intelligently
+* limit uploads and very long chats during trial
+
+---
+
+## 19. Non-goals for Codex
+
+Do **not** start by building:
+
+* a polished marketing site with many pages
+* mobile-native apps
+* advanced RAG over textbooks
+* elaborate real-time collaboration
+* school admin panels
+* dozens of subscription tiers
+* overdesigned design system
+
+The correct initial build is a lean working MVP.
+
+---
+
+## 20. Recommended implementation order
+
+1. app shell + auth + role model
+2. student dashboard + create session
+3. conversation persistence
+4. chat UI + workspace side panel
+5. upload image/PDF + extracted text preview
+6. AI integration for student coach mode
+7. parent/tutor linking and read-only review views
+8. summaries + translation
+9. tutor private notes
+10. quotas + subscription hooks
+11. memory profile updates
+12. safety polish + PWA installability
+
+---
+
+## 21. Expected quality bar
+
+Codex should optimize for:
+
+* clarity
+* maintainability
+* minimal but clean UI
+* realistic MVP velocity
+* good TypeScript hygiene
+* straightforward folder structure
+* components that are easy to modify later
+
+It should avoid:
+
+* over-abstraction
+* premature plugin systems
+* magic hidden logic
+* giant all-in-one files
+
+---
+
+## 22. Folder structure preference
+
+A reasonable starting structure:
+
+* `app/`
+* `components/`
+* `lib/`
+* `lib/ai/`
+* `lib/auth/`
+* `lib/db/`
+* `lib/billing/`
+* `lib/moderation/`
+* `lib/memory/`
+* `lib/uploads/`
+* `types/`
+* `supabase/`
+* `public/`
+
+Keep it simple and obvious.
+
+---
+
+## 23. Product tone
+
+The interface tone should be:
+
+* calm
+* competent
+* student-friendly
+* parent-trustworthy
+* not childish
+* not corporate
+
+Avoid:
+
+* gamification overload
+* cartoon school aesthetic
+* edgy AI branding
+
+---
+
+## 24. Immediate next build artifacts
+
+The next implementation documents to generate after this brief are:
+
+1. Supabase schema / SQL
+2. API route map
+3. system prompts for the 3 AI modes
+4. screen-by-screen wireframe copy
+5. 14-day MVP sprint plan
+
+Those documents will make the first repo much easier to start.
+
+---
+
+## 25. Final instruction to Codex
+
+Build the smallest serious version of this product.
+
+Prefer:
+
+* a working, coherent flow
+* strong role separation
+* clean data model
+* decent iPad web usability
+* simple but trustworthy AI-assisted homework coaching
+
+Do not chase feature breadth.
+Chase a narrow MVP that parents, tutors, and students can actually use.
