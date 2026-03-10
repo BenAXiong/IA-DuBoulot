@@ -218,6 +218,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Why: This keeps session validation tied to the user cookie while preserving a clean server-only path for writes that should not depend on client-side table mutations or relaxed RLS.
 - Follow-up: Reuse the same split for future sensitive routes and extend the auth slice into protected UI onboarding next.
 
+### D-20260310-22 - RLS Verification Uses Deterministic Hosted Fixtures
+
+- Date: 2026-03-10
+- Status: accepted
+- Related tasks: `A1.2.4`, `A1.4.1`, `A1.4.3`
+- Context: Reading RLS SQL is not enough. The project needs repeatable proof that real hosted Supabase policies produce the intended visibility for student, parent, tutor, and admin accounts.
+- Decision: Use deterministic fixture auth accounts, fixed domain-row identifiers, a local-only shared fixture password, and two operator scripts: one to reseed the hosted fixture dataset and one to verify the expected visibility and mutation boundaries through authenticated anon-key clients.
+- Why: This validates the deployed RLS behavior directly, keeps regression checks reproducible across future sessions, and avoids mixing test-only logic into the product runtime.
+- Follow-up: Rerun the fixture scripts after any schema, RLS, or sensitive server-authorization change, and keep `A1.4.2` open until real sample attachment files are added.
+
 ### D-20260310-11 - Personal AI Subscriptions Are Not Backend Fallback Providers
 
 - Date: 2026-03-10

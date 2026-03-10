@@ -14,6 +14,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Minors privacy baseline](docs/minors_privacy_baseline.md)
 - [Supabase schema V1](docs/supabase_schema_v1.md)
 - [Access rules V1](docs/access_rules_v1.md)
+- [RLS fixture verification](docs/rls_fixture_verification.md)
 - [API route map](docs/api_route_map.md)
 - [Service interfaces](docs/service_interfaces.md)
 - [Error and audit conventions](docs/error_audit_conventions.md)
@@ -39,7 +40,9 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - Initial RLS policy migration has been applied to the hosted Supabase project from `supabase/migrations/20260310_000002_access_rules_and_rls.sql`.
 - Backend contract docs now define the API route surface, service boundaries, error/audit rules, and storage rules.
 - Supabase SSR auth helpers, `proxy.ts`, and the first authenticated API routes are now implemented in code.
-- The next recommended execution step is Phase `A0.1` through `A1.3` in [the MVP to-do list](docs/mvp_todo.md).
+- Deterministic hosted fixture seed and verification scripts now exist for live RLS visibility checks across student, parent, tutor, and admin roles.
+- The first hosted fixture run is currently blocked because `SUPABASE_SERVICE_ROLE_KEY` in local env is an `anon` key instead of a Supabase admin key.
+- The next recommended execution step is `A1.4.2` sample attachment corpus work, then `A2.2` user-facing auth onboarding.
 
 ## Working Conventions
 

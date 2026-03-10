@@ -26,6 +26,7 @@ Keep environment configuration explicit so local development, Vercel, and provid
 | `RESEND_API_KEY` | server | Resend | transactional email | local `.env.local`, Vercel |
 | `LEMON_SQUEEZY_API_KEY` | server | Lemon Squeezy | billing API calls | local `.env.local`, Vercel |
 | `LEMON_SQUEEZY_WEBHOOK_SECRET` | server | Lemon Squeezy | webhook verification | local `.env.local`, Vercel |
+| `SUPABASE_FIXTURE_PASSWORD` | local-only | local operator secret | deterministic hosted RLS fixture seed/verify scripts | local `.env.local` only |
 
 ## Storage Constants
 
@@ -35,8 +36,9 @@ Keep environment configuration explicit so local development, Vercel, and provid
 
 ## Current Gaps
 
-- Supabase project exists at `https://dfiiujkhbuvltrlqrerd.supabase.co`, but its keys still need to be copied into local env files and Vercel
-- planned storage buckets still need to be created in Supabase when upload work starts
+- confirm `SUPABASE_SERVICE_ROLE_KEY` is a real Supabase admin key locally and in Vercel, not an `anon` key
+- confirm Vercel environment sync after Supabase integration changes
+- planned storage buckets are now created automatically by the fixture seed script, but production upload flows still need route-level enforcement
 - Gemini key still needs to be provisioned
 - PostHog and Resend values still need to be provisioned
 - Lemon Squeezy webhook secret arrives only after webhook setup

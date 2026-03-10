@@ -34,12 +34,13 @@ Read these in order before any substantial implementation work:
 11. [docs/service_interfaces.md](docs/service_interfaces.md)
 12. [docs/error_audit_conventions.md](docs/error_audit_conventions.md)
 13. [docs/storage_attachment_rules.md](docs/storage_attachment_rules.md)
-14. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
-15. [docs/mvp_todo.md](docs/mvp_todo.md)
-16. [docs/mvp_timeline.md](docs/mvp_timeline.md)
-17. [docs/decision_log.md](docs/decision_log.md)
-18. [docs/work_sessions.md](docs/work_sessions.md)
-19. The relevant code, SQL, prompt, or UI files for the task being worked on
+14. [docs/rls_fixture_verification.md](docs/rls_fixture_verification.md) when auth, schema, or RLS work is in scope
+15. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
+16. [docs/mvp_todo.md](docs/mvp_todo.md)
+17. [docs/mvp_timeline.md](docs/mvp_timeline.md)
+18. [docs/decision_log.md](docs/decision_log.md)
+19. [docs/work_sessions.md](docs/work_sessions.md)
+20. The relevant code, SQL, prompt, or UI files for the task being worked on
 
 If a file above is outdated, update it before or alongside the code change that depends on it.
 
