@@ -32,18 +32,22 @@ Read these in order before any substantial implementation work:
 9. [docs/access_rules_v1.md](docs/access_rules_v1.md)
 10. [docs/api_route_map.md](docs/api_route_map.md)
 11. [docs/app_shell_v1.md](docs/app_shell_v1.md) when layout, dashboard, or navigation work is in scope
-12. [docs/invitation_flows_v1.md](docs/invitation_flows_v1.md) when auth, parent, or tutor link work is in scope
-13. [docs/service_interfaces.md](docs/service_interfaces.md)
-14. [docs/error_audit_conventions.md](docs/error_audit_conventions.md)
-15. [docs/storage_attachment_rules.md](docs/storage_attachment_rules.md)
-16. [docs/rls_fixture_verification.md](docs/rls_fixture_verification.md) when auth, schema, or RLS work is in scope
-17. [docs/sample_attachment_corpus.md](docs/sample_attachment_corpus.md) when upload, extraction, or demo fixture work is in scope
-18. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
-19. [docs/mvp_todo.md](docs/mvp_todo.md)
-20. [docs/mvp_timeline.md](docs/mvp_timeline.md)
-21. [docs/decision_log.md](docs/decision_log.md)
-22. [docs/work_sessions.md](docs/work_sessions.md)
-23. The relevant code, SQL, prompt, or UI files for the task being worked on
+12. [docs/student_dashboard_v1.md](docs/student_dashboard_v1.md) when student-dashboard work is in scope
+13. [docs/student_intake_v1.md](docs/student_intake_v1.md) when intake, upload staging, or extracted-text review is in scope
+14. [docs/student_session_persistence_v1.md](docs/student_session_persistence_v1.md) when conversation persistence or return-to-session behavior is in scope
+15. [docs/student_workbench_v1.md](docs/student_workbench_v1.md) when chat, workspace, or student coaching surfaces are in scope
+16. [docs/invitation_flows_v1.md](docs/invitation_flows_v1.md) when auth, parent, or tutor link work is in scope
+17. [docs/service_interfaces.md](docs/service_interfaces.md)
+18. [docs/error_audit_conventions.md](docs/error_audit_conventions.md)
+19. [docs/storage_attachment_rules.md](docs/storage_attachment_rules.md)
+20. [docs/rls_fixture_verification.md](docs/rls_fixture_verification.md) when auth, schema, or RLS work is in scope
+21. [docs/sample_attachment_corpus.md](docs/sample_attachment_corpus.md) when upload, extraction, or demo fixture work is in scope
+22. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
+23. [docs/mvp_todo.md](docs/mvp_todo.md)
+24. [docs/mvp_timeline.md](docs/mvp_timeline.md)
+25. [docs/decision_log.md](docs/decision_log.md)
+26. [docs/work_sessions.md](docs/work_sessions.md)
+27. The relevant code, SQL, prompt, or UI files for the task being worked on
 
 If a file above is outdated, update it before or alongside the code change that depends on it.
 

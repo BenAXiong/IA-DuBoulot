@@ -18,6 +18,8 @@ Current implemented routes:
 - `GET /api/conversations`
 - `POST /api/conversations`
 - `GET /api/conversations/[conversationId]`
+- `POST /api/conversations/[conversationId]/messages`
+- `PATCH /api/conversations/[conversationId]/workspace`
 
 It exists to prevent accidental drift between:
 
@@ -69,8 +71,8 @@ These routes power the student core flow.
 | `/api/conversations` | `GET` | authenticated user | list visible conversations for the caller role | role-aware filtering required |
 | `/api/conversations` | `POST` | student | create a new conversation | creates initial conversation shell |
 | `/api/conversations/[conversationId]` | `GET` | visible role | load a conversation with messages, attachments, workspace, summaries | server-side auth check still required |
-| `/api/conversations/[conversationId]/messages` | `POST` | student | append a student message and trigger assistant response flow | assistant write stays server-side |
-| `/api/conversations/[conversationId]/workspace` | `PATCH` | student | save workspace state | supports draft restoration |
+| `/api/conversations/[conversationId]/messages` | `POST` | student | append a student message and trigger assistant response flow | current V1 reply path is deterministic server-side until `A4` |
+| `/api/conversations/[conversationId]/workspace` | `PATCH` | student | save workspace state | supports draft restoration and text-only upload references |
 | `/api/conversations/[conversationId]/complete` | `POST` | student | mark conversation complete | can trigger summary generation |
 
 ### Summaries And Memory

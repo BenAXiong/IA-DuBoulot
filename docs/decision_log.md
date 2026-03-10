@@ -328,6 +328,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Why: This makes the student flow durable and reopenable without violating the storage contract or pretending uploaded binaries already exist in Supabase storage.
 - Follow-up: Replace text-only attachment references with real `attachments` rows when the upload route family lands, and keep the session detail route as the canonical return surface.
 
+### D-20260311-33 - A3.4 Locks The Student Workbench Contract Before Real AI
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A3.4.1`, `A3.4.2`, `A3.4.3`, `A3.4.4`
+- Context: The student flow already created durable conversations, but `/app/conversations/[conversationId]` was still only a return surface. Waiting for the full AI provider layer and upload pipeline would have left the core session UX undefined and encouraged later god-route or god-component behavior.
+- Decision: Turn the conversation route into a real student workbench now, backed by thin mutation routes for message appends and workspace saves. Keep the assistant behavior server-owned through a deterministic draft-coach helper, and keep upload controls limited to validated text-only file references until the upload route family exists.
+- Why: This locks the chat/workspace interaction contract, keeps the route and service boundaries explicit, and lets later AI/upload work replace narrow internals instead of redesigning the session surface from scratch.
+- Follow-up: Replace the deterministic reply helper with the `A4` provider layer, convert workspace upload references into real `attachments` rows, and build the `A3.5` history/summary slice on top of the new workbench.
+
 ### D-20260310-11 - Personal AI Subscriptions Are Not Backend Fallback Providers
 
 - Date: 2026-03-10

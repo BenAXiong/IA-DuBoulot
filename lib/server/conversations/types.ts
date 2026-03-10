@@ -3,6 +3,11 @@ import "server-only";
 import type { IntakeAttachmentCategory } from "@/lib/intake/intake-config";
 import type { AppUserRecord, UiLanguageCode } from "@/lib/server/auth/types";
 
+export type ConversationActionIntent =
+  | "student_message"
+  | "hint"
+  | "summarize";
+
 export type DraftAttachmentReferenceInput = {
   name: string;
   category: IntakeAttachmentCategory;
@@ -53,6 +58,24 @@ export type ConversationMessageRecord = {
   content_text: string;
   content_language: UiLanguageCode | null;
   created_at: string;
+};
+
+export type AppendConversationMessageInput = {
+  contentText: string;
+  intent: ConversationActionIntent;
+};
+
+export type AppendConversationMessageResult = {
+  studentMessage: ConversationMessageRecord;
+  assistantMessage: ConversationMessageRecord;
+};
+
+export type UpdateWorkspaceInput = {
+  assignmentText: string;
+  editedExtractedText: string;
+  planText: string;
+  draftAnswerText: string;
+  studentNotes: string;
 };
 
 export type ConversationDetail = {

@@ -136,7 +136,9 @@ interface AccountService {
 interface ConversationService {
   listVisibleConversations(input: ListConversationsInput): Promise<ListConversationsResult>;
   createConversation(input: CreateConversationInput): Promise<CreateConversationResult>;
-  appendStudentMessage(input: AppendStudentMessageInput): Promise<AppendStudentMessageResult>;
+  appendConversationMessage(
+    input: AppendConversationMessageInput
+  ): Promise<AppendConversationMessageResult>;
   saveWorkspace(input: SaveWorkspaceInput): Promise<SaveWorkspaceResult>;
   completeConversation(input: CompleteConversationInput): Promise<CompleteConversationResult>;
 }
@@ -231,6 +233,6 @@ Inside each domain:
 
 ## Immediate Next Implementations
 
-- extend `ConversationService` from intake persistence into real chat turns and workspace saves
-- add upload storage routes/services so attachment references become real `attachments` rows
-- start the `A3.4` coaching surface on top of the now-persisted session route
+- replace the deterministic draft-coach reply helper with the swappable provider layer in `A4.1`
+- add upload storage routes/services so the workbench upload control becomes real `attachments` rows
+- build `A3.5` session history and summary behavior on top of the now-live student workbench

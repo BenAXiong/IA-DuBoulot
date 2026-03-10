@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { StudentConversationDetail } from "@/components/dashboard/student/student-conversation-detail";
+import { StudentConversationWorkbench } from "@/components/dashboard/student/student-conversation-workbench";
 import { requireAppPageContext } from "@/lib/server/auth/page-guards";
 import { loadConversationDetail } from "@/lib/server/conversations/conversation-service";
 
@@ -23,7 +23,7 @@ export default async function ConversationDetailPage({
   });
 
   return (
-    <StudentConversationDetail
+    <StudentConversationWorkbench
       detail={detail}
       languageCode={appUser.preferred_ui_language}
     />

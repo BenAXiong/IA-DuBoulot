@@ -8,11 +8,11 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 
-- Overall: `[############..................]` `53/128` complete (`41%`)
+- Overall: `[#############.................]` `57/128` complete (`45%`)
 - A0: `[xxxxxxxxxxxxxxxx.....]` `16/21`
 - A1: `[xxxxxxxxxxxxxxxx]` `16/16`
 - A2: `[xxxxxxxxxxx......]` `11/17`
-- A3: `[xxxxxxxxxx.......]` `10/17`
+- A3: `[xxxxxxxxxxxxxx...]` `14/17`
 - A4: `[...................]` `0/19`
 - A5: `[.............]` `0/13`
 - A6: `[.............]` `0/13`
@@ -202,10 +202,16 @@ Status note: attachment references are currently persisted as human-readable int
 
 ### A3.4 Homework Chat And Workspace
 
-- [ ] A3.4.1 Build the core chat interface.
-- [ ] A3.4.2 Build the side workspace for assignment text, plan, and draft answer.
-- [ ] A3.4.3 Add upload, hint, and summarize controls.
-- [ ] A3.4.4 Optimize the chat-workspace split for iPad landscape use.
+- [x] A3.4.1 Build the core chat interface.
+- [x] A3.4.2 Build the side workspace for assignment text, plan, and draft answer.
+- [x] A3.4.3 Add upload, hint, and summarize controls.
+- [x] A3.4.4 Optimize the chat-workspace split for iPad landscape use.
+
+Reference: [Student workbench V1](student_workbench_v1.md)
+Status note: `/app/conversations/[conversationId]` now hosts the real student workbench with a persisted transcript, server-owned message mutations, and a saveable side workspace.
+Status note: hint and summarize actions currently run through a deterministic server-side draft coach so the interaction contract is stable before the real provider layer lands in `A4`.
+Status note: the upload control currently appends validated file references into workspace notes; true `attachments` rows and binary storage still belong to the later upload route family.
+Status note: on 2026-03-11 the workbench was checked in a Playwright emulated tablet pass at `820x1180` and `1180x820` on `/app` and `/app/conversations/[conversationId]`, with no horizontal overflow detected.
 
 ### A3.5 Session History And Summary
 

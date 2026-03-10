@@ -21,6 +21,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Student dashboard V1](docs/student_dashboard_v1.md)
 - [Student intake V1](docs/student_intake_v1.md)
 - [Student session persistence V1](docs/student_session_persistence_v1.md)
+- [Student workbench V1](docs/student_workbench_v1.md)
 - [Invitation flows V1](docs/invitation_flows_v1.md)
 - [Service interfaces](docs/service_interfaces.md)
 - [Error and audit conventions](docs/error_audit_conventions.md)
@@ -60,7 +61,8 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - `/app/new` now exists as the canonical student intake entry route ahead of the real title/subject/upload flow.
 - `/app/new` now hosts the real intake surface for title, subject, staged files, pasted text, graded-homework state, and editable review text.
 - validating `/app/new` now persists a conversation draft and redirects into `/app/conversations/[conversationId]`.
-- the next recommended execution step is `A3.4`: turn the persisted draft route into the real chat/workspace coaching surface, while a later upload pass replaces text-only file references with real `attachments` rows. `A2.4` can still be added opportunistically around that work.
+- `/app/conversations/[conversationId]` now hosts the real student workbench with a persisted transcript, saveable workspace, hint/summarize actions, and text-only upload references.
+- the next recommended execution step is `A3.5`: turn the live workbench into the session-history/detail/summary slice, while `A4.1` to `A4.4` replace the deterministic reply helper and text-only reference handling with the real AI, upload, extraction, and moderation stack.
 
 ## Working Conventions
 

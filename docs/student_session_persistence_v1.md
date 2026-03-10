@@ -1,6 +1,6 @@
 # Student Session Persistence V1
 
-Related: [README](../README.md) | [MVP to-do list](mvp_todo.md) | [Student intake V1](student_intake_v1.md) | [API route map](api_route_map.md) | [Service interfaces](service_interfaces.md)
+Related: [README](../README.md) | [MVP to-do list](mvp_todo.md) | [Student intake V1](student_intake_v1.md) | [Student workbench V1](student_workbench_v1.md) | [API route map](api_route_map.md) | [Service interfaces](service_interfaces.md)
 
 ## Purpose
 
@@ -19,7 +19,7 @@ This document covers `A3.3.1` to `A3.3.3`:
 - Create/list route: `app/api/conversations/route.ts`
 - Detail route: `app/api/conversations/[conversationId]/route.ts`
 - Student detail page: `app/app/conversations/[conversationId]/page.tsx`
-- Detail UI: `components/dashboard/student/student-conversation-detail.tsx`
+- Current workbench UI: `components/dashboard/student/student-conversation-workbench.tsx`
 - Conversation service: `lib/server/conversations/conversation-service.ts`
 - Conversation types: `lib/server/conversations/types.ts`
 
@@ -69,6 +69,6 @@ This gives the history enough context to reopen the session without pretending t
 
 ## Next Extension Points
 
-- `A3.4`: replace the intake-only session with a real chat/workspace interaction loop
+- [Student workbench V1](student_workbench_v1.md): extend the persisted session into a real chat/workspace interaction loop
 - upload routes: replace text-only attachment references with real `attachments` rows and storage objects
 - `A4.3`: bind the workspace review text to a real extraction pipeline instead of a placeholder/manual seed

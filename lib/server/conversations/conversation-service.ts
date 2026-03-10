@@ -9,7 +9,14 @@ import {
   requireAppUserContext,
   requireAppUserRole,
 } from "@/lib/server/auth/authorization";
+import {
+  buildDraftAssistantReply,
+  buildInitialWorkspaceFromDraft,
+  buildStudentIntentMessage,
+} from "@/lib/server/conversations/draft-coach";
 import type {
+  AppendConversationMessageInput,
+  AppendConversationMessageResult,
   ConversationDetail,
   ConversationMessageRecord,
   ConversationRecord,
@@ -18,6 +25,7 @@ import type {
   CreateConversationDraftResult,
   DraftAttachmentReferenceInput,
   ListConversationSummary,
+  UpdateWorkspaceInput,
   WorkspaceStateRecord,
 } from "@/lib/server/conversations/types";
 
@@ -41,6 +49,18 @@ function toServiceError(message: string, cause: unknown) {
 function normalizeText(value: string) {
   const normalized = value.trim();
   return normalized.length > 0 ? normalized : null;
+}
+
+function requireBodyObject(body: unknown) {
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    throw new AppError({
+      code: "bad_request",
+      message: "Expected a JSON object body.",
+      status: 400,
+    });
+  }
+
+  return body as Record<string, unknown>;
 }
 
 function validateAttachmentReferences(references: DraftAttachmentReferenceInput[]) {
@@ -144,6 +164,119 @@ export async function parseCreateConversationDraftInput(
   };
 }
 
+export async function parseAppendConversationMessageInput(
+  request: Request,
+): Promise<AppendConversationMessageInput> {
+  let body: unknown;
+
+  try {
+    body = await request.json();
+  } catch (error) {
+    throw new AppError({
+      code: "bad_request",
+      message: "Invalid JSON body.",
+      status: 400,
+      cause: error,
+    });
+  }
+
+  const payload = requireBodyObject(body);
+  const intent =
+    payload.intent === "hint" || payload.intent === "summarize"
+      ? payload.intent
+      : "student_message";
+  const contentText =
+    typeof payload.contentText === "string" ? payload.contentText : "";
+
+  if (intent === "student_message" && contentText.trim().length === 0) {
+    throw new AppError({
+      code: "validation_error",
+      message: "One or more fields are invalid.",
+      status: 400,
+      fieldErrors: {
+        contentText: "Message text is required.",
+      },
+    });
+  }
+
+  if (contentText.trim().length > 4000) {
+    throw new AppError({
+      code: "validation_error",
+      message: "One or more fields are invalid.",
+      status: 400,
+      fieldErrors: {
+        contentText: "Message text must be 4000 characters or fewer.",
+      },
+    });
+  }
+
+  return {
+    contentText,
+    intent,
+  };
+}
+
+export async function parseUpdateWorkspaceInput(
+  request: Request,
+): Promise<UpdateWorkspaceInput> {
+  let body: unknown;
+
+  try {
+    body = await request.json();
+  } catch (error) {
+    throw new AppError({
+      code: "bad_request",
+      message: "Invalid JSON body.",
+      status: 400,
+      cause: error,
+    });
+  }
+
+  const payload = requireBodyObject(body);
+
+  const assignmentText =
+    typeof payload.assignmentText === "string" ? payload.assignmentText : "";
+  const editedExtractedText =
+    typeof payload.editedExtractedText === "string"
+      ? payload.editedExtractedText
+      : "";
+  const planText = typeof payload.planText === "string" ? payload.planText : "";
+  const draftAnswerText =
+    typeof payload.draftAnswerText === "string" ? payload.draftAnswerText : "";
+  const studentNotes =
+    typeof payload.studentNotes === "string" ? payload.studentNotes : "";
+
+  if (assignmentText.length > 12000 || editedExtractedText.length > 12000) {
+    throw new AppError({
+      code: "validation_error",
+      message: "One or more fields are invalid.",
+      status: 400,
+      fieldErrors: {
+        assignmentText: "Assignment and extracted text fields must stay under 12000 characters.",
+      },
+    });
+  }
+
+  if (planText.length > 8000 || draftAnswerText.length > 8000 || studentNotes.length > 8000) {
+    throw new AppError({
+      code: "validation_error",
+      message: "One or more fields are invalid.",
+      status: 400,
+      fieldErrors: {
+        planText: "Workspace fields must stay under 8000 characters.",
+      },
+    });
+  }
+
+  return {
+    assignmentText,
+    editedExtractedText,
+    planText,
+    draftAnswerText,
+    studentNotes,
+  };
+}
+
 function buildAttachmentReferenceLines(references: DraftAttachmentReferenceInput[]) {
   if (references.length === 0) {
     return null;
@@ -211,8 +344,9 @@ export async function createConversationDraft(input: {
 
   const supabase = await createSupabaseServerClient();
   const now = new Date().toISOString();
-  const assignmentText = normalizeText(input.payload.pastedText);
-  const editedExtractedText = normalizeText(input.payload.editedExtractedText);
+  const initialWorkspace = buildInitialWorkspaceFromDraft(input.payload);
+  const assignmentText = normalizeText(initialWorkspace.assignmentText);
+  const editedExtractedText = normalizeText(initialWorkspace.editedExtractedText);
 
   const { data: conversation, error: conversationError } = await supabase
     .from("conversations")
@@ -309,6 +443,47 @@ export async function createConversationDraft(input: {
   };
 }
 
+async function requireWritableStudentConversation(input: {
+  context: AuthenticatedUserContext;
+  conversationId: string;
+}) {
+  const appUser = requireAppUserContext(input.context);
+  requireAppUserRole(appUser, ["student"]);
+
+  const supabase = await createSupabaseServerClient();
+  const { data: conversation, error } = await supabase
+    .from("conversations")
+    .select(CONVERSATION_SELECT)
+    .eq("id", input.conversationId)
+    .maybeSingle<ConversationRecord>();
+
+  if (error) {
+    throw toServiceError("Unable to load the writable conversation.", error);
+  }
+
+  if (!conversation) {
+    throw new AppError({
+      code: "not_found",
+      message: "Conversation not found.",
+      status: 404,
+    });
+  }
+
+  if (conversation.student_user_id !== appUser.id) {
+    throw new AppError({
+      code: "forbidden",
+      message: "You do not have access to this conversation.",
+      status: 403,
+    });
+  }
+
+  return {
+    appUser,
+    conversation,
+    supabase,
+  };
+}
+
 export async function listVisibleConversations(input: {
   context: AuthenticatedUserContext;
 }): Promise<ListConversationSummary[]> {
@@ -385,4 +560,180 @@ export async function loadConversationDetail(input: {
     workspace: workspaceResult.data ?? null,
     messages: (messagesResult.data ?? []) as ConversationMessageRecord[],
   };
+}
+
+export async function appendConversationTurn(input: {
+  context: AuthenticatedUserContext;
+  conversationId: string;
+  payload: AppendConversationMessageInput;
+  requestId: string;
+  route: string;
+}): Promise<AppendConversationMessageResult> {
+  const { appUser, conversation, supabase } =
+    await requireWritableStudentConversation({
+      context: input.context,
+      conversationId: input.conversationId,
+    });
+
+  const { data: workspace, error: workspaceError } = await supabase
+    .from("workspace_states")
+    .select(WORKSPACE_SELECT)
+    .eq("conversation_id", input.conversationId)
+    .maybeSingle<WorkspaceStateRecord>();
+
+  if (workspaceError) {
+    throw toServiceError("Unable to load the workspace before appending a message.", workspaceError);
+  }
+
+  const studentMessageText = buildStudentIntentMessage({
+    intent: input.payload.intent,
+    contentText: input.payload.contentText,
+  });
+  const assistantMessageText = buildDraftAssistantReply({
+    conversation,
+    workspace: workspace ?? null,
+    intent: input.payload.intent,
+    studentMessageText,
+  });
+  const studentCreatedAt = new Date();
+  const assistantCreatedAt = new Date(studentCreatedAt.getTime() + 1);
+
+  const { data: insertedMessages, error: insertError } = await supabase
+    .from("messages")
+    .insert([
+      {
+        conversation_id: input.conversationId,
+        author_user_id: appUser.id,
+        role: "student",
+        content_text: studentMessageText,
+        content_language: appUser.preferred_ui_language,
+        created_at: studentCreatedAt.toISOString(),
+      },
+      {
+        conversation_id: input.conversationId,
+        author_user_id: null,
+        role: "assistant",
+        content_text: assistantMessageText,
+        content_language: appUser.preferred_ui_language,
+        created_at: assistantCreatedAt.toISOString(),
+      },
+    ])
+    .select(MESSAGE_SELECT);
+
+  if (insertError) {
+    throw toServiceError("Unable to append the conversation turn.", insertError);
+  }
+
+  const studentMessage = (insertedMessages ?? []).find(
+    (message) => message.role === "student",
+  ) as ConversationMessageRecord | undefined;
+  const assistantMessage = (insertedMessages ?? []).find(
+    (message) => message.role === "assistant",
+  ) as ConversationMessageRecord | undefined;
+
+  if (!studentMessage || !assistantMessage) {
+    throw new AppError({
+      code: "internal_error",
+      message: "Conversation messages were created in an unexpected shape.",
+      status: 500,
+    });
+  }
+
+  const { error: conversationUpdateError } = await supabase
+    .from("conversations")
+    .update({
+      last_message_at: assistantCreatedAt.toISOString(),
+    })
+    .eq("id", input.conversationId);
+
+  if (conversationUpdateError) {
+    throw toServiceError(
+      "Unable to update the conversation activity timestamp.",
+      conversationUpdateError,
+    );
+  }
+
+  logRuntimeInfo({
+    message: "Appended conversation turn",
+    requestId: input.requestId,
+    route: input.route,
+    method: "POST",
+    actorUserId: appUser.id,
+    actorRole: appUser.role,
+    targetStudentUserId: appUser.id,
+    details: {
+      conversationId: input.conversationId,
+      intent: input.payload.intent,
+    },
+  });
+
+  return {
+    studentMessage,
+    assistantMessage,
+  };
+}
+
+export async function updateWorkspaceState(input: {
+  context: AuthenticatedUserContext;
+  conversationId: string;
+  payload: UpdateWorkspaceInput;
+  requestId: string;
+  route: string;
+}): Promise<WorkspaceStateRecord> {
+  const { appUser, conversation, supabase } =
+    await requireWritableStudentConversation({
+      context: input.context,
+      conversationId: input.conversationId,
+    });
+
+  const assignmentText = normalizeText(input.payload.assignmentText);
+  const editedExtractedText = normalizeText(input.payload.editedExtractedText);
+  const planText = normalizeText(input.payload.planText);
+  const draftAnswerText = normalizeText(input.payload.draftAnswerText);
+  const studentNotes = normalizeText(input.payload.studentNotes);
+
+  const { data: workspace, error: workspaceError } = await supabase
+    .from("workspace_states")
+    .update({
+      assignment_text: assignmentText,
+      edited_extracted_text: editedExtractedText,
+      plan_text: planText,
+      draft_answer_text: draftAnswerText,
+      student_notes: studentNotes,
+      last_saved_by_user_id: appUser.id,
+    })
+    .eq("conversation_id", input.conversationId)
+    .select(WORKSPACE_SELECT)
+    .single<WorkspaceStateRecord>();
+
+  if (workspaceError) {
+    throw toServiceError("Unable to save the workspace draft.", workspaceError);
+  }
+
+  const { error: conversationError } = await supabase
+    .from("conversations")
+    .update({
+      assignment_text: assignmentText,
+      edited_extracted_text: editedExtractedText,
+    })
+    .eq("id", conversation.id);
+
+  if (conversationError) {
+    throw toServiceError("Unable to sync conversation text fields.", conversationError);
+  }
+
+  logRuntimeInfo({
+    message: "Saved workspace draft",
+    requestId: input.requestId,
+    route: input.route,
+    method: "PATCH",
+    actorUserId: appUser.id,
+    actorRole: appUser.role,
+    targetStudentUserId: appUser.id,
+    details: {
+      conversationId: input.conversationId,
+    },
+  });
+
+  return workspace;
 }
