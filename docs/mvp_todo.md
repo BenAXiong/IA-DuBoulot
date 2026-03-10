@@ -8,9 +8,9 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 
-- Overall: `[#######.......................]` `32/128` complete (`25%`)
+- Overall: `[########......................]` `34/128` complete (`27%`)
 - A0: `[xxxxxxxxxxxxxxxx.....]` `16/21`
-- A1: `[xxxxxxxxxxxxx...]` `13/16`
+- A1: `[xxxxxxxxxxxxxxx.]` `15/16`
 - A2: `[xxx..............]` `3/17`
 - A3: `[.................]` `0/17`
 - A4: `[...................]` `0/19`
@@ -94,12 +94,12 @@ Status note: the initial schema SQL has been applied successfully in the hosted 
 - [x] A1.2.1 Write table-by-table access rules before coding policies.
 - [x] A1.2.2 Implement RLS policies for each role relationship.
 - [x] A1.2.3 Add server-side authorization checks for all sensitive routes.
-- [ ] A1.2.4 Verify student, parent, tutor, and admin visibility with seeded test accounts.
+- [x] A1.2.4 Verify student, parent, tutor, and admin visibility with seeded test accounts.
 
 Reference: [Access rules V1](access_rules_v1.md) | [RLS migration draft](../supabase/migrations/20260310_000002_access_rules_and_rls.sql) | [RLS fixture verification](rls_fixture_verification.md)
 Status note: the RLS migration SQL has been applied successfully in the hosted Supabase project.
 Status note: shared server authorization helpers now back the first authenticated routes in `app/api/auth/...`.
-Status note: deterministic hosted fixture scripts are in place, but the first live verification run is blocked until `SUPABASE_SERVICE_ROLE_KEY` is replaced with the real Supabase admin key.
+Status note: deterministic hosted fixtures now verify the current hosted Supabase RLS behavior with `17` passing checks across student, parent, tutor, and admin roles.
 
 ### A1.3 Backend Contracts
 
@@ -112,13 +112,13 @@ Reference: [API route map](api_route_map.md) | [Service interfaces](service_inte
 
 ### A1.4 Seed Data And Smoke Fixtures
 
-- [ ] A1.4.1 Create one seeded student-parent-tutor-admin fixture set.
+- [x] A1.4.1 Create one seeded student-parent-tutor-admin fixture set.
 - [ ] A1.4.2 Create realistic sample homework attachments and extracted-text examples.
 - [x] A1.4.3 Document test-account credentials and safe demo data rules.
 
 Reference: [RLS fixture verification](rls_fixture_verification.md)
-Status note: fixture credentials stay local-only through `SUPABASE_FIXTURE_PASSWORD` and the planned seeded content remains fictional demo data.
-Status note: the first hosted reseed is blocked until `SUPABASE_SERVICE_ROLE_KEY` is corrected.
+Status note: fixture credentials stay local-only through `SUPABASE_FIXTURE_PASSWORD` and the seeded content remains fictional demo data.
+Status note: the deterministic fixture set now seeds successfully into the hosted Supabase project.
 
 ## Phase A2 - App Foundation
 

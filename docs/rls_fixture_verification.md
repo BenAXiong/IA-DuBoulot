@@ -88,9 +88,14 @@ The verification script currently checks that:
 - if a fixture account leaks beyond the development team, rotate the local password and reseed
 - if the scripts fail with `not_admin`, replace `SUPABASE_SERVICE_ROLE_KEY` with the correct Supabase admin key before retrying
 
+## Latest Result
+
+- 2026-03-10 hosted reseed: success
+- 2026-03-10 hosted verification: `17` checks passed, `0` failed
+
 ## Scope Notes
 
-- `A1.4.1` will be complete after the first successful hosted reseed
+- `A1.4.1` is satisfied by the deterministic hosted fixture set
 - `A1.4.3` is satisfied by this documented credential and demo-data workflow
-- `A1.2.4` will be complete after the first successful hosted verification run
+- `A1.2.4` is satisfied by the successful hosted verification run
 - `A1.4.2` remains open because the fixture currently seeds attachment metadata, not a committed sample file corpus

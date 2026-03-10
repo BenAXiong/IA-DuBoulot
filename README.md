@@ -41,7 +41,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - Backend contract docs now define the API route surface, service boundaries, error/audit rules, and storage rules.
 - Supabase SSR auth helpers, `proxy.ts`, and the first authenticated API routes are now implemented in code.
 - Deterministic hosted fixture seed and verification scripts now exist for live RLS visibility checks across student, parent, tutor, and admin roles.
-- The first hosted fixture run is currently blocked because `SUPABASE_SERVICE_ROLE_KEY` in local env is an `anon` key instead of a Supabase admin key.
+- The first hosted fixture reseed and live RLS verification now pass against the hosted Supabase project with `17` checks and `0` failures.
 - The next recommended execution step is `A1.4.2` sample attachment corpus work, then `A2.2` user-facing auth onboarding.
 
 ## Working Conventions

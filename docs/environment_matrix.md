@@ -36,7 +36,6 @@ Keep environment configuration explicit so local development, Vercel, and provid
 
 ## Current Gaps
 
-- confirm `SUPABASE_SERVICE_ROLE_KEY` is a real Supabase admin key locally and in Vercel, not an `anon` key
 - confirm Vercel environment sync after Supabase integration changes
 - planned storage buckets are now created automatically by the fixture seed script, but production upload flows still need route-level enforcement
 - Gemini key still needs to be provisioned
