@@ -1,0 +1,56 @@
+# Supabase Project Setup Notes
+
+Related: [README](../README.md) | [Environment matrix](environment_matrix.md) | [Minors privacy baseline](minors_privacy_baseline.md) | [Supabase schema V1](supabase_schema_v1.md)
+
+## Recommended Project Settings
+
+These are the settings worth paying attention to for the first Supabase project.
+
+### 1. Region
+
+- pick the region closest to the expected first real users
+- if the initial testers are mostly in Taiwan or East Asia, choose the nearest supported region there
+- if the first serious families are in Europe, choose the nearest European region instead
+
+Changing region later is possible, but it is avoidable migration work.
+
+### 2. Auth URL Configuration
+
+- set `SITE_URL` to the production Vercel URL once the domain is stable
+- add local development redirect URLs for `http://localhost:3000/*`
+- add Vercel preview redirect URLs if auth flows need preview deployments
+
+This matters because Supabase auth emails and OTP flows redirect to the configured site and redirect URLs.
+
+### 3. Email Confirmation
+
+- keep confirm email enabled for MVP
+- this matches the parent-linked and under-13 cautious posture already documented in the repo
+
+### 4. Phone Auth
+
+- keep phone auth off for MVP
+- email-based flows are simpler and fit the current product plan
+
+### 5. Storage
+
+- create private buckets, not public ones, for homework files
+- set bucket MIME restrictions and file-size limits when the upload slice is built
+
+### 6. Database Security
+
+- every app table in `public` created via raw SQL must have RLS enabled later
+- do not assume raw SQL tables are protected just because dashboard-created tables often enable RLS automatically
+
+### 7. Next.js Auth Integration
+
+- when auth wiring starts, use the Supabase SSR path for Next.js instead of old auth helpers
+- that is the current Supabase direction for server-side auth with cookies
+
+## Official References
+
+- RLS: https://supabase.com/docs/guides/database/postgres/row-level-security
+- Next.js auth quickstart: https://supabase.com/docs/guides/auth/quickstarts/nextjs
+- SSR auth: https://supabase.com/docs/guides/auth/server-side/oauth-with-pkce-flow-for-ssr
+- Redirect and site URL behavior: https://supabase.com/docs/client/auth-signup
+- Storage bucket restrictions: https://supabase.com/docs/guides/storage/buckets/creating-buckets

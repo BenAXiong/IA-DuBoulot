@@ -29,7 +29,7 @@ Keep environment configuration explicit so local development, Vercel, and provid
 
 ## Current Gaps
 
-- Supabase project values still need to be created
+- Supabase project exists, but its URL and keys still need to be copied into local env files and Vercel
 - Gemini key still needs to be provisioned
 - PostHog and Resend values still need to be provisioned
 - Lemon Squeezy webhook secret arrives only after webhook setup

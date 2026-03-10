@@ -11,7 +11,7 @@ Outcome: the repo is real, the operating rules are in place, and future implemen
 ### A0.1 Repository, Naming, And Deployment Bootstrap
 
 - [x] A0.1.1 Initialize local git and connect a GitHub remote.
-- [ ] A0.1.2 Create the GitHub repository and protect `main`.
+- [x] A0.1.2 Create the GitHub repository and protect `main`.
 - [x] A0.1.3 Decide the canonical project/product naming across repo, product, and deployment.
 - [x] A0.1.4 Create preview and production deployment targets.
 - [x] A0.1.5 Write branch naming and PR review conventions once GitHub exists.
@@ -20,7 +20,7 @@ Current direction: GitHub repo exists, Vercel is the chosen deployment platform,
 
 ### A0.2 Service Accounts And Environment Matrix
 
-- [ ] A0.2.1 Create the Supabase project.
+- [x] A0.2.1 Create the Supabase project.
 - [ ] A0.2.2 Create the PostHog project.
 - [ ] A0.2.3 Create the Resend account and sender setup.
 - [ ] A0.2.4 Choose the primary AI provider and a fallback provider.
@@ -55,11 +55,13 @@ Outcome: the data model, access rules, and backend boundaries are explicit befor
 
 ### A1.1 Core Schema
 
-- [ ] A1.1.1 Draft the first Supabase SQL schema for core tables.
-- [ ] A1.1.2 Add foreign keys, indexes, enums, timestamps, and deletion strategy.
-- [ ] A1.1.3 Model attachments, workspace states, summaries, tutor notes, and usage counters.
-- [ ] A1.1.4 Model audit logs, moderation events, and memory tables.
-- [ ] A1.1.5 Review the schema against the role matrix and MVP scope boundaries.
+- [x] A1.1.1 Draft the first Supabase SQL schema for core tables.
+- [x] A1.1.2 Add foreign keys, indexes, enums, timestamps, and deletion strategy.
+- [x] A1.1.3 Model attachments, workspace states, summaries, tutor notes, and usage counters.
+- [x] A1.1.4 Model audit logs, moderation events, and memory tables.
+- [x] A1.1.5 Review the schema against the role matrix and MVP scope boundaries.
+
+Reference: [Supabase schema V1](supabase_schema_v1.md) and [initial schema SQL](../supabase/migrations/20260310_000001_initial_schema.sql)
 
 ### A1.2 Access Control And RLS
 

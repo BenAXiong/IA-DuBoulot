@@ -10,7 +10,9 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Branch and PR conventions](docs/branch_pr_conventions.md)
 - [Role and access matrix](docs/role_access_matrix.md)
 - [Environment matrix](docs/environment_matrix.md)
+- [Supabase project setup notes](docs/supabase_project_setup.md)
 - [Minors privacy baseline](docs/minors_privacy_baseline.md)
+- [Supabase schema V1](docs/supabase_schema_v1.md)
 - [MVP to-do list](docs/mvp_todo.md)
 - [MVP timeline](docs/mvp_timeline.md)
 - [Decision log](docs/decision_log.md)
@@ -28,6 +30,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - Billing direction is `Lemon Squeezy`.
 - Primary starter AI direction is `Google Gemini`, with the provider layer kept swappable.
 - Next.js app scaffold is now present at repo root.
+- Initial Supabase schema draft exists in `supabase/migrations/20260310_000001_initial_schema.sql`.
 - The next recommended execution step is Phase `A0.1` through `A1.3` in [the MVP to-do list](docs/mvp_todo.md).
 
 ## Working Conventions

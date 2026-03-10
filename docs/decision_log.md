@@ -148,6 +148,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Why: This keeps the access model explainable and implementable in RLS and server authorization.
 - Follow-up: Implement the SQL and RLS policies directly against the access matrix.
 
+### D-20260310-15 - App Data References public.users, Not auth.users Directly
+
+- Date: 2026-03-10
+- Status: accepted
+- Related tasks: `A1.1.1`, `A1.1.2`, `A1.1.5`
+- Context: Supabase provides `auth.users`, but the product needs explicit roles, under-13 state, and lifecycle fields that do not belong in auth metadata alone.
+- Decision: Keep `auth.users` as the identity source of truth, create `public.users` as the app user table, and have the rest of the domain model reference `public.users`.
+- Why: This keeps product authorization, role logic, and lifecycle state explicit and queryable without coupling the whole app to auth internals.
+- Follow-up: Define the onboarding flow that creates and maintains `public.users` rows during `A2.2`.
+
 ### D-20260310-11 - Personal AI Subscriptions Are Not Backend Fallback Providers
 
 - Date: 2026-03-10
