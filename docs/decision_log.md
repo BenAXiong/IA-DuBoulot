@@ -268,6 +268,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Why: This keeps link state explicit, auditable, and durable across future sessions while avoiding insecure shortcuts. It also separates access-control correctness from unfinished provider-email work.
 - Follow-up: Apply `supabase/migrations/20260311_000003_account_link_invitations.sql` to the hosted project, then later add provider-backed invite delivery and cleanup jobs for expired rows.
 
+### D-20260311-27 - Public And Protected Shells Are Split Before Student Workflow Breadth
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A2.3.1`, `A2.3.2`, `A2.3.3`
+- Context: The repo had real auth and invite flows, but the UI still leaned on isolated pages and one temporary `/app` screen. That structure would quickly collapse into duplicated layout code and a god dashboard component once the student workflow started.
+- Decision: Keep one shared public shell for landing, pricing, auth, onboarding, and invite pages, and one shared authenticated shell for `/app`. Split role-specific dashboard content into separate modules per role instead of growing a single mixed `/app/page.tsx`.
+- Why: This creates stable chrome boundaries now, keeps future route work easier to reason about, and reduces the chance of role-specific behavior getting buried inside a generic layout file.
+- Follow-up: Manually validate the shell on iPad portrait and landscape widths, then extend the student dashboard into the real homework intake flow in phase A3.
+
 ### D-20260310-11 - Personal AI Subscriptions Are Not Backend Fallback Providers
 
 - Date: 2026-03-10

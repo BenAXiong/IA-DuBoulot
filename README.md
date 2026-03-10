@@ -17,6 +17,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [RLS fixture verification](docs/rls_fixture_verification.md)
 - [Sample attachment corpus](docs/sample_attachment_corpus.md)
 - [API route map](docs/api_route_map.md)
+- [App shell V1](docs/app_shell_v1.md)
 - [Invitation flows V1](docs/invitation_flows_v1.md)
 - [Service interfaces](docs/service_interfaces.md)
 - [Error and audit conventions](docs/error_audit_conventions.md)
@@ -40,7 +41,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - Next.js app scaffold is now present at repo root.
 - Initial Supabase schema migration has been applied to the hosted Supabase project from `supabase/migrations/20260310_000001_initial_schema.sql`.
 - Initial RLS policy migration has been applied to the hosted Supabase project from `supabase/migrations/20260310_000002_access_rules_and_rls.sql`.
-- The next schema migration to apply in Supabase is `supabase/migrations/20260311_000003_account_link_invitations.sql`.
+- Account-link invitation migration has been applied to the hosted Supabase project from `supabase/migrations/20260311_000003_account_link_invitations.sql`.
 - Backend contract docs now define the API route surface, service boundaries, error/audit rules, and storage rules.
 - Supabase SSR auth helpers, `proxy.ts`, and the first authenticated API routes are now implemented in code.
 - Deterministic hosted fixture seed and verification scripts now exist for live RLS visibility checks across student, parent, tutor, and admin roles.
@@ -48,7 +49,9 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - A source-controlled sample attachment corpus now exists under `fixtures/homework-samples/` for upload and extraction work.
 - The user-facing auth slice is now live with `/auth`, `/auth/confirm`, `/onboarding`, and a protected `/app` entry wired to Supabase SSR plus profile bootstrap.
 - The auth slice now supports role-prefilled signup intent, profile editing through `PATCH /api/auth/profile`, canonical invitation records, `/invite/[token]` acceptance, and auth metadata sync from the canonical app profile.
-- The next recommended execution step is `A2.3`: replace the temporary protected entry with shared shells and role-aware navigation.
+- The public site now has a shared shell for landing, pricing, auth, onboarding, and invite pages.
+- The protected app now has a shared responsive shell plus separate student, parent, tutor, and admin dashboard variants.
+- The next recommended execution step is `A2.3.4`: validate the shell on iPad portrait and landscape widths, then move into `A2.4` or `A3.1`.
 
 ## Working Conventions
 

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { HighlightCard } from "@/components/highlight-card";
+import { PublicShell } from "@/components/layout/public-shell";
 
 const pillars = [
   {
@@ -25,8 +26,9 @@ const buildTrack = [
 
 export default function Home() {
   return (
-    <main className="px-5 py-6 sm:px-8 lg:px-12">
-      <div className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-6xl flex-col gap-8">
+    <PublicShell>
+      <main className="px-5 py-6 sm:px-8 lg:px-12">
+        <div className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-6xl flex-col gap-8">
         <section className="grid gap-6 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] backdrop-blur md:grid-cols-[1.25fr_0.75fr] md:p-10">
           <div className="space-y-6">
             <div className="flex flex-wrap gap-2 text-sm text-[color:var(--ink-soft)]">
@@ -126,7 +128,35 @@ export default function Home() {
             />
           ))}
         </section>
-      </div>
-    </main>
+
+        <section className="grid gap-6 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] md:grid-cols-[0.88fr_1.12fr] md:p-8">
+          <article className="space-y-4">
+            <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.24em] text-[color:var(--ink-soft)]">
+              Public track
+            </p>
+            <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
+              La couche publique ne depend plus d&apos;une simple page placeholder.
+            </h2>
+            <p className="text-base leading-7 text-[color:var(--ink-soft)]">
+              Landing, pricing et auth partagent maintenant le meme squelette,
+              ce qui reduit le risque de derive visuelle avant les phases produit
+              plus lourdes.
+            </p>
+          </article>
+
+          <article className="grid gap-4 sm:grid-cols-2">
+            <HighlightCard
+              body="Le shell protege bascule vers une vraie navigation responsive avec variantes eleve, parent, tuteur et admin."
+              title="App shell"
+            />
+            <HighlightCard
+              body="Le pricing MVP reste volontairement simple pour ne pas inventer de packaging definitif avant Lemon Squeezy."
+              title="Pricing shell"
+            />
+          </article>
+        </section>
+        </div>
+      </main>
+    </PublicShell>
   );
 }

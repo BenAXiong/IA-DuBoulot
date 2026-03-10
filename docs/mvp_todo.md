@@ -9,10 +9,10 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 Legend: `🟩` complete | `🟨` in progress | `⬜` pending
 
-- Overall: `[#########.....................]` `39/128` complete (`30%`)
+- Overall: `[##########....................]` `42/128` complete (`33%`)
 - A0: `[xxxxxxxxxxxxxxxx.....]` `16/21`
 - A1: `[xxxxxxxxxxxxxxxx]` `16/16`
-- A2: `[xxxxxxx..........]` `7/17`
+- A2: `[xxxxxxxxxx.......]` `10/17`
 - A3: `[.................]` `0/17`
 - A4: `[...................]` `0/19`
 - A5: `[.............]` `0/13`
@@ -145,14 +145,17 @@ Outcome: the application shell supports real role-aware development instead of i
 Status note: the SSR auth foundation is now wired into `/auth`, `/auth/confirm`, `/onboarding`, and a protected `/app` page.
 Status note: safe app-profile fields now sync into Supabase auth metadata on bootstrap and profile updates.
 Status note: canonical invitation rows now back the parent-approval and tutor-link flows, with `/invite/[token]` as the shared acceptance surface.
-Constraint: `supabase/migrations/20260311_000003_account_link_invitations.sql` still needs to be applied in the hosted Supabase project before the new routes work there.
+Status note: the third Supabase migration for `account_link_invitations` is now applied to the hosted project.
 
 ### A2.3 Shared Layouts And Navigation
 
-- [ ] A2.3.1 Build the public shell for landing, pricing, and auth.
-- [ ] A2.3.2 Build the authenticated app shell with responsive navigation.
-- [ ] A2.3.3 Create role-specific dashboard layout variants.
+- [x] A2.3.1 Build the public shell for landing, pricing, and auth.
+- [x] A2.3.2 Build the authenticated app shell with responsive navigation.
+- [x] A2.3.3 Create role-specific dashboard layout variants.
 - [ ] A2.3.4 Validate the shell on iPad portrait and landscape widths.
+
+Status note: landing, pricing, auth, onboarding, and invite pages now share one public shell.
+Status note: `/app` now uses a dedicated authenticated shell and role-specific dashboard modules instead of a single temporary mixed page.
 
 ### A2.4 Telemetry And Feature Controls
 

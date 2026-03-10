@@ -1,4 +1,5 @@
 import { InvitationAcceptPanel } from "@/components/links/invitation-accept-panel";
+import { PublicShell } from "@/components/layout/public-shell";
 import {
   buildAuthHrefFromInvitation,
   buildOnboardingHrefFromInvitation,
@@ -41,19 +42,21 @@ export default async function InvitePage({
     : "/onboarding";
 
   return (
-    <main className="px-5 py-6 sm:px-8 lg:px-12">
-      <div className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-6xl flex-col justify-center">
-        <InvitationAcceptPanel
-          appUserRole={pageState.appUser?.role ?? null}
-          authSignInHref={authSignInHref}
-          authSignUpHref={authSignUpHref}
-          email={pageState.context?.email ?? null}
-          landing={landing}
-          onboardingHref={onboardingHref}
-          token={token}
-          viewerState={pageState.viewerState}
-        />
-      </div>
-    </main>
+    <PublicShell>
+      <main className="px-5 py-6 sm:px-8 lg:px-12">
+        <div className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-6xl flex-col justify-center">
+          <InvitationAcceptPanel
+            appUserRole={pageState.appUser?.role ?? null}
+            authSignInHref={authSignInHref}
+            authSignUpHref={authSignUpHref}
+            email={pageState.context?.email ?? null}
+            landing={landing}
+            onboardingHref={onboardingHref}
+            token={token}
+            viewerState={pageState.viewerState}
+          />
+        </div>
+      </main>
+    </PublicShell>
   );
 }

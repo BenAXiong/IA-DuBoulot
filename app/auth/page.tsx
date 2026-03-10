@@ -1,4 +1,5 @@
 import { AuthPanel } from "@/components/auth/auth-panel";
+import { PublicShell } from "@/components/layout/public-shell";
 import { redirectAuthenticatedUserFromAuthPage } from "@/lib/server/auth/page-guards";
 
 type SearchParamsValue = string | string[] | undefined;
@@ -61,17 +62,19 @@ export default async function AuthPage({
   );
 
   return (
-    <main className="px-5 py-6 sm:px-8 lg:px-12">
-      <div className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-6xl flex-col justify-center">
-        <AuthPanel
-          initialError={initialError}
-          initialMessage={initialMessage}
-          initialMode={initialMode}
-          initialRole={initialRole}
-          inviteToken={inviteToken}
-          intentLabel={intentLabel}
-        />
-      </div>
-    </main>
+    <PublicShell>
+      <main className="px-5 py-6 sm:px-8 lg:px-12">
+        <div className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-6xl flex-col justify-center">
+          <AuthPanel
+            initialError={initialError}
+            initialMessage={initialMessage}
+            initialMode={initialMode}
+            initialRole={initialRole}
+            inviteToken={inviteToken}
+            intentLabel={intentLabel}
+          />
+        </div>
+      </main>
+    </PublicShell>
   );
 }
