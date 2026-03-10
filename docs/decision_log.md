@@ -178,6 +178,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Why: This reduces accidental exposure while the app is still gaining server-side authorization layers.
 - Follow-up: Mirror these constraints explicitly when server routes and server actions are implemented.
 
+### D-20260310-18 - Sensitive App Logic Lives In Thin Routes Plus Domain Services
+
+- Date: 2026-03-10
+- Status: accepted
+- Related tasks: `A1.3.1`, `A1.3.2`, `A1.2.3`
+- Context: After schema and RLS, the next risk is letting route handlers absorb provider logic, authorization logic, and multi-table mutation logic in an ad hoc way.
+- Decision: Use Next.js route handlers only as transport layers under `app/api`, and place authorization, orchestration, provider calls, and privileged writes in server-only domain services under `lib/server`. Billing, summaries, moderation, memory updates, and profile bootstrap should not rely on direct client table mutations as their canonical path.
+- Why: This preserves modularity, keeps provider integrations swappable, and aligns server behavior with the conservative RLS model.
+- Follow-up: Implement shared server authorization helpers and the first `AccountService` and `ConversationService` slices next.
+
 ### D-20260310-11 - Personal AI Subscriptions Are Not Backend Fallback Providers
 
 - Date: 2026-03-10

@@ -8,15 +8,26 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 
-- Overall: `[######..........................]` `25/128` complete (`20%`)
+- Overall: `[#######.......................]` `28/128` complete (`22%`)
 - A0: `[xxxxxxxxxxxxxxxx.....]` `16/21`
-- A1: `[xxxxxx..........]` `6/16`
+- A1: `[xxxxxxxxx.......]` `9/16`
 - A2: `[xxx..............]` `3/17`
 - A3: `[.................]` `0/17`
 - A4: `[...................]` `0/19`
 - A5: `[.............]` `0/13`
 - A6: `[.............]` `0/13`
 - A7: `[............]` `0/12`
+
+## Table Of Contents
+
+- [Phase A0 - Bootstrap And Governance](#phase-a0---bootstrap-and-governance)
+- [Phase A1 - Data Contracts And Service Boundaries](#phase-a1---data-contracts-and-service-boundaries)
+- [Phase A2 - App Foundation](#phase-a2---app-foundation)
+- [Phase A3 - Student Core Workflow](#phase-a3---student-core-workflow)
+- [Phase A4 - AI Coaching, Extraction, And Safety](#phase-a4---ai-coaching-extraction-and-safety)
+- [Phase A5 - Parent And Tutor Oversight](#phase-a5---parent-and-tutor-oversight)
+- [Phase A6 - Memory, Billing, And Privacy Controls](#phase-a6---memory-billing-and-privacy-controls)
+- [Phase A7 - QA, iPad Polish, And Launch Readiness](#phase-a7---qa-ipad-polish-and-launch-readiness)
 
 ## Phase A0 - Bootstrap And Governance
 
@@ -81,19 +92,21 @@ Status note: the initial schema SQL has been applied successfully in the hosted 
 ### A1.2 Access Control And RLS
 
 - [x] A1.2.1 Write table-by-table access rules before coding policies.
-- [ ] A1.2.2 Implement RLS policies for each role relationship.
+- [x] A1.2.2 Implement RLS policies for each role relationship.
 - [ ] A1.2.3 Add server-side authorization checks for all sensitive routes.
 - [ ] A1.2.4 Verify student, parent, tutor, and admin visibility with seeded test accounts.
 
 Reference: [Access rules V1](access_rules_v1.md) and [RLS migration draft](../supabase/migrations/20260310_000002_access_rules_and_rls.sql)
-Status note: `A1.2.2` is drafted in the repo but should stay open until the SQL is applied and verified in Supabase.
+Status note: the RLS migration SQL has been applied successfully in the hosted Supabase project.
 
 ### A1.3 Backend Contracts
 
-- [ ] A1.3.1 Write the API route map for auth, uploads, conversations, summaries, memory, parent, tutor, billing, and admin.
-- [ ] A1.3.2 Define service interfaces for AI, uploads, translation, moderation, and billing.
+- [x] A1.3.1 Write the API route map for auth, uploads, conversations, summaries, memory, parent, tutor, billing, and admin.
+- [x] A1.3.2 Define service interfaces for AI, uploads, translation, moderation, and billing.
 - [ ] A1.3.3 Define error handling and audit logging conventions.
 - [ ] A1.3.4 Define file storage buckets and attachment metadata rules.
+
+Reference: [API route map](api_route_map.md) and [Service interfaces](service_interfaces.md)
 
 ### A1.4 Seed Data And Smoke Fixtures
 
