@@ -24,12 +24,15 @@ Read these in order before any substantial implementation work:
 1. [README.md](README.md)
 2. [docs/implementation_plan.md](docs/implementation_plan.md)
 3. [docs/brief_adjustments.md](docs/brief_adjustments.md)
-4. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
-5. [docs/mvp_todo.md](docs/mvp_todo.md)
-6. [docs/mvp_timeline.md](docs/mvp_timeline.md)
-7. [docs/decision_log.md](docs/decision_log.md)
-8. [docs/work_sessions.md](docs/work_sessions.md)
-9. The relevant code, SQL, prompt, or UI files for the task being worked on
+4. [docs/branch_pr_conventions.md](docs/branch_pr_conventions.md)
+5. [docs/role_access_matrix.md](docs/role_access_matrix.md)
+6. [docs/environment_matrix.md](docs/environment_matrix.md)
+7. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
+8. [docs/mvp_todo.md](docs/mvp_todo.md)
+9. [docs/mvp_timeline.md](docs/mvp_timeline.md)
+10. [docs/decision_log.md](docs/decision_log.md)
+11. [docs/work_sessions.md](docs/work_sessions.md)
+12. The relevant code, SQL, prompt, or UI files for the task being worked on
 
 If a file above is outdated, update it before or alongside the code change that depends on it.
 

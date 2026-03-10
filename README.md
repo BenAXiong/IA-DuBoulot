@@ -7,6 +7,9 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Original build brief](project_brief_codex.txt)
 - [Implementation plan](docs/implementation_plan.md)
 - [Brief adjustments](docs/brief_adjustments.md)
+- [Branch and PR conventions](docs/branch_pr_conventions.md)
+- [Role and access matrix](docs/role_access_matrix.md)
+- [Environment matrix](docs/environment_matrix.md)
 - [Minors privacy baseline](docs/minors_privacy_baseline.md)
 - [MVP to-do list](docs/mvp_todo.md)
 - [MVP timeline](docs/mvp_timeline.md)
@@ -24,7 +27,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - Vercel project exists at `https://vercel.com/bmavmartinez-8475s-projects/ia-du-boulot`.
 - Billing direction is `Lemon Squeezy`.
 - Primary starter AI direction is `Google Gemini`, with the provider layer kept swappable.
-- No application scaffold exists yet.
+- Next.js app scaffold is now present at repo root.
 - The next recommended execution step is Phase `A0.1` through `A1.3` in [the MVP to-do list](docs/mvp_todo.md).
 
 ## Working Conventions

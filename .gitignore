@@ -2,6 +2,10 @@
 node_modules/
 .next/
 out/
+.vercel/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
 
 # Logs
 *.log
@@ -12,6 +16,7 @@ pnpm-debug.log*
 
 # Env files
 .env
+.env*
 .env.local
 .env.development.local
 .env.test.local
@@ -22,3 +27,4 @@ pnpm-debug.log*
 Thumbs.db
 .vscode/
 .idea/
+next-tmp-bootstrap/

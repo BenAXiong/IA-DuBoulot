@@ -128,6 +128,26 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Why: This is conservative enough to shape architecture now without forcing heavy operational/legal machinery into day-one implementation.
 - Follow-up: Validate the final consent copy, retention wording, and support process before beta launch.
 
+### D-20260310-13 - Main Branch Workflow Uses Active Protection And Lightweight PRs
+
+- Date: 2026-03-10
+- Status: accepted
+- Related tasks: `A0.1.2`, `A0.1.5`
+- Context: The repo now needs a durable main-branch workflow that keeps history clean without blocking a solo founder using Codex heavily.
+- Decision: Use an active GitHub ruleset on `main`, keep `Require a pull request before merging` enabled with `0` required approvals, prefer squash merges, and use repository-owner bypass only for bootstrap or emergency direct pushes.
+- Why: This gives branch discipline without inventing review overhead the repo cannot support yet.
+- Follow-up: Add required status checks once CI exists.
+
+### D-20260310-14 - Role Access Is Defined By Explicit Links And Audited Sensitive Reads
+
+- Date: 2026-03-10
+- Status: accepted
+- Related tasks: `A0.4.1`, `A1.2`
+- Context: Student, parent, tutor, and admin visibility is the core product trust surface.
+- Decision: All non-student access to student learning data must flow through explicit parent-student or tutor-student links, and sensitive reads remain auditable.
+- Why: This keeps the access model explainable and implementable in RLS and server authorization.
+- Follow-up: Implement the SQL and RLS policies directly against the access matrix.
+
 ### D-20260310-11 - Personal AI Subscriptions Are Not Backend Fallback Providers
 
 - Date: 2026-03-10

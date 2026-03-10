@@ -14,7 +14,7 @@ Outcome: the repo is real, the operating rules are in place, and future implemen
 - [ ] A0.1.2 Create the GitHub repository and protect `main`.
 - [x] A0.1.3 Decide the canonical project/product naming across repo, product, and deployment.
 - [x] A0.1.4 Create preview and production deployment targets.
-- [ ] A0.1.5 Write branch naming and PR review conventions once GitHub exists.
+- [x] A0.1.5 Write branch naming and PR review conventions once GitHub exists.
 
 Current direction: GitHub repo exists, Vercel is the chosen deployment platform, the project is `https://vercel.com/bmavmartinez-8475s-projects/ia-du-boulot`, and the app is expected to live at repo root `./`.
 
@@ -25,7 +25,7 @@ Current direction: GitHub repo exists, Vercel is the chosen deployment platform,
 - [ ] A0.2.3 Create the Resend account and sender setup.
 - [ ] A0.2.4 Choose the primary AI provider and a fallback provider.
 - [x] A0.2.5 Choose the billing provider compatible with the founder's geography/entity setup.
-- [ ] A0.2.6 Create `.env.example` and a secrets ownership checklist.
+- [x] A0.2.6 Create `.env.example` and a secrets ownership checklist.
 
 Current direction: primary starter AI path is Gemini; fallback provider still needs to be selected. Billing provider is Lemon Squeezy.
 Constraint: verify the Gemini tier and data-handling settings are suitable for minors before any live child traffic uses the AI flow.
@@ -42,7 +42,7 @@ Constraint: a founder personal AI subscription is not treated as a backend fallb
 
 ### A0.4 Product Constraints And Acceptance Rules
 
-- [ ] A0.4.1 Write the role/access matrix for student, parent, tutor, and admin.
+- [x] A0.4.1 Write the role/access matrix for student, parent, tutor, and admin.
 - [ ] A0.4.2 Write smoke-test acceptance criteria for the MVP core flows.
 - [x] A0.4.3 Confirm the MVP language set and translation expectations.
 - [x] A0.4.4 Define retention, deletion, and privacy expectations for minors.
@@ -87,10 +87,10 @@ Outcome: the application shell supports real role-aware development instead of i
 
 ### A2.1 Next.js Scaffold
 
-- [ ] A2.1.1 Initialize the Next.js app with TypeScript.
-- [ ] A2.1.2 Add Tailwind CSS and baseline design tokens.
+- [x] A2.1.1 Initialize the Next.js app with TypeScript.
+- [x] A2.1.2 Add Tailwind CSS and baseline design tokens.
 - [ ] A2.1.3 Add the component primitive layer and form conventions.
-- [ ] A2.1.4 Establish the root folder structure from the brief.
+- [x] A2.1.4 Establish the root folder structure from the brief.
 - [ ] A2.1.5 Add linting, formatting, and modularity rules to prevent god components and god services.
 - [ ] A2.1.6 Add localization structure for `fr`, `en`, and `zh` without coupling translations to domain logic.
 

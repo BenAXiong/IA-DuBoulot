@@ -22,4 +22,4 @@ Use `OPEN` for the unfinished side of an active session.
 | Date | Time | Duration | Task IDs | Scope |
 | --- | --- | --- | --- | --- |
 | 2026-03-10 | 18:09 -> 18:10 | 0h01 | A0.3.1 A0.3.2 A0.3.3 A0.3.4 A0.3.5 | planning docs bootstrap from `project_brief_codex.txt` |
-| 2026-03-10 | 20:05 -> OPEN | OPEN | A0.1.1 A0.1.3 A0.1.4 A0.2.5 A0.4.3 A0.4.4 A2.1.5 | project decisions + git bootstrap + vercel setup + architecture guardrails + under-13 baseline |
+| 2026-03-10 | 20:05 -> OPEN | OPEN | A0.1.1 A0.1.3 A0.1.4 A0.1.5 A0.2.5 A0.2.6 A0.4.1 A0.4.3 A0.4.4 A2.1.1 A2.1.2 A2.1.4 A2.1.5 | project decisions + git bootstrap + vercel setup + governance docs + under-13 baseline + next scaffold |
