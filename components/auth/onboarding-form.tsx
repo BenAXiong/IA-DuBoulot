@@ -14,6 +14,7 @@ type BootstrapErrorPayload = {
 type OnboardingFormProps = {
   email: string | null;
   defaultRole?: "student" | "parent" | "tutor";
+  inviteToken?: string | null;
 };
 
 const uiLanguageOptions = [
@@ -52,6 +53,7 @@ function getFieldError(
 export function OnboardingForm({
   email,
   defaultRole = "student",
+  inviteToken = null,
 }: OnboardingFormProps) {
   const router = useRouter();
   const [role, setRole] = useState<"student" | "parent" | "tutor">(defaultRole);
@@ -117,7 +119,7 @@ export function OnboardingForm({
         return;
       }
 
-      router.push("/app");
+      router.push(inviteToken ? `/invite/${inviteToken}` : "/app");
       router.refresh();
     });
   }

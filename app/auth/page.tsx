@@ -54,6 +54,7 @@ export default async function AuthPage({
   const initialMessage = readFirstValue(resolvedSearchParams.message);
   const initialMode = parseMode(readFirstValue(resolvedSearchParams.mode));
   const initialRole = parseRole(readFirstValue(resolvedSearchParams.role));
+  const inviteToken = readFirstValue(resolvedSearchParams.invite);
   const intentLabel = buildIntentLabel(
     initialRole,
     readFirstValue(resolvedSearchParams.intent),
@@ -67,6 +68,7 @@ export default async function AuthPage({
           initialMessage={initialMessage}
           initialMode={initialMode}
           initialRole={initialRole}
+          inviteToken={inviteToken}
           intentLabel={intentLabel}
         />
       </div>

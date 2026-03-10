@@ -258,6 +258,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Why: This preserves a clean canonical data model while giving the auth layer enough context for redirects, operator inspection, and future flow hardening.
 - Follow-up: Reuse the same sync rule for invite acceptance and parent-approval flows instead of adding a second canonical profile source.
 
+### D-20260311-26 - Parent Approval And Tutor Access Use Canonical Invitation Rows
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A2.2.2`
+- Context: The auth slice already supported signup, confirmation, onboarding, and protected routes, but parent approval and tutor linkage were still implicit future routes. Burying those flows in raw query params or ad hoc auth metadata would damage traceability and make access audits weak.
+- Decision: Add `public.account_link_invitations` as the canonical pre-link object for parent approval and tutor access, expose `/invite/[token]` as the shared acceptance surface, and keep raw token handling server-side with hashed persistence only. V1 invite delivery returns copyable invitation URLs instead of waiting for transactional email infrastructure.
+- Why: This keeps link state explicit, auditable, and durable across future sessions while avoiding insecure shortcuts. It also separates access-control correctness from unfinished provider-email work.
+- Follow-up: Apply `supabase/migrations/20260311_000003_account_link_invitations.sql` to the hosted project, then later add provider-backed invite delivery and cleanup jobs for expired rows.
+
 ### D-20260310-11 - Personal AI Subscriptions Are Not Backend Fallback Providers
 
 - Date: 2026-03-10

@@ -1,6 +1,6 @@
 # Supabase Project Setup Notes
 
-Related: [README](../README.md) | [Environment matrix](environment_matrix.md) | [Storage and attachment rules](storage_attachment_rules.md) | [Minors privacy baseline](minors_privacy_baseline.md) | [Supabase schema V1](supabase_schema_v1.md)
+Related: [README](../README.md) | [Environment matrix](environment_matrix.md) | [Invitation flows V1](invitation_flows_v1.md) | [Storage and attachment rules](storage_attachment_rules.md) | [Minors privacy baseline](minors_privacy_baseline.md) | [Supabase schema V1](supabase_schema_v1.md)
 
 ## Recommended Project Settings
 
@@ -60,12 +60,15 @@ This matters because Supabase auth emails and OTP flows redirect to the configur
 3. Put them in local `.env.local`.
 4. Mirror the same values into Vercel environment variables.
 5. Keep the service-role or secret key server-only; never expose it in browser code.
+6. Run the next pending SQL migration:
+- [20260311_000003_account_link_invitations.sql](../supabase/migrations/20260311_000003_account_link_invitations.sql)
 
 ### 8. Next.js Auth Integration
 
 - when auth wiring starts, use the Supabase SSR path for Next.js instead of old auth helpers
 - that is the current Supabase direction for server-side auth with cookies
 - if email confirmation is enabled, wire the project through the repo's `/auth/confirm` route and update the Supabase confirm-signup email template to use `token_hash` + `type=email` instead of relying on the older client-side confirmation flow
+- the current baseline confirm-signup template is valid for generic signup confirmation, but invite-specific `next` redirects are not fully preserved unless the recipient reopens the original `/invite/[token]` link after confirmation
 
 ## Official References
 

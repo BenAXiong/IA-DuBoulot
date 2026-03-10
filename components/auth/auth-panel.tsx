@@ -13,6 +13,7 @@ type AuthPanelProps = {
   initialMode?: AuthMode;
   initialRole?: SignupRole;
   intentLabel?: string | null;
+  inviteToken?: string | null;
 };
 
 function getAuthErrorMessage(error: unknown) {
@@ -29,6 +30,7 @@ export function AuthPanel({
   initialMode = "sign_in",
   initialRole = "student",
   intentLabel = null,
+  inviteToken = null,
 }: AuthPanelProps) {
   const router = useRouter();
   const supabase = createSupabaseBrowserClient();
@@ -60,7 +62,7 @@ export function AuthPanel({
         return;
       }
 
-      router.push("/onboarding");
+      router.push(inviteToken ? `/invite/${inviteToken}` : "/onboarding");
       router.refresh();
     });
   }
@@ -71,7 +73,10 @@ export function AuthPanel({
 
     startTransition(async () => {
       const confirmUrl = new URL("/auth/confirm", window.location.origin);
-      confirmUrl.searchParams.set("next", `/onboarding?role=${signupRole}`);
+      confirmUrl.searchParams.set(
+        "next",
+        inviteToken ? `/invite/${inviteToken}` : `/onboarding?role=${signupRole}`,
+      );
 
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -87,13 +92,15 @@ export function AuthPanel({
       }
 
       if (data.session) {
-        router.push(`/onboarding?role=${signupRole}`);
+        router.push(inviteToken ? `/invite/${inviteToken}` : `/onboarding?role=${signupRole}`);
         router.refresh();
         return;
       }
 
       setInfoMessage(
-        "Compte cree. Confirme l'adresse email depuis le message Supabase avant de continuer.",
+        inviteToken
+          ? "Compte cree. Confirme l'adresse email depuis le message Supabase, puis reouvre le lien d'invitation pour continuer."
+          : "Compte cree. Confirme l'adresse email depuis le message Supabase avant de continuer.",
       );
       setMode("sign_in");
     });

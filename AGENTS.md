@@ -31,17 +31,18 @@ Read these in order before any substantial implementation work:
 8. [docs/supabase_schema_v1.md](docs/supabase_schema_v1.md)
 9. [docs/access_rules_v1.md](docs/access_rules_v1.md)
 10. [docs/api_route_map.md](docs/api_route_map.md)
-11. [docs/service_interfaces.md](docs/service_interfaces.md)
-12. [docs/error_audit_conventions.md](docs/error_audit_conventions.md)
-13. [docs/storage_attachment_rules.md](docs/storage_attachment_rules.md)
-14. [docs/rls_fixture_verification.md](docs/rls_fixture_verification.md) when auth, schema, or RLS work is in scope
-15. [docs/sample_attachment_corpus.md](docs/sample_attachment_corpus.md) when upload, extraction, or demo fixture work is in scope
-16. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
-17. [docs/mvp_todo.md](docs/mvp_todo.md)
-18. [docs/mvp_timeline.md](docs/mvp_timeline.md)
-19. [docs/decision_log.md](docs/decision_log.md)
-20. [docs/work_sessions.md](docs/work_sessions.md)
-21. The relevant code, SQL, prompt, or UI files for the task being worked on
+11. [docs/invitation_flows_v1.md](docs/invitation_flows_v1.md) when auth, parent, or tutor link work is in scope
+12. [docs/service_interfaces.md](docs/service_interfaces.md)
+13. [docs/error_audit_conventions.md](docs/error_audit_conventions.md)
+14. [docs/storage_attachment_rules.md](docs/storage_attachment_rules.md)
+15. [docs/rls_fixture_verification.md](docs/rls_fixture_verification.md) when auth, schema, or RLS work is in scope
+16. [docs/sample_attachment_corpus.md](docs/sample_attachment_corpus.md) when upload, extraction, or demo fixture work is in scope
+17. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
+18. [docs/mvp_todo.md](docs/mvp_todo.md)
+19. [docs/mvp_timeline.md](docs/mvp_timeline.md)
+20. [docs/decision_log.md](docs/decision_log.md)
+21. [docs/work_sessions.md](docs/work_sessions.md)
+22. The relevant code, SQL, prompt, or UI files for the task being worked on
 
 If a file above is outdated, update it before or alongside the code change that depends on it.
 

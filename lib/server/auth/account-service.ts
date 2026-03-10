@@ -40,6 +40,9 @@ type UpdateProfilePayload = Partial<{
   ageBand: string | null;
 }>;
 
+export const APP_USER_SELECT =
+  "id, role, account_status, display_name, preferred_ui_language, ai_help_language, age_band, is_under_13, deletion_requested_at, created_at, updated_at";
+
 function isStringInArray<T extends readonly string[]>(
   value: string,
   allowed: T,
@@ -204,6 +207,36 @@ async function syncAuthUserMetadata(input: {
   }
 }
 
+export async function loadAppUserById(userId: string): Promise<AppUserRecord> {
+  const supabase = createSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from("users")
+    .select(APP_USER_SELECT)
+    .eq("id", userId)
+    .single<AppUserRecord>();
+
+  if (error) {
+    throw new AppError({
+      code: "service_unavailable",
+      message: "Unable to load the app profile.",
+      status: 503,
+      retryable: true,
+      cause: error,
+    });
+  }
+
+  return data;
+}
+
+export async function syncAuthUserMetadataFromAppUser(input: {
+  authUserId: string;
+  appUser: AppUserRecord;
+  requestId: string;
+  route: string;
+}) {
+  await syncAuthUserMetadata(input);
+}
+
 export async function parseBootstrapProfileInput(
   request: Request,
 ): Promise<BootstrapProfileInput> {
@@ -363,9 +396,7 @@ export async function bootstrapProfile(
   const supabase = createSupabaseAdminClient();
   const { data: existingUser, error: existingUserError } = await supabase
     .from("users")
-    .select(
-      "id, role, account_status, display_name, preferred_ui_language, ai_help_language, age_band, is_under_13, deletion_requested_at, created_at, updated_at",
-    )
+    .select(APP_USER_SELECT)
     .eq("id", context.authUserId)
     .maybeSingle<AppUserRecord>();
 
@@ -409,9 +440,7 @@ export async function bootstrapProfile(
     .upsert(upsertPayload, {
       onConflict: "id",
     })
-    .select(
-      "id, role, account_status, display_name, preferred_ui_language, ai_help_language, age_band, is_under_13, deletion_requested_at, created_at, updated_at",
-    )
+    .select(APP_USER_SELECT)
     .single<AppUserRecord>();
 
   if (upsertError) {
@@ -495,9 +524,7 @@ export async function updateProfile(
       age_band: appUser.role === "student" ? input.ageBand : null,
     })
     .eq("id", context.authUserId)
-    .select(
-      "id, role, account_status, display_name, preferred_ui_language, ai_help_language, age_band, is_under_13, deletion_requested_at, created_at, updated_at",
-    )
+    .select(APP_USER_SELECT)
     .single<AppUserRecord>();
 
   if (error) {

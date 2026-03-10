@@ -1,6 +1,7 @@
 import "server-only";
 
 import { AppError } from "@/lib/server/errors/app-error";
+import { APP_USER_SELECT } from "@/lib/server/auth/account-service";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type {
   AppUserRecord,
@@ -29,9 +30,7 @@ export async function getAuthenticatedUserContext(): Promise<AuthenticatedUserCo
 
   const { data: appUser, error: appUserError } = await supabase
     .from("users")
-    .select(
-      "id, role, account_status, display_name, preferred_ui_language, ai_help_language, age_band, is_under_13, deletion_requested_at, created_at, updated_at",
-    )
+    .select(APP_USER_SELECT)
     .eq("id", user.id)
     .maybeSingle<AppUserRecord>();
 

@@ -52,6 +52,7 @@ export default async function OnboardingPage({
             <OnboardingForm
               defaultRole={defaultRole}
               email={context.email}
+              inviteToken={readFirstValue(resolvedSearchParams.invite)}
             />
           </article>
         </section>

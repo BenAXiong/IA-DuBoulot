@@ -1,6 +1,6 @@
 # Service Interfaces
 
-Related: [README](../README.md) | [API route map](api_route_map.md) | [Environment matrix](environment_matrix.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md)
+Related: [README](../README.md) | [API route map](api_route_map.md) | [Invitation flows V1](invitation_flows_v1.md) | [Environment matrix](environment_matrix.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md)
 
 ## Purpose
 
@@ -155,11 +155,24 @@ interface SummaryService {
 
 ```ts
 interface LinkService {
+  createParentApprovalRequest(
+    input: CreateParentApprovalRequestInput
+  ): Promise<CreateParentApprovalRequestResult>;
+  createTutorInvitation(
+    input: CreateTutorInvitationInput
+  ): Promise<CreateTutorInvitationResult>;
+  acceptInvitation(input: AcceptInvitationInput): Promise<AcceptInvitationResult>;
   createParentLink(input: CreateParentLinkInput): Promise<CreateParentLinkResult>;
   createTutorLink(input: CreateTutorLinkInput): Promise<CreateTutorLinkResult>;
   updateLinkStatus(input: UpdateLinkStatusInput): Promise<UpdateLinkStatusResult>;
 }
 ```
+
+Rules:
+
+- canonical invitation rows belong to the link domain, not auth metadata
+- raw invitation tokens must never be persisted outside transient request handling
+- parent approval and tutor acceptance must stay server-side because they touch multiple tables plus audit state
 
 ### Memory Service
 
@@ -192,6 +205,7 @@ Preferred folder direction:
 lib/server/auth/
 lib/server/billing/
 lib/server/conversations/
+lib/server/links/
 lib/server/memory/
 lib/server/moderation/
 lib/server/summaries/
@@ -218,5 +232,5 @@ Inside each domain:
 ## Immediate Next Implementations
 
 - `ConversationService` plus `/api/conversations` and `/api/conversations/[conversationId]/messages`
-- parent/tutor link routes and approval flows on top of the existing auth foundation
+- shared shells and role-aware navigation on top of the now-live invitation flows
 - authenticated app shell work for `A2.3`

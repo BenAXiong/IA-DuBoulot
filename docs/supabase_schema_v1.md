@@ -1,6 +1,6 @@
 # Supabase Schema V1
 
-Related: [README](../README.md) | [Implementation plan](implementation_plan.md) | [Role and access matrix](role_access_matrix.md) | [Access rules V1](access_rules_v1.md) | [Storage and attachment rules](storage_attachment_rules.md) | [Minors privacy baseline](minors_privacy_baseline.md) | [Initial schema SQL](../supabase/migrations/20260310_000001_initial_schema.sql)
+Related: [README](../README.md) | [Implementation plan](implementation_plan.md) | [Role and access matrix](role_access_matrix.md) | [Access rules V1](access_rules_v1.md) | [Invitation flows V1](invitation_flows_v1.md) | [Storage and attachment rules](storage_attachment_rules.md) | [Minors privacy baseline](minors_privacy_baseline.md) | [Initial schema SQL](../supabase/migrations/20260310_000001_initial_schema.sql)
 
 ## Purpose
 
@@ -9,6 +9,7 @@ This document explains the first Supabase schema draft so future sessions do not
 ## File
 
 - SQL migration: [20260310_000001_initial_schema.sql](../supabase/migrations/20260310_000001_initial_schema.sql)
+- Invitation extension: [20260311_000003_account_link_invitations.sql](../supabase/migrations/20260311_000003_account_link_invitations.sql)
 
 ## Main Decisions
 
@@ -27,7 +28,15 @@ Why:
 
 - parent access is represented by `parent_student_links`
 - tutor access is represented by `tutor_student_links`
+- pending parent/tutor acceptance now uses `account_link_invitations`
 - the SQL adds role-validation triggers so those links cannot silently point at the wrong user roles
+
+### Invitation State Is Explicit And Auditable
+
+- `account_link_invitations` is the canonical pre-link object for parent approval and tutor access
+- raw invite tokens are not stored, only `token_hash`
+- the table carries `pending`, `accepted`, `revoked`, and `expired` states
+- server routes create and accept these rows; browser table writes are not the canonical path
 
 ### Session Data Is Normalized By Responsibility
 

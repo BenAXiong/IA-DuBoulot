@@ -1,11 +1,13 @@
 import { AccountSettingsForm } from "@/components/auth/account-settings-form";
 import { SignOutButton } from "@/components/auth/sign-out-button";
+import { ParentApprovalRequestForm } from "@/components/links/parent-approval-request-form";
+import { TutorInviteForm } from "@/components/links/tutor-invite-form";
 import { requireAppPageContext } from "@/lib/server/auth/page-guards";
 
 const nextSlices = [
-  "Relier les flux role-aware d'invitation et d'approbation.",
   "Brancher l'intake devoir sur le corpus d'attachments source-controlled.",
   "Remplacer ce tableau de bord temporaire par les shells eleve / parent / tuteur.",
+  "Construire la navigation partagee et les layouts role-aware de la phase A2.3.",
 ];
 
 export default async function AppHomePage() {
@@ -88,6 +90,41 @@ export default async function AppHomePage() {
               </li>
             ))}
           </ul>
+        </section>
+
+        <section className="grid gap-6 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] md:grid-cols-[0.8fr_1.2fr]">
+          <article className="space-y-3">
+            <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
+              Link flows
+            </p>
+            <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
+              Les flux parent et tuteur passent maintenant par des invitations traçables.
+            </h2>
+            <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
+              Les invitations vivent en base, sont auditees cote serveur, puis
+              s&apos;acceptent depuis une page dediee `/invite/[token]`.
+            </p>
+          </article>
+
+          <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5">
+            {appUser.role === "student" && appUser.is_under_13 ? (
+              <ParentApprovalRequestForm />
+            ) : appUser.role === "student" ? (
+              <TutorInviteForm />
+            ) : (
+              <div className="grid gap-3 text-sm leading-6 text-[color:var(--ink-soft)]">
+                <p>
+                  Les formulaires parent et tuteur sont deja branches pour les
+                  flux eleve. Les variantes parent dashboard arriveront avec les
+                  shells role-aware de `A2.3` et `A5`.
+                </p>
+                <p>
+                  En attendant, les comptes parent et tuteur peuvent deja accepter
+                  un lien recu via la page `/invite/[token]`.
+                </p>
+              </div>
+            )}
+          </article>
         </section>
 
         <section className="grid gap-6 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] md:grid-cols-[0.7fr_1.3fr]">

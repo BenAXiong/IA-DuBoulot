@@ -1,6 +1,6 @@
 # API Route Map
 
-Related: [README](../README.md) | [Access rules V1](access_rules_v1.md) | [Supabase schema V1](supabase_schema_v1.md) | [Service interfaces](service_interfaces.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md)
+Related: [README](../README.md) | [Access rules V1](access_rules_v1.md) | [Supabase schema V1](supabase_schema_v1.md) | [Invitation flows V1](invitation_flows_v1.md) | [Service interfaces](service_interfaces.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md)
 
 ## Purpose
 
@@ -11,6 +11,10 @@ Current implemented routes:
 - `GET /api/auth/me`
 - `POST /api/auth/profile/bootstrap`
 - `PATCH /api/auth/profile`
+- `POST /api/auth/parent-approval/request`
+- `POST /api/auth/parent-approval/confirm`
+- `POST /api/auth/invitations/accept`
+- `POST /api/tutor/links`
 
 It exists to prevent accidental drift between:
 
@@ -38,9 +42,9 @@ These routes establish or sync `public.users` and linked role state after Supaba
 | `/api/auth/me` | `GET` | authenticated user | return current app user + role context | should read `public.users`, not raw auth metadata |
 | `/api/auth/profile/bootstrap` | `POST` | authenticated user | create or repair the caller row in `public.users` | first post-signup bootstrap step |
 | `/api/auth/profile` | `PATCH` | authenticated user | update editable profile fields | route must whitelist safe fields |
-| `/api/auth/parent-approval/request` | `POST` | child or parent flow | start pending parent approval | under-13 and guardian-linked flow |
+| `/api/auth/parent-approval/request` | `POST` | under-13 student | start pending parent approval | current V1 issues a shareable invite URL |
 | `/api/auth/parent-approval/confirm` | `POST` | parent | activate pending child link/account | creates audit trail |
-| `/api/auth/invitations/accept` | `POST` | invited parent or tutor | accept a link invitation | validates token + caller identity |
+| `/api/auth/invitations/accept` | `POST` | invited tutor | accept a link invitation | validates token + caller identity |
 
 ### Uploads And Extraction Intake
 
@@ -86,11 +90,15 @@ These routes manage role links and adult visibility setup.
 | `/api/parent/links` | `POST` | parent | create or confirm parent-student link | under-13 flow depends on this |
 | `/api/parent/links/[linkId]` | `PATCH` | parent | update or revoke parent-student link | sensitive access should be audited |
 | `/api/parent/students` | `GET` | parent | list linked students and overview state | summary-oriented response |
-| `/api/tutor/links` | `POST` | tutor, parent, or eligible student | request tutor-student link | defaults to pending where needed |
+| `/api/tutor/links` | `POST` | linked parent or eligible student | create a canonical tutor invitation | current V1 returns a shareable invite URL |
 | `/api/tutor/links/[linkId]` | `PATCH` | tutor or parent | approve, revoke, or update tutor link | parent approval rules apply |
 | `/api/tutor/students` | `GET` | tutor | list linked students with recent status | no raw memory exposure |
 | `/api/tutor/notes` | `POST` | tutor | create private tutor note | hidden from parent and student |
 | `/api/tutor/notes/[noteId]` | `PATCH` | tutor | update or pin private tutor note | direct browser writes may still be allowed, but route stays canonical |
+
+Current V1 note:
+
+- `POST /api/auth/parent-approval/request`, `POST /api/auth/parent-approval/confirm`, and `/invite/[token]` currently carry the under-13 parent-link flow before a richer parent dashboard exists.
 
 ### Billing
 
