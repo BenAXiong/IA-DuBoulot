@@ -21,6 +21,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - Public GitHub repository exists at `https://github.com/BenAXiong/IA-DuBoulot.git`.
 - The local workspace is initialized as git and connected to `origin`.
 - Deployment direction is `Vercel` with a root app at `./`.
+- Vercel project exists at `https://vercel.com/bmavmartinez-8475s-projects/ia-du-boulot`.
 - Billing direction is `Lemon Squeezy`.
 - Primary starter AI direction is `Google Gemini`, with the provider layer kept swappable.
 - No application scaffold exists yet.

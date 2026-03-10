@@ -13,10 +13,10 @@ Outcome: the repo is real, the operating rules are in place, and future implemen
 - [x] A0.1.1 Initialize local git and connect a GitHub remote.
 - [ ] A0.1.2 Create the GitHub repository and protect `main`.
 - [x] A0.1.3 Decide the canonical project/product naming across repo, product, and deployment.
-- [ ] A0.1.4 Create preview and production deployment targets.
+- [x] A0.1.4 Create preview and production deployment targets.
 - [ ] A0.1.5 Write branch naming and PR review conventions once GitHub exists.
 
-Current direction: GitHub repo exists, Vercel is the chosen deployment platform, and the app is expected to live at repo root `./`.
+Current direction: GitHub repo exists, Vercel is the chosen deployment platform, the project is `https://vercel.com/bmavmartinez-8475s-projects/ia-du-boulot`, and the app is expected to live at repo root `./`.
 
 ### A0.2 Service Accounts And Environment Matrix
 
@@ -29,6 +29,7 @@ Current direction: GitHub repo exists, Vercel is the chosen deployment platform,
 
 Current direction: primary starter AI path is Gemini; fallback provider still needs to be selected. Billing provider is Lemon Squeezy.
 Constraint: verify the Gemini tier and data-handling settings are suitable for minors before any live child traffic uses the AI flow.
+Constraint: a founder personal AI subscription is not treated as a backend fallback provider for the app.
 
 ### A0.3 Traceability Spine
 
@@ -44,9 +45,9 @@ Constraint: verify the Gemini tier and data-handling settings are suitable for m
 - [ ] A0.4.1 Write the role/access matrix for student, parent, tutor, and admin.
 - [ ] A0.4.2 Write smoke-test acceptance criteria for the MVP core flows.
 - [x] A0.4.3 Confirm the MVP language set and translation expectations.
-- [ ] A0.4.4 Define retention, deletion, and privacy expectations for minors.
+- [x] A0.4.4 Define retention, deletion, and privacy expectations for minors.
 
-Reference: [Minors privacy baseline](minors_privacy_baseline.md) captures the provisional implementation baseline that still needs founder confirmation.
+Reference: [Minors privacy baseline](minors_privacy_baseline.md) is now the chosen MVP baseline for implementation, with later legal/policy review still required before launch.
 
 ## Phase A1 - Data Contracts And Service Boundaries
 

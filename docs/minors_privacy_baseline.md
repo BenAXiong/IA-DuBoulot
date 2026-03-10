@@ -2,123 +2,302 @@
 
 Related: [README](../README.md) | [Implementation plan](implementation_plan.md) | [MVP to-do list](mvp_todo.md) | [Decision log](decision_log.md)
 
-Status: provisional implementation baseline for MVP planning. This is not legal advice. It is the minimum policy baseline needed so the product architecture does not get designed blindly.
+Status: chosen MVP product-policy baseline for planning and implementation. This is not legal advice. It is the default operating policy the codebase should be built around unless later replaced by lawyer-reviewed requirements.
 
-## Why This Must Be Addressed Early
+## Goal
 
-Because IA DuBoulot is intended for school-age users, including children under 13, privacy and deletion rules affect:
+Remove avoidable ambiguity now so auth, schema, storage, AI, and settings are designed around a coherent under-13 policy instead of patched later.
 
-- signup and linking flows
-- role permissions
-- what data is stored at all
-- what providers can receive
-- what must be deletable
-- what must be auditable
+## Conservative Product Posture
 
-If these rules are left vague until late in the build, auth, schema, prompts, storage, and settings screens will all need rework.
+IA DuBoulot should be treated as a child-relevant product from day one, not as an adult product that only later discovers children are using it.
 
-## Provisional MVP Baseline
+That means the MVP should choose the conservative path:
 
-### 1. Under-13 Access
+- minimize child data collection
+- require parent involvement for under-13 use
+- make deletion feasible in-product
+- keep third-party data flow explicit
+- avoid relying on weak assumptions about provider free tiers
 
-- No fully independent self-serve under-13 student account.
-- Under-13 student access should require a linked parent or guardian account before normal usage.
-- Parent-linked approval should be part of the account activation flow, not an optional later step.
+## Chosen Defaults For MVP
 
-### 2. Data Minimization
+### 1. Account Model For Under-13 Users
 
-Collect only what the MVP actually needs:
+Chosen default:
+
+- under-13 students do not create normal self-serve accounts on their own
+- a parent or guardian creates the parent account first
+- the parent creates or approves the child profile
+- the child accesses the product only after parent linking is complete
+
+Engineering consequence:
+
+- account state should support `pending_parent_approval`, `active`, and `deletion_requested`
+- parent-student linking is not optional for under-13 accounts
+
+Reason:
+
+- this is the cleanest MVP path that reduces compliance and access-control ambiguity
+
+### 2. Consent Workflow
+
+Chosen default:
+
+- for MVP, under-13 access is limited to parent-created or parent-approved accounts in supervised pilot mode
+- if a child attempts signup directly and indicates they are under 13, capture only the minimum needed to contact the parent
+- send the parent notice and hold the child account in a pending state
+- if parent approval is not completed within 7 days, delete the pending record
+
+What is stored during pending consent:
+
+- parent email
+- child nickname or placeholder
+- age band
+- consent-status timestamps
+
+What is not stored before approval:
+
+- homework uploads
+- chats
+- memory profile
+- tutor notes
+
+Reason:
+
+- it keeps the implementation compatible with a stricter consent flow later without forcing a heavy legal/ops system on day one
+
+### 3. Age Collection
+
+Chosen default:
+
+- collect age band, not full date of birth, wherever possible
+- recommended bands: `6-8`, `9-10`, `11-12`, `13-15`, `16-18`
+- for under-13 gating, use the age-band choice to trigger parent-linking rules
+
+Reason:
+
+- age band is enough for UI, prompt tone, and gating without collecting unnecessary exact birth data
+
+Alternative not chosen:
+
+- exact birth date
+
+Why not:
+
+- it adds sensitive data with little MVP benefit
+
+### 4. Parent Rights In Product
+
+Chosen default:
+
+- parents can review the child's sessions and summaries
+- parents can see linked tutors
+- parents can request deletion of the child's account data from settings
+- parents can revoke tutor access
+- parents can see what data categories are stored
+
+MVP compromise:
+
+- export can be support-assisted at MVP if self-serve export would slow delivery
+
+Reason:
+
+- review and deletion are core rights; export can be implemented later if needed
+
+### 5. Tutor Rules For Under-13 Accounts
+
+Chosen default:
+
+- tutors cannot directly create or activate under-13 student accounts without parent linkage
+- tutors may be linked only after parent approval
+- tutor notes remain private from the student but visible to authorized adults or admins if policy later requires it
+
+Reason:
+
+- parent oversight must stay primary for child accounts
+
+### 6. Data Minimization
+
+Collect only:
 
 - display name or nickname
-- role and linked-account relationships
+- age band
 - language preference
-- school level or age band
+- role and linked-account relationships
 - homework uploads
 - extracted text
 - session chats
 - session summaries
+- workspace state
 - tutor notes
-- student memory items limited to educational relevance
+- memory items limited to educational relevance
+- usage counters
 - audit logs for sensitive access
 
-Avoid collecting by default:
+Do not collect by default:
 
-- precise birth date if age band is sufficient
+- precise birth date
 - home address
-- precise school identity unless truly necessary later
+- precise school name
 - phone number for child accounts
 - advertising identifiers
-- unnecessary behavioral profiling
+- child profile photos
 - sensitive health or psychological labels
+- free-form private family background unless truly required for support
 
-### 3. Provider Handling
+Engineering consequence:
 
-- Prefer providers and settings that do not use child data for provider-side model training or unrelated product improvement.
-- Track which third-party services receive student content: Supabase, Gemini, PostHog, Resend, Lemon Squeezy.
-- Keep provider use documented in user-facing privacy copy and internal implementation docs.
-- Do not assume a provider free tier is acceptable for live minors data; verify the production tier and settings first.
+- uploads should have metadata stripped where feasible
+- forms should avoid fields that invite unnecessary sensitive data
 
-### 4. Parent Rights In Product
+### 7. Third-Party Provider Policy
 
-Parents or guardians should be able to:
+Chosen default:
 
-- review the child's sessions and summaries
-- view what data categories are stored
-- request deletion of the child's account data
-- understand what third-party services are involved
+- use only the minimum providers required for MVP: Supabase, Gemini, PostHog, Resend, Lemon Squeezy
+- do not send child data to a provider unless it is needed for the feature to work
+- do not assume any provider free tier is acceptable for live child data
+- for live under-13 usage, use production provider settings/tiers that are acceptable for minors
 
-Export can be added after MVP if necessary, but review and deletion need to be planned now.
+Specific rule for analytics:
 
-### 5. Retention Baseline
+- student analytics should be minimal
+- avoid capturing raw homework content in analytics
+- if PostHog is used on student surfaces, restrict events to product usage metadata, not child content
 
-Recommended provisional retention rules for planning:
+Specific rule for AI:
 
-- active accounts: retain core homework history while the account remains active
-- parent-requested deletion: remove child-facing and learning-content data from the live product promptly, with full purge targeted within 30 days except where a short retention window is needed for billing, abuse prevention, or backups
-- inactive accounts: define a later auto-review or auto-purge policy before launch rather than storing indefinitely by accident
-- audit logs: retain only what is necessary for access/security review and document the reason
+- send only the content needed for the homework task
+- avoid sending unnecessary account metadata to the model
+- prefer server-side prompt assembly so data flow stays auditable
 
-These values should be confirmed before launch, but the product should be built so retention windows can be configured without redesigning the schema.
+### 8. Retention Windows
 
-### 6. Deletion Baseline
+Chosen default:
 
-The system should support deletion of:
+- pending-consent records: delete after 7 days if parent approval does not complete
+- active uploads and extracted text: keep while the account is active, but delete immediately if the related session or account is deleted
+- inactive child account content: auto-review at 180 days of inactivity, then queue for deletion unless the parent keeps the account active
+- memory items: expire or require refresh after 180 days if they are no longer educationally relevant
+- audit logs for sensitive access: retain for 12 months
+- billing records: retain only as needed for billing/tax operations and keep them logically separate from child learning content
+- backups: allow an operational backup window up to 35 days
 
-- uploads and extracted text
+Reason:
+
+- this is a practical school-year-friendly balance without defaulting to indefinite storage
+
+### 9. Deletion Workflow
+
+Chosen default:
+
+- parents can request deletion from settings
+- deletion should immediately disable access and queue data purge work
+- live product data should be removed promptly
+- full purge target for child learning content is within 30 days, excluding temporary backup retention and strictly necessary billing/security records
+
+Data categories to delete:
+
+- uploads
+- extracted text
 - conversations and messages
+- workspace states
 - summaries
 - tutor notes tied to the child
 - memory items
-- linked-account relationship records where appropriate
+- parent-student and tutor-student links where appropriate
 
-The system may need to retain limited records temporarily for:
+Data categories that may remain temporarily:
 
-- billing reconciliation
-- fraud or abuse investigation
-- operational backups
+- limited billing records
+- security and abuse-review records
+- operational backups during the backup retention window
 
-Any such retained category should be explicitly listed later in privacy copy, not left implicit.
+### 10. Review And Disclosure
+
+Chosen default:
+
+- settings/privacy screens must explain what is stored and why
+- parent linking screens must explain adult visibility and deletion controls
+- the product should avoid vague claims like "we keep your data safe" without concrete controls
+
+## Alternatives Considered
+
+### Alternative A: Block Under-13 Users Entirely Until Later
+
+Pros:
+
+- lowest compliance risk
+
+Why not chosen:
+
+- it conflicts with the product goal and likely first-user base
+
+### Alternative B: Allow Full Under-13 Self-Serve Signup
+
+Pros:
+
+- lowest onboarding friction
+
+Why not chosen:
+
+- too risky for MVP and hard to defend operationally
+
+### Alternative C: Collect Exact Birth Date
+
+Pros:
+
+- precise gating
+
+Why not chosen:
+
+- unnecessary sensitive data for MVP
+
+### Alternative D: Store Child Data Indefinitely Until Manual Deletion
+
+Pros:
+
+- easiest to implement
+
+Why not chosen:
+
+- weak privacy posture and likely to create long-term liability
+
+### Alternative E: Treat A Personal AI Subscription As Fallback Infrastructure
+
+Pros:
+
+- no immediate API cost
+
+Why not chosen:
+
+- not a stable deployable backend dependency
+- unclear rate-limit and terms posture
+- poor traceability and operational resilience
 
 ## Architecture Consequences
 
-To support the baseline above, implementation should include:
+The baseline above requires:
 
-- clear parent-student linking tables
-- explicit deletion workflows
-- storage references that allow attachment cleanup
-- audit logs for sensitive views
-- provider abstraction and documented data flow
-- settings screens that expose data control actions
+- explicit parent-student linking tables
+- account states for pending approval and deletion requested
+- deletion jobs that can clean both database rows and storage objects
+- provider abstraction with documented data flow
+- audit logging for sensitive access
+- settings screens for parent review and deletion actions
+- prompt assembly and provider calls happening server-side
+- analytics designed to avoid child-content capture
 
-## What Still Needs Founder Confirmation
+## Remaining Open Questions
 
-These are still open and should be answered before launch:
+These no longer block architecture, but they still need final review before launch:
 
-1. Exact parent-consent workflow for under-13 students.
-2. Whether tutors can invite students directly or only through parents.
-3. Final retention windows for inactive accounts, uploads, chats, notes, and audit logs.
-4. What data export capability is needed at MVP versus post-MVP.
-5. Exact privacy and consent copy to show during signup and linking.
+1. Whether parent approval should stay in-product only or add a stronger manual verification step for the first pilot.
+2. Whether support-assisted export is enough for MVP.
+3. Exact wording for parent notice, consent, and deletion copy.
+4. Exact tax and billing-retention obligations that Lemon Squeezy may impose.
+5. Whether inactive-account auto-deletion should happen automatically at 180 days or only after parent reminder notice.
 
 ## External Baseline Reference
 

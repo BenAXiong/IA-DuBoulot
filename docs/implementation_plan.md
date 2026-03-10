@@ -15,7 +15,9 @@ Build the smallest serious version of IA DuBoulot: a supervised AI homework coac
 - The product name is locked as `IA DuBoulot`.
 - MVP interface scope is `fr`, `en`, and `zh`, with AI help starting in French first and English only if it is low-cost to add after the French flow is stable.
 - Deployment target is `Vercel`, assuming the Next.js app lives at repository root `./`.
+- The Vercel project is `https://vercel.com/bmavmartinez-8475s-projects/ia-du-boulot`.
 - Primary starter AI direction is `Google Gemini`, but the app must preserve a swappable provider interface from day one. Free-tier usage should be treated as internal prototyping only until provider data-handling terms are acceptable for minors.
+- Personal AI subscriptions are not considered application-backend fallback providers. The realistic API fallback remains open, with OpenAI API as the most likely later candidate after MVP validation.
 - Billing direction is `Lemon Squeezy`.
 
 ## Why The Sequence Changes Slightly From The Brief
@@ -224,9 +226,9 @@ Mitigation:
 These do not block writing docs, but they will block implementation quickly if delayed:
 
 1. Enable branch protection on `main` in GitHub.
-2. Initialize the Vercel project now that the repo is ready to push.
+2. Connect the repo to the existing Vercel project and verify auto-deploy from `main`.
 3. Choose the fallback AI provider after the Gemini-first implementation path is underway.
-4. Confirm the legal/privacy baseline for minors, especially retention and deletion expectations.
+4. Review the chosen minors baseline before launch and tighten it with final policy/legal copy.
 
 ## What "Minors Privacy, Retention, And Deletion Expectations" Means
 

@@ -84,9 +84,9 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Status: accepted
 - Related tasks: `A0.1.4`
 - Context: The founder confirmed Vercel as the preferred deployment platform for the Next.js MVP.
-- Decision: Use Vercel for preview and production deployments, with the app rooted at `./` unless the repository structure changes later.
+- Decision: Use Vercel for preview and production deployments, with the app rooted at `./` unless the repository structure changes later. The current Vercel project is `https://vercel.com/bmavmartinez-8475s-projects/ia-du-boulot`.
 - Why: This is the lowest-friction deployment path for a Next.js MVP and aligns with preview-first iteration.
-- Follow-up: Create the Vercel project after the first push and wire environment variables there.
+- Follow-up: Connect the repo and wire environment variables there.
 
 ### D-20260310-08 - Gemini Is The Primary Starter AI Provider
 
@@ -114,6 +114,26 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Status: accepted
 - Related tasks: `A0.4.4`, `A6.4`
 - Context: The founder wants to support children under 13 but does not yet have final answers for every consent, retention, and deletion detail.
-- Decision: Use [docs/minors_privacy_baseline.md](minors_privacy_baseline.md) as the provisional implementation baseline now, then refine the exact policy and copy before launch.
+- Decision: Use [docs/minors_privacy_baseline.md](minors_privacy_baseline.md) as the chosen MVP implementation baseline now, then refine the exact policy and copy before launch.
 - Why: Auth, schema, provider handling, and deletion workflows cannot be designed responsibly if minors privacy remains completely unspecified.
 - Follow-up: Convert the provisional baseline into finalized product/legal requirements before beta launch.
+
+### D-20260310-12 - Under-13 MVP Defaults Favor Parent-Linked Supervised Access
+
+- Date: 2026-03-10
+- Status: accepted
+- Related tasks: `A0.4.4`, `A5.1`, `A6.4`
+- Context: The founder asked for reasonable under-13 defaults to avoid spending early project time on first-principles policy design.
+- Decision: The MVP baseline uses parent-linked under-13 accounts, age-band collection instead of full birth date, 7-day pending-consent cleanup, 180-day inactivity review for child content, 12-month sensitive-access audit retention, and parent-controlled deletion requests with a 30-day live-data purge target.
+- Why: This is conservative enough to shape architecture now without forcing heavy operational/legal machinery into day-one implementation.
+- Follow-up: Validate the final consent copy, retention wording, and support process before beta launch.
+
+### D-20260310-11 - Personal AI Subscriptions Are Not Backend Fallback Providers
+
+- Date: 2026-03-10
+- Status: accepted
+- Related tasks: `A0.2.4`, `A4.1`
+- Context: The founder has a personal AI subscription under active use and mentioned it as a possible fallback.
+- Decision: Do not treat founder personal subscriptions as application-backend fallback providers. The production-capable API fallback remains open, with OpenAI API as the likely later candidate after MVP validation.
+- Why: Personal subscriptions are not a clean deployable backend dependency and create unclear rate-limit, terms, and operational risks.
+- Follow-up: Select the real API fallback when production load and paid-user economics justify it.
