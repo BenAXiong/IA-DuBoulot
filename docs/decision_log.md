@@ -338,6 +338,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Why: This locks the chat/workspace interaction contract, keeps the route and service boundaries explicit, and lets later AI/upload work replace narrow internals instead of redesigning the session surface from scratch.
 - Follow-up: Replace the deterministic reply helper with the `A4` provider layer, convert workspace upload references into real `attachments` rows, and build the `A3.5` history/summary slice on top of the new workbench.
 
+### D-20260311-34 - A3.5 Makes Session Completion Deterministic Before Real Summary AI
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A3.5.1`, `A3.5.2`, `A3.5.3`
+- Context: The student workbench was now live, but there was still no canonical way to end a session, persist a summary, or browse long-form history. Waiting for the future AI summary layer would have left the product without a stable closure contract and kept `session_summaries` effectively theoretical.
+- Decision: Add `/app/history` as the canonical student history route, extend the conversation detail surface to show summary state, and make `POST /api/conversations/[conversationId]/complete` mark the session completed while upserting one deterministic student summary.
+- Why: This activates the history and summary contract now, keeps the route/service split narrow, and lets later provider-backed summary generation replace a focused helper instead of redefining session completion behavior.
+- Follow-up: Replace deterministic student summaries with provider-backed generation in `A4`, add parent/tutor summary audiences in `A4.5`, and connect real attachment metadata once upload routes exist.
+
 ### D-20260310-11 - Personal AI Subscriptions Are Not Backend Fallback Providers
 
 - Date: 2026-03-10

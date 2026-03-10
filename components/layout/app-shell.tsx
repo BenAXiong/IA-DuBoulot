@@ -16,8 +16,8 @@ type NavItem = {
 
 const navByRole: Record<AppUserRecord["role"], NavItem[]> = {
   student: [
-    { href: "/app#start", label: "Nouveau", hint: "point d'entree devoir" },
-    { href: "/app#sessions", label: "Sessions", hint: "historique recent" },
+    { href: "/app/new", label: "Nouveau", hint: "point d'entree devoir" },
+    { href: "/app/history", label: "Sessions", hint: "historique et resumes" },
     { href: "/app#account", label: "Compte", hint: "profil et preferences" },
   ],
   parent: [

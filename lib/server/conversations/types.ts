@@ -8,6 +8,8 @@ export type ConversationActionIntent =
   | "hint"
   | "summarize";
 
+export type SummaryAudience = "student" | "parent" | "tutor";
+
 export type DraftAttachmentReferenceInput = {
   name: string;
   category: IntakeAttachmentCategory;
@@ -60,6 +62,19 @@ export type ConversationMessageRecord = {
   created_at: string;
 };
 
+export type SessionSummaryRecord = {
+  id: string;
+  conversation_id: string;
+  audience: SummaryAudience;
+  language_code: UiLanguageCode;
+  summary_text: string;
+  weakness_tags: string[];
+  next_step_recommendation: string | null;
+  generated_model_name: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type AppendConversationMessageInput = {
   contentText: string;
   intent: ConversationActionIntent;
@@ -82,6 +97,7 @@ export type ConversationDetail = {
   conversation: ConversationRecord;
   workspace: WorkspaceStateRecord | null;
   messages: ConversationMessageRecord[];
+  summaries: SessionSummaryRecord[];
 };
 
 export type ListConversationSummary = Pick<
@@ -100,6 +116,11 @@ export type CreateConversationDraftResult = {
   conversation: ConversationRecord;
   workspace: WorkspaceStateRecord;
   initialMessage: ConversationMessageRecord;
+};
+
+export type CompleteConversationResult = {
+  conversation: ConversationRecord;
+  summaries: SessionSummaryRecord[];
 };
 
 export type ConversationViewer = Pick<

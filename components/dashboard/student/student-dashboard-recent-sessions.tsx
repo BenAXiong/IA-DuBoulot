@@ -43,9 +43,9 @@ export function StudentDashboardRecentSessions({
           Sessions recentes
         </p>
         <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
-          Reprendre le contexte avant d&apos;ouvrir un nouveau devoir.
+          Reprendre vite, puis basculer vers l&apos;historique complet si besoin.
         </h2>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {subjectRollup.length > 0 ? (
             subjectRollup.slice(0, 6).map((subject) => (
               <StudentStatusPill
@@ -56,6 +56,12 @@ export function StudentDashboardRecentSessions({
           ) : (
             <StudentStatusPill label="Aucun tag recent" tone="warning" />
           )}
+          <Link
+            className="inline-flex rounded-full border border-[color:var(--line)] bg-white px-3 py-1 text-sm font-medium text-[color:var(--foreground)] transition hover:-translate-y-0.5"
+            href="/app/history"
+          >
+            Tout voir
+          </Link>
         </div>
       </div>
 
@@ -64,7 +70,8 @@ export function StudentDashboardRecentSessions({
           <p className="font-medium">Aucune session enregistree pour l&apos;instant.</p>
           <p className="mt-2 text-sm leading-6 text-[color:var(--ink-soft)]">
             Des que le premier devoir passera par le produit, cette zone affichera
-            l&apos;historique recent, les tags de matiere, puis la reprise detaillee en `A3.5`.
+            l&apos;historique recent, les tags de matiere, puis la reprise detaillee
+            depuis `/app/history`.
           </p>
         </article>
       ) : (
@@ -91,8 +98,8 @@ export function StudentDashboardRecentSessions({
                     {session.title}
                   </h3>
                   <p className="mt-2 text-sm leading-6 text-[color:var(--ink-soft)]">
-                    Cette session peut deja etre rouverte. Le detail historique
-                    plus riche et les resumes arriveront ensuite avec `A3.5`.
+                    Cette session peut deja etre rouverte, puis l&apos;historique complet
+                    reste centralise sur `/app/history`.
                   </p>
                 </div>
               </div>

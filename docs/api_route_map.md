@@ -18,6 +18,7 @@ Current implemented routes:
 - `GET /api/conversations`
 - `POST /api/conversations`
 - `GET /api/conversations/[conversationId]`
+- `POST /api/conversations/[conversationId]/complete`
 - `POST /api/conversations/[conversationId]/messages`
 - `PATCH /api/conversations/[conversationId]/workspace`
 

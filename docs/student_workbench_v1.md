@@ -1,6 +1,6 @@
 # Student Workbench V1
 
-Related: [README](../README.md) | [MVP to-do list](mvp_todo.md) | [Student session persistence V1](student_session_persistence_v1.md) | [API route map](api_route_map.md) | [Service interfaces](service_interfaces.md) | [Storage and attachment rules](storage_attachment_rules.md)
+Related: [README](../README.md) | [MVP to-do list](mvp_todo.md) | [Student session persistence V1](student_session_persistence_v1.md) | [Student history and summary V1](student_history_summary_v1.md) | [API route map](api_route_map.md) | [Service interfaces](service_interfaces.md) | [Storage and attachment rules](storage_attachment_rules.md)
 
 ## Purpose
 
@@ -37,6 +37,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 3. lets the student send a freeform message, ask for a hint, or request a summary
 4. saves workspace edits through a dedicated server route
 5. keeps validated upload references as text in workspace notes until real attachments exist
+6. renders the summary/closure panel that now drives `A3.5`
 
 ## Interaction Rules
 
@@ -50,6 +51,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 - the current hint and summarize actions are not real AI calls yet
 - the upload control does not create `attachments` rows or store binary files
 - selected files are validated with the same intake constraints, then written as human-readable references into `workspace_states.student_notes`
+- once the session is marked complete, the workbench becomes read-only for student writes
 - true attachment upload, extraction, and provider-backed coaching still belong to later phases
 
 ## Validation Record
@@ -62,6 +64,6 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 
 ## Next Extension Points
 
-- `A3.5`: add richer history/detail/summary behavior on top of the new workbench
+- [Student history and summary V1](student_history_summary_v1.md): the workbench now feeds explicit completion and summary behavior
 - upload routes: replace text-only file references with real `attachments` rows and private storage objects
 - `A4.1` to `A4.4`: replace the deterministic draft coach with the real provider, prompts, extraction, and moderation stack

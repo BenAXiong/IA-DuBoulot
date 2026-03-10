@@ -43,9 +43,12 @@ Code:
 - `app/app/layout.tsx`
 - `components/layout/app-shell.tsx`
 
-Current route using it:
+Current routes using it:
 
 - `/app`
+- `/app/history`
+- `/app/new`
+- `/app/conversations/[conversationId]`
 
 Rules:
 
@@ -72,19 +75,22 @@ Rule:
 
 ## Navigation Model
 
-The authenticated shell currently uses same-page anchors for the first pass:
+The authenticated shell now uses a hybrid model:
 
-- `#overview`
-- `#actions`
-- `#students`
-- `#links`
-- `#operations`
-- `#account`
+- real sub-routes for student workflow surfaces:
+  - `/app/new`
+  - `/app/history`
+- same-page anchors where a role still has one page module:
+  - `#actions`
+  - `#students`
+  - `#links`
+  - `#operations`
+  - `#account`
 
 Why:
 
-- real sub-routes for sessions, billing, notes, and student lists do not exist yet
-- anchor navigation still gives the shell a stable structure without inventing fake routes
+- the student workflow now has enough real depth to deserve stable routes
+- parent, tutor, and admin surfaces are still too early to justify fake sub-route sprawl
 
 ## iPad Validation
 

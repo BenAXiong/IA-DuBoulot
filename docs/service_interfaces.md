@@ -233,6 +233,6 @@ Inside each domain:
 
 ## Immediate Next Implementations
 
-- replace the deterministic draft-coach reply helper with the swappable provider layer in `A4.1`
+- replace the deterministic draft-coach and deterministic completion-summary helpers with the swappable provider layer in `A4.1`
 - add upload storage routes/services so the workbench upload control becomes real `attachments` rows
-- build `A3.5` session history and summary behavior on top of the now-live student workbench
+- extend the now-live history/summary contract into parent and tutor audiences in `A4.5`

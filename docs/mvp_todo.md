@@ -8,11 +8,11 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 
-- Overall: `[#############.................]` `57/128` complete (`45%`)
+- Overall: `[##############................]` `60/128` complete (`47%`)
 - A0: `[xxxxxxxxxxxxxxxx.....]` `16/21`
 - A1: `[xxxxxxxxxxxxxxxx]` `16/16`
 - A2: `[xxxxxxxxxxx......]` `11/17`
-- A3: `[xxxxxxxxxxxxxx...]` `14/17`
+- A3: `[xxxxxxxxxxxxxxxxx]` `17/17`
 - A4: `[...................]` `0/19`
 - A5: `[.............]` `0/13`
 - A6: `[.............]` `0/13`
@@ -164,7 +164,7 @@ Status note: on 2026-03-11 the shell was checked in a browser pass at `820x1180`
 - [ ] A2.4.2 Add server/runtime logging conventions.
 - [ ] A2.4.3 Add feature flags or environment toggles for risky integrations.
 
-## 🟨 Phase A3 - Student Core Workflow
+## 🟩 Phase A3 - Student Core Workflow
 
 Outcome: a student can complete a full homework-help session through the product.
 
@@ -215,9 +215,14 @@ Status note: on 2026-03-11 the workbench was checked in a Playwright emulated ta
 
 ### A3.5 Session History And Summary
 
-- [ ] A3.5.1 Build the student session history list.
-- [ ] A3.5.2 Build the student session detail and summary view.
-- [ ] A3.5.3 Support marking a session complete and triggering summary generation.
+- [x] A3.5.1 Build the student session history list.
+- [x] A3.5.2 Build the student session detail and summary view.
+- [x] A3.5.3 Support marking a session complete and triggering summary generation.
+
+Reference: [Student history and summary V1](student_history_summary_v1.md)
+Status note: `/app/history` is now the canonical long-form student session list, while `/app` keeps only recent-session shortcuts.
+Status note: `/app/conversations/[conversationId]` now renders the persisted student summary and a completion card in the same detail surface as the transcript and workspace.
+Status note: `POST /api/conversations/[conversationId]/complete` now marks the session `completed`, freezes further student writes, and upserts a deterministic `student` summary record.
 
 ## ⬜ Phase A4 - AI Coaching, Extraction, And Safety
 

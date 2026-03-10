@@ -3,6 +3,7 @@ import "server-only";
 import { AppError } from "@/lib/server/errors/app-error";
 import { logRuntimeInfo } from "@/lib/server/audit/runtime-logger";
 import { recordAuditEvent } from "@/lib/server/audit/audit-service";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AuthenticatedUserContext } from "@/lib/server/auth/types";
 import {
@@ -14,9 +15,11 @@ import {
   buildInitialWorkspaceFromDraft,
   buildStudentIntentMessage,
 } from "@/lib/server/conversations/draft-coach";
+import { buildDeterministicStudentSessionSummary } from "@/lib/server/conversations/draft-summary";
 import type {
   AppendConversationMessageInput,
   AppendConversationMessageResult,
+  CompleteConversationResult,
   ConversationDetail,
   ConversationMessageRecord,
   ConversationRecord,
@@ -25,6 +28,7 @@ import type {
   CreateConversationDraftResult,
   DraftAttachmentReferenceInput,
   ListConversationSummary,
+  SessionSummaryRecord,
   UpdateWorkspaceInput,
   WorkspaceStateRecord,
 } from "@/lib/server/conversations/types";
@@ -35,6 +39,8 @@ const WORKSPACE_SELECT =
   "conversation_id, assignment_text, edited_extracted_text, plan_text, draft_answer_text, student_notes, updated_at";
 const MESSAGE_SELECT =
   "id, conversation_id, author_user_id, role, content_text, content_language, created_at";
+const SUMMARY_SELECT =
+  "id, conversation_id, audience, language_code, summary_text, weakness_tags, next_step_recommendation, generated_model_name, created_at, updated_at";
 
 function toServiceError(message: string, cause: unknown) {
   return new AppError({
@@ -534,7 +540,7 @@ export async function loadConversationDetail(input: {
     });
   }
 
-  const [workspaceResult, messagesResult] = await Promise.all([
+  const [workspaceResult, messagesResult, summariesResult] = await Promise.all([
     supabase
       .from("workspace_states")
       .select(WORKSPACE_SELECT)
@@ -545,6 +551,11 @@ export async function loadConversationDetail(input: {
       .select(MESSAGE_SELECT)
       .eq("conversation_id", input.conversationId)
       .order("created_at", { ascending: true }),
+    supabase
+      .from("session_summaries")
+      .select(SUMMARY_SELECT)
+      .eq("conversation_id", input.conversationId)
+      .order("created_at", { ascending: false }),
   ]);
 
   if (workspaceResult.error) {
@@ -555,10 +566,15 @@ export async function loadConversationDetail(input: {
     throw toServiceError("Unable to load the conversation history.", messagesResult.error);
   }
 
+  if (summariesResult.error) {
+    throw toServiceError("Unable to load the visible summaries.", summariesResult.error);
+  }
+
   return {
     conversation,
     workspace: workspaceResult.data ?? null,
     messages: (messagesResult.data ?? []) as ConversationMessageRecord[],
+    summaries: (summariesResult.data ?? []) as SessionSummaryRecord[],
   };
 }
 
@@ -574,6 +590,14 @@ export async function appendConversationTurn(input: {
       context: input.context,
       conversationId: input.conversationId,
     });
+
+  if (conversation.status !== "active") {
+    throw new AppError({
+      code: "conflict",
+      message: "Completed sessions are read-only.",
+      status: 409,
+    });
+  }
 
   const { data: workspace, error: workspaceError } = await supabase
     .from("workspace_states")
@@ -686,6 +710,14 @@ export async function updateWorkspaceState(input: {
       conversationId: input.conversationId,
     });
 
+  if (conversation.status !== "active") {
+    throw new AppError({
+      code: "conflict",
+      message: "Completed sessions are read-only.",
+      status: 409,
+    });
+  }
+
   const assignmentText = normalizeText(input.payload.assignmentText);
   const editedExtractedText = normalizeText(input.payload.editedExtractedText);
   const planText = normalizeText(input.payload.planText);
@@ -736,4 +768,180 @@ export async function updateWorkspaceState(input: {
   });
 
   return workspace;
+}
+
+async function upsertStudentSummary(input: {
+  conversation: ConversationRecord;
+  workspace: WorkspaceStateRecord | null;
+  messages: ConversationMessageRecord[];
+  languageCode: ConversationViewer["preferred_ui_language"];
+}) {
+  const supabase = createSupabaseAdminClient();
+  const summaryPayload = buildDeterministicStudentSessionSummary({
+    conversation: input.conversation,
+    workspace: input.workspace,
+    messages: input.messages,
+    languageCode: input.languageCode,
+  });
+
+  const { data, error } = await supabase
+    .from("session_summaries")
+    .upsert(
+      {
+        conversation_id: input.conversation.id,
+        audience: "student",
+        ...summaryPayload,
+      },
+      {
+        onConflict: "conversation_id,audience,language_code",
+      },
+    )
+    .select(SUMMARY_SELECT)
+    .single<SessionSummaryRecord>();
+
+  if (error) {
+    throw toServiceError("Unable to persist the student summary.", error);
+  }
+
+  return data;
+}
+
+function mergeSummaryRecord(
+  summaries: SessionSummaryRecord[],
+  nextSummary: SessionSummaryRecord,
+) {
+  const remaining = summaries.filter(
+    (summary) =>
+      !(
+        summary.audience === nextSummary.audience &&
+        summary.language_code === nextSummary.language_code
+      ),
+  );
+
+  return [nextSummary, ...remaining].sort((left, right) =>
+    right.created_at.localeCompare(left.created_at),
+  );
+}
+
+export async function completeConversation(input: {
+  context: AuthenticatedUserContext;
+  conversationId: string;
+  requestId: string;
+  route: string;
+}): Promise<CompleteConversationResult> {
+  const { appUser, conversation, supabase } =
+    await requireWritableStudentConversation({
+      context: input.context,
+      conversationId: input.conversationId,
+    });
+
+  if (conversation.status === "archived") {
+    throw new AppError({
+      code: "conflict",
+      message: "Archived sessions cannot be completed again.",
+      status: 409,
+    });
+  }
+
+  const [workspaceResult, messagesResult, summariesResult] = await Promise.all([
+    supabase
+      .from("workspace_states")
+      .select(WORKSPACE_SELECT)
+      .eq("conversation_id", input.conversationId)
+      .maybeSingle<WorkspaceStateRecord>(),
+    supabase
+      .from("messages")
+      .select(MESSAGE_SELECT)
+      .eq("conversation_id", input.conversationId)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("session_summaries")
+      .select(SUMMARY_SELECT)
+      .eq("conversation_id", input.conversationId)
+      .order("created_at", { ascending: false }),
+  ]);
+
+  if (workspaceResult.error) {
+    throw toServiceError("Unable to load the workspace before completion.", workspaceResult.error);
+  }
+
+  if (messagesResult.error) {
+    throw toServiceError("Unable to load conversation messages before completion.", messagesResult.error);
+  }
+
+  if (summariesResult.error) {
+    throw toServiceError("Unable to load existing summaries before completion.", summariesResult.error);
+  }
+
+  const now = new Date().toISOString();
+  let completedConversation = conversation;
+
+  if (conversation.status !== "completed") {
+    const { data, error } = await supabase
+      .from("conversations")
+      .update({
+        status: "completed",
+        completed_at: now,
+        last_message_at: now,
+      })
+      .eq("id", input.conversationId)
+      .select(CONVERSATION_SELECT)
+      .single<ConversationRecord>();
+
+    if (error) {
+      throw toServiceError("Unable to mark the conversation complete.", error);
+    }
+
+    completedConversation = data;
+  }
+
+  const studentSummary = await upsertStudentSummary({
+    conversation: completedConversation,
+    workspace: workspaceResult.data ?? null,
+    messages: (messagesResult.data ?? []) as ConversationMessageRecord[],
+    languageCode: appUser.preferred_ui_language,
+  });
+  const summaries = mergeSummaryRecord(
+    (summariesResult.data ?? []) as SessionSummaryRecord[],
+    studentSummary,
+  );
+
+  logRuntimeInfo({
+    message: "Completed conversation",
+    requestId: input.requestId,
+    route: input.route,
+    method: "POST",
+    actorUserId: appUser.id,
+    actorRole: appUser.role,
+    targetStudentUserId: appUser.id,
+    details: {
+      conversationId: input.conversationId,
+      summaryAudience: studentSummary.audience,
+    },
+  });
+
+  try {
+    await recordAuditEvent({
+      actorUserId: appUser.id,
+      actorRole: appUser.role,
+      action: "conversation_complete",
+      targetTable: "conversations",
+      targetId: input.conversationId,
+      studentUserId: appUser.id,
+      conversationId: input.conversationId,
+      metadata: {
+        request_id: input.requestId,
+        route: input.route,
+        summary_audience: studentSummary.audience,
+      },
+      requestId: input.requestId,
+    });
+  } catch {
+    // Audit failures should not block the student flow.
+  }
+
+  return {
+    conversation: completedConversation,
+    summaries,
+  };
 }

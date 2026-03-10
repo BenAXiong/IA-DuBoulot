@@ -14,6 +14,7 @@ import {
 } from "@/components/dashboard/student/student-dashboard-presenters";
 import { StudentChatThread } from "@/components/dashboard/student/student-chat-thread";
 import { StudentConversationComposer } from "@/components/dashboard/student/student-conversation-composer";
+import { StudentSessionSummaryPanel } from "@/components/dashboard/student/student-session-summary-panel";
 import {
   StudentWorkspacePanel,
   type WorkspaceDraftState,
@@ -22,6 +23,8 @@ import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type {
   ConversationDetail,
   ConversationMessageRecord,
+  ConversationRecord,
+  SessionSummaryRecord,
 } from "@/lib/server/conversations/types";
 
 type StudentConversationWorkbenchProps = {
@@ -58,6 +61,21 @@ type WorkspaceRouteResponse =
       };
     };
 
+type CompleteRouteResponse =
+  | {
+      ok: true;
+      data: {
+        conversation: ConversationRecord;
+        summaries: SessionSummaryRecord[];
+      };
+    }
+  | {
+      ok?: false;
+      error?: {
+        message?: string;
+      };
+    };
+
 function buildInitialWorkspace(detail: ConversationDetail): WorkspaceDraftState {
   return {
     assignmentText:
@@ -76,7 +94,9 @@ export function StudentConversationWorkbench({
   detail,
   languageCode,
 }: StudentConversationWorkbenchProps) {
+  const [conversation, setConversation] = useState(detail.conversation);
   const [messages, setMessages] = useState(detail.messages);
+  const [summaries, setSummaries] = useState(detail.summaries);
   const [workspace, setWorkspace] = useState<WorkspaceDraftState>(
     buildInitialWorkspace(detail),
   );
@@ -84,9 +104,15 @@ export function StudentConversationWorkbench({
   const [chatError, setChatError] = useState<string | null>(null);
   const [workspaceMessage, setWorkspaceMessage] = useState<string | null>(null);
   const [workspaceError, setWorkspaceError] = useState<string | null>(null);
+  const [completionMessage, setCompletionMessage] = useState<string | null>(null);
+  const [completionError, setCompletionError] = useState<string | null>(null);
   const [isSending, startSending] = useTransition();
   const [isSaving, startSaving] = useTransition();
+  const [isCompleting, startCompleting] = useTransition();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const isReadOnly = conversation.status !== "active";
+  const studentSummary =
+    summaries.find((summary) => summary.audience === "student") ?? null;
 
   async function sendMessage(intent: "student_message" | "hint" | "summarize") {
     setChatError(null);
@@ -98,7 +124,7 @@ export function StudentConversationWorkbench({
 
     startSending(async () => {
       const response = await fetch(
-        `/api/conversations/${detail.conversation.id}/messages`,
+        `/api/conversations/${conversation.id}/messages`,
         {
           method: "POST",
           headers: {
@@ -188,7 +214,7 @@ export function StudentConversationWorkbench({
 
     startSaving(async () => {
       const response = await fetch(
-        `/api/conversations/${detail.conversation.id}/workspace`,
+        `/api/conversations/${conversation.id}/workspace`,
         {
           method: "PATCH",
           headers: {
@@ -222,6 +248,39 @@ export function StudentConversationWorkbench({
     });
   }
 
+  function completeSession() {
+    setCompletionError(null);
+    setCompletionMessage(null);
+
+    startCompleting(async () => {
+      const response = await fetch(
+        `/api/conversations/${conversation.id}/complete`,
+        {
+          method: "POST",
+        },
+      );
+
+      const payload = (await response
+        .json()
+        .catch(() => null)) as CompleteRouteResponse | null;
+      const routeErrorMessage =
+        payload && "error" in payload ? payload.error?.message : null;
+
+      if (!response.ok || !payload?.ok || !payload.data?.conversation) {
+        setCompletionError(
+          routeErrorMessage ?? "Impossible de terminer cette session.",
+        );
+        return;
+      }
+
+      setConversation(payload.data.conversation);
+      setSummaries(payload.data.summaries ?? []);
+      setCompletionMessage("Session terminee. Le resume eleve est maintenant fige.");
+      setChatError(null);
+      setWorkspaceError(null);
+    });
+  }
+
   return (
     <div className="grid gap-6">
       <input
@@ -236,12 +295,12 @@ export function StudentConversationWorkbench({
       <section className="grid gap-6 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] lg:grid-cols-[1.15fr_0.85fr]">
         <article className="space-y-4">
           <div className="flex flex-wrap gap-2">
-            <StudentStatusPill label={detail.conversation.subject_tag} tone="accent" />
+            <StudentStatusPill label={conversation.subject_tag} tone="accent" />
             <StudentStatusPill
-              label={getConversationStatusLabel(detail.conversation.status)}
+              label={getConversationStatusLabel(conversation.status)}
             />
             <StudentStatusPill
-              label={detail.conversation.graded_homework ? "Notee" : "Exercice libre"}
+              label={conversation.graded_homework ? "Notee" : "Exercice libre"}
             />
           </div>
 
@@ -250,12 +309,12 @@ export function StudentConversationWorkbench({
               Chat et espace de travail
             </p>
             <h1 className="font-[family-name:var(--font-heading)] text-4xl leading-tight sm:text-5xl">
-              {detail.conversation.title}
+              {conversation.title}
             </h1>
             <p className="text-sm leading-7 text-[color:var(--ink-soft)]">
-              La session garde maintenant un transcript reel, des actions d&apos;indice
-              et de resume, et un espace de travail sauvegardable avant l&apos;arrivee
-              du vrai moteur IA.
+              La session garde maintenant un transcript reel, des actions
+              d&apos;indice et de resume, puis une vraie cloture avec resume
+              persiste avant l&apos;arrivee du moteur IA.
             </p>
           </div>
         </article>
@@ -263,23 +322,23 @@ export function StudentConversationWorkbench({
         <article className="grid gap-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5 text-sm">
           <p className="font-medium">Reprise</p>
           <p className="text-[color:var(--ink-soft)]">
-            Cree le {formatDateLabel(detail.conversation.created_at, languageCode)}
+            Cree le {formatDateLabel(conversation.created_at, languageCode)}
           </p>
           <p className="text-[color:var(--ink-soft)]">
             Derniere activite le{" "}
             {formatDateLabel(
               messages.at(-1)?.created_at ??
-                detail.conversation.last_message_at ??
-                detail.conversation.created_at,
+                conversation.last_message_at ??
+                conversation.created_at,
               languageCode,
             )}
           </p>
           <div className="flex flex-wrap gap-3">
             <Link
               className="inline-flex justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 font-medium transition hover:-translate-y-0.5"
-              href="/app"
+              href="/app/history"
             >
-              Retour au dashboard
+              Voir l&apos;historique
             </Link>
             <Link
               className="inline-flex justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 font-medium transition hover:-translate-y-0.5"
@@ -309,7 +368,7 @@ export function StudentConversationWorkbench({
 
             <StudentConversationComposer
               composerText={composerText}
-              disabled={false}
+              disabled={isReadOnly}
               isSending={isSending}
               onComposerTextChange={setComposerText}
               onRequestHint={() => sendMessage("hint")}
@@ -323,17 +382,35 @@ export function StudentConversationWorkbench({
                 {chatError}
               </p>
             ) : null}
+
+            {isReadOnly ? (
+              <p className="rounded-[1.25rem] border border-[#cbbf8d] bg-[#fff8df] px-4 py-3 text-sm leading-6 text-[#69551b]">
+                Cette session est terminee. Le transcript reste lisible, mais les
+                nouvelles ecritures passent maintenant par une nouvelle session.
+              </p>
+            ) : null}
           </div>
         </article>
 
-        <StudentWorkspacePanel
-          disabled={false}
-          isSaving={isSaving}
-          onSaveWorkspace={saveWorkspace}
-          onWorkspaceChange={setWorkspace}
-          saveMessage={workspaceError ?? workspaceMessage}
-          workspace={workspace}
-        />
+        <div className="grid gap-6">
+          <StudentSessionSummaryPanel
+            conversation={conversation}
+            feedbackMessage={completionError ?? completionMessage}
+            isCompleting={isCompleting}
+            languageCode={languageCode}
+            onComplete={completeSession}
+            summary={studentSummary}
+          />
+
+          <StudentWorkspacePanel
+            disabled={isReadOnly}
+            isSaving={isSaving}
+            onSaveWorkspace={saveWorkspace}
+            onWorkspaceChange={setWorkspace}
+            saveMessage={workspaceError ?? workspaceMessage}
+            workspace={workspace}
+          />
+        </div>
       </section>
     </div>
   );

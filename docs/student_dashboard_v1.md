@@ -83,12 +83,11 @@ Those belong to the later upload and coaching phases.
 
 ## Known Boundaries
 
-- recent sessions can now reopen persisted draft pages, but the richer history/summaries layer still belongs to `A3.5`
+- recent sessions on `/app` are intentionally short; the canonical long-form list now lives at `/app/history`
 - usage is display-only until `A6.2` adds real trial/quota enforcement
 - under-13 blocking still depends on the existing parent-approval flow documented in [Invitation flows V1](invitation_flows_v1.md)
 
 ## Next Extension Points
 
-- `A3.2.1`: mount the real title-and-subject form on `/app/new`
-- `A3.2.2` to `A3.2.4`: add upload and extraction-review steps
-- `A3.3.1`: persist the first conversation shell instead of using a staging route only
+- extend recent-session cards and counts only when they still complement, rather than duplicate, `/app/history`
+- keep the dashboard focused on start-state and short status signals while summaries stay in the dedicated session surfaces
