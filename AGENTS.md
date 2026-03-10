@@ -29,12 +29,13 @@ Read these in order before any substantial implementation work:
 6. [docs/environment_matrix.md](docs/environment_matrix.md)
 7. [docs/supabase_project_setup.md](docs/supabase_project_setup.md)
 8. [docs/supabase_schema_v1.md](docs/supabase_schema_v1.md)
-9. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
-10. [docs/mvp_todo.md](docs/mvp_todo.md)
-11. [docs/mvp_timeline.md](docs/mvp_timeline.md)
-12. [docs/decision_log.md](docs/decision_log.md)
-13. [docs/work_sessions.md](docs/work_sessions.md)
-14. The relevant code, SQL, prompt, or UI files for the task being worked on
+9. [docs/access_rules_v1.md](docs/access_rules_v1.md)
+10. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
+11. [docs/mvp_todo.md](docs/mvp_todo.md)
+12. [docs/mvp_timeline.md](docs/mvp_timeline.md)
+13. [docs/decision_log.md](docs/decision_log.md)
+14. [docs/work_sessions.md](docs/work_sessions.md)
+15. The relevant code, SQL, prompt, or UI files for the task being worked on
 
 If a file above is outdated, update it before or alongside the code change that depends on it.
 

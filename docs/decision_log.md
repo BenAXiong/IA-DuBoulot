@@ -128,15 +128,15 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Why: This is conservative enough to shape architecture now without forcing heavy operational/legal machinery into day-one implementation.
 - Follow-up: Validate the final consent copy, retention wording, and support process before beta launch.
 
-### D-20260310-13 - Main Branch Workflow Uses Active Protection And Lightweight PRs
+### D-20260310-13 - Main Branch Uses Active Protection Without Mandatory PRs Yet
 
 - Date: 2026-03-10
 - Status: accepted
 - Related tasks: `A0.1.2`, `A0.1.5`
-- Context: The repo now needs a durable main-branch workflow that keeps history clean without blocking a solo founder using Codex heavily.
-- Decision: Use an active GitHub ruleset on `main`, keep `Require a pull request before merging` enabled with `0` required approvals, prefer squash merges, and use repository-owner bypass only for bootstrap or emergency direct pushes.
-- Why: This gives branch discipline without inventing review overhead the repo cannot support yet.
-- Follow-up: Add required status checks once CI exists.
+- Context: The repo now needs durable `main` protection, but the founder is still in a fast bootstrap phase with heavy direct Codex usage and no CI gates yet.
+- Decision: Use an active GitHub ruleset on `main` with deletion and force-push protection, but leave `Require a pull request before merging` off for now. Prefer squash merges when PRs are used, and switch to mandatory PRs later once CI and a steadier review flow exist.
+- Why: This protects the branch without blocking direct pushes during bootstrap.
+- Follow-up: Add required status checks and consider turning PR enforcement on once CI exists.
 
 ### D-20260310-14 - Role Access Is Defined By Explicit Links And Audited Sensitive Reads
 
@@ -167,6 +167,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Enable RLS on every app table directly in the initial migration, then add policies in `A1.2`.
 - Why: It is safer to have locked tables with missing policies than exposed tables with forgotten RLS.
 - Follow-up: Write table-by-table policies next and do not expose any browser data flow before that pass is complete.
+
+### D-20260310-17 - Direct Browser RLS Stays Stricter Than Product Capability
+
+- Date: 2026-03-10
+- Status: accepted
+- Related tasks: `A1.2.1`, `A1.2.2`, `A1.2.3`
+- Context: Some product actions, especially billing, summaries, moderation, and audit writes, should not be exposed as broad browser-level table mutations even if the product eventually allows those outcomes.
+- Decision: Keep direct authenticated table access conservative in RLS, and reserve privileged writes for server-side or service-role paths where needed.
+- Why: This reduces accidental exposure while the app is still gaining server-side authorization layers.
+- Follow-up: Mirror these constraints explicitly when server routes and server actions are implemented.
 
 ### D-20260310-11 - Personal AI Subscriptions Are Not Backend Fallback Providers
 

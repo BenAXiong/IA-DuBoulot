@@ -13,32 +13,23 @@ Apply this to `main`:
 - Enforcement status: `Active`
 - Restrict deletions: `On`
 - Restrict force pushes: `On`
-- Require a pull request before merging: `On`
-- Required approvals: `0`
-- Dismiss stale approvals: `Off`
-- Require review from specific teams: `Off`
-- Require review from Code Owners: `Off`
-- Require approval of the most recent reviewable push: `Off`
-- Require conversation resolution before merging: `Off` for now
-- Allowed merge methods: prefer `Squash` only
-
-Recommended bypass:
-
-- repository owner only
+- Require a pull request before merging: `Off` for now
+- Allowed merge methods: prefer `Squash` when PRs are used
 
 Important:
 
-- if `Require a pull request before merging` is on and there is no bypass, direct pushes to `main` will be blocked
-- use owner bypass only for bootstrap or emergency work, not as the default workflow forever
+- this matches the current solo-founder bootstrap workflow and keeps direct pushes available
+- turn PR enforcement on later when CI and a steadier branch review rhythm exist
 
 ## Default Working Flow
 
 1. Pull the latest `main`.
-2. Create a task-scoped branch.
-3. Make the change.
-4. Update docs, logs, and task status in the same branch.
-5. Open a PR to `main`.
-6. Squash merge when the branch is coherent.
+2. For small or low-risk work, direct commits to `main` are acceptable if the traceability docs are updated in the same change.
+3. For larger or riskier work, create a task-scoped branch.
+4. Make the change.
+5. Update docs, logs, and task status in the same branch or commit set.
+6. Open a PR to `main` when branch review adds value.
+7. Squash merge when the branch is coherent.
 
 ## Branch Naming
 
@@ -93,15 +84,20 @@ Every PR should state:
 - what was verified
 - what remains open
 
-## Bootstrap Exception
+## Direct Push Guardrails
 
-During early bootstrap, direct pushes may still happen if:
+Direct pushes to `main` are acceptable right now if:
 
-- the owner uses bypass intentionally
-- the change is low-risk and traceability docs are updated
+- the change stays understandable as a single coherent update
+- the traceability docs are updated in the same change
+- the task IDs are present in commit and log context
 
 Even in that case:
 
 - update [work_sessions.md](work_sessions.md)
 - update [decision_log.md](decision_log.md) if structure changed
 - update [mvp_todo.md](mvp_todo.md) task state
+
+Later target:
+
+- once CI exists and the repo is less bootstrap-heavy, turn on `Require a pull request before merging`

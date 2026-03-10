@@ -62,13 +62,17 @@ Outcome: the data model, access rules, and backend boundaries are explicit befor
 - [x] A1.1.5 Review the schema against the role matrix and MVP scope boundaries.
 
 Reference: [Supabase schema V1](supabase_schema_v1.md) and [initial schema SQL](../supabase/migrations/20260310_000001_initial_schema.sql)
+Status note: the initial schema SQL has been applied successfully in the hosted Supabase project.
 
 ### A1.2 Access Control And RLS
 
-- [ ] A1.2.1 Write table-by-table access rules before coding policies.
+- [x] A1.2.1 Write table-by-table access rules before coding policies.
 - [ ] A1.2.2 Implement RLS policies for each role relationship.
 - [ ] A1.2.3 Add server-side authorization checks for all sensitive routes.
 - [ ] A1.2.4 Verify student, parent, tutor, and admin visibility with seeded test accounts.
+
+Reference: [Access rules V1](access_rules_v1.md) and [RLS migration draft](../supabase/migrations/20260310_000002_access_rules_and_rls.sql)
+Status note: `A1.2.2` is drafted in the repo but should stay open until the SQL is applied and verified in Supabase.
 
 ### A1.3 Backend Contracts
 

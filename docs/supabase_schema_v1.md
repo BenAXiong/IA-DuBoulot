@@ -1,6 +1,6 @@
 # Supabase Schema V1
 
-Related: [README](../README.md) | [Implementation plan](implementation_plan.md) | [Role and access matrix](role_access_matrix.md) | [Minors privacy baseline](minors_privacy_baseline.md) | [Initial schema SQL](../supabase/migrations/20260310_000001_initial_schema.sql)
+Related: [README](../README.md) | [Implementation plan](implementation_plan.md) | [Role and access matrix](role_access_matrix.md) | [Access rules V1](access_rules_v1.md) | [Minors privacy baseline](minors_privacy_baseline.md) | [Initial schema SQL](../supabase/migrations/20260310_000001_initial_schema.sql)
 
 ## Purpose
 
