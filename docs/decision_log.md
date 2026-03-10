@@ -308,6 +308,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Why: This keeps the page thin, avoids a god dashboard component, and gives future A3 work a stable place to extend when title/subject entry, uploads, and conversation creation arrive.
 - Follow-up: Mount the real intake form on `/app/new` in `A3.2`, and keep named adult display out of the student UI until there is an explicitly-authorized server-side path for it.
 
+### D-20260311-31 - Student Intake Is Implemented Before Persistence And OCR
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A3.2.1`, `A3.2.2`, `A3.2.3`, `A3.2.4`
+- Context: The new `/app/new` route needed to become a real student workflow surface, but the conversation APIs, upload-confirm routes, and extraction pipeline are still future work. Binding the intake UI directly to unfinished persistence would either force throwaway APIs or delay meaningful UX work.
+- Decision: Implement the intake form now as a protected, browser-local staging surface with explicit limits, file-type validation, pasted-text input, graded-homework toggle, and an editable extracted-text review panel. Keep conversation creation, attachment persistence, and true OCR out of this slice.
+- Why: This lets the product lock the student-facing intake contract early while preserving the intended separation between intake (`A3.2`), persistence (`A3.3`), and extraction (`A4.3`).
+- Follow-up: Replace local staging with real `conversations` and `attachments` persistence in `A3.3`, then connect the review panel to the extraction pipeline in `A4.3`.
+
 ### D-20260310-11 - Personal AI Subscriptions Are Not Backend Fallback Providers
 
 - Date: 2026-03-10

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NewHomeworkIntakeForm } from "@/components/dashboard/student/new-homework-intake-form";
 import { StudentStatusPill } from "@/components/dashboard/student/student-status-pill";
 import {
   getStartStateBody,
@@ -45,7 +46,7 @@ export function NewHomeworkEntry({ snapshot }: NewHomeworkEntryProps) {
               Retour au dashboard
             </Link>
             <span className="inline-flex items-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-2 text-sm text-[color:var(--ink-soft)]">
-              A3.2 branchera ici le formulaire titre + matiere + upload
+              Cette route porte maintenant le vrai formulaire d&apos;intake
             </span>
           </div>
         </div>
@@ -73,6 +74,8 @@ export function NewHomeworkEntry({ snapshot }: NewHomeworkEntryProps) {
           </ol>
         </div>
       </article>
+
+      <NewHomeworkIntakeForm snapshot={snapshot} />
     </section>
   );
 }

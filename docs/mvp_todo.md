@@ -9,11 +9,11 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 Legend: `🟩` complete | `🟨` in progress | `⬜` pending
 
-- Overall: `[###########...................]` `46/128` complete (`36%`)
+- Overall: `[############.................]` `50/128` complete (`39%`)
 - A0: `[xxxxxxxxxxxxxxxx.....]` `16/21`
 - A1: `[xxxxxxxxxxxxxxxx]` `16/16`
 - A2: `[xxxxxxxxxxx......]` `11/17`
-- A3: `[xxx..............]` `3/17`
+- A3: `[xxxxxxx..........]` `7/17`
 - A4: `[...................]` `0/19`
 - A5: `[.............]` `0/13`
 - A6: `[.............]` `0/13`
@@ -181,10 +181,14 @@ Status note: `/app/new` is now the canonical student intake entry route, even th
 
 ### A3.2 New Homework Intake
 
-- [ ] A3.2.1 Build assignment title and subject entry.
-- [ ] A3.2.2 Add upload for image, screenshot, and PDF files.
-- [ ] A3.2.3 Add pasted-text input and graded-homework toggle.
-- [ ] A3.2.4 Build extracted-text preview and manual edit flow.
+- [x] A3.2.1 Build assignment title and subject entry.
+- [x] A3.2.2 Add upload for image, screenshot, and PDF files.
+- [x] A3.2.3 Add pasted-text input and graded-homework toggle.
+- [x] A3.2.4 Build extracted-text preview and manual edit flow.
+
+Reference: [Student intake V1](student_intake_v1.md)
+Status note: `/app/new` now hosts the real intake form with title, subject, staged files, pasted text, graded toggle, and editable review text.
+Status note: files and extracted-text review are still browser-local at this stage; upload persistence belongs to `A3.3` and real extraction belongs to `A4.3`.
 
 ### A3.3 Conversation Persistence
 
