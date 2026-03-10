@@ -298,6 +298,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Why: This restores the pending invite automatically for the same browser session without depending on provider-specific email-link customization.
 - Follow-up: If cross-device invite recovery becomes important, add a server-tracked pending-invite recovery token instead of relying only on a browser-local cookie.
 
+### D-20260311-30 - Student Dashboard Reads One Server Snapshot And Gates /app/new
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A3.1.1`, `A3.1.2`, `A3.1.3`
+- Context: The first student dashboard variant was mostly placeholder copy. Moving into the real workflow risked either burying Supabase queries inside the page tree or faking progress with static cards disconnected from account state, session history, and adult-link status.
+- Decision: Add a dedicated `lib/server/student-dashboard` service that builds one student-dashboard snapshot from `student_profiles`, `parent_student_links`, `tutor_student_links`, `conversations`, and `usage_counters`. Use that snapshot to drive the student dashboard and gate the canonical intake entry route at `/app/new`.
+- Why: This keeps the page thin, avoids a god dashboard component, and gives future A3 work a stable place to extend when title/subject entry, uploads, and conversation creation arrive.
+- Follow-up: Mount the real intake form on `/app/new` in `A3.2`, and keep named adult display out of the student UI until there is an explicitly-authorized server-side path for it.
+
 ### D-20260310-11 - Personal AI Subscriptions Are Not Backend Fallback Providers
 
 - Date: 2026-03-10

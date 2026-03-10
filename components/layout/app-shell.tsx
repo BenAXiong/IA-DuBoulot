@@ -16,8 +16,8 @@ type NavItem = {
 
 const navByRole: Record<AppUserRecord["role"], NavItem[]> = {
   student: [
-    { href: "/app#overview", label: "Overview", hint: "etat du compte" },
-    { href: "/app#actions", label: "Actions", hint: "invites et prochaines etapes" },
+    { href: "/app#start", label: "Nouveau", hint: "point d'entree devoir" },
+    { href: "/app#sessions", label: "Sessions", hint: "historique recent" },
     { href: "/app#account", label: "Compte", hint: "profil et preferences" },
   ],
   parent: [
@@ -57,11 +57,11 @@ export function AppShell({ children, email, appUser }: AppShellProps) {
                 {roleLabels[appUser.role]}
               </p>
               <h1 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
-                Navigation partagee pour la phase A2.3
+                Navigation protegee pour les prochains workflows
               </h1>
               <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-                Le shell protege reste volontairement simple, mais il separe
-                deja le chrome applicatif des contenus de dashboard.
+                Le shell garde le chrome applicatif partage, pendant que chaque
+                role evolue dans son propre module sans composant monolithique.
               </p>
             </div>
 
@@ -107,7 +107,7 @@ export function AppShell({ children, email, appUser }: AppShellProps) {
                 </div>
                 <div>
                   <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.24em] text-[color:var(--ink-soft)]">
-                    Authenticated shell
+                    Application
                   </p>
                   <h2 className="mt-2 font-[family-name:var(--font-heading)] text-3xl leading-tight sm:text-4xl">
                     {roleLabels[appUser.role]}

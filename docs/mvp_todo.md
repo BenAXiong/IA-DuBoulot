@@ -9,11 +9,11 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 Legend: `🟩` complete | `🟨` in progress | `⬜` pending
 
-- Overall: `[##########....................]` `43/128` complete (`34%`)
+- Overall: `[###########...................]` `46/128` complete (`36%`)
 - A0: `[xxxxxxxxxxxxxxxx.....]` `16/21`
 - A1: `[xxxxxxxxxxxxxxxx]` `16/16`
 - A2: `[xxxxxxxxxxx......]` `11/17`
-- A3: `[.................]` `0/17`
+- A3: `[xxx..............]` `3/17`
 - A4: `[...................]` `0/19`
 - A5: `[.............]` `0/13`
 - A6: `[.............]` `0/13`
@@ -165,15 +165,19 @@ Status note: on 2026-03-11 the shell was checked in a browser pass at `820x1180`
 - [ ] A2.4.2 Add server/runtime logging conventions.
 - [ ] A2.4.3 Add feature flags or environment toggles for risky integrations.
 
-## ⬜ Phase A3 - Student Core Workflow
+## 🟨 Phase A3 - Student Core Workflow
 
 Outcome: a student can complete a full homework-help session through the product.
 
 ### A3.1 Student Dashboard
 
-- [ ] A3.1.1 Build the student dashboard with the main `New homework` CTA.
-- [ ] A3.1.2 Show recent sessions, subject tags, and linked adult status.
-- [ ] A3.1.3 Show trial, quota, or usage status.
+- [x] A3.1.1 Build the student dashboard with the main `New homework` CTA.
+- [x] A3.1.2 Show recent sessions, subject tags, and linked adult status.
+- [x] A3.1.3 Show trial, quota, or usage status.
+
+Reference: [Student dashboard V1](student_dashboard_v1.md)
+Status note: the student home screen now reads a dedicated server snapshot for recent conversations, subject-tag rollup, adult-link counts, parent-approval state, and latest usage counters.
+Status note: `/app/new` is now the canonical student intake entry route, even though the detailed title/subject/upload flow still belongs to `A3.2`.
 
 ### A3.2 New Homework Intake
 
