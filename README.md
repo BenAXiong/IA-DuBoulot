@@ -44,7 +44,8 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - Deterministic hosted fixture seed and verification scripts now exist for live RLS visibility checks across student, parent, tutor, and admin roles.
 - The first hosted fixture reseed and live RLS verification now pass against the hosted Supabase project with `17` checks and `0` failures.
 - A source-controlled sample attachment corpus now exists under `fixtures/homework-samples/` for upload and extraction work.
-- The next recommended execution step is `A2.2` user-facing auth onboarding, using the sample corpus for later upload/extraction slices.
+- The user-facing auth slice is now live with `/auth`, `/auth/confirm`, `/onboarding`, and a protected `/app` entry wired to Supabase SSR plus profile bootstrap.
+- The next recommended execution step is `A2.2.2` and `A2.2.3`: tighten role-aware signup and invite flows on top of the connected auth foundation.
 
 ## Working Conventions
 

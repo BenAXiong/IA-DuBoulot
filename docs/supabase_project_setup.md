@@ -65,11 +65,13 @@ This matters because Supabase auth emails and OTP flows redirect to the configur
 
 - when auth wiring starts, use the Supabase SSR path for Next.js instead of old auth helpers
 - that is the current Supabase direction for server-side auth with cookies
+- if email confirmation is enabled, wire the project through the repo's `/auth/confirm` route and update the Supabase confirm-signup email template to use `token_hash` + `type=email` instead of relying on the older client-side confirmation flow
 
 ## Official References
 
 - RLS: https://supabase.com/docs/guides/database/postgres/row-level-security
 - Next.js auth quickstart: https://supabase.com/docs/guides/auth/quickstarts/nextjs
 - SSR auth: https://supabase.com/docs/guides/auth/server-side/oauth-with-pkce-flow-for-ssr
+- Server-side email confirmation guide: https://supabase.com/docs/guides/auth/server-side/nextjs
 - Redirect and site URL behavior: https://supabase.com/docs/client/auth-signup
 - Storage bucket restrictions: https://supabase.com/docs/guides/storage/buckets/creating-buckets

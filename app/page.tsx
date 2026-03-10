@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { HighlightCard } from "@/components/highlight-card";
 
 const pillars = [
@@ -58,6 +59,12 @@ export default function Home() {
             </div>
 
             <div className="flex flex-wrap gap-3">
+              <Link
+                className="rounded-full bg-[color:var(--accent)] px-5 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5"
+                href="/auth"
+              >
+                Open auth flow
+              </Link>
               <a
                 className="rounded-full bg-[color:var(--foreground)] px-5 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5"
                 href="https://github.com/BenAXiong/IA-DuBoulot"

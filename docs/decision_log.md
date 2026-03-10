@@ -238,6 +238,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Why: This keeps upload fixtures stable, reviewable, and reusable across route work, extraction work, and smoke checks.
 - Follow-up: Extend the corpus only through paired file-plus-manifest updates, and reuse it before adding new ad hoc samples.
 
+### D-20260310-24 - Auth Uses A Guarded /auth -> /onboarding -> /app Flow
+
+- Date: 2026-03-10
+- Status: accepted
+- Related tasks: `A2.2.1`
+- Context: The repo already had SSR auth helpers and bootstrap APIs, but not a usable user-facing path that exercised them end to end.
+- Decision: Use `/auth` for email/password entry, `/auth/confirm` for SSR-friendly email confirmation, `/onboarding` for profile bootstrap, and `/app` as the protected temporary app entry. Page-level guards redirect unauthenticated users to `/auth` and unbootstrapped users to `/onboarding`.
+- Why: This connects the real Supabase session lifecycle to the existing bootstrap/backend contracts without waiting for the full role-aware dashboard work.
+- Follow-up: Extend this into parent/tutor invite flows and richer protected shells during `A2.2.2`, `A2.2.3`, and `A2.3`.
+
 ### D-20260310-11 - Personal AI Subscriptions Are Not Backend Fallback Providers
 
 - Date: 2026-03-10

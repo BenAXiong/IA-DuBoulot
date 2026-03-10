@@ -7,11 +7,12 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 ## Progress Snapshot
 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
+Legend: `🟩` complete | `🟨` in progress | `⬜` pending
 
-- Overall: `[########......................]` `35/128` complete (`27%`)
+- Overall: `[########......................]` `36/128` complete (`28%`)
 - A0: `[xxxxxxxxxxxxxxxx.....]` `16/21`
 - A1: `[xxxxxxxxxxxxxxxx]` `16/16`
-- A2: `[xxx..............]` `3/17`
+- A2: `[xxxx.............]` `4/17`
 - A3: `[.................]` `0/17`
 - A4: `[...................]` `0/19`
 - A5: `[.............]` `0/13`
@@ -29,7 +30,7 @@ Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 - [Phase A6 - Memory, Billing, And Privacy Controls](#phase-a6---memory-billing-and-privacy-controls)
 - [Phase A7 - QA, iPad Polish, And Launch Readiness](#phase-a7---qa-ipad-polish-and-launch-readiness)
 
-## Phase A0 - Bootstrap And Governance
+## 🟨 Phase A0 - Bootstrap And Governance
 
 Outcome: the repo is real, the operating rules are in place, and future implementation has a stable source of truth.
 
@@ -74,7 +75,7 @@ Constraint: a founder personal AI subscription is not treated as a backend fallb
 
 Reference: [Minors privacy baseline](minors_privacy_baseline.md) is now the chosen MVP baseline for implementation, with later legal/policy review still required before launch.
 
-## Phase A1 - Data Contracts And Service Boundaries
+## 🟩 Phase A1 - Data Contracts And Service Boundaries
 
 Outcome: the data model, access rules, and backend boundaries are explicit before UI breadth starts.
 
@@ -121,7 +122,7 @@ Status note: fixture credentials stay local-only through `SUPABASE_FIXTURE_PASSW
 Status note: the deterministic fixture set now seeds successfully into the hosted Supabase project.
 Status note: the canonical upload/extraction sample corpus now lives under `fixtures/homework-samples/`.
 
-## Phase A2 - App Foundation
+## 🟨 Phase A2 - App Foundation
 
 Outcome: the application shell supports real role-aware development instead of isolated mockups.
 
@@ -136,12 +137,13 @@ Outcome: the application shell supports real role-aware development instead of i
 
 ### A2.2 Auth And Role Onboarding
 
-- [ ] A2.2.1 Connect Supabase auth to the app.
+- [x] A2.2.1 Connect Supabase auth to the app.
 - [ ] A2.2.2 Implement role-aware signup/invite flows.
 - [ ] A2.2.3 Persist user profile and role metadata.
 - [ ] A2.2.4 Implement protected routes and session refresh handling.
 
-Status note: the SSR auth foundation is in place with `proxy.ts`, Supabase server/admin helpers, and the first `GET /api/auth/me` plus `POST /api/auth/profile/bootstrap` routes, but user-facing onboarding flows are still pending.
+Status note: the SSR auth foundation is now wired into `/auth`, `/auth/confirm`, `/onboarding`, and a protected `/app` page.
+Status note: role-aware invites and full onboarding edge cases are still pending even though the bootstrap-backed happy path is connected.
 
 ### A2.3 Shared Layouts And Navigation
 
@@ -156,7 +158,7 @@ Status note: the SSR auth foundation is in place with `proxy.ts`, Supabase serve
 - [ ] A2.4.2 Add server/runtime logging conventions.
 - [ ] A2.4.3 Add feature flags or environment toggles for risky integrations.
 
-## Phase A3 - Student Core Workflow
+## ⬜ Phase A3 - Student Core Workflow
 
 Outcome: a student can complete a full homework-help session through the product.
 
@@ -192,7 +194,7 @@ Outcome: a student can complete a full homework-help session through the product
 - [ ] A3.5.2 Build the student session detail and summary view.
 - [ ] A3.5.3 Support marking a session complete and triggering summary generation.
 
-## Phase A4 - AI Coaching, Extraction, And Safety
+## ⬜ Phase A4 - AI Coaching, Extraction, And Safety
 
 Outcome: the product behaves like a coach instead of a generic answer bot.
 
@@ -230,7 +232,7 @@ Outcome: the product behaves like a coach instead of a generic answer bot.
 - [ ] A4.5.3 Generate tutor insight summaries with weakness tags.
 - [ ] A4.5.4 Store next-step recommendations for later review.
 
-## Phase A5 - Parent And Tutor Oversight
+## ⬜ Phase A5 - Parent And Tutor Oversight
 
 Outcome: adults can review the student's work with the right visibility boundaries.
 
@@ -259,7 +261,7 @@ Outcome: adults can review the student's work with the right visibility boundari
 - [ ] A5.4.2 Add admin review tools for sensitive access events.
 - [ ] A5.4.3 Verify private-note isolation and access restrictions.
 
-## Phase A6 - Memory, Billing, And Privacy Controls
+## ⬜ Phase A6 - Memory, Billing, And Privacy Controls
 
 Outcome: the MVP can retain useful educational context, gate usage, and handle data responsibly.
 
@@ -288,7 +290,7 @@ Outcome: the MVP can retain useful educational context, gate usage, and handle d
 - [ ] A6.4.2 Implement account-linked data deletion flows.
 - [ ] A6.4.3 Write clear user-facing privacy copy for the MVP.
 
-## Phase A7 - QA, iPad Polish, And Launch Readiness
+## ⬜ Phase A7 - QA, iPad Polish, And Launch Readiness
 
 Outcome: the product is stable enough for serious parent and tutor trials.
 
