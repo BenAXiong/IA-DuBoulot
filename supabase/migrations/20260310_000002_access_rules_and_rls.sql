@@ -238,7 +238,7 @@ returns boolean
 language sql
 stable
 security definer
-set search_path = public
+set search_path = pg_catalog, public
 as $$
   select
     auth.uid() = target_student_user_id
@@ -251,7 +251,7 @@ returns boolean
 language sql
 stable
 security definer
-set search_path = public
+set search_path = pg_catalog, public
 as $$
   select
     auth.uid() = target_student_user_id
