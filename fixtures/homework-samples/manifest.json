@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "updated_at": "2026-03-10",
+  "notes": [
+    "All sample content is fictional and safe for demos, tests, and extraction work.",
+    "Every attachment fixture must have a paired extracted-text file and explicit metadata expectations."
+  ],
+  "samples": [
+    {
+      "sample_key": "fractions_pdf_fr",
+      "attachment_path": "fixtures/homework-samples/attachments/fractions-partage.pdf",
+      "extracted_text_path": "fixtures/homework-samples/extracted/fractions-partage.txt",
+      "attachment_kind": "pdf",
+      "mime_type": "application/pdf",
+      "subject_tag": "mathematiques",
+      "language_code": "fr",
+      "scenario": "typed worksheet pdf",
+      "source_style": "clean digital worksheet",
+      "difficulty": "low",
+      "byte_size": 1115,
+      "sha256": "1CBA3CA42B7EE2B4A4BFCEB63603C8FE3883DEF32471971472C9EB32416064BF",
+      "expected_metadata": {
+        "upload_source": "file_picker",
+        "client_extension": "pdf",
+        "sha256": "1CBA3CA42B7EE2B4A4BFCEB63603C8FE3883DEF32471971472C9EB32416064BF",
+        "pdf_page_count": 1,
+        "detected_language": "fr",
+        "extraction_engine": "fixture-manual-baseline",
+        "extraction_version": "v1"
+      },
+      "expected_extraction_notes": [
+        "The extraction should preserve numbered questions and the student note.",
+        "No OCR confidence field is required for this clean typed PDF."
+      ]
+    },
+    {
+      "sample_key": "geometry_screenshot_fr",
+      "attachment_path": "fixtures/homework-samples/attachments/geometrie-capture.png",
+      "extracted_text_path": "fixtures/homework-samples/extracted/geometrie-capture.txt",
+      "attachment_kind": "screenshot",
+      "mime_type": "image/png",
+      "subject_tag": "mathematiques",
+      "language_code": "fr",
+      "scenario": "tablet screenshot with student draft",
+      "source_style": "clean annotated screenshot",
+      "difficulty": "medium",
+      "byte_size": 27938,
+      "sha256": "AA4DC548D65E7501E42CB031F43481C5341B47E8EE40F0EA92F93E62DD21E1E0",
+      "expected_metadata": {
+        "upload_source": "paste",
+        "client_extension": "png",
+        "sha256": "AA4DC548D65E7501E42CB031F43481C5341B47E8EE40F0EA92F93E62DD21E1E0",
+        "image_width": 1240,
+        "image_height": 840,
+        "detected_language": "fr",
+        "extraction_engine": "fixture-manual-baseline",
+        "extraction_version": "v1",
+        "ocr_confidence": 0.97
+      },
+      "expected_extraction_notes": [
+        "The extraction should preserve the draft answer and the follow-up explanation prompt.",
+        "Line breaks may vary, but the numeric values and student uncertainty note must survive."
+      ]
+    }
+  ]
+}

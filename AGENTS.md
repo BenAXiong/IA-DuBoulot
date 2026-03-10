@@ -35,12 +35,13 @@ Read these in order before any substantial implementation work:
 12. [docs/error_audit_conventions.md](docs/error_audit_conventions.md)
 13. [docs/storage_attachment_rules.md](docs/storage_attachment_rules.md)
 14. [docs/rls_fixture_verification.md](docs/rls_fixture_verification.md) when auth, schema, or RLS work is in scope
-15. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
-16. [docs/mvp_todo.md](docs/mvp_todo.md)
-17. [docs/mvp_timeline.md](docs/mvp_timeline.md)
-18. [docs/decision_log.md](docs/decision_log.md)
-19. [docs/work_sessions.md](docs/work_sessions.md)
-20. The relevant code, SQL, prompt, or UI files for the task being worked on
+15. [docs/sample_attachment_corpus.md](docs/sample_attachment_corpus.md) when upload, extraction, or demo fixture work is in scope
+16. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
+17. [docs/mvp_todo.md](docs/mvp_todo.md)
+18. [docs/mvp_timeline.md](docs/mvp_timeline.md)
+19. [docs/decision_log.md](docs/decision_log.md)
+20. [docs/work_sessions.md](docs/work_sessions.md)
+21. The relevant code, SQL, prompt, or UI files for the task being worked on
 
 If a file above is outdated, update it before or alongside the code change that depends on it.
 
@@ -115,6 +116,7 @@ Log a decision when changing:
 - Planning and meta docs: `docs/`
 - SQL and Supabase config: `supabase/`
 - Scripts and automation: `scripts/`
+- Source-controlled sample inputs and demo attachments: `fixtures/`
 - App routes: `app/`
 - Reusable UI: `components/`
 - Shared libraries: `lib/`

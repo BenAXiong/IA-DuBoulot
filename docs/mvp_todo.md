@@ -8,9 +8,9 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 
-- Overall: `[########......................]` `34/128` complete (`27%`)
+- Overall: `[########......................]` `35/128` complete (`27%`)
 - A0: `[xxxxxxxxxxxxxxxx.....]` `16/21`
-- A1: `[xxxxxxxxxxxxxxx.]` `15/16`
+- A1: `[xxxxxxxxxxxxxxxx]` `16/16`
 - A2: `[xxx..............]` `3/17`
 - A3: `[.................]` `0/17`
 - A4: `[...................]` `0/19`
@@ -113,12 +113,13 @@ Reference: [API route map](api_route_map.md) | [Service interfaces](service_inte
 ### A1.4 Seed Data And Smoke Fixtures
 
 - [x] A1.4.1 Create one seeded student-parent-tutor-admin fixture set.
-- [ ] A1.4.2 Create realistic sample homework attachments and extracted-text examples.
+- [x] A1.4.2 Create realistic sample homework attachments and extracted-text examples.
 - [x] A1.4.3 Document test-account credentials and safe demo data rules.
 
-Reference: [RLS fixture verification](rls_fixture_verification.md)
+Reference: [RLS fixture verification](rls_fixture_verification.md) | [Sample attachment corpus](sample_attachment_corpus.md)
 Status note: fixture credentials stay local-only through `SUPABASE_FIXTURE_PASSWORD` and the seeded content remains fictional demo data.
 Status note: the deterministic fixture set now seeds successfully into the hosted Supabase project.
+Status note: the canonical upload/extraction sample corpus now lives under `fixtures/homework-samples/`.
 
 ## Phase A2 - App Foundation
 

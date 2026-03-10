@@ -228,6 +228,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Why: This validates the deployed RLS behavior directly, keeps regression checks reproducible across future sessions, and avoids mixing test-only logic into the product runtime.
 - Follow-up: Rerun the fixture scripts after any schema, RLS, or sensitive server-authorization change, and keep `A1.4.2` open until real sample attachment files are added.
 
+### D-20260310-23 - Upload And Extraction Work Uses A Source-Controlled Sample Corpus
+
+- Date: 2026-03-10
+- Status: accepted
+- Related tasks: `A1.4.2`, `A3.2`, `A4.3`, `A7.2`
+- Context: Future upload and extraction work will drift quickly if every session invents new demo files, extracted-text snippets, and metadata expectations from scratch.
+- Decision: Keep a canonical sample corpus under `fixtures/homework-samples/`, with original files in `attachments/`, paired extracted-text baselines in `extracted/`, and one `manifest.json` entry point. The operating explanation lives in [docs/sample_attachment_corpus.md](sample_attachment_corpus.md).
+- Why: This keeps upload fixtures stable, reviewable, and reusable across route work, extraction work, and smoke checks.
+- Follow-up: Extend the corpus only through paired file-plus-manifest updates, and reuse it before adding new ad hoc samples.
+
 ### D-20260310-11 - Personal AI Subscriptions Are Not Backend Fallback Providers
 
 - Date: 2026-03-10

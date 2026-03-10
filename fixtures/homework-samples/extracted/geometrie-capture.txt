@@ -1,0 +1,11 @@
+Capture d'ecran - devoir de geometrie
+
+Consigne : Calcule l'aire du rectangle puis explique ta methode.
+Longueur = 8 cm | largeur = 5 cm
+
+Brouillon eleve :
+Aire = 8 x 5 = 40 cm2
+Je dois encore expliquer pourquoi on multiplie longueur et largeur.
+Peut-on verifier avec un dessin en petits carres ?
+
+Note: l'image simule une photo nette prise sur tablette.

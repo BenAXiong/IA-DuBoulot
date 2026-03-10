@@ -1,6 +1,6 @@
 # Storage And Attachment Rules
 
-Related: [README](../README.md) | [API route map](api_route_map.md) | [Service interfaces](service_interfaces.md) | [Supabase schema V1](supabase_schema_v1.md) | [Supabase project setup](supabase_project_setup.md) | [MVP to-do list](mvp_todo.md)
+Related: [README](../README.md) | [API route map](api_route_map.md) | [Service interfaces](service_interfaces.md) | [Supabase schema V1](supabase_schema_v1.md) | [Supabase project setup](supabase_project_setup.md) | [Sample attachment corpus](sample_attachment_corpus.md) | [MVP to-do list](mvp_todo.md)
 
 ## Purpose
 
@@ -136,3 +136,4 @@ Expected service behavior:
 - `UploadStorageService` owns signed upload and signed read URL creation
 - conversation services should reference attachments by ID, not raw bucket/path strings
 - bucket names should live in a storage constants module later, not repeated inline
+- use the source-controlled files in [sample_attachment_corpus.md](sample_attachment_corpus.md) before inventing new ad hoc upload fixtures

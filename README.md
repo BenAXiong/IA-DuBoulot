@@ -15,6 +15,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Supabase schema V1](docs/supabase_schema_v1.md)
 - [Access rules V1](docs/access_rules_v1.md)
 - [RLS fixture verification](docs/rls_fixture_verification.md)
+- [Sample attachment corpus](docs/sample_attachment_corpus.md)
 - [API route map](docs/api_route_map.md)
 - [Service interfaces](docs/service_interfaces.md)
 - [Error and audit conventions](docs/error_audit_conventions.md)
@@ -42,7 +43,8 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - Supabase SSR auth helpers, `proxy.ts`, and the first authenticated API routes are now implemented in code.
 - Deterministic hosted fixture seed and verification scripts now exist for live RLS visibility checks across student, parent, tutor, and admin roles.
 - The first hosted fixture reseed and live RLS verification now pass against the hosted Supabase project with `17` checks and `0` failures.
-- The next recommended execution step is `A1.4.2` sample attachment corpus work, then `A2.2` user-facing auth onboarding.
+- A source-controlled sample attachment corpus now exists under `fixtures/homework-samples/` for upload and extraction work.
+- The next recommended execution step is `A2.2` user-facing auth onboarding, using the sample corpus for later upload/extraction slices.
 
 ## Working Conventions
 
