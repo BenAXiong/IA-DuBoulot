@@ -318,6 +318,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Why: This lets the product lock the student-facing intake contract early while preserving the intended separation between intake (`A3.2`), persistence (`A3.3`), and extraction (`A4.3`).
 - Follow-up: Replace local staging with real `conversations` and `attachments` persistence in `A3.3`, then connect the review panel to the extraction pipeline in `A4.3`.
 
+### D-20260311-32 - A3.3 Persists The Intake Contract Before Real Upload Storage
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A3.3.1`, `A3.3.2`, `A3.3.3`
+- Context: The intake form was now stable enough to persist, but the upload/create/confirm route family and extraction pipeline were still not implemented. Waiting for true binary upload persistence would have blocked draft restoration and return-to-session behavior entirely.
+- Decision: Persist the intake contract now through `conversations`, `workspace_states`, and one initial student `messages` row. Carry selected file references forward as human-readable session context instead of inventing fake `attachments` rows before the storage path exists.
+- Why: This makes the student flow durable and reopenable without violating the storage contract or pretending uploaded binaries already exist in Supabase storage.
+- Follow-up: Replace text-only attachment references with real `attachments` rows when the upload route family lands, and keep the session detail route as the canonical return surface.
+
 ### D-20260310-11 - Personal AI Subscriptions Are Not Backend Fallback Providers
 
 - Date: 2026-03-10

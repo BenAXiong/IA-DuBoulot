@@ -7,13 +7,12 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 ## Progress Snapshot
 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
-Legend: `🟩` complete | `🟨` in progress | `⬜` pending
 
-- Overall: `[############.................]` `50/128` complete (`39%`)
+- Overall: `[############..................]` `53/128` complete (`41%`)
 - A0: `[xxxxxxxxxxxxxxxx.....]` `16/21`
 - A1: `[xxxxxxxxxxxxxxxx]` `16/16`
 - A2: `[xxxxxxxxxxx......]` `11/17`
-- A3: `[xxxxxxx..........]` `7/17`
+- A3: `[xxxxxxxxxx.......]` `10/17`
 - A4: `[...................]` `0/19`
 - A5: `[.............]` `0/13`
 - A6: `[.............]` `0/13`
@@ -192,9 +191,14 @@ Status note: files and extracted-text review are still browser-local at this sta
 
 ### A3.3 Conversation Persistence
 
-- [ ] A3.3.1 Create conversation and message persistence.
-- [ ] A3.3.2 Support draft restoration and return-to-session behavior.
-- [ ] A3.3.3 Support attachment references inside the session history.
+- [x] A3.3.1 Create conversation and message persistence.
+- [x] A3.3.2 Support draft restoration and return-to-session behavior.
+- [x] A3.3.3 Support attachment references inside the session history.
+
+Reference: [Student session persistence V1](student_session_persistence_v1.md)
+Status note: validating `/app/new` now creates a persisted `conversations` row, `workspace_states` row, and first student message through the new conversation service.
+Status note: the dashboard recent-session cards now reopen `/app/conversations/[conversationId]` instead of staying informational only.
+Status note: attachment references are currently persisted as human-readable intake context inside the session history and workspace notes; true `attachments` rows still belong to the later upload path.
 
 ### A3.4 Homework Chat And Workspace
 

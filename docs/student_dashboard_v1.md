@@ -71,20 +71,19 @@ Current role:
 
 - receives the student from the dashboard CTA
 - repeats the current start-state gate
-- explains the target A3.2 sequence
+- hosts the real intake form from [Student intake V1](student_intake_v1.md)
 
 What it does not do yet:
 
-- no assignment-title persistence
-- no subject entry form yet
-- no upload step yet
-- no conversation creation yet
+- no binary upload persistence yet
+- no real extraction/OCR yet
+- no chat exchange yet
 
-Those belong to `A3.2` and `A3.3`.
+Those belong to the later upload and coaching phases.
 
 ## Known Boundaries
 
-- recent sessions are informational only until `A3.5` adds detail/reopen views
+- recent sessions can now reopen persisted draft pages, but the richer history/summaries layer still belongs to `A3.5`
 - usage is display-only until `A6.2` adds real trial/quota enforcement
 - under-13 blocking still depends on the existing parent-approval flow documented in [Invitation flows V1](invitation_flows_v1.md)
 

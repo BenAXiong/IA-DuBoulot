@@ -15,6 +15,9 @@ Current implemented routes:
 - `POST /api/auth/parent-approval/confirm`
 - `POST /api/auth/invitations/accept`
 - `POST /api/tutor/links`
+- `GET /api/conversations`
+- `POST /api/conversations`
+- `GET /api/conversations/[conversationId]`
 
 It exists to prevent accidental drift between:
 

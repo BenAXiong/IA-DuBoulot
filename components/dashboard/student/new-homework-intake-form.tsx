@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { IntakeFileList } from "@/components/dashboard/student/intake-file-list";
 import { IntakeReadinessCard } from "@/components/dashboard/student/intake-readiness-card";
 import {
@@ -15,6 +16,21 @@ import type { StudentDashboardSnapshot } from "@/lib/server/student-dashboard/ty
 type NewHomeworkIntakeFormProps = {
   snapshot: StudentDashboardSnapshot;
 };
+
+type CreateConversationResponse =
+  | {
+      ok: true;
+      data: {
+        conversationId: string;
+      };
+    }
+  | {
+      ok?: false;
+      error?: {
+        message?: string;
+        fieldErrors?: Record<string, string>;
+      };
+    };
 
 function getResolvedSubjectTag(subjectChoice: string, customSubject: string) {
   if (subjectChoice === "autre") {
@@ -39,6 +55,7 @@ function hasAnySource(input: {
 export function NewHomeworkIntakeForm({
   snapshot,
 }: NewHomeworkIntakeFormProps) {
+  const router = useRouter();
   const [assignmentTitle, setAssignmentTitle] = useState("");
   const [subjectChoice, setSubjectChoice] = useState("mathematiques");
   const [customSubject, setCustomSubject] = useState("");
@@ -49,6 +66,7 @@ export function NewHomeworkIntakeForm({
   const [hasEditedExtractionDraft, setHasEditedExtractionDraft] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [reviewMessage, setReviewMessage] = useState<string | null>(null);
+  const [isSubmitting, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const totalBytes = files.reduce((sum, file) => sum + file.file.size, 0);
@@ -147,9 +165,44 @@ export function NewHomeworkIntakeForm({
       return;
     }
 
-    setReviewMessage(
-      "Intake local pret. Le titre, la matiere, les fichiers stages et le texte relu sont maintenant structures. La persistence et l'ouverture de conversation arrivent avec A3.3.",
-    );
+    startTransition(async () => {
+      const response = await fetch("/api/conversations", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          title: assignmentTitle.trim(),
+          subjectTag: resolvedSubjectTag,
+          gradedHomework,
+          pastedText,
+          editedExtractedText: extractionDraft,
+          attachmentReferences: files.map((file) => ({
+            name: file.file.name,
+            category: file.category,
+            byteSize: file.file.size,
+          })),
+        }),
+      });
+
+      const payload = (await response
+        .json()
+        .catch(() => null)) as CreateConversationResponse | null;
+      const routeErrorMessage =
+        payload && "error" in payload ? payload.error?.message : null;
+
+      if (!response.ok || !payload?.ok || !payload.data?.conversationId) {
+        setErrorMessage(
+          routeErrorMessage ??
+            "Impossible de creer la session brouillon pour ce devoir.",
+        );
+        return;
+      }
+
+      setReviewMessage("Brouillon persiste. Redirection vers la session...");
+      router.push(`/app/conversations/${payload.data.conversationId}`);
+      router.refresh();
+    });
   }
 
   return (
@@ -311,13 +364,13 @@ export function NewHomeworkIntakeForm({
           <div className="flex flex-wrap gap-3">
             <button
               className="rounded-full bg-[color:var(--accent)] px-5 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
-              disabled={!snapshot.canStartHomework}
+              disabled={!snapshot.canStartHomework || isSubmitting}
               type="submit"
             >
-              Verifier l&apos;intake
+              {isSubmitting ? "Creation..." : "Creer la session"}
             </button>
             <span className="inline-flex items-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-2 text-sm text-[color:var(--ink-soft)]">
-              Conversation reelle a brancher dans `A3.3`
+              Le brouillon sera persiste dans `conversations` et `workspace_states`
             </span>
           </div>
 

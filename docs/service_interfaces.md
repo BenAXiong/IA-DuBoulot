@@ -231,6 +231,6 @@ Inside each domain:
 
 ## Immediate Next Implementations
 
-- `ConversationService` plus `/api/conversations` and `/api/conversations/[conversationId]/messages`
-- shared shells and role-aware navigation on top of the now-live invitation flows
-- authenticated app shell work for `A2.3`
+- extend `ConversationService` from intake persistence into real chat turns and workspace saves
+- add upload storage routes/services so attachment references become real `attachments` rows
+- start the `A3.4` coaching surface on top of the now-persisted session route

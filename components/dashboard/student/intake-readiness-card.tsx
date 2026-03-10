@@ -36,7 +36,7 @@ export function IntakeReadinessCard({
           Controle rapide
         </p>
         <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
-          Le brouillon d&apos;intake reste local tant que `A3.3` n&apos;est pas branche.
+          Cette carte verifie le brouillon juste avant sa persistence.
         </h2>
       </div>
 

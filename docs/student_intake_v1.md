@@ -4,7 +4,7 @@ Related: [README](../README.md) | [MVP to-do list](mvp_todo.md) | [Student dashb
 
 ## Purpose
 
-Describe the first real `/app/new` intake surface so future sessions know what is already implemented and what is still intentionally staged.
+Describe the first real `/app/new` intake surface so future sessions know what is already implemented and where persistence starts.
 
 ## Scope
 
@@ -28,7 +28,7 @@ This document covers `A3.2.1` to `A3.2.4`:
 
 ## Current Behavior
 
-The route is real and protected, but the intake draft is still local to the browser.
+The route is real, protected, and now creates a persisted session draft when validated.
 
 What works now:
 
@@ -38,16 +38,16 @@ What works now:
 - the student can paste readable homework text
 - the student can toggle whether the homework is graded
 - the student can review and edit the text that will later feed the chat
+- the validated intake now creates a conversation draft and redirects into the persisted session page
 
 What does not happen yet:
 
-- no `conversations` row is created yet
 - no `attachments` row is created yet
 - no storage upload is sent yet
 - no extraction job runs yet
-- no draft is restored after navigation or refresh
+- file binaries are still browser-staged before the later upload path
 
-Those belong to `A3.3` and `A4.3`.
+Those belong to the upload/extraction work after `A3.3`.
 
 ## File Staging Rules
 
@@ -71,10 +71,10 @@ Current seed logic:
 
 This means the review/edit surface can already be designed and tested before the true extraction backend exists.
 
-## Why A3.2 Can Be Complete Before A3.3
+## Relationship To A3.3
 
-`A3.2` is the intake surface.
-`A3.3` is persistence.
+`A3.2` defines the intake surface.
+`A3.3` defines how that intake becomes a reusable session.
 
 That split is intentional:
 
@@ -85,7 +85,6 @@ Keeping them separate avoids binding the form to unfinished upload and conversat
 
 ## Next Extension Points
 
-- `A3.3.1`: create the first conversation shell and persist the intake draft
-- `A3.3.2`: restore the local draft and then replace it with real persisted draft behavior
-- `A3.3.3`: attach staged files to the session history
+- upload routes: convert staged file picks into real `attachments` rows
+- storage confirm flow: replace browser-only file state with durable storage references
 - `A4.3`: replace the placeholder extraction seed with real PDF/image interpretation

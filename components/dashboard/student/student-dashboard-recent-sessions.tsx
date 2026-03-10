@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { StudentStatusPill } from "@/components/dashboard/student/student-status-pill";
 import {
   formatDateLabel,
@@ -90,17 +91,23 @@ export function StudentDashboardRecentSessions({
                     {session.title}
                   </h3>
                   <p className="mt-2 text-sm leading-6 text-[color:var(--ink-soft)]">
-                    Reprise detaillee a venir avec `A3.5`. Pour l&apos;instant, le
-                    tableau de bord garde surtout le contexte et les sujets recurrents.
+                    Cette session peut deja etre rouverte. Le detail historique
+                    plus riche et les resumes arriveront ensuite avec `A3.5`.
                   </p>
                 </div>
               </div>
 
-              <div className="text-sm text-[color:var(--ink-soft)] md:text-right">
+              <div className="grid gap-3 text-sm text-[color:var(--ink-soft)] md:justify-items-end">
                 <p>Derniere activite</p>
                 <p className="mt-1 font-medium text-[color:var(--foreground)]">
                   {getSessionDate(session, languageCode)}
                 </p>
+                <Link
+                  className="inline-flex rounded-full border border-[color:var(--line)] bg-white px-4 py-2 font-medium text-[color:var(--foreground)] transition hover:-translate-y-0.5"
+                  href={`/app/conversations/${session.id}`}
+                >
+                  Reprendre
+                </Link>
               </div>
             </article>
           ))}
