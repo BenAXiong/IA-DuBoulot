@@ -15,7 +15,7 @@ Build the smallest serious version of IA DuBoulot: a supervised AI homework coac
 - The product name is locked as `IA DuBoulot`.
 - MVP interface scope is `fr`, `en`, and `zh`, with AI help starting in French first and English only if it is low-cost to add after the French flow is stable.
 - Deployment target is `Vercel`, assuming the Next.js app lives at repository root `./`.
-- Primary starter AI direction is `Google Gemini`, but the app must preserve a swappable provider interface from day one.
+- Primary starter AI direction is `Google Gemini`, but the app must preserve a swappable provider interface from day one. Free-tier usage should be treated as internal prototyping only until provider data-handling terms are acceptable for minors.
 - Billing direction is `Lemon Squeezy`.
 
 ## Why The Sequence Changes Slightly From The Brief

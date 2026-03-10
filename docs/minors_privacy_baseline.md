@@ -56,6 +56,7 @@ Avoid collecting by default:
 - Prefer providers and settings that do not use child data for provider-side model training or unrelated product improvement.
 - Track which third-party services receive student content: Supabase, Gemini, PostHog, Resend, Lemon Squeezy.
 - Keep provider use documented in user-facing privacy copy and internal implementation docs.
+- Do not assume a provider free tier is acceptable for live minors data; verify the production tier and settings first.
 
 ### 4. Parent Rights In Product
 

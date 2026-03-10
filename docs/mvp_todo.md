@@ -28,6 +28,7 @@ Current direction: GitHub repo exists, Vercel is the chosen deployment platform,
 - [ ] A0.2.6 Create `.env.example` and a secrets ownership checklist.
 
 Current direction: primary starter AI path is Gemini; fallback provider still needs to be selected. Billing provider is Lemon Squeezy.
+Constraint: verify the Gemini tier and data-handling settings are suitable for minors before any live child traffic uses the AI flow.
 
 ### A0.3 Traceability Spine
 

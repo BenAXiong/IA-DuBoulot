@@ -94,9 +94,9 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Status: accepted
 - Related tasks: `A0.2.4`, `A4.1`
 - Context: The founder wants to start with Gemini credits and keep costs low at the beginning.
-- Decision: Implement the first AI integration against Google Gemini while preserving a swappable provider layer. Fallback provider remains open.
+- Decision: Implement the first AI integration against Google Gemini while preserving a swappable provider layer. Fallback provider remains open. Treat free-tier Gemini use as internal prototyping until provider-side data handling is acceptable for minors.
 - Why: It reduces startup cost while keeping the architecture flexible if pricing, policy, or quality changes.
-- Follow-up: Select and record the fallback provider before production hardening.
+- Follow-up: Select and record the fallback provider before production hardening, and confirm the production Gemini tier does not use child data for provider-side product improvement.
 
 ### D-20260310-09 - Billing Provider Is Lemon Squeezy
 
