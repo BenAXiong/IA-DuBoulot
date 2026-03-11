@@ -15,6 +15,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Supabase schema V1](docs/supabase_schema_v1.md)
 - [Access rules V1](docs/access_rules_v1.md)
 - [RLS fixture verification](docs/rls_fixture_verification.md)
+- [Smoke checklist V1](docs/smoke_checklist_v1.md)
 - [Sample attachment corpus](docs/sample_attachment_corpus.md)
 - [API route map](docs/api_route_map.md)
 - [App shell V1](docs/app_shell_v1.md)
@@ -77,6 +78,8 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - a fourth fixture-backed privacy smoke script now exists at `scripts/smoke-privacy-controls.mjs` and passed on 2026-03-11 against the real settings route, linked-child deletion queueing, immediate tutor-access revocation, redirect-to-settings behavior, and write blocking for deletion-requested accounts.
 - the student dashboard and linked-parent student detail now expose a pedagogical memory panel backed by `lib/server/memory/`, with completion-triggered refresh, manual edit/delete controls, and tutor raw-memory access explicitly blocked.
 - a fifth fixture-backed smoke script now exists at `scripts/smoke-memory-profile.mjs` and passed on 2026-03-11 against the real memory route, dashboard surfaces, manual mutation flow, and tutor-access boundary.
+- a written operator smoke checklist now exists at `docs/smoke_checklist_v1.md`, and `npm run regress:mvp` now gives the canonical pre-demo regression pass across typecheck, build, RLS verification, and all current smoke scripts.
+- the latest `npm run regress:mvp` pass succeeded on 2026-03-11; the current non-blocking warning profile still consists of documented Gemini fallback usage and optional adult summary variants missing in some student-flow runs.
 - the latest student smoke completed successfully with only optional adult summary variants missing in that run; provider reliability remains a QA follow-up even though the student flow stays stable.
 
 ## Working Conventions

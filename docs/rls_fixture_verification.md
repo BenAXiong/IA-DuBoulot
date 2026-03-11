@@ -1,6 +1,6 @@
 # RLS Fixture Verification
 
-Related: [README](../README.md) | [Environment matrix](environment_matrix.md) | [Supabase schema V1](supabase_schema_v1.md) | [Access rules V1](access_rules_v1.md) | [Student memory profile V1](student_memory_profile_v1.md) | [MVP to-do list](mvp_todo.md) | [Decision log](decision_log.md)
+Related: [README](../README.md) | [Environment matrix](environment_matrix.md) | [Supabase schema V1](supabase_schema_v1.md) | [Access rules V1](access_rules_v1.md) | [Student memory profile V1](student_memory_profile_v1.md) | [Smoke checklist V1](smoke_checklist_v1.md) | [MVP to-do list](mvp_todo.md) | [Decision log](decision_log.md)
 
 ## Purpose
 
@@ -69,6 +69,7 @@ npm run smoke:privacy
 npm run smoke:student-flow
 npm run smoke:adult-oversight
 npm run smoke:billing
+npm run regress:mvp
 ```
 
 ## What Gets Verified
@@ -155,6 +156,7 @@ The privacy smoke script currently checks that:
 - 2026-03-11 local adult-oversight smoke: success against a temporary local `next start` instance across parent, tutor, and admin routes
 - 2026-03-11 local privacy smoke: success against a temporary local `next start` instance for `/app/settings`, linked-child deletion queueing, tutor-link revocation, redirect-to-settings behavior, and write blocking after deletion request
 - 2026-03-11 local billing smoke: success against a temporary local `next start` instance for checkout-config failure handling, signed webhook sync, and parent dashboard billing visibility
+- 2026-03-11 local `npm run regress:mvp`: success across typecheck, lint, build, hosted RLS verification, and the full smoke suite
 - 2026-03-11 deployed billing verification: success on `https://ia-du-boulot.vercel.app` with real Lemon test-mode checkout open, completed payment, redirect back to `/app`, parent dashboard subscription visibility, Lemon confirmation email, and Lemon dashboard order logging
 
 ## Scope Notes
@@ -162,4 +164,5 @@ The privacy smoke script currently checks that:
 - `A1.4.1` is satisfied by the deterministic hosted fixture set
 - `A1.4.3` is satisfied by this documented credential and demo-data workflow
 - `A1.2.4` is satisfied by the successful hosted verification run
+- `A7.2.3` now uses `npm run regress:mvp` as the canonical pre-demo regression pass
 - `A1.4.2` remains open because the fixture currently seeds attachment metadata, not a committed sample file corpus

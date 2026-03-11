@@ -477,3 +477,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Implement memory through `lib/server/memory/` as one canonical domain. Refresh memory on conversation completion using a provider-backed `memory-profile-v1` prompt plus a deterministic fallback when the provider fails; persist only pedagogical categories centered on strengths, weaknesses, preferences, and recurring topics; expose raw memory through `GET` and `PATCH /api/students/[studentId]/memory`; allow manual edit and delete for the student, linked parent, and admin; audit parent and admin raw-memory reads; and deny tutor raw-memory access entirely so tutor surfaces continue to rely on derived summaries instead.
 - Why: This keeps durable learning context useful for the next homework without turning memory into hidden profiling, aligns the feature with the minors/privacy baseline, and preserves student-flow stability by making memory refresh best-effort rather than another completion blocker.
 - Follow-up: Keep `learning_note` reserved until a clearly-scoped use case exists, revisit retention windows after real pilot usage, and expand tutor-facing derived insights separately instead of weakening the raw-memory boundary.
+
+### D-20260311-47 - Demo Readiness Uses One Written Checklist And One Aggregated Regression Command
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A0.4.2`, `A7.2.1`, `A7.2.3`
+- Context: The repo already had several focused smoke scripts, but there was still no single acceptance document describing what "demo-ready" means across student, parent, tutor, admin, billing, privacy, and deployment checks. That left the project with automation but no stable operator runbook, and with no single command to rerun the current regression set before a demo or external walkthrough.
+- Decision: Add `docs/smoke_checklist_v1.md` as the canonical acceptance checklist, covering automated and manual role-based smoke expectations, explicit blocking versus non-blocking outcomes, and the remaining device/deployment checks. Add `npm run regress:mvp` as the canonical pre-demo regression command that chains typecheck, lint, build, RLS verification, and the full current smoke suite.
+- Why: This turns the existing smoke scripts into a repeatable release gate, reduces the chance of skipping an important cross-role check before demos, and makes later sessions inherit one stable definition of regression coverage instead of reconstructing it from scattered docs and package scripts.
+- Follow-up: Record real iPad Safari results against this checklist as `A7.1` progresses, and tighten the regression command further if new high-risk flows are added later.

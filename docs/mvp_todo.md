@@ -8,15 +8,15 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 
-- Overall: `[#########################.....]` `106/128` complete (`83%`)
-- A0: `[xxxxxxxxxxxxxxxx.....]` `16/21`
+- Overall: `[##########################....]` `109/128` complete (`85%`)
+- A0: `[xxxxxxxxxxxxxxxxx....]` `17/21`
 - A1: `[xxxxxxxxxxxxxxxx]` `16/16`
 - A2: `[xxxxxxxxxxx......]` `11/17`
 - A3: `[xxxxxxxxxxxxxxxxx]` `17/17`
 - A4: `[xxxxxxxxxxxxxxxxxxx]` `19/19`
 - A5: `[xxxxxxxxxxxxx]` `13/13`
 - A6: `[xxxxxxxxxxxxx]` `13/13`
-- A7: `[x...........]` `1/12`
+- A7: `[xxx.........]` `3/12`
 
 ## Table Of Contents
 
@@ -69,6 +69,7 @@ Constraint: a founder personal AI subscription is not treated as a backend fallb
 
 - [x] A0.4.1 Write the role/access matrix for student, parent, tutor, and admin.
 - [ ] A0.4.2 Write smoke-test acceptance criteria for the MVP core flows.
+- [x] A0.4.2 Write smoke-test acceptance criteria for the MVP core flows.
 - [x] A0.4.3 Confirm the MVP language set and translation expectations.
 - [x] A0.4.4 Define retention, deletion, and privacy expectations for minors.
 
@@ -357,11 +358,11 @@ Outcome: the product is stable enough for serious parent and tutor trials.
 
 ### A7.2 Smoke Tests And Regression Coverage
 
-- [ ] A7.2.1 Create a written smoke test checklist for student, parent, tutor, and admin roles.
+- [x] A7.2.1 Create a written smoke test checklist for student, parent, tutor, and admin roles.
 - [x] A7.2.2 Add automated coverage for the highest-risk backend and auth paths.
-- [ ] A7.2.3 Add a pre-demo regression pass.
+- [x] A7.2.3 Add a pre-demo regression pass.
 
-Status note: fixture-backed automated smoke now exists for both the student core flow (`scripts/smoke-student-flow.mjs`) and the parent/tutor/admin oversight flow (`scripts/smoke-adult-oversight.mjs`).
+Status note: fixture-backed automated smoke now exists for student, memory, adult-oversight, privacy, and billing flows; `docs/smoke_checklist_v1.md` now defines the written acceptance criteria for student, parent, tutor, and admin roles; and `npm run regress:mvp` now acts as the canonical pre-demo regression pass.
 
 ### A7.3 Performance And Cost Controls
 

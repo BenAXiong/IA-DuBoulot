@@ -16,9 +16,10 @@ That makes this a roughly 7-week full-time-equivalent MVP, or about 10 to 12 cal
 
 As of 2026-03-11:
 
-- phases `A0` to `A6` are now complete in the local workspace
-- `A7.2.2` is also complete through the student and adult smoke scripts
-- the next active product phase is `A7`, with `A7.2.1`, `A7.2.3`, and `A7.3.*` remaining the highest-leverage repo-owned tasks while `A7.1` still requires real iPad Safari passes
+- phases `A1`, `A3`, `A4`, `A5`, and `A6` are now complete in the local workspace
+- `A7.2` is now complete through the written smoke checklist, the aggregated regression pass, and the existing automated smoke scripts
+- the next active product phase is still `A7`, with `A7.1` manual iPad Safari validation and `A7.3.*` cost-control follow-ups now the highest-leverage remaining repo-owned tasks
+- `A0` and `A2` still contain governance and app-foundation follow-ups, but they are no longer the critical path for the current MVP slice
 
 ## Week-By-Week Plan
 

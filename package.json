@@ -14,7 +14,8 @@
     "smoke:adult-oversight": "node --env-file=.env.local scripts/smoke-adult-oversight.mjs",
     "smoke:billing": "node --env-file=.env.local scripts/smoke-billing-webhook.mjs",
     "smoke:privacy": "node --env-file=.env.local scripts/smoke-privacy-controls.mjs",
-    "smoke:memory": "node --env-file=.env.local scripts/smoke-memory-profile.mjs"
+    "smoke:memory": "node --env-file=.env.local scripts/smoke-memory-profile.mjs",
+    "regress:mvp": "npm run typecheck && npm run lint && npm run build && npm run verify:rls-fixtures && npm run smoke:memory && npm run smoke:student-flow && npm run smoke:adult-oversight && npm run smoke:privacy && npm run smoke:billing"
   },
   "dependencies": {
     "@google/genai": "^1.44.0",
