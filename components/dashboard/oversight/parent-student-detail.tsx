@@ -1,3 +1,4 @@
+import { MemoryPanel } from "@/components/dashboard/memory/memory-panel";
 import Link from "next/link";
 import { TutorInviteForm } from "@/components/links/tutor-invite-form";
 import { StudentStatusPill } from "@/components/dashboard/student/student-status-pill";
@@ -148,6 +149,14 @@ export function ParentStudentDetailView({
         </div>
 
         <div className="grid gap-6">
+          <MemoryPanel
+            intro="Le parent peut relire et corriger les observations pedagogiques durables sans toucher aux donnees brutes de session."
+            languageCode={languageCode}
+            snapshot={detail.memory}
+            studentUserId={detail.student.id}
+            title="Memoire pedagogique visible pour cet eleve lie"
+          />
+
           <section className="grid gap-4 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]">
             <div className="space-y-3">
               <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">

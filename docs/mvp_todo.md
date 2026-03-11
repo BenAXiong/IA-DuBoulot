@@ -8,14 +8,14 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 
-- Overall: `[########################......]` `102/128` complete (`80%`)
+- Overall: `[#########################.....]` `106/128` complete (`83%`)
 - A0: `[xxxxxxxxxxxxxxxx.....]` `16/21`
 - A1: `[xxxxxxxxxxxxxxxx]` `16/16`
 - A2: `[xxxxxxxxxxx......]` `11/17`
 - A3: `[xxxxxxxxxxxxxxxxx]` `17/17`
 - A4: `[xxxxxxxxxxxxxxxxxxx]` `19/19`
 - A5: `[xxxxxxxxxxxxx]` `13/13`
-- A6: `[xxxxxxxxx....]` `9/13`
+- A6: `[xxxxxxxxxxxxx]` `13/13`
 - A7: `[x...........]` `1/12`
 
 ## Table Of Contents
@@ -311,16 +311,17 @@ Status note: `/app` now renders data-backed parent and tutor dashboards, `/app/s
 Status note: tutor private notes now mutate only through canonical routes, stay hidden from parent/student, and emit audit rows on create, update, and delete.
 Status note: `scripts/smoke-adult-oversight.mjs` now verifies parent, tutor, and admin route behavior against a temporary local `next start` instance.
 
-## 🟨 Phase A6 - Memory, Billing, And Privacy Controls
+## 🟩 Phase A6 - Memory, Billing, And Privacy Controls
 
 Outcome: the MVP can retain useful educational context, gate usage, and handle data responsibly.
 
 ### A6.1 Student Memory Profile
 
-- [ ] A6.1.1 Generate structured learning-relevant memory updates.
-- [ ] A6.1.2 Store strengths, weaknesses, preferences, and recurring topics.
-- [ ] A6.1.3 Make memory editable and deletable.
-- [ ] A6.1.4 Prevent speculative or sensitive profiling from being stored.
+- [x] A6.1.1 Generate structured learning-relevant memory updates.
+- [x] A6.1.2 Store strengths, weaknesses, preferences, and recurring topics.
+- [x] A6.1.3 Make memory editable and deletable.
+- [x] A6.1.4 Prevent speculative or sensitive profiling from being stored.
+Status note: `POST /api/conversations/[conversationId]/complete` now refreshes pedagogical memory through `lib/server/memory`, the student dashboard and linked-parent student detail both expose the canonical memory panel, manual edits and deletes flow through `PATCH /api/students/[studentId]/memory`, tutors are blocked from raw memory, and `npm run smoke:memory` now verifies the real route and UI behavior with provider-fallback coverage.
 
 ### A6.2 Usage Counters, Trial, And Quotas
 

@@ -21,6 +21,7 @@ import {
   GEMINI_UPLOAD_POLL_DELAY_MS,
 } from "@/lib/server/ai/config";
 import { buildAttachmentExtractionPrompt } from "@/lib/server/ai/prompts/attachment-extraction";
+import { buildMemoryProfilePrompt } from "@/lib/server/ai/prompts/memory-profile";
 import { buildStudentCoachSystemPrompt } from "@/lib/server/ai/prompts/student-coach";
 import { buildSummaryPrompt } from "@/lib/server/ai/prompts/summary-prompts";
 import { buildTranslationPrompt } from "@/lib/server/ai/prompts/translation";
@@ -33,6 +34,9 @@ import type {
   ExtractAttachmentTextResult,
   GenerateCoachReplyInput,
   GenerateCoachReplyResult,
+  MemoryGenerationItem,
+  GenerateMemoryProfileInput,
+  GenerateMemoryProfileResult,
   GenerateSummaryInput,
   GenerateSummaryResult,
   TranslateTextInput,
@@ -542,6 +546,80 @@ export class GeminiAiProvider implements AiProvider {
         : [],
       next_step_recommendation: asString(response.nextStepRecommendation),
       generated_model_name: response.modelName,
+      promptVersion: prompt.version,
+      usage: response.usage,
+    };
+  }
+
+  async generateMemoryProfile(
+    input: GenerateMemoryProfileInput,
+  ): Promise<GenerateMemoryProfileResult> {
+    const prompt = buildMemoryProfilePrompt(input);
+    const response = await this.generateJsonResponse<{
+      items?: Array<{
+        category?: string;
+        title?: string;
+        detail?: string | null;
+        confidence?: number | null;
+      }>;
+    }>({
+      model: GEMINI_SUMMARY_MODEL,
+      systemInstruction: prompt.instruction,
+      contents: createUserContent([
+        `Langue cible: ${input.languageCode}`,
+        `Conversation: ${input.conversation.id}`,
+      ]),
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          items: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                category: {
+                  type: Type.STRING,
+                  enum: ["strength", "weakness", "preference", "topic"],
+                },
+                title: { type: Type.STRING },
+                detail: { type: Type.STRING },
+                confidence: { type: Type.NUMBER },
+              },
+              required: ["category", "title"],
+            },
+          },
+        },
+        required: ["items"],
+      },
+      requestContext: input.requestContext,
+      operation: "memory_profile",
+      extraLogDetails: {
+        language_code: input.languageCode,
+        summary_count: input.summaries.length,
+      },
+    });
+
+    return {
+      items: Array.isArray(response.items)
+        ? response.items
+            .map(
+              (item): MemoryGenerationItem => ({
+              category:
+                item.category === "strength"
+                  ? "strength"
+                  : item.category === "weakness"
+                    ? "weakness"
+                    : item.category === "preference"
+                      ? "preference"
+                      : "topic",
+              title: asString(item.title) ?? "",
+              detail: asString(item.detail),
+              confidence: asNumber(item.confidence),
+            }),
+            )
+            .filter((item) => item.title.length > 0)
+        : [],
+      generatedModelName: response.modelName,
       promptVersion: prompt.version,
       usage: response.usage,
     };

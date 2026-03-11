@@ -23,6 +23,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Student session persistence V1](docs/student_session_persistence_v1.md)
 - [Student workbench V1](docs/student_workbench_v1.md)
 - [Student history and summary V1](docs/student_history_summary_v1.md)
+- [Student memory profile V1](docs/student_memory_profile_v1.md)
 - [Invitation flows V1](docs/invitation_flows_v1.md)
 - [Oversight surfaces V1](docs/oversight_surfaces_v1.md)
 - [Privacy controls V1](docs/privacy_controls_v1.md)
@@ -74,6 +75,8 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - a third fixture-backed billing smoke script now exists at `scripts/smoke-billing-webhook.mjs` and passed on 2026-03-11 against the real webhook route plus the parent dashboard billing surface.
 - `/app/settings` now provides the stable profile, billing, privacy, and deletion-control surface for every role, backed by `lib/server/privacy/` plus `POST /api/privacy/deletion-requests`.
 - a fourth fixture-backed privacy smoke script now exists at `scripts/smoke-privacy-controls.mjs` and passed on 2026-03-11 against the real settings route, linked-child deletion queueing, immediate tutor-access revocation, redirect-to-settings behavior, and write blocking for deletion-requested accounts.
+- the student dashboard and linked-parent student detail now expose a pedagogical memory panel backed by `lib/server/memory/`, with completion-triggered refresh, manual edit/delete controls, and tutor raw-memory access explicitly blocked.
+- a fifth fixture-backed smoke script now exists at `scripts/smoke-memory-profile.mjs` and passed on 2026-03-11 against the real memory route, dashboard surfaces, manual mutation flow, and tutor-access boundary.
 - the latest student smoke completed successfully with only optional adult summary variants missing in that run; provider reliability remains a QA follow-up even though the student flow stays stable.
 
 ## Working Conventions

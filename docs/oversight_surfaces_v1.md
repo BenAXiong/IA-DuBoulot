@@ -1,10 +1,10 @@
 # Oversight Surfaces V1
 
-Related: [README](../README.md) | [App shell V1](app_shell_v1.md) | [Invitation flows V1](invitation_flows_v1.md) | [Role and access matrix](role_access_matrix.md) | [API route map](api_route_map.md) | [Service interfaces](service_interfaces.md) | [Error and audit conventions](error_audit_conventions.md) | [MVP to-do list](mvp_todo.md)
+Related: [README](../README.md) | [App shell V1](app_shell_v1.md) | [Student memory profile V1](student_memory_profile_v1.md) | [Invitation flows V1](invitation_flows_v1.md) | [Role and access matrix](role_access_matrix.md) | [API route map](api_route_map.md) | [Service interfaces](service_interfaces.md) | [Error and audit conventions](error_audit_conventions.md) | [MVP to-do list](mvp_todo.md)
 
 ## Purpose
 
-This document records the first real parent, tutor, and admin oversight surfaces delivered in `A5`.
+This document records the first real parent, tutor, and admin oversight surfaces delivered in `A5`, plus the `A6.1` parent memory extension.
 
 It exists so later sessions do not have to reconstruct:
 
@@ -21,6 +21,7 @@ This V1 covers:
 - `A5.2.1` to `A5.2.3` through the parent dashboard, linked-student detail, read-only session review, summary language toggle, and billing-status display
 - `A5.3.1` to `A5.3.4` through the tutor dashboard, linked-student detail, tutor-summary review, and private tutor notes
 - `A5.4.1` to `A5.4.3` through adult session-view audit rows, the first admin audit page, and automated route smoke coverage
+- `A6.1` parent extension through the linked-student pedagogical memory panel and raw-memory audit path
 
 ## Canonical Routes
 
@@ -34,6 +35,8 @@ Pages:
 APIs:
 
 - `GET /api/conversations/[conversationId]`
+- `GET /api/students/[studentId]/memory`
+- `PATCH /api/students/[studentId]/memory`
 - `POST /api/tutor/notes`
 - `PATCH /api/tutor/notes/[noteId]`
 - `DELETE /api/tutor/notes/[noteId]`
@@ -61,6 +64,7 @@ Dashboard and review components:
 - `components/dashboard/oversight/tutor-notes-panel.tsx`
 - `components/dashboard/oversight/admin-access-audit-list.tsx`
 - `components/dashboard/oversight/billing-status-card.tsx`
+- `components/dashboard/memory/memory-panel.tsx`
 
 Server services:
 
@@ -70,10 +74,12 @@ Server services:
 - `lib/server/oversight/tutor-note-service.ts`
 - `lib/server/oversight/admin-service.ts`
 - `lib/server/oversight/types.ts`
+- `lib/server/memory/service.ts`
 
 Verification:
 
 - `scripts/smoke-adult-oversight.mjs`
+- `scripts/smoke-memory-profile.mjs`
 
 ## Parent Surface Rules
 
@@ -88,10 +94,12 @@ Dashboard:
 
 Student detail:
 
-- stays read-only
+- stays read-only for session content
 - links to session review
+- includes the pedagogical memory panel with manual edit and delete controls for the linked parent
 - exposes the canonical parent-issued tutor invite form for that linked child
 - repeats the linked student's current quota state and remaining period budget
+- emits audit rows when the parent reads raw memory
 
 Session review:
 
@@ -112,6 +120,7 @@ Student detail:
 
 - shows recent sessions and derived next topics
 - includes a persistent private-note panel for that student
+- does not expose raw student memory; tutor views stay limited to derived summary and note surfaces
 
 Session review:
 
@@ -147,6 +156,7 @@ Current review surface:
 Current automated coverage now includes:
 
 - `npm run verify:rls-fixtures`
+- `npm run smoke:memory`
 - `npm run smoke:student-flow`
 - `npm run smoke:adult-oversight`
 - `npm run smoke:billing`
@@ -154,6 +164,7 @@ Current automated coverage now includes:
 Latest local result on 2026-03-11:
 
 - RLS fixture verification passed with `17` checks and `0` failures
+- memory smoke passed across student and parent memory surfaces while confirming tutor raw-memory denial
 - student-flow smoke passed with provider-fallback warnings
 - adult-oversight smoke passed across parent, tutor, and admin surfaces
 - billing smoke passed against the signed Lemon webhook route and the parent dashboard billing surface, while intentionally blanking local checkout env to keep the graceful `503` branch covered
@@ -163,5 +174,6 @@ Latest local result on 2026-03-11:
 
 - the local billing smoke still forces `/api/billing/checkout` through the explicit `503` path even though real Lemon env can now be provisioned locally or in Vercel
 - parent summary translation depends on the available stored summary variants; no on-demand translation UI exists yet
+- tutor raw-memory access remains intentionally blocked even though the linked-parent surface now exposes the same memory panel used on the student dashboard
 - tutor notes do not yet support rich categorization, attachments, or admin annotation
 - admin audit review is intentionally narrow and does not replace broader moderation or support tooling

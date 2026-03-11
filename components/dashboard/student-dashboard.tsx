@@ -1,8 +1,10 @@
+import { MemoryPanel } from "@/components/dashboard/memory/memory-panel";
 import { ParentApprovalRequestForm } from "@/components/links/parent-approval-request-form";
 import { TutorInviteForm } from "@/components/links/tutor-invite-form";
 import { StudentDashboardRecentSessions } from "@/components/dashboard/student/student-dashboard-recent-sessions";
 import { StudentDashboardStartPanel } from "@/components/dashboard/student/student-dashboard-start-panel";
 import { StudentDashboardSupportGrid } from "@/components/dashboard/student/student-dashboard-support-grid";
+import { loadVisibleStudentMemory } from "@/lib/server/memory/service";
 import { loadStudentDashboardSnapshot } from "@/lib/server/student-dashboard/student-dashboard-service";
 import type { AppUserRecord } from "@/lib/server/auth/types";
 
@@ -11,7 +13,13 @@ type StudentDashboardProps = {
 };
 
 export async function StudentDashboard({ appUser }: StudentDashboardProps) {
-  const snapshot = await loadStudentDashboardSnapshot(appUser);
+  const [snapshot, memory] = await Promise.all([
+    loadStudentDashboardSnapshot(appUser),
+    loadVisibleStudentMemory({
+      viewer: appUser,
+      studentUserId: appUser.id,
+    }),
+  ]);
 
   return (
     <div className="grid gap-6">
@@ -29,6 +37,14 @@ export async function StudentDashboard({ appUser }: StudentDashboardProps) {
           usage={snapshot.usage}
         />
       </div>
+
+      <MemoryPanel
+        intro="Cette memoire garde uniquement des points pedagogiques reutilisables, jamais des etiquettes sensibles ou speculatives."
+        languageCode={appUser.preferred_ui_language}
+        snapshot={memory}
+        studentUserId={appUser.id}
+        title="Relire, corriger, et nettoyer les points durables utiles au prochain devoir"
+      />
 
       <section
         className="grid gap-6 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] md:grid-cols-[0.85fr_1.15fr]"

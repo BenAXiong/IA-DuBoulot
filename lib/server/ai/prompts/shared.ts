@@ -1,6 +1,10 @@
 import "server-only";
 
-import type { ConversationAttachmentRecord, GenerateSummaryInput } from "@/lib/server/ai/types";
+import type {
+  ConversationAttachmentRecord,
+  GenerateSummaryInput,
+  GenerateMemoryProfileInput,
+} from "@/lib/server/ai/types";
 import type {
   ConversationMessageRecord,
   ConversationRecord,
@@ -14,6 +18,7 @@ export const PARENT_SUMMARY_PROMPT_VERSION = "parent-summary-v1";
 export const TUTOR_SUMMARY_PROMPT_VERSION = "tutor-summary-v1";
 export const ATTACHMENT_EXTRACTION_PROMPT_VERSION = "attachment-extraction-v1";
 export const TRANSLATION_PROMPT_VERSION = "translation-v1";
+export const MEMORY_PROFILE_PROMPT_VERSION = "memory-profile-v1";
 
 function normalizeText(value: string | null | undefined) {
   const normalized = value?.trim() ?? "";
@@ -129,4 +134,30 @@ export function buildSummarySourceContext(input: GenerateSummaryInput) {
     messages: input.messages,
     attachments: input.attachments,
   });
+}
+
+export function buildMemorySourceContext(input: GenerateMemoryProfileInput) {
+  const summaryLines =
+    input.summaries.length === 0
+      ? ["- aucun resume de session encore disponible"]
+      : input.summaries.map((summary) => {
+          const weaknessTags =
+            summary.weakness_tags.length > 0
+              ? ` | tags: ${summary.weakness_tags.join(", ")}`
+              : "";
+
+          return `- [${summary.audience}/${summary.language_code}] ${summary.summary_text}${weaknessTags}`;
+        });
+
+  return [
+    buildConversationCoreContext({
+      conversation: input.conversation,
+      workspace: input.workspace,
+      messages: input.messages,
+      attachments: input.attachments,
+    }),
+    "",
+    "Resumes deja generes",
+    ...summaryLines,
+  ].join("\n");
 }

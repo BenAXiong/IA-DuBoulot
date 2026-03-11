@@ -5,6 +5,7 @@ import type { AppUserRecord, UiLanguageCode } from "@/lib/server/auth/types";
 import { loadPayerBillingSnapshot } from "@/lib/server/billing/service";
 import { AppError } from "@/lib/server/errors/app-error";
 import { loadConversationDetail } from "@/lib/server/conversations/conversation-service";
+import { loadVisibleStudentMemory } from "@/lib/server/memory/service";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { resolveStudentUsageSnapshot } from "@/lib/server/usage/service";
 import type { SessionSummaryRecord } from "@/lib/server/conversations/types";
@@ -375,7 +376,18 @@ export async function loadParentStudentDetail(input: {
   );
   const studentsById = new Map([[student.id, student]]);
   const summariesByConversation = buildSummaryMap(summaries);
-  const studentSnapshot = await toParentLinkedStudentSnapshot(student);
+  const [studentSnapshot, memory] = await Promise.all([
+    toParentLinkedStudentSnapshot(student),
+    loadVisibleStudentMemory({
+      viewer: input.appUser,
+      studentUserId: input.studentUserId,
+      auditContext: {
+        action: "parent_student_memory_view",
+        route: "/app/students/[studentUserId]",
+        requestId: `memory_${crypto.randomUUID()}`,
+      },
+    }),
+  ]);
 
   return {
     student: studentSnapshot,
@@ -392,6 +404,7 @@ export async function loadParentStudentDetail(input: {
       summariesByConversation,
       preferredLanguage: input.appUser.preferred_ui_language,
     }),
+    memory,
   };
 }
 

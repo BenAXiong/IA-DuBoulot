@@ -13,7 +13,8 @@
     "smoke:student-flow": "node --env-file=.env.local scripts/smoke-student-flow.mjs",
     "smoke:adult-oversight": "node --env-file=.env.local scripts/smoke-adult-oversight.mjs",
     "smoke:billing": "node --env-file=.env.local scripts/smoke-billing-webhook.mjs",
-    "smoke:privacy": "node --env-file=.env.local scripts/smoke-privacy-controls.mjs"
+    "smoke:privacy": "node --env-file=.env.local scripts/smoke-privacy-controls.mjs",
+    "smoke:memory": "node --env-file=.env.local scripts/smoke-memory-profile.mjs"
   },
   "dependencies": {
     "@google/genai": "^1.44.0",

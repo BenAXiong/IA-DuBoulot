@@ -9,6 +9,7 @@ import type {
   WorkspaceStateRecord,
 } from "@/lib/server/conversations/types";
 import type { AiLanguageCode, UiLanguageCode } from "@/lib/server/auth/types";
+import type { MemoryCategory } from "@/lib/server/memory/types";
 
 export type AiProviderName = "gemini";
 
@@ -117,6 +118,30 @@ export type GenerateSummaryResult = Pick<
   usage: AiUsageSnapshot;
 };
 
+export type MemoryGenerationItem = {
+  category: MemoryCategory;
+  title: string;
+  detail: string | null;
+  confidence: number | null;
+};
+
+export type GenerateMemoryProfileInput = {
+  conversation: ConversationRecord;
+  workspace: WorkspaceStateRecord | null;
+  messages: ConversationMessageRecord[];
+  attachments: ConversationAttachmentRecord[];
+  summaries: SessionSummaryRecord[];
+  languageCode: UiLanguageCode;
+  requestContext: AiProviderLogContext;
+};
+
+export type GenerateMemoryProfileResult = {
+  items: MemoryGenerationItem[];
+  generatedModelName: string;
+  promptVersion: string;
+  usage: AiUsageSnapshot;
+};
+
 export type TranslateTextInput = {
   sourceText: string;
   sourceLanguage: UiLanguageCode;
@@ -140,5 +165,8 @@ export interface AiProvider {
     input: ExtractAttachmentTextInput,
   ): Promise<ExtractAttachmentTextResult>;
   generateSummary(input: GenerateSummaryInput): Promise<GenerateSummaryResult>;
+  generateMemoryProfile(
+    input: GenerateMemoryProfileInput,
+  ): Promise<GenerateMemoryProfileResult>;
   translateText(input: TranslateTextInput): Promise<TranslateTextResult>;
 }

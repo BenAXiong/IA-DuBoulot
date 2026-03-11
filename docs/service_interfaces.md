@@ -1,6 +1,6 @@
 # Service Interfaces
 
-Related: [README](../README.md) | [API route map](api_route_map.md) | [Invitation flows V1](invitation_flows_v1.md) | [Oversight surfaces V1](oversight_surfaces_v1.md) | [Privacy controls V1](privacy_controls_v1.md) | [Environment matrix](environment_matrix.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md)
+Related: [README](../README.md) | [API route map](api_route_map.md) | [Student memory profile V1](student_memory_profile_v1.md) | [Invitation flows V1](invitation_flows_v1.md) | [Oversight surfaces V1](oversight_surfaces_v1.md) | [Privacy controls V1](privacy_controls_v1.md) | [Environment matrix](environment_matrix.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md)
 
 ## Purpose
 
@@ -20,10 +20,12 @@ Current local status:
 - `lib/server/moderation/`, `lib/server/summaries/`, and `lib/server/translations/` now exist in code
 - `lib/server/oversight/` now contains parent/tutor/admin read services plus tutor-note mutation handling
 - `lib/server/privacy/` now owns the `/app/settings` snapshot plus queued deletion request flow
+- `lib/server/memory/` now owns visible memory reads, manual mutations, and completion-triggered refresh
 - `scripts/smoke-student-flow.mjs` now verifies the real student route flow against a temporary local `next start` instance
 - `scripts/smoke-adult-oversight.mjs` now verifies parent, tutor, and admin oversight routes against the same local server model
 - `scripts/smoke-privacy-controls.mjs` now verifies settings rendering, linked-child deletion queueing, tutor-access revocation, and deletion-requested write blocking
-- provider-unavailable fallbacks now exist for attachment extraction, coach replies, and the required student summary, while adult summary variants remain best-effort
+- `scripts/smoke-memory-profile.mjs` now verifies the live memory route, student dashboard memory panel, parent linked-student panel, and tutor-access denial
+- provider-unavailable fallbacks now exist for attachment extraction, coach replies, the required student summary, and memory refresh, while adult summary variants remain best-effort
 
 ## Interface Rules
 
@@ -37,7 +39,7 @@ Current local status:
 
 ### AI Provider
 
-Owns model calls for coaching, extraction, and summary generation.
+Owns model calls for coaching, extraction, summary generation, and memory refresh.
 
 Primary implementation target: Gemini.
 Future fallback target: OpenAI API or another production-ready API provider.
@@ -46,6 +48,9 @@ Future fallback target: OpenAI API or another production-ready API provider.
 interface AiProvider {
   generateCoachReply(input: CoachReplyInput): Promise<CoachReplyResult>;
   generateSummary(input: SummaryGenerationInput): Promise<SummaryResult>;
+  generateMemoryProfile(
+    input: GenerateMemoryProfileInput
+  ): Promise<GenerateMemoryProfileResult>;
   extractAttachmentText(input: AttachmentExtractionInput): Promise<AttachmentExtractionResult>;
   translateText(input: TranslateTextInput): Promise<TranslateTextResult>;
 }
@@ -213,8 +218,17 @@ Rules:
 interface MemoryService {
   getVisibleMemory(input: GetVisibleMemoryInput): Promise<GetVisibleMemoryResult>;
   applyMemoryUpdate(input: ApplyMemoryUpdateInput): Promise<ApplyMemoryUpdateResult>;
+  refreshMemoryFromConversationCompletion(
+    input: RefreshMemoryFromConversationCompletionInput
+  ): Promise<void>;
 }
 ```
+
+Rules:
+
+- raw memory visibility is restricted to the student, linked parent, and admin; tutor surfaces must rely on derived insights instead
+- manual edits and provider-generated items must pass the same sensitive-content filter before persistence
+- completion-triggered refresh should never block the student completion route; it must degrade gracefully when the provider is unavailable
 
 ### Privacy Service
 

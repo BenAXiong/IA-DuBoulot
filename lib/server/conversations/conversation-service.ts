@@ -1,7 +1,7 @@
 import "server-only";
 
 import { AppError } from "@/lib/server/errors/app-error";
-import { logRuntimeInfo } from "@/lib/server/audit/runtime-logger";
+import { logRuntimeError, logRuntimeInfo } from "@/lib/server/audit/runtime-logger";
 import { recordAuditEvent } from "@/lib/server/audit/audit-service";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -21,6 +21,7 @@ import type {
   ConversationAttachmentRecord,
 } from "@/lib/server/ai/types";
 import { getAiProvider } from "@/lib/server/ai/provider";
+import { refreshStudentMemoryFromConversationCompletion } from "@/lib/server/memory/service";
 import { generateConversationSummaries } from "@/lib/server/summaries/service";
 import {
   moderateAssistantOutput,
@@ -1061,6 +1062,39 @@ export async function completeConversation(input: {
     messages: (messagesResult.data ?? []) as ConversationMessageRecord[],
     attachments: (attachmentsResult.data ?? []) as ConversationAttachmentRecord[],
   });
+  try {
+    await refreshStudentMemoryFromConversationCompletion({
+      appUser,
+      conversation: completedConversation,
+      workspace: workspaceResult.data ?? null,
+      messages: (messagesResult.data ?? []) as ConversationMessageRecord[],
+      attachments: (attachmentsResult.data ?? []) as ConversationAttachmentRecord[],
+      summaries,
+      requestId: input.requestId,
+      route: input.route,
+    });
+  } catch (error) {
+    logRuntimeError({
+      message: "Student memory refresh failed",
+      requestId: input.requestId,
+      route: input.route,
+      method: "POST",
+      actorUserId: appUser.id,
+      actorRole: appUser.role,
+      targetStudentUserId: appUser.id,
+      errorCode: "memory_refresh_failed",
+      details: {
+        conversationId: input.conversationId,
+        error:
+          error instanceof Error
+            ? {
+                name: error.name,
+                message: error.message,
+              }
+            : error,
+      },
+    });
+  }
   const studentSummary =
     summaries.find((summary) => summary.audience === "student") ?? null;
   const visibleSummaries = studentSummary ? [studentSummary] : [];

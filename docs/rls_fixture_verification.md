@@ -1,6 +1,6 @@
 # RLS Fixture Verification
 
-Related: [README](../README.md) | [Environment matrix](environment_matrix.md) | [Supabase schema V1](supabase_schema_v1.md) | [Access rules V1](access_rules_v1.md) | [MVP to-do list](mvp_todo.md) | [Decision log](decision_log.md)
+Related: [README](../README.md) | [Environment matrix](environment_matrix.md) | [Supabase schema V1](supabase_schema_v1.md) | [Access rules V1](access_rules_v1.md) | [Student memory profile V1](student_memory_profile_v1.md) | [MVP to-do list](mvp_todo.md) | [Decision log](decision_log.md)
 
 ## Purpose
 
@@ -14,6 +14,7 @@ The goal is to test the policies that are actually deployed, not just read the S
 - Verification script: `scripts/verify-rls-fixtures.mjs`
 - Shared helpers: `scripts/rls-fixture-shared.mjs`
 - Student-flow smoke: `scripts/smoke-student-flow.mjs`
+- Memory smoke: `scripts/smoke-memory-profile.mjs`
 - Adult-oversight smoke: `scripts/smoke-adult-oversight.mjs`
 - Privacy smoke: `scripts/smoke-privacy-controls.mjs`
 - Billing smoke: `scripts/smoke-billing-webhook.mjs`
@@ -63,6 +64,7 @@ Run these from the repo root:
 npm run seed:rls-fixtures
 npm run verify:rls-fixtures
 npm run build
+npm run smoke:memory
 npm run smoke:privacy
 npm run smoke:student-flow
 npm run smoke:adult-oversight
@@ -110,6 +112,15 @@ The adult-oversight smoke script currently checks that:
 - tutor private notes create, update, and delete through the canonical routes
 - admin can read the sensitive access feed and the `/app/audit` page after those events
 
+The memory smoke script currently checks that:
+
+- the seeded fixture student dashboard renders the memory panel through the real `/app` page
+- `POST /api/conversations/[conversationId]/complete` refreshes memory without blocking completion
+- `GET /api/students/[studentId]/memory` returns the current snapshot for the student
+- `PATCH /api/students/[studentId]/memory` supports create, update, and delete for safe manual items
+- the linked-parent student detail page renders the same memory panel
+- tutor raw-memory access through the canonical memory route stays denied
+
 The billing smoke script currently checks that:
 
 - the parent-authenticated billing checkout route fails cleanly with `503` while the smoke intentionally blanks local Lemon checkout config
@@ -139,6 +150,7 @@ The privacy smoke script currently checks that:
 - 2026-03-10 hosted reseed: success
 - 2026-03-10 hosted verification: `17` checks passed, `0` failed
 - 2026-03-11 local student-flow smoke: success against a temporary local `next start` instance
+- 2026-03-11 local memory smoke: success against a temporary local `next start` instance for student dashboard memory, parent linked-student memory, manual mutations, and tutor raw-memory denial
 - 2026-03-11 local student-flow smoke warnings: the latest pass completed successfully with optional adult summary variants missing in that run, and earlier passes have also exercised the Gemini fallback paths now kept in the student contract
 - 2026-03-11 local adult-oversight smoke: success against a temporary local `next start` instance across parent, tutor, and admin routes
 - 2026-03-11 local privacy smoke: success against a temporary local `next start` instance for `/app/settings`, linked-child deletion queueing, tutor-link revocation, redirect-to-settings behavior, and write blocking after deletion request

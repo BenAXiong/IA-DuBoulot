@@ -10,6 +10,7 @@ import type {
   ConversationDetail,
   ConversationRecord,
 } from "@/lib/server/conversations/types";
+import type { StudentMemorySnapshot } from "@/lib/server/memory/types";
 import type { StudentUsageSnapshot } from "@/lib/server/usage/types";
 
 export type OversightStudentSnapshot = {
@@ -73,6 +74,7 @@ export type ParentStudentDetail = {
   relationshipLabel: string | null;
   recentSessions: OversightConversationPreview[];
   weeklySummary: ParentWeeklySummary;
+  memory: StudentMemorySnapshot;
 };
 
 export type ParentConversationSummaryVariant = {

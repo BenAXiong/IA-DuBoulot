@@ -1,6 +1,6 @@
 # Student Dashboard V1
 
-Related: [README](../README.md) | [MVP to-do list](mvp_todo.md) | [App shell V1](app_shell_v1.md) | [Invitation flows V1](invitation_flows_v1.md) | [Supabase schema V1](supabase_schema_v1.md)
+Related: [README](../README.md) | [MVP to-do list](mvp_todo.md) | [App shell V1](app_shell_v1.md) | [Student memory profile V1](student_memory_profile_v1.md) | [Invitation flows V1](invitation_flows_v1.md) | [Supabase schema V1](supabase_schema_v1.md)
 
 ## Purpose
 
@@ -8,13 +8,14 @@ Capture the first real student home screen so future sessions can extend it with
 
 ## Scope
 
-This document covers `A3.1.1` to `A3.1.3`:
+This document started with `A3.1.1` to `A3.1.3` and now also records the `A6.1` memory-panel extension:
 
 - main `New homework` CTA on the student dashboard
 - recent session list with subject tags
 - linked-adult status
 - usage status from `usage_counters`
 - canonical intake entry route at `/app/new`
+- student-owned pedagogical memory review and cleanup
 
 ## Source Files
 
@@ -23,9 +24,11 @@ This document covers `A3.1.1` to `A3.1.3`:
 - Start panel: `components/dashboard/student/student-dashboard-start-panel.tsx`
 - Recent sessions panel: `components/dashboard/student/student-dashboard-recent-sessions.tsx`
 - Support and usage panel: `components/dashboard/student/student-dashboard-support-grid.tsx`
+- Memory panel: `components/dashboard/memory/memory-panel.tsx`
 - Canonical intake entry route: `app/app/new/page.tsx`
 - Intake entry component: `components/dashboard/student/new-homework-entry.tsx`
 - Server snapshot service: `lib/server/student-dashboard/student-dashboard-service.ts`
+- Memory service: `lib/server/memory/service.ts`
 - Dashboard types: `lib/server/student-dashboard/types.ts`
 
 ## Data Contract
@@ -40,6 +43,7 @@ The student dashboard reads one server-side snapshot object:
 - parent-approval status from `student_profiles`
 - latest usage period from `usage_counters`
 - quota and trial snapshot resolved through the server-owned usage service
+- a separate student-memory snapshot resolved through the memory service
 
 The page does not query Supabase directly. The service owns that logic.
 
@@ -81,15 +85,32 @@ What it does not do yet:
 
 - billing and privacy controls now live on `/app/settings` instead of expanding the student dashboard itself
 - no parent/tutor management actions on the student side
-- no memory editing controls yet
 
 Those belong to later business and privacy phases rather than the dashboard shell itself.
+
+## Memory Panel Extension
+
+The student dashboard now includes the canonical pedagogical memory panel.
+
+Current behavior:
+
+- loads the current `StudentMemorySnapshot` beside the existing dashboard snapshot
+- shows profile summaries for strengths, weaknesses, and preferences
+- groups active items by category
+- allows the student to add, edit, and delete durable pedagogical items through `PATCH /api/students/[studentId]/memory`
+- reminds the user that sensitive or speculative labels are rejected
+
+Current boundary:
+
+- raw session content still lives in the session detail and workbench surfaces
+- the dashboard memory panel is only for durable learning context that can help the next homework
 
 ## Known Boundaries
 
 - recent sessions on `/app` are intentionally short; the canonical long-form list now lives at `/app/history`
 - the student dashboard now shows the same quota state the mutation routes enforce, but billing remains a parent-owned workflow surfaced on `/app/settings`
 - under-13 blocking still depends on the existing parent-approval flow documented in [Invitation flows V1](invitation_flows_v1.md)
+- tutor-facing derived insights still belong to the tutor oversight surface; tutors do not receive raw student memory
 
 ## Next Extension Points
 

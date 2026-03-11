@@ -1,6 +1,6 @@
 # API Route Map
 
-Related: [README](../README.md) | [Access rules V1](access_rules_v1.md) | [Supabase schema V1](supabase_schema_v1.md) | [Invitation flows V1](invitation_flows_v1.md) | [Oversight surfaces V1](oversight_surfaces_v1.md) | [Privacy controls V1](privacy_controls_v1.md) | [Service interfaces](service_interfaces.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md)
+Related: [README](../README.md) | [Access rules V1](access_rules_v1.md) | [Supabase schema V1](supabase_schema_v1.md) | [Student memory profile V1](student_memory_profile_v1.md) | [Invitation flows V1](invitation_flows_v1.md) | [Oversight surfaces V1](oversight_surfaces_v1.md) | [Privacy controls V1](privacy_controls_v1.md) | [Service interfaces](service_interfaces.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md)
 
 ## Purpose
 
@@ -29,6 +29,8 @@ Current implemented routes:
 - `PATCH /api/conversations/[conversationId]/workspace`
 - `GET /api/admin/audit/access-events`
 - `POST /api/privacy/deletion-requests`
+- `GET /api/students/[studentId]/memory`
+- `PATCH /api/students/[studentId]/memory`
 - `POST /api/uploads/create`
 - `POST /api/uploads/confirm`
 - `POST /api/uploads/extract`
@@ -96,8 +98,8 @@ These routes expose generated educational context while keeping raw generation s
 | --- | --- | --- | --- | --- |
 | `/api/conversations/[conversationId]/summaries` | `GET` | visible role | fetch summaries allowed for the caller | audience segregation must match RLS |
 | `/api/conversations/[conversationId]/summaries/generate` | `POST` | server/admin | generate student, parent, or tutor summaries | not a browser-direct route in V1 |
-| `/api/students/[studentId]/memory` | `GET` | student, linked parent, admin | fetch memory profile and safe items | tutor uses derived insights later |
-| `/api/students/[studentId]/memory` | `PATCH` | server/admin | apply curated memory updates or deletions | speculative profiling must stay blocked |
+| `/api/students/[studentId]/memory` | `GET` | student, linked parent, admin | fetch the current memory profile and active items | parent and admin reads are audited; tutor raw-memory access stays denied |
+| `/api/students/[studentId]/memory` | `PATCH` | student, linked parent, admin | apply manual memory upserts or deletions | completion-triggered generation stays server-owned; speculative profiling must stay blocked |
 
 ### Parent And Tutor Linking
 

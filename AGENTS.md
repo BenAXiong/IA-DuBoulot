@@ -37,20 +37,21 @@ Read these in order before any substantial implementation work:
 14. [docs/student_session_persistence_v1.md](docs/student_session_persistence_v1.md) when conversation persistence or return-to-session behavior is in scope
 15. [docs/student_workbench_v1.md](docs/student_workbench_v1.md) when chat, workspace, or student coaching surfaces are in scope
 16. [docs/student_history_summary_v1.md](docs/student_history_summary_v1.md) when history, completion, or summary work is in scope
-17. [docs/invitation_flows_v1.md](docs/invitation_flows_v1.md) when auth, parent, or tutor link work is in scope
-18. [docs/oversight_surfaces_v1.md](docs/oversight_surfaces_v1.md) when parent, tutor, adult review, tutor-note, or admin-audit work is in scope
-19. [docs/privacy_controls_v1.md](docs/privacy_controls_v1.md) when settings, billing/privacy controls, or deletion work is in scope
-20. [docs/service_interfaces.md](docs/service_interfaces.md)
-21. [docs/error_audit_conventions.md](docs/error_audit_conventions.md)
-22. [docs/storage_attachment_rules.md](docs/storage_attachment_rules.md)
-23. [docs/rls_fixture_verification.md](docs/rls_fixture_verification.md) when auth, schema, or RLS work is in scope
-24. [docs/sample_attachment_corpus.md](docs/sample_attachment_corpus.md) when upload, extraction, or demo fixture work is in scope
-25. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
-26. [docs/mvp_todo.md](docs/mvp_todo.md)
-27. [docs/mvp_timeline.md](docs/mvp_timeline.md)
-28. [docs/decision_log.md](docs/decision_log.md)
-29. [docs/work_sessions.md](docs/work_sessions.md)
-30. The relevant code, SQL, prompt, or UI files for the task being worked on
+17. [docs/student_memory_profile_v1.md](docs/student_memory_profile_v1.md) when memory, durable pedagogical context, or profile-retention work is in scope
+18. [docs/invitation_flows_v1.md](docs/invitation_flows_v1.md) when auth, parent, or tutor link work is in scope
+19. [docs/oversight_surfaces_v1.md](docs/oversight_surfaces_v1.md) when parent, tutor, adult review, tutor-note, or admin-audit work is in scope
+20. [docs/privacy_controls_v1.md](docs/privacy_controls_v1.md) when settings, billing/privacy controls, or deletion work is in scope
+21. [docs/service_interfaces.md](docs/service_interfaces.md)
+22. [docs/error_audit_conventions.md](docs/error_audit_conventions.md)
+23. [docs/storage_attachment_rules.md](docs/storage_attachment_rules.md)
+24. [docs/rls_fixture_verification.md](docs/rls_fixture_verification.md) when auth, schema, or RLS work is in scope
+25. [docs/sample_attachment_corpus.md](docs/sample_attachment_corpus.md) when upload, extraction, or demo fixture work is in scope
+26. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
+27. [docs/mvp_todo.md](docs/mvp_todo.md)
+28. [docs/mvp_timeline.md](docs/mvp_timeline.md)
+29. [docs/decision_log.md](docs/decision_log.md)
+30. [docs/work_sessions.md](docs/work_sessions.md)
+31. The relevant code, SQL, prompt, or UI files for the task being worked on
 
 If a file above is outdated, update it before or alongside the code change that depends on it.
 

@@ -16,10 +16,9 @@ That makes this a roughly 7-week full-time-equivalent MVP, or about 10 to 12 cal
 
 As of 2026-03-11:
 
-- phases `A0` to `A5` are now complete in the local workspace
-- `A6.2` to `A6.4` are now complete through usage, billing, and privacy/control slices
+- phases `A0` to `A6` are now complete in the local workspace
 - `A7.2.2` is also complete through the student and adult smoke scripts
-- the next active product phase is `A6.1`, with provider-reliability tuning remaining as QA follow-up rather than unfinished `A4` scope
+- the next active product phase is `A7`, with `A7.2.1`, `A7.2.3`, and `A7.3.*` remaining the highest-leverage repo-owned tasks while `A7.1` still requires real iPad Safari passes
 
 ## Week-By-Week Plan
 
