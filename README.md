@@ -8,6 +8,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Implementation plan](docs/implementation_plan.md)
 - [Brief adjustments](docs/brief_adjustments.md)
 - [Branch and PR conventions](docs/branch_pr_conventions.md)
+- [GitHub workflow V1](docs/github_workflow_v1.md)
 - [Role and access matrix](docs/role_access_matrix.md)
 - [Environment matrix](docs/environment_matrix.md)
 - [Supabase project setup notes](docs/supabase_project_setup.md)
@@ -21,6 +22,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Sample attachment corpus](docs/sample_attachment_corpus.md)
 - [API route map](docs/api_route_map.md)
 - [App shell V1](docs/app_shell_v1.md)
+- [Frontend foundations V1](docs/frontend_foundations_v1.md)
 - [Student dashboard V1](docs/student_dashboard_v1.md)
 - [Student intake V1](docs/student_intake_v1.md)
 - [Student session persistence V1](docs/student_session_persistence_v1.md)
@@ -31,6 +33,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Oversight surfaces V1](docs/oversight_surfaces_v1.md)
 - [Privacy controls V1](docs/privacy_controls_v1.md)
 - [AI ops and economics V1](docs/ai_ops_economics_v1.md)
+- [Telemetry and feature controls V1](docs/telemetry_feature_controls_v1.md)
 - [Service interfaces](docs/service_interfaces.md)
 - [Error and audit conventions](docs/error_audit_conventions.md)
 - [Storage and attachment rules](docs/storage_attachment_rules.md)
@@ -87,6 +90,9 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - launch-candidate operating docs now exist at `docs/founder_walkthrough_v1.md` and `docs/launch_checklist_v1.md`, and the current scope decision explicitly defers PWA installability until after real iPad Safari validation and early beta feedback.
 - an experimental prompt-level trace now also exists at `docs/work_prompt_log.md`, while `docs/work_sessions.md` remains the canonical session log.
 - a consolidated AI operations and economics note now exists at `docs/ai_ops_economics_v1.md`, including the current quota model, prompt pipeline, guardrails, token-cost ceilings, and the recommended parent-paid policy for future adult-triggered AI features.
+- frontend foundations now live in `components/ui/`, `lib/i18n/config.ts`, `.editorconfig`, and `docs/frontend_foundations_v1.md`, giving the repo a stable primitive layer, shared locale metadata, and explicit form/modularity rules.
+- telemetry and risky-integration controls now live in `lib/analytics/`, `lib/server/telemetry/`, `lib/feature-flags.ts`, and `docs/telemetry_feature_controls_v1.md`, with the MVP analytics path currently staying runtime-only until a real PostHog project exists.
+- the repo-owned GitHub workflow layer now includes issue templates plus a labels manifest in `.github/`, while actual remote label creation remains an external follow-up.
 - the latest `npm run regress:mvp` pass succeeded on 2026-03-11; the current non-blocking warning profile still consists of documented Gemini fallback usage and optional adult summary variants missing in some student-flow runs.
 - the latest student smoke completed successfully while also verifying repeated upload confirmation and repeated completion reuse the existing expensive artifacts; provider reliability remains a QA follow-up even though the student flow stays stable.
 

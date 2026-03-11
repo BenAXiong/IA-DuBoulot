@@ -1,0 +1,42 @@
+[
+  {
+    "name": "type:bug",
+    "color": "B60205",
+    "description": "Regression or behavior mismatch against the documented product contract."
+  },
+  {
+    "name": "type:work",
+    "color": "1D76DB",
+    "description": "Tracked implementation slice tied to MVP task IDs."
+  },
+  {
+    "name": "type:ops",
+    "color": "5319E7",
+    "description": "External provisioning, deployment, or operator work outside the repo."
+  },
+  {
+    "name": "needs:triage",
+    "color": "FBCA04",
+    "description": "New issue that still needs severity, ownership, or task alignment."
+  },
+  {
+    "name": "blocked:external",
+    "color": "000000",
+    "description": "Cannot close inside the repo because an external system or device is required."
+  },
+  {
+    "name": "risk:student-flow",
+    "color": "D93F0B",
+    "description": "Touches the core student intake, workbench, or completion contract."
+  },
+  {
+    "name": "risk:oversight",
+    "color": "C5DEF5",
+    "description": "Touches parent, tutor, admin, or privacy visibility boundaries."
+  },
+  {
+    "name": "risk:billing-ai",
+    "color": "0E8A16",
+    "description": "Touches usage, billing, provider behavior, or monetized AI surfaces."
+  }
+]

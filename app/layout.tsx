@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
+import { Suspense } from "react";
+import { RouteViewTracker } from "@/components/telemetry/route-view-tracker";
 import "./globals.css";
 
 const bodyFont = IBM_Plex_Sans({
@@ -28,6 +30,9 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className={`${bodyFont.variable} ${headingFont.variable}`}>
+        <Suspense fallback={null}>
+          <RouteViewTracker />
+        </Suspense>
         {children}
       </body>
     </html>

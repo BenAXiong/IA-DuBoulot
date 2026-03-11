@@ -1,9 +1,13 @@
 import "server-only";
+import {
+  AI_LANGUAGE_CODES,
+  UI_LANGUAGE_CODES,
+  type AiLanguageCode,
+  type UiLanguageCode,
+} from "@/lib/i18n/config";
 
 export const APP_USER_ROLES = ["student", "parent", "tutor", "admin"] as const;
 export const SELF_BOOTSTRAP_ROLES = ["student", "parent", "tutor"] as const;
-export const UI_LANGUAGE_CODES = ["fr", "en", "zh"] as const;
-export const AI_LANGUAGE_CODES = ["fr", "en"] as const;
 export const AGE_BANDS = [
   "six_eight",
   "nine_ten",
@@ -17,10 +21,11 @@ export const UNDER_13_AGE_BANDS = [
   "eleven_twelve",
 ] as const;
 
+export { AI_LANGUAGE_CODES, UI_LANGUAGE_CODES };
+export type { AiLanguageCode, UiLanguageCode } from "@/lib/i18n/config";
+
 export type AppUserRole = (typeof APP_USER_ROLES)[number];
 export type SelfBootstrapRole = (typeof SELF_BOOTSTRAP_ROLES)[number];
-export type UiLanguageCode = (typeof UI_LANGUAGE_CODES)[number];
-export type AiLanguageCode = (typeof AI_LANGUAGE_CODES)[number];
 export type AgeBand = (typeof AGE_BANDS)[number];
 export type AccountStatus =
   | "pending_parent_approval"

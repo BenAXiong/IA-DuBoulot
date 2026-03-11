@@ -8,10 +8,10 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 
-- Overall: `[############################..]` `117/130` complete (`90%`)
-- A0: `[xxxxxxxxxxxxxxxxxx....]` `18/22`
+- Overall: `[#############################.]` `124/130` complete (`95%`)
+- A0: `[xxxxxxxxxxxxxxxxxxx...]` `19/22`
 - A1: `[xxxxxxxxxxxxxxxx]` `16/16`
-- A2: `[xxxxxxxxxxx......]` `11/17`
+- A2: `[xxxxxxxxxxxxxxxxx]` `17/17`
 - A3: `[xxxxxxxxxxxxxxxxx]` `17/17`
 - A4: `[xxxxxxxxxxxxxxxxxxx]` `19/19`
 - A5: `[xxxxxxxxxxxxx]` `13/13`
@@ -48,13 +48,14 @@ Current direction: GitHub repo exists, Vercel is the chosen deployment platform,
 - [x] A0.2.1 Create the Supabase project.
 - [ ] A0.2.2 Create the PostHog project.
 - [ ] A0.2.3 Create the Resend account and sender setup.
-- [ ] A0.2.4 Choose the primary AI provider and a fallback provider.
+- [x] A0.2.4 Choose the primary AI provider and a fallback provider.
 - [x] A0.2.5 Choose the billing provider compatible with the founder's geography/entity setup.
 - [x] A0.2.6 Create `.env.example` and a secrets ownership checklist.
 
-Current direction: primary starter AI path is Gemini; fallback provider still needs to be selected. Billing provider is Lemon Squeezy.
+Current direction: primary starter AI path is Gemini, with OpenAI API now selected as the explicit fallback provider for a later adapter. Billing provider is Lemon Squeezy.
 Constraint: verify the Gemini tier and data-handling settings are suitable for minors before any live child traffic uses the AI flow.
 Constraint: a founder personal AI subscription is not treated as a backend fallback provider for the app.
+Status note: the fallback choice is now documented in `docs/decision_log.md`, `docs/environment_matrix.md`, and `docs/telemetry_feature_controls_v1.md`; the actual fallback adapter remains intentionally disabled until implemented.
 
 ### A0.3 Traceability Spine
 
@@ -67,6 +68,7 @@ Constraint: a founder personal AI subscription is not treated as a backend fallb
 - [x] A0.3.7 Add an experimental prompt-level log that can run in parallel with session logging.
 
 Status note: `docs/work_sessions.md` remains the canonical session log, and `docs/work_prompt_log.md` now exists as an experimental one-row-per-prompt trace with a manual Codex-credit column.
+Status note: repo-owned issue and PR workflow artifacts now live under `.github/` plus `docs/github_workflow_v1.md`, but the actual GitHub label creation step remains an external follow-up.
 
 ### A0.4 Product Constraints And Acceptance Rules
 
@@ -132,10 +134,12 @@ Outcome: the application shell supports real role-aware development instead of i
 
 - [x] A2.1.1 Initialize the Next.js app with TypeScript.
 - [x] A2.1.2 Add Tailwind CSS and baseline design tokens.
-- [ ] A2.1.3 Add the component primitive layer and form conventions.
+- [x] A2.1.3 Add the component primitive layer and form conventions.
 - [x] A2.1.4 Establish the root folder structure from the brief.
-- [ ] A2.1.5 Add linting, formatting, and modularity rules to prevent god components and god services.
-- [ ] A2.1.6 Add localization structure for `fr`, `en`, and `zh` without coupling translations to domain logic.
+- [x] A2.1.5 Add linting, formatting, and modularity rules to prevent god components and god services.
+- [x] A2.1.6 Add localization structure for `fr`, `en`, and `zh` without coupling translations to domain logic.
+
+Status note: `components/ui/` now provides the shared primitive layer, onboarding/settings/invite forms now follow one documented convention set, `.editorconfig` and the current ESLint rules now define the MVP formatting/modularity floor, and shared locale metadata now lives in `lib/i18n/config.ts` plus `docs/frontend_foundations_v1.md`.
 
 ### A2.2 Auth And Role Onboarding
 
@@ -163,9 +167,11 @@ Status note: on 2026-03-11 the shell was checked in a browser pass at `820x1180`
 
 ### A2.4 Telemetry And Feature Controls
 
-- [ ] A2.4.1 Add basic analytics hooks.
-- [ ] A2.4.2 Add server/runtime logging conventions.
-- [ ] A2.4.3 Add feature flags or environment toggles for risky integrations.
+- [x] A2.4.1 Add basic analytics hooks.
+- [x] A2.4.2 Add server/runtime logging conventions.
+- [x] A2.4.3 Add feature flags or environment toggles for risky integrations.
+
+Status note: `POST /api/telemetry/events`, `components/telemetry/route-view-tracker.tsx`, and `lib/analytics/` now define the MVP analytics hook layer; runtime logging remains canonical through the existing error/audit stack; and risky integrations now resolve through `lib/feature-flags.ts` plus the documented env toggles in `docs/telemetry_feature_controls_v1.md`.
 
 ## 🟩 Phase A3 - Student Core Workflow
 

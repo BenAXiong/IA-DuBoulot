@@ -527,3 +527,43 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Publish `docs/ai_ops_economics_v1.md` as the canonical AI ops and economics note. Keep passive parent oversight in the MVP baseline, including stored parent summary variants when they already exist as a byproduct of student completion. Reserve any future parent-initiated AI action for the paid `Family` plan, such as on-demand summary regeneration, translation refresh, or parent-side coaching tools.
 - Why: This keeps the current student-first contract stable, avoids weakening the free oversight story that helps parents evaluate the product, and creates a clear monetization boundary once adult-triggered AI actions are added.
 - Follow-up: If parent-triggered AI routes are introduced after MVP, gate them explicitly through billing and usage services instead of relying on passive visibility rules or ad hoc UI hiding.
+
+### D-20260311-52 - Gemini Stays Primary While OpenAI API Becomes The Explicit Fallback Provider Choice
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A0.2.4`
+- Context: The MVP already ships against Gemini with stable fallbacks, but the original bootstrap task still left the fallback-provider choice undecided. That ambiguity was no longer useful: the provider boundary exists, billing and privacy assumptions are documented, and future reliability work needs one explicit fallback direction instead of an open-ended placeholder.
+- Decision: Keep Gemini as the primary MVP provider and choose OpenAI API as the explicit fallback-provider target. Document the reserved fallback env in `docs/environment_matrix.md` and `.env.example`, but keep the fallback adapter disabled until it is intentionally implemented and provisioned.
+- Why: This closes the architectural indecision without destabilizing the current Gemini-backed MVP slice, preserves a swappable provider boundary, and avoids pretending that a founder personal subscription is an acceptable backend fallback.
+- Follow-up: If fallback reliability work becomes necessary after MVP, add the OpenAI adapter behind the existing AI provider interface and gate it through the documented env toggle instead of branching provider logic inside route handlers.
+
+### D-20260311-53 - Frontend Foundation Work Uses Small Shared Primitives And Shared Locale Metadata Rather Than A Late Full UI-System Rewrite
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A2.1.3`, `A2.1.5`, `A2.1.6`
+- Context: The app foundation tasks for component primitives, modularity guardrails, and localization structure were still open even though the product already had real role-based flows. A full design-system or full-copy rewrite at this stage would have added risk without improving MVP stability.
+- Decision: Close the foundation gap with a narrow primitive layer under `components/ui/`, shared locale metadata under `lib/i18n/config.ts`, `.editorconfig` plus a small ESLint rule floor, and a written foundation contract in `docs/frontend_foundations_v1.md`. Apply the new primitives first to the highest-duplication forms and cards instead of forcing a repo-wide refactor.
+- Why: This gives the codebase a stable shared foundation, removes duplicated locale option definitions, and improves reviewability without destabilizing the working student, parent, and tutor flows.
+- Follow-up: Expand primitive adoption opportunistically in later slices instead of treating the MVP foundation task as a mandatory all-component migration.
+
+### D-20260311-54 - MVP Telemetry Stays Whitelisted, Runtime-First, And Flag-Gated Until PostHog Exists
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A2.4.1`, `A2.4.2`, `A2.4.3`
+- Context: The app already had runtime logging conventions and env placeholders for PostHog, but no actual telemetry route, no client event hook, and no explicit integration-toggle layer. At the same time, the minors/privacy baseline forbids broad or content-heavy analytics collection on student surfaces.
+- Decision: Add a whitelisted telemetry route at `POST /api/telemetry/events`, a client route-view hook, and a shared `lib/feature-flags.ts` layer. Keep telemetry metadata-only, validate event names server-side, write the current MVP sink to structured runtime logs, and defer third-party forwarding until a real PostHog project exists. Reserve env toggles for analytics, OpenAI fallback, Resend-backed email, and future parent-initiated AI.
+- Why: This closes the app-foundation telemetry task without leaking child content into analytics, keeps the contract reviewable, and gives risky integrations one explicit env-driven control surface.
+- Follow-up: Once `A0.2.2` is complete, wire the telemetry service to PostHog through the same validated event boundary rather than bypassing it from client code.
+
+### D-20260311-55 - GitHub Workflow Artifacts Are Source-Controlled Even When Remote Labels Remain Manual
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A0.3.6`
+- Context: The repo already had a PR template, but the workflow task still lacked issue templates and any reviewable source of truth for labels. Remote label creation depends on authenticated GitHub settings access, which is not guaranteed in every session.
+- Decision: Add source-controlled issue templates plus a canonical labels manifest under `.github/`, and document them in `docs/github_workflow_v1.md`. Keep the task itself open until the manifest is actually applied to the GitHub repository, because the in-repo artifacts alone do not create the labels remotely.
+- Why: This preserves traceability and reviewability inside git while staying honest about the remaining external blocker.
+- Follow-up: Apply `.github/labels.json` to the GitHub repository through the UI or an authenticated automation step, then close `A0.3.6`.

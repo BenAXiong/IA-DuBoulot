@@ -17,13 +17,18 @@ Keep environment configuration explicit so local development, Vercel, and provid
 | Variable | Scope | Provider | Required for | Where it lives |
 | --- | --- | --- | --- | --- |
 | `NEXT_PUBLIC_APP_URL` | public | app | canonical app URL | local `.env.local`, Vercel |
+| `NEXT_PUBLIC_ENABLE_ANALYTICS` | public | app | enable browser telemetry hooks and the server telemetry sink | local `.env.local`, Vercel |
 | `NEXT_PUBLIC_SUPABASE_URL` | public | Supabase | browser and server client bootstrap | local `.env.local`, Vercel |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | public | Supabase | browser and server client bootstrap | local `.env.local`, Vercel |
 | `SUPABASE_SERVICE_ROLE_KEY` | server | Supabase | admin jobs, secure server actions, audit writes, profile bootstrap repair | local `.env.local`, Vercel |
 | `GEMINI_API_KEY` | server | Google Gemini | AI provider calls | local `.env.local`, Vercel |
+| `OPENAI_API_KEY` | server | OpenAI | future fallback AI provider adapter | local `.env.local`, Vercel |
+| `ENABLE_OPENAI_FALLBACK` | server | app | explicit toggle for a future OpenAI fallback adapter | local `.env.local`, Vercel |
 | `NEXT_PUBLIC_POSTHOG_KEY` | public | PostHog | product analytics | local `.env.local`, Vercel |
 | `NEXT_PUBLIC_POSTHOG_HOST` | public | PostHog | product analytics host | local `.env.local`, Vercel |
 | `RESEND_API_KEY` | server | Resend | transactional email | local `.env.local`, Vercel |
+| `ENABLE_RESEND_EMAILS` | server | app | explicit toggle for future Resend-backed send flows | local `.env.local`, Vercel |
+| `ENABLE_PARENT_AI_ACTIONS` | server | app | explicit toggle for future parent-initiated AI surfaces | local `.env.local`, Vercel |
 | `LEMON_SQUEEZY_API_KEY` | server | Lemon Squeezy | billing API calls | local `.env.local`, Vercel |
 | `LEMON_SQUEEZY_WEBHOOK_SECRET` | server | Lemon Squeezy | webhook verification | local `.env.local`, Vercel |
 | `LEMON_SQUEEZY_STORE_ID` | server | Lemon Squeezy | checkout creation store target | local `.env.local`, Vercel |
@@ -42,8 +47,9 @@ Keep environment configuration explicit so local development, Vercel, and provid
 - confirm Vercel environment sync after Supabase integration changes
 - planned storage buckets are now created automatically by the fixture seed script, and the upload route family now exists locally, but deployed route-level verification still needs a targeted smoke pass
 - `GEMINI_API_KEY` is present locally; confirm the same key is mirrored in Vercel before relying on deployed `A4` behavior
-- PostHog and Resend values still need to be provisioned
+- PostHog and Resend values still need to be provisioned before their corresponding flags should be enabled
 - Lemon Squeezy is now verified in deployed production with `LEMON_SQUEEZY_TEST_MODE=true`; the remaining billing follow-up is a later live-mode cutover, not missing MVP wiring
+- OpenAI is now the chosen fallback provider, but the adapter remains intentionally disabled until implemented and provisioned
 
 ## Lemon Squeezy Provisioning Names
 

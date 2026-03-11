@@ -1,6 +1,10 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { ActionButton } from "@/components/ui/action-button";
+import { FormCallout } from "@/components/ui/form-callout";
+import { FormField } from "@/components/ui/form-field";
+import { TextInput } from "@/components/ui/text-input";
 
 type InviteResponsePayload = {
   ok?: boolean;
@@ -88,51 +92,39 @@ export function ParentApprovalRequestForm() {
       </div>
 
       {errorMessage ? (
-        <p className="rounded-2xl border border-[#d07c5b] bg-[#fff0ea] px-4 py-3 text-sm text-[#8d3b1f]">
+        <FormCallout variant="error">
           {errorMessage}
-        </p>
+        </FormCallout>
       ) : null}
 
-      <label className="grid gap-2 text-sm">
-        <span className="font-medium">Email du parent ou tuteur legal</span>
-        <input
-          className="rounded-2xl border border-[color:var(--line)] bg-white px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
+      <FormField
+        error={getFieldError(fieldErrors, "parentEmail")}
+        label="Email du parent ou tuteur legal"
+      >
+        <TextInput
           onChange={(event) => setParentEmail(event.target.value)}
           placeholder="parent@example.com"
           required
           type="email"
           value={parentEmail}
         />
-        {getFieldError(fieldErrors, "parentEmail") ? (
-          <span className="text-[#8d3b1f]">
-            {getFieldError(fieldErrors, "parentEmail")}
-          </span>
-        ) : null}
-      </label>
+      </FormField>
 
-      <label className="grid gap-2 text-sm">
-        <span className="font-medium">Etiquette de relation</span>
-        <input
-          className="rounded-2xl border border-[color:var(--line)] bg-white px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
+      <FormField
+        error={getFieldError(fieldErrors, "relationshipLabel")}
+        label="Etiquette de relation"
+      >
+        <TextInput
           onChange={(event) => setRelationshipLabel(event.target.value)}
           placeholder="Parent"
           type="text"
           value={relationshipLabel}
         />
-        {getFieldError(fieldErrors, "relationshipLabel") ? (
-          <span className="text-[#8d3b1f]">
-            {getFieldError(fieldErrors, "relationshipLabel")}
-          </span>
-        ) : null}
-      </label>
+      </FormField>
 
-      <button
-        className="rounded-full bg-[color:var(--foreground)] px-5 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
-        disabled={isPending}
-        type="submit"
-      >
+      <ActionButton disabled={isPending} type="submit">
         {isPending ? "Preparation..." : "Generer le lien parent"}
-      </button>
+      </ActionButton>
 
       {inviteUrl ? (
         <div className="grid gap-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4">
@@ -143,13 +135,14 @@ export function ParentApprovalRequestForm() {
           <code className="overflow-x-auto rounded-2xl bg-white px-4 py-3 text-xs leading-6 text-[color:var(--foreground)]">
             {inviteUrl}
           </code>
-          <button
-            className="justify-self-start rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium text-[color:var(--foreground)] transition hover:-translate-y-0.5"
+          <ActionButton
+            className="justify-self-start px-4 py-2"
             onClick={handleCopyInviteUrl}
             type="button"
+            variant="secondary"
           >
             Copier le lien
-          </button>
+          </ActionButton>
         </div>
       ) : null}
     </form>

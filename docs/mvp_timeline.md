@@ -16,13 +16,14 @@ That makes this a roughly 7-week full-time-equivalent MVP, or about 10 to 12 cal
 
 As of 2026-03-11:
 
+- phase `A2` is now complete in the local workspace through the shared primitive layer, localization structure, telemetry hooks, and risky-integration flags
 - phases `A1`, `A3`, `A4`, `A5`, and `A6` are now complete in the local workspace
 - `A7.2` is now complete through the written smoke checklist, the aggregated regression pass, and the existing automated smoke scripts
 - `A7.3` is now complete through AI request caps, artifact-reuse guardrails, and the upload-economics review
 - `A7.3.4` is now complete through the consolidated AI ops/economics note and the logged recommendation to reserve future parent-triggered AI for the paid Family plan
 - `A7.4` is now complete through the founder walkthrough, launch checklist, scope freeze, and explicit PWA deferral
 - the next active product work inside `A7` is now `A7.1` manual iPad Safari validation
-- `A0` and `A2` still contain governance and app-foundation follow-ups, but they are no longer the critical path for the current MVP slice
+- `A0` now only contains external-account or remote-settings follow-ups, and is no longer on the repo-owned critical path for the current MVP slice
 
 ## Week-By-Week Plan
 

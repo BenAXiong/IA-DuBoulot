@@ -1,6 +1,6 @@
 # Service Interfaces
 
-Related: [README](../README.md) | [API route map](api_route_map.md) | [AI ops and economics V1](ai_ops_economics_v1.md) | [Student memory profile V1](student_memory_profile_v1.md) | [Invitation flows V1](invitation_flows_v1.md) | [Oversight surfaces V1](oversight_surfaces_v1.md) | [Privacy controls V1](privacy_controls_v1.md) | [Environment matrix](environment_matrix.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md)
+Related: [README](../README.md) | [API route map](api_route_map.md) | [AI ops and economics V1](ai_ops_economics_v1.md) | [Telemetry and feature controls V1](telemetry_feature_controls_v1.md) | [Student memory profile V1](student_memory_profile_v1.md) | [Invitation flows V1](invitation_flows_v1.md) | [Oversight surfaces V1](oversight_surfaces_v1.md) | [Privacy controls V1](privacy_controls_v1.md) | [Environment matrix](environment_matrix.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md)
 
 ## Purpose
 
@@ -21,6 +21,7 @@ Current local status:
 - `lib/server/oversight/` now contains parent/tutor/admin read services plus tutor-note mutation handling
 - `lib/server/privacy/` now owns the `/app/settings` snapshot plus queued deletion request flow
 - `lib/server/memory/` now owns visible memory reads, manual mutations, and completion-triggered refresh
+- `lib/analytics/`, `lib/server/telemetry/`, and `lib/feature-flags.ts` now provide the MVP analytics event boundary plus env-driven risky-integration toggles
 - `lib/server/ai/guardrails.ts` now centralizes prompt-context truncation and output-token caps for the Gemini-backed path
 - `scripts/smoke-student-flow.mjs` now verifies the real student route flow against a temporary local `next start` instance
 - `scripts/smoke-adult-oversight.mjs` now verifies parent, tutor, and admin oversight routes against the same local server model
@@ -155,6 +156,24 @@ Rules:
 - usage counters stay server-owned even when RLS would allow read access
 - quota evaluation must be shared between dashboard reads and mutation gates so UI and API decisions stay aligned
 - provider token usage should be recorded from the same service boundary that already receives normalized provider usage metadata
+
+### Telemetry Service
+
+Owns the safe event boundary between client telemetry hooks and runtime logging or future provider forwarding.
+
+```ts
+interface TelemetryService {
+  parseAnalyticsEventInput(request: Request): Promise<AnalyticsEventInput>;
+  recordAnalyticsEvent(input: RecordAnalyticsEventInput): Promise<RecordAnalyticsEventResult>;
+}
+```
+
+Rules:
+
+- event names must be whitelisted
+- telemetry properties must stay compact and content-free
+- telemetry must not bypass the runtime logging conventions
+- provider forwarding can be added later without changing the client event hook contract
 
 ## Core Orchestration Services
 

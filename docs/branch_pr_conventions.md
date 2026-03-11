@@ -1,6 +1,6 @@
 # Branch And PR Conventions
 
-Related: [README](../README.md) | [AGENTS](../AGENTS.md) | [MVP to-do list](mvp_todo.md) | [Decision log](decision_log.md) | [Work sessions log](work_sessions.md)
+Related: [README](../README.md) | [AGENTS](../AGENTS.md) | [GitHub workflow V1](github_workflow_v1.md) | [MVP to-do list](mvp_todo.md) | [Decision log](decision_log.md) | [Work sessions log](work_sessions.md)
 
 ## Goal
 

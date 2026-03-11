@@ -1,6 +1,6 @@
 # API Route Map
 
-Related: [README](../README.md) | [Access rules V1](access_rules_v1.md) | [Supabase schema V1](supabase_schema_v1.md) | [Student memory profile V1](student_memory_profile_v1.md) | [Invitation flows V1](invitation_flows_v1.md) | [Oversight surfaces V1](oversight_surfaces_v1.md) | [Privacy controls V1](privacy_controls_v1.md) | [Service interfaces](service_interfaces.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md)
+Related: [README](../README.md) | [Access rules V1](access_rules_v1.md) | [Supabase schema V1](supabase_schema_v1.md) | [Student memory profile V1](student_memory_profile_v1.md) | [Invitation flows V1](invitation_flows_v1.md) | [Oversight surfaces V1](oversight_surfaces_v1.md) | [Privacy controls V1](privacy_controls_v1.md) | [Telemetry and feature controls V1](telemetry_feature_controls_v1.md) | [Service interfaces](service_interfaces.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md)
 
 ## Purpose
 
@@ -31,6 +31,7 @@ Current implemented routes:
 - `POST /api/privacy/deletion-requests`
 - `GET /api/students/[studentId]/memory`
 - `PATCH /api/students/[studentId]/memory`
+- `POST /api/telemetry/events`
 - `POST /api/uploads/create`
 - `POST /api/uploads/confirm`
 - `POST /api/uploads/extract`
@@ -139,6 +140,14 @@ These routes own user-facing privacy controls and queued deletion requests.
 | --- | --- | --- | --- | --- |
 | `/api/privacy/deletion-requests` | `POST` | authenticated user or linked parent | queue deletion for the caller or a linked child account | updates `users.account_status`, syncs auth metadata, revokes tutor access for child deletion, and returns the queued purge target date |
 
+### Telemetry And Feature Controls
+
+These routes keep product telemetry explicit and keep analytics metadata out of domain routes.
+
+| Route | Method | Caller | Purpose | Notes |
+| --- | --- | --- | --- | --- |
+| `/api/telemetry/events` | `POST` | browser client | record a whitelisted product event | current MVP sink is structured runtime logging; no raw child content; actual PostHog forwarding remains deferred until `A0.2.2` |
+
 ### Admin And Operations
 
 These routes stay narrow and operational.
@@ -167,6 +176,7 @@ app/api/uploads/create/route.ts
 app/api/uploads/confirm/route.ts
 app/api/uploads/extract/route.ts
 app/api/privacy/deletion-requests/route.ts
+app/api/telemetry/events/route.ts
 app/api/conversations/route.ts
 app/api/conversations/[conversationId]/route.ts
 app/api/conversations/[conversationId]/messages/route.ts

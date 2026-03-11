@@ -2,6 +2,17 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { ActionButton } from "@/components/ui/action-button";
+import { FormCallout } from "@/components/ui/form-callout";
+import { FormField } from "@/components/ui/form-field";
+import { SelectInput } from "@/components/ui/select-input";
+import { TextInput } from "@/components/ui/text-input";
+import {
+  AI_LANGUAGE_OPTIONS,
+  STUDENT_AGE_BAND_OPTIONS,
+  UI_LANGUAGE_OPTIONS,
+  UNDER_13_AGE_BAND_VALUES,
+} from "@/lib/i18n/config";
 import type { AppUserRecord } from "@/lib/server/auth/types";
 
 type ProfileErrorPayload = {
@@ -15,32 +26,6 @@ type ProfileErrorPayload = {
 type AccountSettingsFormProps = {
   appUser: AppUserRecord;
 };
-
-const uiLanguageOptions = [
-  { value: "fr", label: "Francais" },
-  { value: "en", label: "English" },
-  { value: "zh", label: "中文" },
-] as const;
-
-const aiLanguageOptions = [
-  { value: "fr", label: "Francais" },
-  { value: "en", label: "English" },
-] as const;
-
-const studentAgeBandOptions = [
-  { value: "", label: "Selectionner une tranche d'age" },
-  { value: "six_eight", label: "6-8 ans" },
-  { value: "nine_ten", label: "9-10 ans" },
-  { value: "eleven_twelve", label: "11-12 ans" },
-  { value: "thirteen_fifteen", label: "13-15 ans" },
-  { value: "sixteen_eighteen", label: "16-18 ans" },
-] as const;
-
-const under13AgeBandValues = new Set([
-  "six_eight",
-  "nine_ten",
-  "eleven_twelve",
-]);
 
 function getFieldError(
   fieldErrors: Record<string, string>,
@@ -64,11 +49,11 @@ export function AccountSettingsForm({ appUser }: AccountSettingsFormProps) {
 
   const ageBandOptions =
     appUser.role === "student" && appUser.is_under_13
-      ? studentAgeBandOptions.filter(
+      ? STUDENT_AGE_BAND_OPTIONS.filter(
           (option) =>
-            option.value === "" || under13AgeBandValues.has(option.value),
+            option.value === "" || UNDER_13_AGE_BAND_VALUES.has(option.value),
         )
-      : studentAgeBandOptions;
+      : STUDENT_AGE_BAND_OPTIONS;
 
   function resetMessages() {
     setFieldErrors({});
@@ -115,83 +100,72 @@ export function AccountSettingsForm({ appUser }: AccountSettingsFormProps) {
   return (
     <form className="grid gap-4" onSubmit={handleSubmit}>
       {errorMessage ? (
-        <p className="rounded-2xl border border-[#d07c5b] bg-[#fff0ea] px-4 py-3 text-sm text-[#8d3b1f]">
+        <FormCallout variant="error">
           {errorMessage}
-        </p>
+        </FormCallout>
       ) : null}
 
       {successMessage ? (
-        <p className="rounded-2xl border border-[#8cb88b] bg-[#eef8ee] px-4 py-3 text-sm text-[#295a2a]">
+        <FormCallout variant="success">
           {successMessage}
-        </p>
+        </FormCallout>
       ) : null}
 
-      <label className="grid gap-2 text-sm">
-        <span className="font-medium">Nom affiche</span>
-        <input
-          className="rounded-2xl border border-[color:var(--line)] bg-white px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
+      <FormField
+        error={getFieldError(fieldErrors, "displayName")}
+        label="Nom affiche"
+      >
+        <TextInput
           onChange={(event) => setDisplayName(event.target.value)}
           type="text"
           value={displayName}
         />
-        {getFieldError(fieldErrors, "displayName") ? (
-          <span className="text-[#8d3b1f]">
-            {getFieldError(fieldErrors, "displayName")}
-          </span>
-        ) : null}
-      </label>
+      </FormField>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="grid gap-2 text-sm">
-          <span className="font-medium">Langue de l&apos;interface</span>
-          <select
-            className="rounded-2xl border border-[color:var(--line)] bg-white px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
+        <FormField
+          error={getFieldError(fieldErrors, "preferredUiLanguage")}
+          label="Langue de l'interface"
+        >
+          <SelectInput
             onChange={(event) =>
               setPreferredUiLanguage(event.target.value as typeof appUser.preferred_ui_language)
             }
             value={preferredUiLanguage}
           >
-            {uiLanguageOptions.map((option) => (
+            {UI_LANGUAGE_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
             ))}
-          </select>
-          {getFieldError(fieldErrors, "preferredUiLanguage") ? (
-            <span className="text-[#8d3b1f]">
-              {getFieldError(fieldErrors, "preferredUiLanguage")}
-            </span>
-          ) : null}
-        </label>
+          </SelectInput>
+        </FormField>
 
-        <label className="grid gap-2 text-sm">
-          <span className="font-medium">Langue de l&apos;aide IA</span>
-          <select
-            className="rounded-2xl border border-[color:var(--line)] bg-white px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
+        <FormField
+          error={getFieldError(fieldErrors, "aiHelpLanguage")}
+          label="Langue de l'aide IA"
+        >
+          <SelectInput
             onChange={(event) =>
               setAiHelpLanguage(event.target.value as typeof appUser.ai_help_language)
             }
             value={aiHelpLanguage}
           >
-            {aiLanguageOptions.map((option) => (
+            {AI_LANGUAGE_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
             ))}
-          </select>
-          {getFieldError(fieldErrors, "aiHelpLanguage") ? (
-            <span className="text-[#8d3b1f]">
-              {getFieldError(fieldErrors, "aiHelpLanguage")}
-            </span>
-          ) : null}
-        </label>
+          </SelectInput>
+        </FormField>
       </div>
 
       {appUser.role === "student" ? (
-        <label className="grid gap-2 text-sm">
-          <span className="font-medium">Tranche d&apos;age</span>
-          <select
-            className="rounded-2xl border border-[color:var(--line)] bg-white px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
+        <FormField
+          error={getFieldError(fieldErrors, "ageBand")}
+          label="Tranche d'age"
+        >
+          <SelectInput
             onChange={(event) => setAgeBand(event.target.value)}
             value={ageBand}
           >
@@ -200,22 +174,13 @@ export function AccountSettingsForm({ appUser }: AccountSettingsFormProps) {
                 {option.label}
               </option>
             ))}
-          </select>
-          {getFieldError(fieldErrors, "ageBand") ? (
-            <span className="text-[#8d3b1f]">
-              {getFieldError(fieldErrors, "ageBand")}
-            </span>
-          ) : null}
-        </label>
+          </SelectInput>
+        </FormField>
       ) : null}
 
-      <button
-        className="rounded-full bg-[color:var(--foreground)] px-5 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
-        disabled={isPending}
-        type="submit"
-      >
+      <ActionButton disabled={isPending} type="submit">
         {isPending ? "Mise a jour..." : "Enregistrer le profil"}
-      </button>
+      </ActionButton>
     </form>
   );
 }

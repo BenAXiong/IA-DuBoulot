@@ -1,19 +1,9 @@
-import type { UiLanguageCode } from "@/lib/server/auth/types";
+import { getIntlLocale, type UiLanguageCode } from "@/lib/i18n/config";
 import type {
   ConversationStatus,
   StudentDashboardStartState,
   StudentDashboardUsageSnapshot,
 } from "@/lib/server/student-dashboard/types";
-
-const localeByUiLanguage: Record<UiLanguageCode, string> = {
-  fr: "fr-FR",
-  en: "en-US",
-  zh: "zh-TW",
-};
-
-function getLocale(languageCode: UiLanguageCode) {
-  return localeByUiLanguage[languageCode] ?? "fr-FR";
-}
 
 export function formatDateLabel(
   value: string | null,
@@ -23,7 +13,7 @@ export function formatDateLabel(
     return null;
   }
 
-  return new Intl.DateTimeFormat(getLocale(languageCode), {
+  return new Intl.DateTimeFormat(getIntlLocale(languageCode), {
     dateStyle: "medium",
   }).format(new Date(value));
 }
@@ -46,7 +36,7 @@ export function formatCompactNumber(
   value: number,
   languageCode: UiLanguageCode,
 ) {
-  return new Intl.NumberFormat(getLocale(languageCode), {
+  return new Intl.NumberFormat(getIntlLocale(languageCode), {
     notation: "compact",
     maximumFractionDigits: 1,
   }).format(value);

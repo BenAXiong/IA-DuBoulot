@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: MVP to-do list
+    url: https://github.com/BenAXiong/IA-DuBoulot/blob/main/docs/mvp_todo.md
+    about: Check the canonical task IDs before opening a new issue.
+  - name: Decision log
+    url: https://github.com/BenAXiong/IA-DuBoulot/blob/main/docs/decision_log.md
+    about: Review prior structural decisions before proposing architecture changes.
