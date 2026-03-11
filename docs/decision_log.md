@@ -507,3 +507,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Freeze the launch candidate around the current web MVP, defer PWA installability until after beta, and treat `docs/founder_walkthrough_v1.md` plus `docs/launch_checklist_v1.md` as the canonical operating docs for demos and launch-readiness. Use the deterministic fixture accounts as the default role-demo set, while keeping real Lemon checkout demos on a separate fresh parent account instead of the seeded fixture parent.
 - Why: This keeps the launch surface small, focuses attention on the flows that already exist and are regression-covered, and avoids spending launch time on installability plumbing before the web experience is fully validated on the target device.
 - Follow-up: Revisit PWA only after `A7.1` closes on a real iPad Safari pass and early beta usage shows that installability would materially improve retention or return frequency.
+
+### D-20260311-50 - Prompt-Level Traceability Is Experimental And Does Not Replace Session Logging
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A0.3.7`
+- Context: The canonical session log preserves long multi-turn continuity well, but it is less useful for measuring one-prompt-at-a-time throughput, prompt handling duration, or remaining Codex credits across a dense working session.
+- Decision: Keep [docs/work_sessions.md](work_sessions.md) as the mandatory canonical session log, and add [docs/work_prompt_log.md](work_prompt_log.md) as an experimental parallel trace with one row per handled user prompt. The prompt log records timestamps, duration, task IDs, scope, and a manual `Credits Left` column when the usage percentage is operator-visible.
+- Why: This tests a finer-grained traceability method without breaking the existing session protocol or losing compatibility with the current operating rules.
+- Follow-up: Compare the usefulness and maintenance cost of the prompt log after a few sessions before deciding whether it becomes permanent, optional, or retired.

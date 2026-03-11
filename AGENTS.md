@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Primary references: [README.md](README.md) | [Implementation plan](docs/implementation_plan.md) | [MVP to-do list](docs/mvp_todo.md) | [Decision log](docs/decision_log.md) | [Work sessions log](docs/work_sessions.md)
+Primary references: [README.md](README.md) | [Implementation plan](docs/implementation_plan.md) | [MVP to-do list](docs/mvp_todo.md) | [Decision log](docs/decision_log.md) | [Work sessions log](docs/work_sessions.md) | [Prompt work log](docs/work_prompt_log.md)
 
 This repository is being built as a long-term AI-assisted software project. The main failure mode is not raw coding quality. It is traceability loss: code, docs, prompts, scripts, and operating rules drifting out of sync until future sessions build on incomplete context.
 
@@ -54,7 +54,8 @@ Read these in order before any substantial implementation work:
 31. [docs/mvp_timeline.md](docs/mvp_timeline.md)
 32. [docs/decision_log.md](docs/decision_log.md)
 33. [docs/work_sessions.md](docs/work_sessions.md)
-34. The relevant code, SQL, prompt, or UI files for the task being worked on
+34. [docs/work_prompt_log.md](docs/work_prompt_log.md) when the experimental prompt-level trace is active
+35. The relevant code, SQL, prompt, or UI files for the task being worked on
 
 If a file above is outdated, update it before or alongside the code change that depends on it.
 
@@ -65,6 +66,7 @@ If a file above is outdated, update it before or alongside the code change that 
 - Open [docs/work_sessions.md](docs/work_sessions.md) immediately.
 - If there is already an `OPEN` session and the user has not explicitly said `end session`, continue that row instead of creating a second open session.
 - If there is no open row, append a new row with the current date, start time, `OPEN` as the end marker, planned task IDs, and a short scope description.
+- If the experimental prompt log is active, append or update the current prompt row in [docs/work_prompt_log.md](docs/work_prompt_log.md) in parallel.
 
 ### 2. Rebuild Context
 
@@ -106,6 +108,19 @@ Each entry must contain:
 - duration
 - task IDs
 - a short human-readable scope summary
+
+### Prompt Work Log
+
+Use [docs/work_prompt_log.md](docs/work_prompt_log.md) only as an experimental parallel trace.
+
+Each entry should contain:
+
+- date
+- prompt handling time span
+- duration
+- task IDs
+- a short human-readable scope summary
+- Codex credits left when visible, otherwise blank for manual fill
 
 ### Decisions
 

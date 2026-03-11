@@ -37,6 +37,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [MVP timeline](docs/mvp_timeline.md)
 - [Decision log](docs/decision_log.md)
 - [Work sessions log](docs/work_sessions.md)
+- [Prompt work log](docs/work_prompt_log.md)
 - [Vibestructions](docs/vibestructions.md)
 - [Agent operating manual](AGENTS.md)
 
@@ -83,6 +84,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - a written operator smoke checklist now exists at `docs/smoke_checklist_v1.md`, and `npm run regress:mvp` now gives the canonical pre-demo regression pass across typecheck, build, RLS verification, and all current smoke scripts.
 - `A7.3` cost-control guardrails now bound the Gemini-backed path through request-size caps, prompt-context truncation, output-token caps, and idempotent reuse of existing upload-extraction and completion artifacts instead of repeating expensive provider calls.
 - launch-candidate operating docs now exist at `docs/founder_walkthrough_v1.md` and `docs/launch_checklist_v1.md`, and the current scope decision explicitly defers PWA installability until after real iPad Safari validation and early beta feedback.
+- an experimental prompt-level trace now also exists at `docs/work_prompt_log.md`, while `docs/work_sessions.md` remains the canonical session log.
 - the latest `npm run regress:mvp` pass succeeded on 2026-03-11; the current non-blocking warning profile still consists of documented Gemini fallback usage and optional adult summary variants missing in some student-flow runs.
 - the latest student smoke completed successfully while also verifying repeated upload confirmation and repeated completion reuse the existing expensive artifacts; provider reliability remains a QA follow-up even though the student flow stays stable.
 

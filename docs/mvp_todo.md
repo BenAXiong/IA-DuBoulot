@@ -8,15 +8,15 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 
-- Overall: `[###########################...]` `115/128` complete (`90%`)
-- A0: `[xxxxxxxxxxxxxxxxx....]` `17/21`
+- Overall: `[###########################...]` `116/130` complete (`89%`)
+- A0: `[xxxxxxxxxxxxxxxxxx....]` `18/22`
 - A1: `[xxxxxxxxxxxxxxxx]` `16/16`
 - A2: `[xxxxxxxxxxx......]` `11/17`
 - A3: `[xxxxxxxxxxxxxxxxx]` `17/17`
 - A4: `[xxxxxxxxxxxxxxxxxxx]` `19/19`
 - A5: `[xxxxxxxxxxxxx]` `13/13`
 - A6: `[xxxxxxxxxxxxx]` `13/13`
-- A7: `[xxxxxxxxx...]` `9/12`
+- A7: `[xxxxxxxxx....]` `9/13`
 
 ## Table Of Contents
 
@@ -64,6 +64,9 @@ Constraint: a founder personal AI subscription is not treated as a backend fallb
 - [x] A0.3.4 Create the decision log and work sessions log.
 - [x] A0.3.5 Create `Vibestructions`.
 - [ ] A0.3.6 Add issue labels and review templates after GitHub setup.
+- [x] A0.3.7 Add an experimental prompt-level log that can run in parallel with session logging.
+
+Status note: `docs/work_sessions.md` remains the canonical session log, and `docs/work_prompt_log.md` now exists as an experimental one-row-per-prompt trace with a manual Codex-credit column.
 
 ### A0.4 Product Constraints And Acceptance Rules
 
@@ -369,6 +372,7 @@ Status note: fixture-backed automated smoke now exists for student, memory, adul
 - [x] A7.3.1 Add request caps and guardrails for expensive AI usage.
 - [x] A7.3.2 Add caching or summarization where it lowers cost without harming behavior.
 - [x] A7.3.3 Review storage and upload limits against trial economics.
+- [ ] A7.3.4 Publish a consolidated AI ops and economics note covering quota windows, prompt pipeline, guardrails, per-activity usage estimates, and the paid-vs-trial policy for parent-facing AI value.
 
 Status note: the current Gemini-backed path now enforces bounded prompt context and output-token caps, reuses existing upload-extraction and completion artifacts instead of repeating provider calls, and keeps the current upload byte limits after an explicit review against the 30-day trial quotas.
 
