@@ -71,7 +71,6 @@ Status note: `docs/work_sessions.md` remains the canonical session log, and `doc
 ### A0.4 Product Constraints And Acceptance Rules
 
 - [x] A0.4.1 Write the role/access matrix for student, parent, tutor, and admin.
-- [ ] A0.4.2 Write smoke-test acceptance criteria for the MVP core flows.
 - [x] A0.4.2 Write smoke-test acceptance criteria for the MVP core flows.
 - [x] A0.4.3 Confirm the MVP language set and translation expectations.
 - [x] A0.4.4 Define retention, deletion, and privacy expectations for minors.

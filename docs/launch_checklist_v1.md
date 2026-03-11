@@ -80,6 +80,9 @@ Explicitly defer beyond this launch candidate:
 
 ## Current Remaining Blocker
 
-The only remaining open work inside `A7` is `A7.1` real iPad Safari validation.
+The remaining open work inside `A7` is:
 
-This checklist freezes the scope for launch-candidate prep, but it does not close that manual device task.
+- `A7.1` real iPad Safari validation
+- `A7.3.4` consolidated AI ops/economics and parent-AI policy note
+
+The main product blocker is still the real iPad Safari pass. The new `A7.3.4` item is a documentation and policy follow-up, not a broad code-slice blocker.
