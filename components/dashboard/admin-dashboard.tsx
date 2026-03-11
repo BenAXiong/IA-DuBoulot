@@ -1,35 +1,50 @@
-import { DashboardCard } from "@/components/dashboard/dashboard-card";
+import Link from "next/link";
 
-const adminCards = [
-  {
-    eyebrow: "Operations",
-    title: "Surface admin minimale",
-    body: "Le shell admin reste volontairement etroit tant que les vues d'audit et moderation ne sont pas implementees.",
-  },
-  {
-    eyebrow: "Contrats",
-    title: "Schema et routes avant breadth UI",
-    body: "L'ordre d'implementation continue de privilegier les contrats et la tracabilite avant la richesse des panneaux.",
-  },
-  {
-    eyebrow: "Suite MVP",
-    title: "Outils ops plus tard",
-    body: "Les tables et routes existent dans la roadmap, mais les vraies vues admin viennent apres les parcours coeur.",
-  },
-] as const;
+type AdminDashboardProps = {
+  auditEventCount: number;
+};
 
-export function AdminDashboard() {
+export function AdminDashboard({ auditEventCount }: AdminDashboardProps) {
   return (
     <div className="grid gap-6">
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" id="overview">
-        {adminCards.map((card) => (
-          <DashboardCard
-            body={card.body}
-            eyebrow={card.eyebrow}
-            key={card.title}
-            title={card.title}
-          />
-        ))}
+        <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-[var(--shadow)]">
+          <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
+            Operations
+          </p>
+          <h3 className="mt-3 font-[family-name:var(--font-heading)] text-2xl leading-tight">
+            Audit sensible
+          </h3>
+          <p className="mt-3 text-sm leading-6 text-[color:var(--ink-soft)]">
+            Les lectures parent/tuteur et les mutations de notes privees sont
+            maintenant regroupees dans une vue admin dediee.
+          </p>
+        </article>
+
+        <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-[var(--shadow)]">
+          <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
+            Volume
+          </p>
+          <h3 className="mt-3 font-[family-name:var(--font-heading)] text-2xl leading-tight">
+            {auditEventCount} evenement(s)
+          </h3>
+          <p className="mt-3 text-sm leading-6 text-[color:var(--ink-soft)]">
+            Le flux actuel couvre les ouvertures de session adulte et les notes
+            privees tuteur.
+          </p>
+        </article>
+
+        <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-[var(--shadow)]">
+          <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
+            Route
+          </p>
+          <h3 className="mt-3 font-[family-name:var(--font-heading)] text-2xl leading-tight">
+            /app/audit
+          </h3>
+          <p className="mt-3 text-sm leading-6 text-[color:var(--ink-soft)]">
+            Surface admin initiale pour revue de confiance et support.
+          </p>
+        </article>
       </section>
 
       <section
@@ -41,19 +56,25 @@ export function AdminDashboard() {
             Ops
           </p>
           <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
-            Shell en place pour les futures surfaces moderation, audit et support.
+            Le shell admin pointe maintenant vers une vraie revue des acces sensibles.
           </h2>
           <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-            La valeur ici est surtout structurelle: navigation, zones de contenu
-            et separation nette entre chrome applicatif et panels metier.
+            Cette etape ne couvre pas encore toute l&apos;ops du produit, mais elle
+            ferme deja la boucle sur les acces adultes et les notes privees.
           </p>
         </article>
 
-        <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5 text-sm leading-6 text-[color:var(--ink-soft)]">
+        <article className="grid gap-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5 text-sm leading-6 text-[color:var(--ink-soft)]">
           <p>
-            Les vraies listes utilisateurs, moderation events et audit logs
-            attendent encore leurs routes et vues dediees.
+            Les prochaines surfaces admin pourront se brancher ici sans melanger
+            moderation, support et audit dans un panneau unique.
           </p>
+          <Link
+            className="inline-flex justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 font-medium text-[color:var(--foreground)] transition hover:-translate-y-0.5"
+            href="/app/audit"
+          >
+            Ouvrir l&apos;audit
+          </Link>
         </article>
       </section>
     </div>

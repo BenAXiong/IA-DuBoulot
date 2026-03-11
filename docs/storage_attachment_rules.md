@@ -137,3 +137,10 @@ Expected service behavior:
 - conversation services should reference attachments by ID, not raw bucket/path strings
 - bucket names should live in a storage constants module later, not repeated inline
 - use the source-controlled files in [sample_attachment_corpus.md](sample_attachment_corpus.md) before inventing new ad hoc upload fixtures
+
+Current local status:
+
+- the upload route family now exists in `app/api/uploads/...`
+- the canonical storage constants now live in `lib/server/uploads/constants.ts`
+- the current local flow creates real `attachments` rows, signed upload targets, extraction updates, and short-lived attachment access URLs
+- remaining stability work is to align per-file route enforcement and metadata capture fully with the documented contract

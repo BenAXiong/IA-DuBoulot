@@ -10,7 +10,7 @@ const tiers = [
     points: [
       "Acces supervise",
       "Auth et invitations reelles",
-      "Pas encore de billing branche",
+      "Quota d'essai actif",
     ],
   },
   {
@@ -20,7 +20,7 @@ const tiers = [
     points: [
       "Compte parent payeur",
       "Historique et supervision",
-      "Intention Lemon Squeezy",
+      "Checkout et portail Lemon Squeezy",
     ],
   },
   {
@@ -57,7 +57,7 @@ export default function PricingPage() {
 
             <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5">
               <HighlightCard
-                body="Le vrai checkout n'est pas encore branche. La page pricing sert surtout de shell public coherent et de point d'appui pour la suite."
+                body="Le parcours parent pointe maintenant vers le vrai chemin de checkout et de portail. Le parametrage Lemon final reste a activer selon l'environnement."
                 title="MVP posture"
               />
             </article>

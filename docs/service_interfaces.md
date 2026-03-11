@@ -1,6 +1,6 @@
 # Service Interfaces
 
-Related: [README](../README.md) | [API route map](api_route_map.md) | [Invitation flows V1](invitation_flows_v1.md) | [Environment matrix](environment_matrix.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md)
+Related: [README](../README.md) | [API route map](api_route_map.md) | [Invitation flows V1](invitation_flows_v1.md) | [Oversight surfaces V1](oversight_surfaces_v1.md) | [Environment matrix](environment_matrix.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md)
 
 ## Purpose
 
@@ -12,6 +12,16 @@ The goal is to keep:
 - route handlers thin
 - product logic explicit
 - future AI-assisted implementation from collapsing into god services
+
+Current local status:
+
+- `lib/server/ai/` now contains the first Gemini-backed provider adapter plus prompt modules
+- `lib/server/uploads/` now contains the signed-upload, confirm, extraction, and read-access service layer
+- `lib/server/moderation/`, `lib/server/summaries/`, and `lib/server/translations/` now exist in code
+- `lib/server/oversight/` now contains parent/tutor/admin read services plus tutor-note mutation handling
+- `scripts/smoke-student-flow.mjs` now verifies the real student route flow against a temporary local `next start` instance
+- `scripts/smoke-adult-oversight.mjs` now verifies parent, tutor, and admin oversight routes against the same local server model
+- provider-unavailable fallbacks now exist for attachment extraction, coach replies, and the required student summary, while adult summary variants remain best-effort
 
 ## Interface Rules
 
@@ -35,6 +45,7 @@ interface AiProvider {
   generateCoachReply(input: CoachReplyInput): Promise<CoachReplyResult>;
   generateSummary(input: SummaryGenerationInput): Promise<SummaryResult>;
   extractAttachmentText(input: AttachmentExtractionInput): Promise<AttachmentExtractionResult>;
+  translateText(input: TranslateTextInput): Promise<TranslateTextResult>;
 }
 ```
 
@@ -115,6 +126,24 @@ Rules:
 - provider event parsing stays inside the billing adapter
 - route handlers should not know Lemon Squeezy payload details
 - subscription state persistence belongs to a billing orchestration layer around this adapter
+
+### Usage Service
+
+Owns usage counter increments, trial/quota evaluation, and the shared quota snapshot used by student and parent surfaces.
+
+```ts
+interface UsageService {
+  resolveStudentUsage(input: ResolveStudentUsageInput): Promise<StudentUsageSnapshot>;
+  assertStudentActionAllowed(input: AssertStudentActionInput): Promise<StudentUsageSnapshot>;
+  recordUsageDelta(input: RecordUsageDeltaInput): Promise<void>;
+}
+```
+
+Rules:
+
+- usage counters stay server-owned even when RLS would allow read access
+- quota evaluation must be shared between dashboard reads and mutation gates so UI and API decisions stay aligned
+- provider token usage should be recorded from the same service boundary that already receives normalized provider usage metadata
 
 ## Core Orchestration Services
 
@@ -199,6 +228,40 @@ Rules:
 - event names and metadata should follow `error_audit_conventions.md`
 - do not use the audit service as a dumping ground for general debug logs
 
+### Oversight Services
+
+These services keep parent/tutor/admin review logic out of route handlers and dashboard components.
+
+```ts
+interface ParentOversightService {
+  loadDashboardSnapshot(input: ParentOversightInput): Promise<ParentDashboardSnapshot>;
+  loadStudentDetail(input: ParentStudentDetailInput): Promise<ParentStudentDetail>;
+  loadConversationReview(input: ParentConversationReviewInput): Promise<ParentConversationReview>;
+}
+
+interface TutorOversightService {
+  loadDashboardSnapshot(input: TutorOversightInput): Promise<TutorDashboardSnapshot>;
+  loadStudentDetail(input: TutorStudentDetailInput): Promise<TutorStudentDetail>;
+  loadConversationReview(input: TutorConversationReviewInput): Promise<TutorConversationReview>;
+}
+
+interface TutorNoteService {
+  createNote(input: CreateTutorNoteInput): Promise<TutorNoteRecord>;
+  updateNote(input: UpdateTutorNoteInput): Promise<TutorNoteRecord>;
+  deleteNote(input: DeleteTutorNoteInput): Promise<void>;
+}
+
+interface AdminAuditReviewService {
+  loadAccessAudit(input: AdminAuditReviewInput): Promise<AdminAccessAuditSnapshot>;
+}
+```
+
+Rules:
+
+- parent/tutor reads must explicitly revalidate linked-student access even though RLS already exists
+- tutor notes stay behind canonical mutation routes so writes are auditable and reviewable
+- admin audit review stays narrow to sensitive access events instead of becoming a generic reporting service
+
 ## Placement Guidance
 
 Preferred folder direction:
@@ -210,8 +273,10 @@ lib/server/conversations/
 lib/server/links/
 lib/server/memory/
 lib/server/moderation/
+lib/server/oversight/
 lib/server/summaries/
 lib/server/translations/
+lib/server/usage/
 lib/server/uploads/
 ```
 
@@ -233,6 +298,7 @@ Inside each domain:
 
 ## Immediate Next Implementations
 
-- replace the deterministic draft-coach and deterministic completion-summary helpers with the swappable provider layer in `A4.1`
-- add upload storage routes/services so the workbench upload control becomes real `attachments` rows
-- extend the now-live history/summary contract into parent and tutor audiences in `A4.5`
+- confirm deployed environment parity for the fallback-aware student flow instead of relying only on the local smoke
+- improve provider reliability or add a second provider path so the student flow uses the fallbacks less often
+- tighten upload guardrails to match the documented per-file limits and capture any missing metadata fields such as image dimensions and PDF page counts
+- broaden the admin audit surface only when moderation/support workflows justify it

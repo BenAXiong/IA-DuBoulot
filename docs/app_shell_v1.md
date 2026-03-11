@@ -49,6 +49,9 @@ Current routes using it:
 - `/app/history`
 - `/app/new`
 - `/app/conversations/[conversationId]`
+- `/app/students/[studentUserId]`
+- `/app/review/[conversationId]`
+- `/app/audit`
 
 Rules:
 
@@ -75,22 +78,25 @@ Rule:
 
 ## Navigation Model
 
-The authenticated shell now uses a hybrid model:
+The authenticated shell now mixes stable sub-routes with a few local anchors:
 
-- real sub-routes for student workflow surfaces:
+- student workflow routes:
   - `/app/new`
   - `/app/history`
-- same-page anchors where a role still has one page module:
-  - `#actions`
+  - `/app/conversations/[conversationId]`
+- adult oversight routes:
+  - `/app/students/[studentUserId]`
+  - `/app/review/[conversationId]`
+  - `/app/audit`
+- local anchors still used for sections that remain on the dashboard page:
   - `#students`
-  - `#links`
   - `#operations`
   - `#account`
 
 Why:
 
-- the student workflow now has enough real depth to deserve stable routes
-- parent, tutor, and admin surfaces are still too early to justify fake sub-route sprawl
+- the student workflow and adult review flow now both have enough depth to deserve stable URLs
+- the shell still avoids exploding into route sprawl for every small card or metric panel
 
 ## iPad Validation
 

@@ -38,16 +38,16 @@ What works now:
 - the student can paste readable homework text
 - the student can toggle whether the homework is graded
 - the student can review and edit the text that will later feed the chat
-- the validated intake now creates a conversation draft and redirects into the persisted session page
+- the validated intake now creates a conversation draft, uploads the selected files through the signed upload flow, confirms them, runs extraction, syncs extracted text back into the workspace, and then redirects into the persisted session page
+- if provider extraction fails during confirmation, the attachment is kept, marked `failed`, and returned with a manual-review warning instead of breaking the student flow
 
 What does not happen yet:
 
-- no `attachments` row is created yet
-- no storage upload is sent yet
-- no extraction job runs yet
-- file binaries are still browser-staged before the later upload path
+- there is still no dedicated background queue for extraction retries or long-running attachment processing
+- per-file enforcement and metadata capture still need to be tightened to match the full storage contract exactly
+- there is still no non-provider local PDF extraction fallback when Gemini is unavailable
 
-Those belong to the upload/extraction work after `A3.3`.
+Those belong to the remaining stabilization work in `A4.3`.
 
 ## File Staging Rules
 
@@ -85,6 +85,6 @@ Keeping them separate avoids binding the form to unfinished upload and conversat
 
 ## Next Extension Points
 
-- upload routes: convert staged file picks into real `attachments` rows
-- storage confirm flow: replace browser-only file state with durable storage references
-- `A4.3`: replace the placeholder extraction seed with real PDF/image interpretation
+- tighten the upload limits and metadata capture to match [Storage and attachment rules](storage_attachment_rules.md)
+- add a local non-provider extraction fallback or retry path if provider extraction failures stay common
+- move long-running extraction or retry work into a queued path if synchronous confirmation becomes too slow

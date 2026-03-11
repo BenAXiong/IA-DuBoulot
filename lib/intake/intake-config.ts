@@ -1,3 +1,11 @@
+import {
+  ATTACHMENT_ACCEPT_ATTR,
+  ATTACHMENT_MAX_IMAGE_BYTES,
+  ATTACHMENT_MAX_PDF_BYTES,
+  resolveAttachmentPolicy,
+  type SharedAttachmentCategory,
+} from "@/lib/uploads/attachment-policy";
+
 export const INTAKE_SUBJECT_OPTIONS = [
   { value: "mathematiques", label: "Mathematiques" },
   { value: "francais", label: "Francais" },
@@ -11,10 +19,9 @@ export const INTAKE_SUBJECT_OPTIONS = [
 
 export const INTAKE_MAX_ATTACHMENTS = 5;
 export const INTAKE_MAX_TOTAL_UPLOAD_BYTES = 50 * 1024 * 1024;
-export const INTAKE_ACCEPT_ATTR =
-  "image/jpeg,image/png,image/webp,image/heic,application/pdf";
+export const INTAKE_ACCEPT_ATTR = ATTACHMENT_ACCEPT_ATTR;
 
-export type IntakeAttachmentCategory = "image" | "pdf";
+export type IntakeAttachmentCategory = SharedAttachmentCategory;
 
 export type StagedIntakeFile = {
   id: string;
@@ -41,20 +48,7 @@ export function formatBytes(bytes: number) {
 export function resolveIntakeCategory(
   file: File,
 ): IntakeAttachmentCategory | null {
-  if (file.type === "application/pdf") {
-    return "pdf";
-  }
-
-  if (
-    file.type === "image/jpeg" ||
-    file.type === "image/png" ||
-    file.type === "image/webp" ||
-    file.type === "image/heic"
-  ) {
-    return "image";
-  }
-
-  return null;
+  return resolveAttachmentPolicy(file.type)?.category ?? null;
 }
 
 export function stageIntakeFiles(input: {
@@ -70,6 +64,16 @@ export function stageIntakeFiles(input: {
 
     if (!category) {
       errors.push(`${file.name}: format non accepte.`);
+      continue;
+    }
+
+    const maxBytes =
+      category === "pdf" ? ATTACHMENT_MAX_PDF_BYTES : ATTACHMENT_MAX_IMAGE_BYTES;
+
+    if (file.size > maxBytes) {
+      errors.push(
+        `${file.name}: ${formatBytes(maxBytes)} maximum pour ce type de fichier.`,
+      );
       continue;
     }
 
@@ -129,4 +133,8 @@ export function buildExtractionDraftSeed(input: {
     "",
     "Ajoute ici une transcription manuelle, les consignes importantes, ou les zones a faire relire avant l'ouverture de la conversation.",
   ].join("\n");
+}
+
+export function isProvisionalExtractionDraft(value: string) {
+  return value.trim().startsWith("[Brouillon d'extraction provisoire]");
 }

@@ -3,6 +3,7 @@ import "server-only";
 import type { AppUserRecord } from "@/lib/server/auth/types";
 import { AppError } from "@/lib/server/errors/app-error";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { resolveStudentUsageSnapshot } from "@/lib/server/usage/service";
 import type {
   ConversationStatus,
   LinkStatus,
@@ -33,16 +34,6 @@ type ConversationRow = {
   last_message_at: string | null;
   completed_at: string | null;
   created_at: string;
-};
-
-type UsageRow = {
-  period_start: string;
-  period_end: string;
-  sessions_count: number;
-  uploads_count: number;
-  assistant_message_count: number;
-  input_tokens: number;
-  output_tokens: number;
 };
 
 function toServiceError(message: string, cause: unknown) {
@@ -98,8 +89,9 @@ function buildSubjectRollup(
 function buildStartState(input: {
   appUser: AppUserRecord;
   support: StudentDashboardSupportSnapshot;
+  usage: StudentDashboardUsageSnapshot;
 }): StudentDashboardStartState {
-  const { appUser, support } = input;
+  const { appUser, support, usage } = input;
 
   if (appUser.account_status === "suspended") {
     return "suspended";
@@ -119,33 +111,11 @@ function buildStartState(input: {
     return "pending_parent_approval";
   }
 
-  return "ready";
-}
-
-function buildUsageSnapshot(usage: UsageRow | null): StudentDashboardUsageSnapshot {
-  if (!usage) {
-    return {
-      hasUsage: false,
-      periodStart: null,
-      periodEnd: null,
-      sessionsCount: 0,
-      uploadsCount: 0,
-      assistantMessageCount: 0,
-      inputTokens: 0,
-      outputTokens: 0,
-    };
+  if (usage.quota.accessState === "blocked") {
+    return "quota_blocked";
   }
 
-  return {
-    hasUsage: true,
-    periodStart: usage.period_start,
-    periodEnd: usage.period_end,
-    sessionsCount: usage.sessions_count,
-    uploadsCount: usage.uploads_count,
-    assistantMessageCount: usage.assistant_message_count,
-    inputTokens: usage.input_tokens,
-    outputTokens: usage.output_tokens,
-  };
+  return "ready";
 }
 
 export async function loadStudentDashboardSnapshot(
@@ -166,7 +136,7 @@ export async function loadStudentDashboardSnapshot(
     parentLinksResult,
     tutorLinksResult,
     conversationsResult,
-    usageResult,
+    usage,
   ] = await Promise.all([
     supabase
       .from("student_profiles")
@@ -193,15 +163,9 @@ export async function loadStudentDashboardSnapshot(
       })
       .order("created_at", { ascending: false })
       .limit(6),
-    supabase
-      .from("usage_counters")
-      .select(
-        "period_start, period_end, sessions_count, uploads_count, assistant_message_count, input_tokens, output_tokens",
-      )
-      .eq("student_user_id", appUser.id)
-      .order("period_start", { ascending: false })
-      .limit(1)
-      .maybeSingle<UsageRow>(),
+    resolveStudentUsageSnapshot({
+      studentUserId: appUser.id,
+    }),
   ]);
 
   if (studentProfileResult.error) {
@@ -232,13 +196,6 @@ export async function loadStudentDashboardSnapshot(
     );
   }
 
-  if (usageResult.error) {
-    throw toServiceError(
-      "Unable to load usage counters.",
-      usageResult.error,
-    );
-  }
-
   const recentSessions = ((conversationsResult.data ?? []) as ConversationRow[]).map(
     (conversation): StudentDashboardConversation => ({
       id: conversation.id,
@@ -265,6 +222,7 @@ export async function loadStudentDashboardSnapshot(
   const startState = buildStartState({
     appUser,
     support,
+    usage,
   });
 
   return {
@@ -280,6 +238,6 @@ export async function loadStudentDashboardSnapshot(
     recentSessions,
     subjectRollup: buildSubjectRollup(recentSessions),
     support,
-    usage: buildUsageSnapshot(usageResult.data ?? null),
+    usage,
   };
 }

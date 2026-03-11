@@ -4,6 +4,7 @@ import type {
   AccountStatus,
   AppUserRecord,
 } from "@/lib/server/auth/types";
+import type { StudentUsageSnapshot } from "@/lib/server/usage/types";
 
 export type LinkStatus = "pending" | "active" | "revoked";
 export type ConversationStatus = "active" | "completed" | "archived";
@@ -39,22 +40,14 @@ export type StudentDashboardSupportSnapshot = {
   tutorLinks: StudentDashboardLinkCounts;
 };
 
-export type StudentDashboardUsageSnapshot = {
-  hasUsage: boolean;
-  periodStart: string | null;
-  periodEnd: string | null;
-  sessionsCount: number;
-  uploadsCount: number;
-  assistantMessageCount: number;
-  inputTokens: number;
-  outputTokens: number;
-};
+export type StudentDashboardUsageSnapshot = StudentUsageSnapshot;
 
 export type StudentDashboardStartState =
   | "ready"
   | "pending_parent_approval"
   | "deletion_requested"
-  | "suspended";
+  | "suspended"
+  | "quota_blocked";
 
 export type StudentDashboardSnapshot = {
   appUser: Pick<

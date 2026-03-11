@@ -159,7 +159,6 @@ Runtime logs may include invite domain and status metadata, but should not log r
 ## Known Follow-Ups
 
 - add provider-backed invite email delivery
-- add parent dashboard issuance for tutor invites against linked children
 - add invitation cleanup jobs for expired and stale pending rows
 - decide whether cross-device invite recovery is worth adding before beta
 - decide whether future parent-link flows should reuse `parent_link` or stay inside dedicated parent dashboards only

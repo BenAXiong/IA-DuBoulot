@@ -46,9 +46,11 @@ The recent-session cards on the dashboard now link back to that persisted route.
 
 ## Important Boundary
 
-Attachment references are persisted, but binary uploads are not yet.
+This document records the original `A3.3` persistence boundary.
 
-That means:
+The current local workspace has already moved beyond that boundary into the real upload path, but the original split still explains why the first persisted session contract existed before `attachments` storage was wired.
+
+At the original `A3.3` exit point:
 
 - there are no `attachments` rows yet for the staged browser files
 - there is no storage upload yet

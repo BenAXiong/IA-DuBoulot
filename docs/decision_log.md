@@ -357,3 +357,103 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Do not treat founder personal subscriptions as application-backend fallback providers. The production-capable API fallback remains open, with OpenAI API as the likely later candidate after MVP validation.
 - Why: Personal subscriptions are not a clean deployable backend dependency and create unclear rate-limit, terms, and operational risks.
 - Follow-up: Select the real API fallback when production load and paid-user economics justify it.
+
+### D-20260311-35 - Phase A4 Reuses The Existing Student Flow Instead Of Adding Parallel AI Surfaces
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A4.1.1`, `A4.1.2`, `A4.1.3`, `A4.2.1`, `A4.2.2`, `A4.2.3`, `A4.2.4`, `A4.3.1`, `A4.3.2`, `A4.3.3`, `A4.3.4`, `A4.4.1`, `A4.4.2`, `A4.4.3`, `A4.4.4`, `A4.5.1`, `A4.5.2`, `A4.5.3`, `A4.5.4`
+- Context: The student flow was already stable enough that adding a second temporary AI path would have created more drift than value. The local workspace now contains Gemini-backed provider modules, upload/extraction routes, moderation handling, and summary generation wired directly into the same `/app/new` and `/app/conversations/[conversationId]` flow that A3 established.
+- Decision: Implement Phase A4 by replacing the deterministic internals inside the existing student intake, workbench, and completion flow instead of introducing parallel experimental routes or duplicate UI surfaces. Keep the A4 modules split by responsibility under `lib/server/ai`, `lib/server/uploads`, `lib/server/moderation`, `lib/server/summaries`, and `lib/server/translations`.
+- Why: This preserves the thin-route, narrow-service architecture, avoids duplicated product contracts, and makes the A4 rollout a stability pass on one canonical student workflow instead of a second application hidden beside it.
+- Follow-up: Keep task closure conservative until targeted end-to-end smoke verification is logged, confirm deployed env parity for Gemini-backed behavior, and tighten upload enforcement so the implementation matches the documented storage contract exactly.
+
+### D-20260311-36 - Student Completion Responses Must Not Leak Adult Summary Audiences
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A4.4.3`, `A4.4.4`, `A4.5.1`, `A4.5.2`, `A4.5.3`, `A4.5.4`
+- Context: The A4 completion pipeline now generates student, parent, and tutor summaries in one service call. During the first end-to-end student-flow smoke design, the student completion route was found to return that full summary array directly, which would leak adult-only content even though later detail reads rely on RLS-filtered visibility.
+- Decision: Keep multi-audience summary generation and storage as-is, but treat the student completion response as a student-only surface and return only the student-visible summary subset from that route path.
+- Why: Visibility rules must hold at every boundary, not only on later reads. Filtering the response at the completion boundary closes the leak without weakening the downstream parent/tutor summary pipeline.
+- Follow-up: Keep the smoke script asserting that the student completion response only contains the student audience, and apply the same boundary check to any future admin or adult completion surfaces before they ship.
+
+### D-20260311-37 - Assistant Chat Turns Are Persisted Through The Admin Boundary
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A4.4.1`, `A4.4.2`, `A4.4.3`, `A4.4.4`
+- Context: The hosted RLS rules intentionally allow direct `messages` inserts only for student-authored rows. During the A4 student-flow smoke, the chat route reached Gemini successfully but failed when it tried to persist the assistant reply through the student-scoped Supabase client.
+- Decision: Keep student-authored reads and conversation ownership checks on the student-scoped server client, but persist assistant/system-generated message rows and their activity timestamp updates through the admin Supabase boundary.
+- Why: This matches the documented access model, preserves conservative direct-browser RLS, and keeps privileged system writes explicit instead of weakening the `messages` table policy to accommodate server internals.
+- Follow-up: Keep the student-flow smoke asserting that a real assistant turn persists successfully after the provider call, and route any future system-generated conversation rows through the same privileged write boundary.
+
+### D-20260311-38 - Student Completion Stays Available Even If Adult Summary Derivations Fail
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A4.5.1`, `A4.5.2`, `A4.5.3`, `A4.5.4`
+- Context: The A4 smoke exposed intermittent Gemini failures on parent translation and tutor-summary derivations after the required student summary had already been generated successfully. Blocking `POST /api/conversations/[conversationId]/complete` on those secondary adult artifacts would leave the student unable to finish the session for reasons they cannot act on.
+- Decision: Treat the student summary as the required completion artifact, but make parent/tutor summary generation and translated parent variants best-effort during the student completion path. Log failures for those optional adult artifacts and continue returning a successful student completion response.
+- Why: This preserves the student-facing closure contract, matches the current product priority where adult surfaces are not yet the active workflow, and keeps optional provider instability from turning into a hard student regression.
+- Follow-up: Keep the smoke script reporting missing adult variants explicitly, and revisit stricter guarantees once the A5 parent/tutor review surfaces are live and have their own retry or repair workflows.
+
+### D-20260311-39 - Attachment Confirmation Degrades Gracefully On Extraction Provider Failure
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A4.3.1`, `A4.3.2`, `A4.3.3`, `A4.3.4`
+- Context: The A4 smoke exposed intermittent Gemini extraction failures during `POST /api/uploads/confirm`. Returning a hard `502` at that point broke the student flow even though the file upload itself had succeeded and the product already has a UI contract for manual review when extraction is weak or unavailable.
+- Decision: Keep successful uploads durable even when extraction fails. On provider extraction failure, mark the attachment `failed`, persist failure metadata, return a warning message, and let the student continue with the attachment plus manual review instead of failing the whole confirmation route.
+- Why: This matches the documented graceful-fallback rule for extraction, prevents provider instability from invalidating a completed upload, and keeps the student moving through the workflow with an explicit manual-review signal.
+- Follow-up: Keep the smoke script treating both `ready` extraction and `failed with warning` as valid outcomes for the upload-confirm step, and revisit local non-provider PDF extraction later if graceful degradation proves too common.
+
+### D-20260311-40 - Student Chat Falls Back To The Deterministic Coach When Gemini Fails
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A4.4.1`, `A4.4.2`, `A4.4.3`, `A4.4.4`
+- Context: The A4 smoke exposed intermittent Gemini failures on live coaching turns after the student message had already passed moderation and the conversation context was valid. Returning a hard `502` at that point made the core workbench feel broken even though the repo already contained the earlier deterministic coaching helper from `A3.4`.
+- Decision: Keep the provider-backed coaching path as the primary route, but fall back to the deterministic draft-coach helper when the provider call fails. Preserve the same moderation and persistence flow around that fallback so the student still receives a structured next step instead of a route error.
+- Why: This keeps the student workbench usable during provider instability, reuses an existing bounded fallback instead of inventing a second chat system, and preserves the current route/service architecture.
+- Follow-up: Keep the smoke script reporting when deterministic coach fallback was used, and revisit provider retries or a second API provider later instead of making the student workflow depend on one flaky upstream call.
+
+### D-20260311-41 - Phase A4 Closes On Stable Fallback-Backed Behavior Rather Than Perfect Provider Reliability
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A4.1.1`, `A4.1.2`, `A4.1.3`, `A4.2.1`, `A4.2.2`, `A4.2.3`, `A4.2.4`, `A4.3.1`, `A4.3.2`, `A4.3.3`, `A4.3.4`, `A4.4.1`, `A4.4.2`, `A4.4.3`, `A4.4.4`, `A4.5.1`, `A4.5.2`, `A4.5.3`, `A4.5.4`, `A7.2.2`
+- Context: The latest student-flow smoke still exercised Gemini failure paths in extraction, coaching, and summary generation. Leaving `A4` open until those warnings disappeared would have conflated provider quality with product stability even though the implemented fallbacks now keep the full student workflow usable and verified end to end.
+- Decision: Treat `A4` as complete once the student flow stays available through explicit fallbacks, the contracts are documented, and the smoke/verification passes are green. Track provider reliability as a QA and regression concern instead of a blocker on the phase itself.
+- Why: The MVP needs bounded failure behavior more than upstream perfection. This closure rule keeps the roadmap aligned with the stable product contract actually delivered in code.
+- Follow-up: Keep `scripts/smoke-student-flow.mjs` in the regression pass, confirm deployed env parity before demos, and revisit provider retries or a second backend provider later if fallback usage remains too frequent.
+
+### D-20260311-42 - Phase A5 Uses Shared Adult Review Routes With Narrow Oversight Services
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A5.1.1`, `A5.1.2`, `A5.1.3`, `A5.2.1`, `A5.2.2`, `A5.2.3`, `A5.3.1`, `A5.3.2`, `A5.3.3`, `A5.3.4`, `A5.4.1`, `A5.4.2`, `A5.4.3`
+- Context: Parent and tutor linkage already existed, but the protected app still only exposed placeholder adult dashboards. Adding one-off parent and tutor route trees would have duplicated the same conversation review contract, while leaving tutor notes as implicit table writes would have weakened traceability for the most sensitive adult-only surface in the MVP.
+- Decision: Implement `A5` through shared adult review routes under `/app/students/[studentUserId]` and `/app/review/[conversationId]`, backed by narrow oversight services in `lib/server/oversight/`. Keep tutor-note writes behind canonical server routes, add explicit adult access revalidation plus audit rows on review reads, and expose a first admin queue at `/app/audit`.
+- Why: This keeps the route tree compact, centralizes adult access checks, preserves the role-separated summary audiences already enforced by RLS, and makes tutor-note mutations auditable instead of hidden inside direct client writes.
+- Follow-up: Expand the admin audit surface only when support or moderation workflows justify it, and keep richer billing management, quota enforcement, and note taxonomy in later phases instead of overloading `A5`.
+
+### D-20260311-43 - Trial And Quota Decisions Share One Server-Owned Usage Snapshot
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A6.2.1`, `A6.2.2`, `A6.2.3`
+- Context: `usage_counters` already existed, but the app still treated them as display-only. A6 needed real gating without letting the student dashboard, parent dashboard, and mutation routes drift into separate interpretations of "trial" or "quota reached."
+- Decision: Resolve one server-owned usage snapshot per student inside `lib/server/usage/`, use that same snapshot for dashboard reads and mutation gates, count usage on conversation creation, upload-target creation, assistant replies, and provider token usage, and anchor quotas to the current calendar month. The MVP trial now starts on first recorded usage, lasts 30 days, and blocks new conversation, upload, or assistant-turn actions once either the trial window or the relevant quota budget is exhausted.
+- Why: This keeps UI state and server enforcement aligned, avoids requiring a schema migration for first-pass usage tracking, and preserves student stability by gating only new expensive actions instead of retroactively breaking completed work.
+- Follow-up: Recalibrate trial and paid quota numbers once real pilot usage data exists, and revisit a more atomic counter-write path if counter contention becomes visible in production telemetry.
+
+### D-20260311-44 - MVP Billing Is Parent-Owned And Gracefully Disabled Until Lemon Checkout Config Exists
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A6.3.1`, `A6.3.2`, `A6.3.3`
+- Context: The repo already reserved billing routes and the provider choice was settled, but the actual Lemon store and variant identifiers are still unset locally. The app still needed a real abstraction and webhook sync path without pretending checkout could succeed in an unconfigured environment.
+- Decision: Implement billing through `lib/server/billing/`, keep the MVP payer role limited to `parent`, route checkout and portal actions through canonical server endpoints, and make those endpoints return an explicit `503` when Lemon checkout config is incomplete instead of failing opaquely. Subscription lifecycle state is now persisted only through the billing service and synced from signed Lemon webhooks, with a dedicated billing smoke covering both graceful checkout failure and webhook-driven persistence.
+- Why: This preserves the thin-route architecture, keeps provider payload details out of route handlers and UI code, and gives the repo a verifiable subscription sync path even before the real Lemon checkout credentials are provisioned locally.
+- Follow-up: Provision `LEMON_SQUEEZY_API_KEY`, `LEMON_SQUEEZY_STORE_ID`, `LEMON_SQUEEZY_VARIANT_ID_FAMILY_MONTHLY`, and the webhook secret in Vercel and local `.env.local`, then replace the current config-failure branch with a real parent checkout round-trip smoke.

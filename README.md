@@ -24,6 +24,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Student workbench V1](docs/student_workbench_v1.md)
 - [Student history and summary V1](docs/student_history_summary_v1.md)
 - [Invitation flows V1](docs/invitation_flows_v1.md)
+- [Oversight surfaces V1](docs/oversight_surfaces_v1.md)
 - [Service interfaces](docs/service_interfaces.md)
 - [Error and audit conventions](docs/error_audit_conventions.md)
 - [Storage and attachment rules](docs/storage_attachment_rules.md)
@@ -62,9 +63,15 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - `/app/new` now exists as the canonical student intake entry route ahead of the real title/subject/upload flow.
 - `/app/new` now hosts the real intake surface for title, subject, staged files, pasted text, graded-homework state, and editable review text.
 - validating `/app/new` now persists a conversation draft and redirects into `/app/conversations/[conversationId]`.
-- `/app/conversations/[conversationId]` now hosts the real student workbench with a persisted transcript, saveable workspace, hint/summarize actions, and text-only upload references.
-- `/app/history` now provides the canonical student session list, and the conversation detail page now supports completion plus a persisted student summary.
-- the next recommended execution step is `A4.1` to `A4.4`: replace the deterministic reply and summary helpers plus text-only reference handling with the real AI, upload, extraction, and moderation stack.
+- `/app/conversations/[conversationId]` now hosts the real student workbench with a persisted transcript, saveable workspace, private attachment access, upload-triggered extraction, and provider-backed coaching replies.
+- `/app/history` now provides the canonical student session list, and the conversation detail page now supports completion plus provider-backed student, parent, and tutor summary generation.
+- the current local workspace now contains a build-clean and smoke-verified `A4` slice for Gemini-backed coaching, upload/extraction, moderation event logging, and multi-audience summaries, with deterministic fallbacks preserving the student flow when Gemini fails.
+- a fixture-backed local smoke script now exists at `scripts/smoke-student-flow.mjs` and passed on 2026-03-11 against the real `/app/new` -> upload -> workspace -> chat -> complete API flow.
+- parent, tutor, and admin oversight surfaces now exist at `/app`, `/app/students/[studentUserId]`, `/app/review/[conversationId]`, and `/app/audit`, backed by explicit oversight services, tutor-note routes, and adult session-view audit logging.
+- a second fixture-backed smoke script now exists at `scripts/smoke-adult-oversight.mjs` and passed on 2026-03-11 against the real parent/tutor/admin oversight routes.
+- usage tracking, trial/quota enforcement, and Lemon Squeezy billing routes now live behind dedicated `lib/server/usage/` and `lib/server/billing/` services, with student and parent dashboards reading the same server-owned quota snapshot.
+- a third fixture-backed billing smoke script now exists at `scripts/smoke-billing-webhook.mjs` and passed on 2026-03-11 against the real webhook route plus the parent dashboard billing surface.
+- the latest student smoke still exercised Gemini fallbacks in extraction, coaching, and summary generation, so provider reliability remains a QA follow-up even though the Phase A4 flow is now stable enough to stay usable.
 
 ## Working Conventions
 

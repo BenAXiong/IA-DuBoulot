@@ -8,7 +8,7 @@ type StudentConversationComposerProps = {
   onSendMessage: () => void;
   onRequestHint: () => void;
   onRequestSummary: () => void;
-  onUploadReferences: () => void;
+  onUploadAttachments: () => void;
 };
 
 export function StudentConversationComposer({
@@ -19,7 +19,7 @@ export function StudentConversationComposer({
   onSendMessage,
   onRequestHint,
   onRequestSummary,
-  onUploadReferences,
+  onUploadAttachments,
 }: StudentConversationComposerProps) {
   return (
     <div className="grid gap-4 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4">
@@ -27,10 +27,10 @@ export function StudentConversationComposer({
         <button
           className="rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
           disabled={disabled || isSending}
-          onClick={onUploadReferences}
+          onClick={onUploadAttachments}
           type="button"
         >
-          Ajouter des refs fichier
+          Ajouter une piece
         </button>
         <button
           className="rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
@@ -60,7 +60,7 @@ export function StudentConversationComposer({
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-[color:var(--ink-soft)]">
-          Le coaching reste deterministe dans `A3.4`. Le vrai comportement IA arrive en `A4`.
+          Le coaching utilise maintenant le moteur IA et le texte extrait des pieces confirmees.
         </p>
         <button
           className="rounded-full bg-[color:var(--accent)] px-5 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"

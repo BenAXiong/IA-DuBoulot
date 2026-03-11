@@ -26,6 +26,9 @@ Keep environment configuration explicit so local development, Vercel, and provid
 | `RESEND_API_KEY` | server | Resend | transactional email | local `.env.local`, Vercel |
 | `LEMON_SQUEEZY_API_KEY` | server | Lemon Squeezy | billing API calls | local `.env.local`, Vercel |
 | `LEMON_SQUEEZY_WEBHOOK_SECRET` | server | Lemon Squeezy | webhook verification | local `.env.local`, Vercel |
+| `LEMON_SQUEEZY_STORE_ID` | server | Lemon Squeezy | checkout creation store target | local `.env.local`, Vercel |
+| `LEMON_SQUEEZY_VARIANT_ID_FAMILY_MONTHLY` | server | Lemon Squeezy | Family checkout variant mapping | local `.env.local`, Vercel |
+| `LEMON_SQUEEZY_TEST_MODE` | server | Lemon Squeezy | optional checkout test-mode toggle | local `.env.local`, Vercel |
 | `SUPABASE_FIXTURE_PASSWORD` | local-only | local operator secret | deterministic hosted RLS fixture seed/verify scripts | local `.env.local` only |
 
 ## Storage Constants
@@ -37,7 +40,25 @@ Keep environment configuration explicit so local development, Vercel, and provid
 ## Current Gaps
 
 - confirm Vercel environment sync after Supabase integration changes
-- planned storage buckets are now created automatically by the fixture seed script, but production upload flows still need route-level enforcement
-- Gemini key still needs to be provisioned
+- planned storage buckets are now created automatically by the fixture seed script, and the upload route family now exists locally, but deployed route-level verification still needs a targeted smoke pass
+- `GEMINI_API_KEY` is present locally; confirm the same key is mirrored in Vercel before relying on deployed `A4` behavior
 - PostHog and Resend values still need to be provisioned
-- Lemon Squeezy webhook secret arrives only after webhook setup
+- local `.env.local` now carries Lemon Squeezy test-mode config, and Vercel production env has been populated; redeploy plus a deployed checkout/webhook verification pass are still required before treating billing as operational
+
+## Lemon Squeezy Provisioning Names
+
+For the current MVP billing slice, these are the exact Lemon Squeezy values the repo expects you to provide:
+
+| Lemon Squeezy info name | Repo variable | Notes |
+| --- | --- | --- |
+| `API key` | `LEMON_SQUEEZY_API_KEY` | server-side secret used for checkout creation and portal lookups |
+| `Store ID` | `LEMON_SQUEEZY_STORE_ID` | the Lemon store that owns the checkout |
+| `Variant ID` for the `Family` monthly plan | `LEMON_SQUEEZY_VARIANT_ID_FAMILY_MONTHLY` | the single paid MVP plan currently wired in code |
+| `Signing secret` from the Lemon webhook config | `LEMON_SQUEEZY_WEBHOOK_SECRET` | required for `POST /api/billing/webhooks/lemonsqueezy` signature verification |
+| `Test mode` choice | `LEMON_SQUEEZY_TEST_MODE` | set to `true` or `false`; defaults to `false` in `.env.example` |
+
+Current MVP note:
+
+- the code does not currently require a separate Lemon `Product ID`
+- the code does not currently require a separate Lemon `Webhook URL` env var because the app route is fixed at `/api/billing/webhooks/lemonsqueezy`
+- if the Family offer later gains yearly or alternate variants, add new env vars here before wiring them in code

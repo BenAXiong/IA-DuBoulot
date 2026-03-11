@@ -12,6 +12,14 @@ Assuming implementation begins immediately after this planning pass and runs at 
 
 That makes this a roughly 7-week full-time-equivalent MVP, or about 10 to 12 calendar weeks if the work is done part-time.
 
+## Current Checkpoint
+
+As of 2026-03-11:
+
+- phases `A0` to `A5` are now complete in the local workspace
+- `A7.2.2` is also complete through the student and adult smoke scripts
+- the next active product phase is `A6`, with provider-reliability tuning remaining as QA follow-up rather than unfinished `A4` scope
+
 ## Week-By-Week Plan
 
 ### Week 0: 2026-03-11 to 2026-03-13

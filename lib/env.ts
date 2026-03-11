@@ -11,6 +11,11 @@ export const env = {
   LEMON_SQUEEZY_API_KEY: process.env.LEMON_SQUEEZY_API_KEY ?? "",
   LEMON_SQUEEZY_WEBHOOK_SECRET:
     process.env.LEMON_SQUEEZY_WEBHOOK_SECRET ?? "",
+  LEMON_SQUEEZY_STORE_ID: process.env.LEMON_SQUEEZY_STORE_ID ?? "",
+  LEMON_SQUEEZY_VARIANT_ID_FAMILY_MONTHLY:
+    process.env.LEMON_SQUEEZY_VARIANT_ID_FAMILY_MONTHLY ?? "",
+  LEMON_SQUEEZY_TEST_MODE:
+    process.env.LEMON_SQUEEZY_TEST_MODE === "true",
 };
 
 export function hasSupabaseEnv() {

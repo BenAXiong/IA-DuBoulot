@@ -23,12 +23,20 @@ function getButtonLabel(snapshot: StudentDashboardSnapshot) {
     return "Attendre le parent";
   }
 
+  if (snapshot.startState === "quota_blocked") {
+    return "Voir le quota";
+  }
+
   return "Depart bloque";
 }
 
 function getButtonHref(snapshot: StudentDashboardSnapshot) {
   if (snapshot.canStartHomework) {
     return "/app/new";
+  }
+
+  if (snapshot.startState === "quota_blocked") {
+    return "/app#usage";
   }
 
   return "/app#links";
@@ -90,6 +98,13 @@ export function StudentDashboardStartPanel({
           />
           <StudentStatusPill
             label={
+              snapshot.usage.quota.planKind === "paid"
+                ? "Acces Family"
+                : "Essai gratuit"
+            }
+          />
+          <StudentStatusPill
+            label={
               snapshot.support.parentalApprovalRequired
                 ? "Supervision requise"
                 : "Depart autonome"
@@ -148,8 +163,8 @@ export function StudentDashboardStartPanel({
         )}
 
         <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-          Le formulaire d&apos;intake detaille arrive en `A3.2`, mais cette route
-          fixe deja le vrai point d&apos;entree du workflow eleve.
+          Le formulaire d&apos;intake detaille est maintenant relie au quota et a
+          la facturation sans changer la route canonique d&apos;entree eleve.
         </p>
       </article>
     </section>

@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { IntakeAttachmentCategory } from "@/lib/intake/intake-config";
+import type { ConversationAttachmentRecord } from "@/lib/server/ai/types";
 import type { AppUserRecord, UiLanguageCode } from "@/lib/server/auth/types";
 
 export type ConversationActionIntent =
@@ -97,6 +98,7 @@ export type ConversationDetail = {
   conversation: ConversationRecord;
   workspace: WorkspaceStateRecord | null;
   messages: ConversationMessageRecord[];
+  attachments: ConversationAttachmentRecord[];
   summaries: SessionSummaryRecord[];
 };
 

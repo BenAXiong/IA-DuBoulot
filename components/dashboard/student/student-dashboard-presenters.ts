@@ -58,6 +58,8 @@ export function getStartStateLabel(startState: StudentDashboardStartState) {
       return "Pret";
     case "pending_parent_approval":
       return "En attente parent";
+    case "quota_blocked":
+      return "Quota bloque";
     case "suspended":
       return "Suspendu";
     case "deletion_requested":
@@ -73,6 +75,8 @@ export function getStartStateBody(startState: StudentDashboardStartState) {
       return "Le compte peut lancer un nouveau devoir et reprendre les sessions recentes.";
     case "pending_parent_approval":
       return "Le prochain devoir reste bloque tant qu'un parent n'a pas active le lien de supervision.";
+    case "quota_blocked":
+      return "Le compte a atteint sa limite d'essai ou de quota. La reprise passe maintenant par le statut de facturation et le renouvellement de la periode.";
     case "suspended":
       return "Le compte ne peut pas demarrer de nouveau devoir tant que la suspension n'est pas levee.";
     case "deletion_requested":

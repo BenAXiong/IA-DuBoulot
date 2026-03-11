@@ -30,6 +30,20 @@ export const GET = withRouteErrorHandling<{ params: Params }>(
     const detail = await loadConversationDetail({
       viewer: appUser,
       conversationId: resolvedParams.conversationId,
+      auditContext:
+        appUser.role === "parent"
+          ? {
+              action: "parent_session_review_view",
+              route: "/api/conversations/[conversationId]",
+              requestId,
+            }
+          : appUser.role === "tutor"
+            ? {
+                action: "tutor_session_review_view",
+                route: "/api/conversations/[conversationId]",
+                requestId,
+              }
+            : undefined,
     });
 
     return NextResponse.json({

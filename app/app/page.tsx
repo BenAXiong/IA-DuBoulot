@@ -5,17 +5,39 @@ import { StudentDashboard } from "@/components/dashboard/student-dashboard";
 import { TutorDashboard } from "@/components/dashboard/tutor-dashboard";
 import { requireAppPageContext } from "@/lib/server/auth/page-guards";
 import type { AppUserRecord } from "@/lib/server/auth/types";
+import { loadAdminAccessAuditSnapshot } from "@/lib/server/oversight/admin-service";
+import { loadParentDashboardSnapshot } from "@/lib/server/oversight/parent-service";
+import { loadTutorDashboardSnapshot } from "@/lib/server/oversight/tutor-service";
 
-function renderRoleDashboard(role: AppUserRecord["role"], appUser: AppUserRecord) {
+async function renderRoleDashboard(
+  role: AppUserRecord["role"],
+  appUser: AppUserRecord,
+) {
   switch (role) {
     case "student":
       return <StudentDashboard appUser={appUser} />;
-    case "parent":
-      return <ParentDashboard />;
-    case "tutor":
-      return <TutorDashboard />;
-    case "admin":
-      return <AdminDashboard />;
+    case "parent": {
+      const snapshot = await loadParentDashboardSnapshot(appUser);
+      return (
+        <ParentDashboard
+          languageCode={appUser.preferred_ui_language}
+          snapshot={snapshot}
+        />
+      );
+    }
+    case "tutor": {
+      const snapshot = await loadTutorDashboardSnapshot(appUser);
+      return (
+        <TutorDashboard
+          languageCode={appUser.preferred_ui_language}
+          snapshot={snapshot}
+        />
+      );
+    }
+    case "admin": {
+      const snapshot = await loadAdminAccessAuditSnapshot(appUser);
+      return <AdminDashboard auditEventCount={snapshot.events.length} />;
+    }
     default:
       return null;
   }
@@ -26,7 +48,7 @@ export default async function AppHomePage() {
 
   return (
     <div className="grid gap-6">
-      {renderRoleDashboard(appUser.role, appUser)}
+      {await renderRoleDashboard(appUser.role, appUser)}
 
       <section
         className="grid gap-6 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] md:grid-cols-[0.7fr_1.3fr]"

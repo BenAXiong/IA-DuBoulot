@@ -32,6 +32,85 @@ function getSupportHeadline(support: StudentDashboardSupportSnapshot) {
   return "Aucun adulte lie pour l'instant";
 }
 
+function getUsageHeadline(usage: StudentDashboardUsageSnapshot) {
+  if (usage.quota.accessState === "blocked") {
+    return "Essai ou quota atteint";
+  }
+
+  if (usage.quota.accessState === "warning") {
+    return usage.quota.planKind === "paid"
+      ? "Acces actif, marge a surveiller"
+      : "Essai en cours, marge bientot reduite";
+  }
+
+  if (usage.hasUsage) {
+    return "Activite suivie sur la periode courante";
+  }
+
+  return "Le suivi d'usage demarre avec le premier devoir";
+}
+
+function getUsageBody(
+  usage: StudentDashboardUsageSnapshot,
+  languageCode: UiLanguageCode,
+) {
+  if (!usage.quota.trialStartedAt && usage.quota.planKind === "trial") {
+    return "L'essai gratuit commencera avec le premier devoir enregistre.";
+  }
+
+  if (usage.quota.blockReason === "trial_window_expired") {
+    return "La periode d'essai est terminee. Le prochain devoir depend maintenant d'un abonnement payeur actif.";
+  }
+
+  if (usage.quota.blockReason === "sessions") {
+    return "La limite de sessions de cette periode est atteinte.";
+  }
+
+  if (usage.quota.blockReason === "uploads") {
+    return "La limite d'uploads de cette periode est atteinte.";
+  }
+
+  if (usage.quota.blockReason === "assistant_messages") {
+    return "La limite de messages IA de cette periode est atteinte.";
+  }
+
+  if (
+    usage.quota.blockReason === "input_tokens" ||
+    usage.quota.blockReason === "output_tokens"
+  ) {
+    return "Le budget IA de cette periode est atteint.";
+  }
+
+  if (usage.quota.planKind === "paid") {
+    return usage.quota.subscriptionStatus === "past_due"
+      ? "Le plan Family reste actif pour l'instant, mais la facturation parent demande une verification."
+      : "Le compte travaille sur un acces Family actif pilote par un adulte payeur.";
+  }
+
+  if (usage.quota.trialEndsAt) {
+    return `Essai actif jusqu'au ${formatDateLabel(
+      usage.quota.trialEndsAt,
+      languageCode,
+    )}.`;
+  }
+
+  return "Le premier devoir fixera la date d'essai et la premiere periode d'usage.";
+}
+
+function formatBudgetLine(
+  used: number,
+  limit: number | null,
+  languageCode: UiLanguageCode,
+) {
+  const formattedUsed = formatCompactNumber(used, languageCode);
+
+  if (limit == null) {
+    return `${formattedUsed} utilises`;
+  }
+
+  return `${formattedUsed} / ${formatCompactNumber(limit, languageCode)}`;
+}
+
 export function StudentDashboardSupportGrid({
   languageCode,
   support,
@@ -97,11 +176,42 @@ export function StudentDashboardSupportGrid({
             Usage
           </p>
           <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
-            {usage.hasUsage ? "Activite suivie sur la periode courante" : "Le suivi d'usage demarre avec le premier devoir"}
+            {getUsageHeadline(usage)}
           </h2>
           <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
             {formatUsagePeriod(usage, languageCode)}
           </p>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          <StudentStatusPill
+            label={usage.quota.planKind === "paid" ? "Plan Family" : "Essai gratuit"}
+            tone={usage.quota.planKind === "paid" ? "accent" : undefined}
+          />
+          <StudentStatusPill
+            label={
+              usage.quota.accessState === "blocked"
+                ? "Bloque"
+                : usage.quota.accessState === "warning"
+                  ? "A surveiller"
+                  : "Disponible"
+            }
+            tone={
+              usage.quota.accessState === "blocked"
+                ? "warning"
+                : usage.quota.accessState === "warning"
+                  ? "accent"
+                  : undefined
+            }
+          />
+          {usage.quota.trialEndsAt ? (
+            <StudentStatusPill
+              label={`Essai jusqu'au ${formatDateLabel(
+                usage.quota.trialEndsAt,
+                languageCode,
+              )}`}
+            />
+          ) : null}
         </div>
 
         <div className="grid gap-3 sm:grid-cols-3">
@@ -110,7 +220,14 @@ export function StudentDashboardSupportGrid({
               Sessions
             </p>
             <p className="mt-3 font-[family-name:var(--font-heading)] text-3xl">
-              {formatCompactNumber(usage.sessionsCount, languageCode)}
+              {formatBudgetLine(
+                usage.sessionsCount,
+                usage.quota.sessions.limit,
+                languageCode,
+              )}
+            </p>
+            <p className="mt-2 text-sm text-[color:var(--ink-soft)]">
+              Restant: {formatCompactNumber(usage.quota.sessions.remaining ?? 0, languageCode)}
             </p>
           </article>
           <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4">
@@ -118,7 +235,14 @@ export function StudentDashboardSupportGrid({
               Uploads
             </p>
             <p className="mt-3 font-[family-name:var(--font-heading)] text-3xl">
-              {formatCompactNumber(usage.uploadsCount, languageCode)}
+              {formatBudgetLine(
+                usage.uploadsCount,
+                usage.quota.uploads.limit,
+                languageCode,
+              )}
+            </p>
+            <p className="mt-2 text-sm text-[color:var(--ink-soft)]">
+              Restant: {formatCompactNumber(usage.quota.uploads.remaining ?? 0, languageCode)}
             </p>
           </article>
           <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4">
@@ -126,15 +250,41 @@ export function StudentDashboardSupportGrid({
               Messages IA
             </p>
             <p className="mt-3 font-[family-name:var(--font-heading)] text-3xl">
-              {formatCompactNumber(usage.assistantMessageCount, languageCode)}
+              {formatBudgetLine(
+                usage.assistantMessageCount,
+                usage.quota.assistantMessages.limit,
+                languageCode,
+              )}
+            </p>
+            <p className="mt-2 text-sm text-[color:var(--ink-soft)]">
+              Restant:{" "}
+              {formatCompactNumber(
+                usage.quota.assistantMessages.remaining ?? 0,
+                languageCode,
+              )}
             </p>
           </article>
         </div>
 
-        <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-          Le produit affiche deja la consommation actuelle. Les vraies regles de
-          quota et d&apos;essai seront branchees en `A6.2` sans refaire cette surface.
-        </p>
+        <div className="grid gap-2 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4 text-sm leading-6 text-[color:var(--ink-soft)]">
+          <p>{getUsageBody(usage, languageCode)}</p>
+          <p>
+            Tokens entree:{" "}
+            {formatBudgetLine(
+              usage.inputTokens,
+              usage.quota.inputTokens.limit,
+              languageCode,
+            )}
+          </p>
+          <p>
+            Tokens sortie:{" "}
+            {formatBudgetLine(
+              usage.outputTokens,
+              usage.quota.outputTokens.limit,
+              languageCode,
+            )}
+          </p>
+        </div>
       </section>
     </div>
   );

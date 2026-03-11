@@ -39,6 +39,7 @@ The student dashboard reads one server-side snapshot object:
 - parent/tutor link counts
 - parent-approval status from `student_profiles`
 - latest usage period from `usage_counters`
+- quota and trial snapshot resolved through the server-owned usage service
 
 The page does not query Supabase directly. The service owns that logic.
 
@@ -48,12 +49,14 @@ The page does not query Supabase directly. The service owns that logic.
 
 - `ready`
 - `pending_parent_approval`
+- `quota_blocked`
 - `suspended`
 - `deletion_requested`
 
 Current rule:
 
 - under-13 students cannot start a new homework flow while `account_status` is `pending_parent_approval` or while no active parent approval is visible yet
+- quota-blocked students stay on the dashboard and `/app/new`, but cannot create a fresh session until the next period or a paying adult subscription restores access
 - suspended and deletion-requested accounts cannot start new homework
 - everyone else is `ready`
 
@@ -72,19 +75,20 @@ Current role:
 - receives the student from the dashboard CTA
 - repeats the current start-state gate
 - hosts the real intake form from [Student intake V1](student_intake_v1.md)
+- hands off into the persisted student workbench once the intake draft is validated
 
 What it does not do yet:
 
-- no binary upload persistence yet
-- no real extraction/OCR yet
-- no chat exchange yet
+- no in-dashboard billing or privacy settings yet
+- no parent/tutor management actions on the student side
+- no memory editing controls yet
 
-Those belong to the later upload and coaching phases.
+Those belong to later business and privacy phases rather than the dashboard shell itself.
 
 ## Known Boundaries
 
 - recent sessions on `/app` are intentionally short; the canonical long-form list now lives at `/app/history`
-- usage is display-only until `A6.2` adds real trial/quota enforcement
+- the student dashboard now shows the same quota state the mutation routes enforce, but the actual Family checkout still depends on Lemon Squeezy environment provisioning
 - under-13 blocking still depends on the existing parent-approval flow documented in [Invitation flows V1](invitation_flows_v1.md)
 
 ## Next Extension Points

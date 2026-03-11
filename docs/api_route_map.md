@@ -1,6 +1,6 @@
 # API Route Map
 
-Related: [README](../README.md) | [Access rules V1](access_rules_v1.md) | [Supabase schema V1](supabase_schema_v1.md) | [Invitation flows V1](invitation_flows_v1.md) | [Service interfaces](service_interfaces.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md)
+Related: [README](../README.md) | [Access rules V1](access_rules_v1.md) | [Supabase schema V1](supabase_schema_v1.md) | [Invitation flows V1](invitation_flows_v1.md) | [Oversight surfaces V1](oversight_surfaces_v1.md) | [Service interfaces](service_interfaces.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md)
 
 ## Purpose
 
@@ -15,12 +15,20 @@ Current implemented routes:
 - `POST /api/auth/parent-approval/confirm`
 - `POST /api/auth/invitations/accept`
 - `POST /api/tutor/links`
+- `POST /api/tutor/notes`
+- `PATCH /api/tutor/notes/[noteId]`
+- `DELETE /api/tutor/notes/[noteId]`
 - `GET /api/conversations`
 - `POST /api/conversations`
 - `GET /api/conversations/[conversationId]`
 - `POST /api/conversations/[conversationId]/complete`
 - `POST /api/conversations/[conversationId]/messages`
 - `PATCH /api/conversations/[conversationId]/workspace`
+- `GET /api/admin/audit/access-events`
+- `POST /api/uploads/create`
+- `POST /api/uploads/confirm`
+- `POST /api/uploads/extract`
+- `GET /api/attachments/[attachmentId]/access`
 
 It exists to prevent accidental drift between:
 
@@ -58,8 +66,8 @@ These routes reserve storage locations, confirm uploaded files, and trigger extr
 
 | Route | Method | Caller | Purpose | Notes |
 | --- | --- | --- | --- | --- |
-| `/api/uploads/create` | `POST` | student | create an upload record + signed upload target | route owns file limits and bucket choice |
-| `/api/uploads/confirm` | `POST` | student | mark upload complete and attach to conversation | validates ownership + upload metadata |
+| `/api/uploads/create` | `POST` | student | create an upload record + signed upload target | route owns file limits, bucket choice, and the upload quota gate |
+| `/api/uploads/confirm` | `POST` | student | mark upload complete and attach to conversation | validates ownership + upload metadata; provider extraction failure now returns a warning plus attachment `failed` instead of a hard route error |
 | `/api/uploads/extract` | `POST` | server-triggered or student | request text extraction for an attachment | should enqueue or async-trigger later |
 | `/api/attachments/[attachmentId]/access` | `GET` | visible role | mint short-lived read access for an attachment | required because buckets stay private |
 
@@ -70,11 +78,11 @@ These routes power the student core flow.
 | Route | Method | Caller | Purpose | Notes |
 | --- | --- | --- | --- | --- |
 | `/api/conversations` | `GET` | authenticated user | list visible conversations for the caller role | role-aware filtering required |
-| `/api/conversations` | `POST` | student | create a new conversation | creates initial conversation shell |
-| `/api/conversations/[conversationId]` | `GET` | visible role | load a conversation with messages, attachments, workspace, summaries | server-side auth check still required |
-| `/api/conversations/[conversationId]/messages` | `POST` | student | append a student message and trigger assistant response flow | current V1 reply path is deterministic server-side until `A4` |
-| `/api/conversations/[conversationId]/workspace` | `PATCH` | student | save workspace state | supports draft restoration and text-only upload references |
-| `/api/conversations/[conversationId]/complete` | `POST` | student | mark conversation complete | can trigger summary generation |
+| `/api/conversations` | `POST` | student | create a new conversation | creates initial conversation shell and enforces the session quota gate |
+| `/api/conversations/[conversationId]` | `GET` | visible role | load a conversation with messages, attachments, workspace, summaries | server-side auth check now explicitly revalidates adult links and audits parent/tutor review reads |
+| `/api/conversations/[conversationId]/messages` | `POST` | student | append a student message and trigger assistant response flow | current local workspace uses the Gemini-backed provider plus moderation, with deterministic coach fallback if the provider call fails and a quota gate before new assistant turns |
+| `/api/conversations/[conversationId]/workspace` | `PATCH` | student | save workspace state | supports draft restoration, extracted-text sync, and attachment follow-up notes |
+| `/api/conversations/[conversationId]/complete` | `POST` | student | mark conversation complete | returns only the student-visible summary; adult variants are generated best-effort and do not block student completion |
 
 ### Summaries And Memory
 
@@ -100,7 +108,8 @@ These routes manage role links and adult visibility setup.
 | `/api/tutor/links/[linkId]` | `PATCH` | tutor or parent | approve, revoke, or update tutor link | parent approval rules apply |
 | `/api/tutor/students` | `GET` | tutor | list linked students with recent status | no raw memory exposure |
 | `/api/tutor/notes` | `POST` | tutor | create private tutor note | hidden from parent and student |
-| `/api/tutor/notes/[noteId]` | `PATCH` | tutor | update or pin private tutor note | direct browser writes may still be allowed, but route stays canonical |
+| `/api/tutor/notes/[noteId]` | `PATCH` | tutor | update or pin private tutor note | route stays canonical and emits audit rows |
+| `/api/tutor/notes/[noteId]` | `DELETE` | tutor | delete private tutor note | route stays canonical and emits audit rows |
 
 Current V1 note:
 
@@ -112,9 +121,9 @@ These routes isolate provider-specific billing behavior from the rest of the app
 
 | Route | Method | Caller | Purpose | Notes |
 | --- | --- | --- | --- | --- |
-| `/api/billing/checkout` | `POST` | parent or payer | create Lemon Squeezy checkout session or redirect payload | payer authorization required |
-| `/api/billing/portal` | `POST` | parent or payer | open customer management flow | provider-specific payload stays behind service |
-| `/api/billing/webhooks/lemonsqueezy` | `POST` | Lemon Squeezy | receive subscription lifecycle webhooks | signature verification required |
+| `/api/billing/checkout` | `POST` | parent | create a Lemon Squeezy checkout redirect or JSON payload | MVP payer role is `parent`; explicit `503` when Lemon checkout config is still blank |
+| `/api/billing/portal` | `POST` | parent | open customer management flow | route may redirect directly for form submits or return JSON for scripted callers |
+| `/api/billing/webhooks/lemonsqueezy` | `POST` | Lemon Squeezy | receive subscription lifecycle webhooks | signature verification required; sync persists `subscriptions` through the billing service |
 
 ### Admin And Operations
 
@@ -125,11 +134,12 @@ These routes stay narrow and operational.
 | `/api/admin/users` | `GET` | admin | list or inspect app users | for support/debug only |
 | `/api/admin/moderation` | `GET` | admin | inspect flagged moderation events | operational surface |
 | `/api/admin/moderation/[eventId]` | `PATCH` | admin | resolve or annotate moderation event | log every action |
-| `/api/admin/audit` | `GET` | admin | inspect audit logs | paginate aggressively |
+| `/api/admin/audit` | `GET` | admin | inspect audit logs | broader audit route still remains future work |
+| `/api/admin/audit/access-events` | `GET` | admin | inspect adult review and tutor-note events | current V1 powers `/app/audit` plus the adult smoke script |
 
 ## Planned File Layout
 
-These are route targets, not implemented files yet.
+These are the canonical route targets. Several are now implemented in code, including auth, conversations, uploads, and attachment access.
 
 ```text
 app/api/auth/me/route.ts
@@ -164,6 +174,7 @@ app/api/admin/users/route.ts
 app/api/admin/moderation/route.ts
 app/api/admin/moderation/[eventId]/route.ts
 app/api/admin/audit/route.ts
+app/api/admin/audit/access-events/route.ts
 ```
 
 ## What Stays Out Of Scope For Route Handlers

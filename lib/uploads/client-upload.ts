@@ -1,0 +1,130 @@
+"use client";
+
+import type { ConversationAttachmentRecord } from "@/lib/server/ai/types";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import type { UploadSource } from "@/lib/server/uploads/constants";
+
+type UploadStepResult = {
+  attachment: ConversationAttachmentRecord;
+  extractedTextBlock: string | null;
+  warningMessage: string | null;
+};
+
+type CreateUploadResponse =
+  | {
+      ok: true;
+      data: {
+        attachment: ConversationAttachmentRecord;
+        uploadTarget: {
+          bucket: string;
+          path: string;
+          token: string;
+        };
+      };
+    }
+  | {
+      ok?: false;
+      error?: {
+        message?: string;
+      };
+    };
+
+type ConfirmUploadResponse =
+  | {
+      ok: true;
+      data: UploadStepResult;
+    }
+  | {
+      ok?: false;
+      error?: {
+        message?: string;
+      };
+    };
+
+function getResponseErrorMessage(
+  payload: CreateUploadResponse | ConfirmUploadResponse | null,
+) {
+  if (!payload || payload.ok) {
+    return null;
+  }
+
+  return payload.error?.message ?? null;
+}
+
+export async function uploadConversationFiles(input: {
+  conversationId: string;
+  files: File[];
+  uploadSource?: UploadSource;
+}) {
+  const supabase = createSupabaseBrowserClient();
+  const results: UploadStepResult[] = [];
+
+  for (const file of input.files) {
+    const createResponse = await fetch("/api/uploads/create", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        conversationId: input.conversationId,
+        originalFilename: file.name,
+        mimeType: file.type,
+        byteSize: file.size,
+        uploadSource: input.uploadSource ?? "file_picker",
+      }),
+    });
+    const createPayload = (await createResponse
+      .json()
+      .catch(() => null)) as CreateUploadResponse | null;
+
+    if (
+      !createResponse.ok ||
+      !createPayload?.ok ||
+      !createPayload.data?.uploadTarget?.token
+    ) {
+      throw new Error(
+        getResponseErrorMessage(createPayload) ??
+          `Impossible de preparer l'upload pour ${file.name}.`,
+      );
+    }
+
+    const uploadResult = await supabase.storage
+      .from(createPayload.data.uploadTarget.bucket)
+      .uploadToSignedUrl(
+        createPayload.data.uploadTarget.path,
+        createPayload.data.uploadTarget.token,
+        file,
+      );
+
+    if (uploadResult.error) {
+      throw new Error(
+        `Impossible de transferer ${file.name}: ${uploadResult.error.message}`,
+      );
+    }
+
+    const confirmResponse = await fetch("/api/uploads/confirm", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        conversationId: input.conversationId,
+        attachmentId: createPayload.data.attachment.id,
+      }),
+    });
+    const confirmPayload = (await confirmResponse
+      .json()
+      .catch(() => null)) as ConfirmUploadResponse | null;
+
+    if (!confirmResponse.ok || !confirmPayload?.ok || !confirmPayload.data) {
+      throw new Error(
+        getResponseErrorMessage(confirmPayload) ??
+          `Impossible de confirmer l'upload pour ${file.name}.`,
+      );
+    }
+
+    results.push(confirmPayload.data);
+  }
+
+  return results;
+}

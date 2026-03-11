@@ -38,17 +38,18 @@ Read these in order before any substantial implementation work:
 15. [docs/student_workbench_v1.md](docs/student_workbench_v1.md) when chat, workspace, or student coaching surfaces are in scope
 16. [docs/student_history_summary_v1.md](docs/student_history_summary_v1.md) when history, completion, or summary work is in scope
 17. [docs/invitation_flows_v1.md](docs/invitation_flows_v1.md) when auth, parent, or tutor link work is in scope
-18. [docs/service_interfaces.md](docs/service_interfaces.md)
-19. [docs/error_audit_conventions.md](docs/error_audit_conventions.md)
-20. [docs/storage_attachment_rules.md](docs/storage_attachment_rules.md)
-21. [docs/rls_fixture_verification.md](docs/rls_fixture_verification.md) when auth, schema, or RLS work is in scope
-22. [docs/sample_attachment_corpus.md](docs/sample_attachment_corpus.md) when upload, extraction, or demo fixture work is in scope
-23. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
-24. [docs/mvp_todo.md](docs/mvp_todo.md)
-25. [docs/mvp_timeline.md](docs/mvp_timeline.md)
-26. [docs/decision_log.md](docs/decision_log.md)
-27. [docs/work_sessions.md](docs/work_sessions.md)
-28. The relevant code, SQL, prompt, or UI files for the task being worked on
+18. [docs/oversight_surfaces_v1.md](docs/oversight_surfaces_v1.md) when parent, tutor, adult review, tutor-note, or admin-audit work is in scope
+19. [docs/service_interfaces.md](docs/service_interfaces.md)
+20. [docs/error_audit_conventions.md](docs/error_audit_conventions.md)
+21. [docs/storage_attachment_rules.md](docs/storage_attachment_rules.md)
+22. [docs/rls_fixture_verification.md](docs/rls_fixture_verification.md) when auth, schema, or RLS work is in scope
+23. [docs/sample_attachment_corpus.md](docs/sample_attachment_corpus.md) when upload, extraction, or demo fixture work is in scope
+24. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
+25. [docs/mvp_todo.md](docs/mvp_todo.md)
+26. [docs/mvp_timeline.md](docs/mvp_timeline.md)
+27. [docs/decision_log.md](docs/decision_log.md)
+28. [docs/work_sessions.md](docs/work_sessions.md)
+29. The relevant code, SQL, prompt, or UI files for the task being worked on
 
 If a file above is outdated, update it before or alongside the code change that depends on it.
 

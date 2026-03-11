@@ -15,7 +15,22 @@ import {
   buildInitialWorkspaceFromDraft,
   buildStudentIntentMessage,
 } from "@/lib/server/conversations/draft-coach";
-import { buildDeterministicStudentSessionSummary } from "@/lib/server/conversations/draft-summary";
+import type {
+  AiUsageSnapshot,
+  ConversationAttachmentRecord,
+} from "@/lib/server/ai/types";
+import { getAiProvider } from "@/lib/server/ai/provider";
+import { generateConversationSummaries } from "@/lib/server/summaries/service";
+import {
+  moderateAssistantOutput,
+  moderateUserInput,
+  recordModerationEvent,
+} from "@/lib/server/moderation/service";
+import {
+  assertStudentUsageActionAllowed,
+  recordStudentAiUsageBestEffort,
+  recordStudentUsageDeltaBestEffort,
+} from "@/lib/server/usage/service";
 import type {
   AppendConversationMessageInput,
   AppendConversationMessageResult,
@@ -32,6 +47,7 @@ import type {
   UpdateWorkspaceInput,
   WorkspaceStateRecord,
 } from "@/lib/server/conversations/types";
+import { loadAuthorizedConversationForViewer } from "@/lib/server/oversight/access";
 
 const CONVERSATION_SELECT =
   "id, student_user_id, created_by_user_id, title, subject_tag, status, graded_homework, assignment_text, edited_extracted_text, source_language, last_message_at, completed_at, created_at, updated_at";
@@ -39,6 +55,8 @@ const WORKSPACE_SELECT =
   "conversation_id, assignment_text, edited_extracted_text, plan_text, draft_answer_text, student_notes, updated_at";
 const MESSAGE_SELECT =
   "id, conversation_id, author_user_id, role, content_text, content_language, created_at";
+const ATTACHMENT_SELECT =
+  "id, conversation_id, uploaded_by_user_id, storage_bucket, storage_path, attachment_kind, mime_type, original_filename, byte_size, page_count, extraction_status, raw_extracted_text, source_language, metadata, created_at, updated_at";
 const SUMMARY_SELECT =
   "id, conversation_id, audience, language_code, summary_text, weakness_tags, next_step_recommendation, generated_model_name, created_at, updated_at";
 
@@ -55,6 +73,14 @@ function toServiceError(message: string, cause: unknown) {
 function normalizeText(value: string) {
   const normalized = value.trim();
   return normalized.length > 0 ? normalized : null;
+}
+
+function buildModerationSafeReply() {
+  return "Je ne peux pas continuer sur cette demande telle quelle. Reformule ton besoin sur le devoir, montre ce que tu as deja essaye, et je t'aiderai pas a pas.";
+}
+
+function buildMaskedStudentMessage() {
+  return "[message masque par la moderation]";
 }
 
 function requireBodyObject(body: unknown) {
@@ -347,6 +373,10 @@ export async function createConversationDraft(input: {
 }): Promise<CreateConversationDraftResult> {
   const appUser = requireAppUserContext(input.context);
   requireAppUserRole(appUser, ["student"]);
+  await assertStudentUsageActionAllowed({
+    studentUserId: appUser.id,
+    action: "create_conversation",
+  });
 
   const supabase = await createSupabaseServerClient();
   const now = new Date().toISOString();
@@ -442,6 +472,13 @@ export async function createConversationDraft(input: {
     // Audit failures should not block the student flow.
   }
 
+  await recordStudentUsageDeltaBestEffort({
+    studentUserId: appUser.id,
+    delta: {
+      sessions: 1,
+    },
+  });
+
   return {
     conversation,
     workspace,
@@ -520,27 +557,19 @@ export async function listVisibleConversations(input: {
 export async function loadConversationDetail(input: {
   viewer: ConversationViewer;
   conversationId: string;
+  auditContext?: {
+    action: string;
+    route: string;
+    requestId?: string;
+  };
 }): Promise<ConversationDetail> {
-  const supabase = await createSupabaseServerClient();
-  const { data: conversation, error: conversationError } = await supabase
-    .from("conversations")
-    .select(CONVERSATION_SELECT)
-    .eq("id", input.conversationId)
-    .maybeSingle<ConversationRecord>();
+  const { supabase, conversation } = await loadAuthorizedConversationForViewer({
+    viewer: input.viewer,
+    conversationId: input.conversationId,
+  });
 
-  if (conversationError) {
-    throw toServiceError("Unable to load the conversation.", conversationError);
-  }
-
-  if (!conversation) {
-    throw new AppError({
-      code: "not_found",
-      message: "Conversation not found.",
-      status: 404,
-    });
-  }
-
-  const [workspaceResult, messagesResult, summariesResult] = await Promise.all([
+  const [workspaceResult, messagesResult, attachmentsResult, summariesResult] =
+    await Promise.all([
     supabase
       .from("workspace_states")
       .select(WORKSPACE_SELECT)
@@ -549,6 +578,11 @@ export async function loadConversationDetail(input: {
     supabase
       .from("messages")
       .select(MESSAGE_SELECT)
+      .eq("conversation_id", input.conversationId)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("attachments")
+      .select(ATTACHMENT_SELECT)
       .eq("conversation_id", input.conversationId)
       .order("created_at", { ascending: true }),
     supabase
@@ -566,14 +600,43 @@ export async function loadConversationDetail(input: {
     throw toServiceError("Unable to load the conversation history.", messagesResult.error);
   }
 
+  if (attachmentsResult.error) {
+    throw toServiceError("Unable to load the conversation attachments.", attachmentsResult.error);
+  }
+
   if (summariesResult.error) {
     throw toServiceError("Unable to load the visible summaries.", summariesResult.error);
+  }
+
+  if (
+    input.auditContext &&
+    (input.viewer.role === "parent" || input.viewer.role === "tutor")
+  ) {
+    try {
+      await recordAuditEvent({
+        actorUserId: input.viewer.id,
+        actorRole: input.viewer.role,
+        action: input.auditContext.action,
+        targetTable: "conversations",
+        targetId: conversation.id,
+        studentUserId: conversation.student_user_id,
+        conversationId: conversation.id,
+        metadata: {
+          request_id: input.auditContext.requestId ?? null,
+          route: input.auditContext.route,
+        },
+        requestId: input.auditContext.requestId,
+      });
+    } catch {
+      // Audit failures should not block review reads.
+    }
   }
 
   return {
     conversation,
     workspace: workspaceResult.data ?? null,
     messages: (messagesResult.data ?? []) as ConversationMessageRecord[],
+    attachments: (attachmentsResult.data ?? []) as ConversationAttachmentRecord[],
     summaries: (summariesResult.data ?? []) as SessionSummaryRecord[],
   };
 }
@@ -599,38 +662,168 @@ export async function appendConversationTurn(input: {
     });
   }
 
-  const { data: workspace, error: workspaceError } = await supabase
-    .from("workspace_states")
-    .select(WORKSPACE_SELECT)
-    .eq("conversation_id", input.conversationId)
-    .maybeSingle<WorkspaceStateRecord>();
+  await assertStudentUsageActionAllowed({
+    studentUserId: appUser.id,
+    action: "append_message",
+  });
+
+  const [
+    { data: workspace, error: workspaceError },
+    { data: messages, error: messagesError },
+    { data: attachments, error: attachmentsError },
+  ] = await Promise.all([
+    supabase
+      .from("workspace_states")
+      .select(WORKSPACE_SELECT)
+      .eq("conversation_id", input.conversationId)
+      .maybeSingle<WorkspaceStateRecord>(),
+    supabase
+      .from("messages")
+      .select(MESSAGE_SELECT)
+      .eq("conversation_id", input.conversationId)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("attachments")
+      .select(ATTACHMENT_SELECT)
+      .eq("conversation_id", input.conversationId)
+      .order("created_at", { ascending: true }),
+  ]);
 
   if (workspaceError) {
-    throw toServiceError("Unable to load the workspace before appending a message.", workspaceError);
+    throw toServiceError(
+      "Unable to load the workspace before appending a message.",
+      workspaceError,
+    );
+  }
+
+  if (messagesError) {
+    throw toServiceError(
+      "Unable to load the message history before appending a message.",
+      messagesError,
+    );
+  }
+
+  if (attachmentsError) {
+    throw toServiceError(
+      "Unable to load the attachments before appending a message.",
+      attachmentsError,
+    );
   }
 
   const studentMessageText = buildStudentIntentMessage({
     intent: input.payload.intent,
     contentText: input.payload.contentText,
   });
-  const assistantMessageText = buildDraftAssistantReply({
-    conversation,
-    workspace: workspace ?? null,
-    intent: input.payload.intent,
-    studentMessageText,
+  const inputModeration = moderateUserInput(studentMessageText);
+
+  await recordModerationEvent({
+    source: "user_input",
+    result: inputModeration,
+    actorUserId: appUser.id,
+    actorRole: appUser.role,
+    conversationId: input.conversationId,
+    requestContext: {
+      requestId: input.requestId,
+      route: input.route,
+      actorUserId: appUser.id,
+      actorRole: appUser.role,
+      conversationId: input.conversationId,
+      studentUserId: appUser.id,
+    },
+    textPreview: studentMessageText.slice(0, 200),
   });
+
+  const aiProvider = getAiProvider();
+  const persistedStudentMessageText =
+    inputModeration.status === "blocked"
+      ? buildMaskedStudentMessage()
+      : studentMessageText;
+  let assistantMessageText = buildModerationSafeReply();
+  let providerUsage: AiUsageSnapshot | null = null;
+
+  if (inputModeration.status !== "blocked") {
+    try {
+      const aiReply = await aiProvider.generateCoachReply({
+        conversation,
+        workspace: workspace ?? null,
+        messages: (messages ?? []) as ConversationMessageRecord[],
+        attachments: (attachments ?? []) as ConversationAttachmentRecord[],
+        studentMessageText,
+        intent: input.payload.intent,
+        languageCode: appUser.ai_help_language,
+        requestContext: {
+          requestId: input.requestId,
+          route: input.route,
+          actorUserId: appUser.id,
+          actorRole: appUser.role,
+          conversationId: input.conversationId,
+          studentUserId: appUser.id,
+        },
+      });
+      providerUsage = aiReply.usage;
+      const outputModeration = moderateAssistantOutput(aiReply.replyText);
+
+      await recordModerationEvent({
+        source: "assistant_output",
+        result: outputModeration,
+        actorUserId: appUser.id,
+        actorRole: appUser.role,
+        conversationId: input.conversationId,
+        requestContext: {
+          requestId: input.requestId,
+          route: input.route,
+          actorUserId: appUser.id,
+          actorRole: appUser.role,
+          conversationId: input.conversationId,
+          studentUserId: appUser.id,
+        },
+        textPreview: aiReply.replyText.slice(0, 200),
+      });
+
+      assistantMessageText =
+        outputModeration.status === "blocked"
+          ? buildModerationSafeReply()
+          : aiReply.replyText;
+    } catch (error) {
+      assistantMessageText = buildDraftAssistantReply({
+        conversation,
+        workspace: workspace ?? null,
+        intent: input.payload.intent,
+        studentMessageText,
+      });
+
+      logRuntimeInfo({
+        message: "Fell back to deterministic coach reply",
+        requestId: input.requestId,
+        route: input.route,
+        method: "POST",
+        actorUserId: appUser.id,
+        actorRole: appUser.role,
+        targetStudentUserId: appUser.id,
+        details: {
+          conversationId: input.conversationId,
+          intent: input.payload.intent,
+          reason:
+            error instanceof Error
+              ? error.message
+              : "coach_provider_failure",
+        },
+      });
+    }
+  }
   const studentCreatedAt = new Date();
   const assistantCreatedAt = new Date(studentCreatedAt.getTime() + 1);
+  const admin = createSupabaseAdminClient();
 
-  const { data: insertedMessages, error: insertError } = await supabase
+  const { data: insertedMessages, error: insertError } = await admin
     .from("messages")
     .insert([
       {
         conversation_id: input.conversationId,
         author_user_id: appUser.id,
         role: "student",
-        content_text: studentMessageText,
-        content_language: appUser.preferred_ui_language,
+        content_text: persistedStudentMessageText,
+        content_language: appUser.ai_help_language,
         created_at: studentCreatedAt.toISOString(),
       },
       {
@@ -638,7 +831,7 @@ export async function appendConversationTurn(input: {
         author_user_id: null,
         role: "assistant",
         content_text: assistantMessageText,
-        content_language: appUser.preferred_ui_language,
+        content_language: appUser.ai_help_language,
         created_at: assistantCreatedAt.toISOString(),
       },
     ])
@@ -663,7 +856,7 @@ export async function appendConversationTurn(input: {
     });
   }
 
-  const { error: conversationUpdateError } = await supabase
+  const { error: conversationUpdateError } = await admin
     .from("conversations")
     .update({
       last_message_at: assistantCreatedAt.toISOString(),
@@ -689,6 +882,17 @@ export async function appendConversationTurn(input: {
       conversationId: input.conversationId,
       intent: input.payload.intent,
     },
+  });
+
+  await recordStudentUsageDeltaBestEffort({
+    studentUserId: appUser.id,
+    delta: {
+      assistantMessages: 1,
+    },
+  });
+  await recordStudentAiUsageBestEffort({
+    studentUserId: appUser.id,
+    usage: providerUsage,
   });
 
   return {
@@ -770,59 +974,6 @@ export async function updateWorkspaceState(input: {
   return workspace;
 }
 
-async function upsertStudentSummary(input: {
-  conversation: ConversationRecord;
-  workspace: WorkspaceStateRecord | null;
-  messages: ConversationMessageRecord[];
-  languageCode: ConversationViewer["preferred_ui_language"];
-}) {
-  const supabase = createSupabaseAdminClient();
-  const summaryPayload = buildDeterministicStudentSessionSummary({
-    conversation: input.conversation,
-    workspace: input.workspace,
-    messages: input.messages,
-    languageCode: input.languageCode,
-  });
-
-  const { data, error } = await supabase
-    .from("session_summaries")
-    .upsert(
-      {
-        conversation_id: input.conversation.id,
-        audience: "student",
-        ...summaryPayload,
-      },
-      {
-        onConflict: "conversation_id,audience,language_code",
-      },
-    )
-    .select(SUMMARY_SELECT)
-    .single<SessionSummaryRecord>();
-
-  if (error) {
-    throw toServiceError("Unable to persist the student summary.", error);
-  }
-
-  return data;
-}
-
-function mergeSummaryRecord(
-  summaries: SessionSummaryRecord[],
-  nextSummary: SessionSummaryRecord,
-) {
-  const remaining = summaries.filter(
-    (summary) =>
-      !(
-        summary.audience === nextSummary.audience &&
-        summary.language_code === nextSummary.language_code
-      ),
-  );
-
-  return [nextSummary, ...remaining].sort((left, right) =>
-    right.created_at.localeCompare(left.created_at),
-  );
-}
-
 export async function completeConversation(input: {
   context: AuthenticatedUserContext;
   conversationId: string;
@@ -843,7 +994,7 @@ export async function completeConversation(input: {
     });
   }
 
-  const [workspaceResult, messagesResult, summariesResult] = await Promise.all([
+  const [workspaceResult, messagesResult, attachmentsResult] = await Promise.all([
     supabase
       .from("workspace_states")
       .select(WORKSPACE_SELECT)
@@ -855,10 +1006,10 @@ export async function completeConversation(input: {
       .eq("conversation_id", input.conversationId)
       .order("created_at", { ascending: true }),
     supabase
-      .from("session_summaries")
-      .select(SUMMARY_SELECT)
+      .from("attachments")
+      .select(ATTACHMENT_SELECT)
       .eq("conversation_id", input.conversationId)
-      .order("created_at", { ascending: false }),
+      .order("created_at", { ascending: true }),
   ]);
 
   if (workspaceResult.error) {
@@ -869,8 +1020,11 @@ export async function completeConversation(input: {
     throw toServiceError("Unable to load conversation messages before completion.", messagesResult.error);
   }
 
-  if (summariesResult.error) {
-    throw toServiceError("Unable to load existing summaries before completion.", summariesResult.error);
+  if (attachmentsResult.error) {
+    throw toServiceError(
+      "Unable to load existing attachments before completion.",
+      attachmentsResult.error,
+    );
   }
 
   const now = new Date().toISOString();
@@ -895,16 +1049,18 @@ export async function completeConversation(input: {
     completedConversation = data;
   }
 
-  const studentSummary = await upsertStudentSummary({
+  const summaries = await generateConversationSummaries({
+    requestId: input.requestId,
+    route: input.route,
+    appUser,
     conversation: completedConversation,
     workspace: workspaceResult.data ?? null,
     messages: (messagesResult.data ?? []) as ConversationMessageRecord[],
-    languageCode: appUser.preferred_ui_language,
+    attachments: (attachmentsResult.data ?? []) as ConversationAttachmentRecord[],
   });
-  const summaries = mergeSummaryRecord(
-    (summariesResult.data ?? []) as SessionSummaryRecord[],
-    studentSummary,
-  );
+  const studentSummary =
+    summaries.find((summary) => summary.audience === "student") ?? null;
+  const visibleSummaries = studentSummary ? [studentSummary] : [];
 
   logRuntimeInfo({
     message: "Completed conversation",
@@ -916,7 +1072,8 @@ export async function completeConversation(input: {
     targetStudentUserId: appUser.id,
     details: {
       conversationId: input.conversationId,
-      summaryAudience: studentSummary.audience,
+      summaryAudience: studentSummary?.audience ?? "student",
+      summaryCount: summaries.length,
     },
   });
 
@@ -932,7 +1089,7 @@ export async function completeConversation(input: {
       metadata: {
         request_id: input.requestId,
         route: input.route,
-        summary_audience: studentSummary.audience,
+        summary_audience: studentSummary?.audience ?? "student",
       },
       requestId: input.requestId,
     });
@@ -942,6 +1099,6 @@ export async function completeConversation(input: {
 
   return {
     conversation: completedConversation,
-    summaries,
+    summaries: visibleSummaries,
   };
 }

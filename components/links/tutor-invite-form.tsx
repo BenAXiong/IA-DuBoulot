@@ -20,7 +20,13 @@ function getFieldError(
   return fieldErrors[fieldName] ?? null;
 }
 
-export function TutorInviteForm() {
+type TutorInviteFormProps = {
+  studentUserId?: string | null;
+};
+
+export function TutorInviteForm({
+  studentUserId = null,
+}: TutorInviteFormProps) {
   const [tutorEmail, setTutorEmail] = useState("");
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -52,6 +58,7 @@ export function TutorInviteForm() {
           "content-type": "application/json",
         },
         body: JSON.stringify({
+          studentUserId,
           tutorEmail,
         }),
       });

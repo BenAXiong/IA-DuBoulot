@@ -21,18 +21,18 @@ const navByRole: Record<AppUserRecord["role"], NavItem[]> = {
     { href: "/app#account", label: "Compte", hint: "profil et preferences" },
   ],
   parent: [
-    { href: "/app#overview", label: "Overview", hint: "vision generale" },
+    { href: "/app", label: "Overview", hint: "vision generale" },
     { href: "/app#students", label: "Eleves", hint: "liens et supervision" },
     { href: "/app#account", label: "Compte", hint: "preferences" },
   ],
   tutor: [
-    { href: "/app#overview", label: "Overview", hint: "surface tuteur" },
-    { href: "/app#links", label: "Liens", hint: "etat des invitations" },
+    { href: "/app", label: "Overview", hint: "surface tuteur" },
+    { href: "/app#students", label: "Eleves", hint: "sessions et notes" },
     { href: "/app#account", label: "Compte", hint: "preferences" },
   ],
   admin: [
-    { href: "/app#overview", label: "Overview", hint: "etat global" },
-    { href: "/app#operations", label: "Ops", hint: "schema et moderation" },
+    { href: "/app", label: "Overview", hint: "etat global" },
+    { href: "/app/audit", label: "Audit", hint: "lectures sensibles" },
     { href: "/app#account", label: "Compte", hint: "profil admin" },
   ],
 };

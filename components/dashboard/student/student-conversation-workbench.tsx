@@ -2,16 +2,13 @@
 
 import Link from "next/link";
 import { useRef, useState, useTransition } from "react";
-import {
-  formatBytes,
-  INTAKE_ACCEPT_ATTR,
-  stageIntakeFiles,
-} from "@/lib/intake/intake-config";
+import { INTAKE_ACCEPT_ATTR, stageIntakeFiles } from "@/lib/intake/intake-config";
 import { StudentStatusPill } from "@/components/dashboard/student/student-status-pill";
 import {
   formatDateLabel,
   getConversationStatusLabel,
 } from "@/components/dashboard/student/student-dashboard-presenters";
+import { StudentAttachmentList } from "@/components/dashboard/student/student-attachment-list";
 import { StudentChatThread } from "@/components/dashboard/student/student-chat-thread";
 import { StudentConversationComposer } from "@/components/dashboard/student/student-conversation-composer";
 import { StudentSessionSummaryPanel } from "@/components/dashboard/student/student-session-summary-panel";
@@ -19,6 +16,7 @@ import {
   StudentWorkspacePanel,
   type WorkspaceDraftState,
 } from "@/components/dashboard/student/student-workspace-panel";
+import type { ConversationAttachmentRecord } from "@/lib/server/ai/types";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type {
   ConversationDetail,
@@ -26,6 +24,7 @@ import type {
   ConversationRecord,
   SessionSummaryRecord,
 } from "@/lib/server/conversations/types";
+import { uploadConversationFiles } from "@/lib/uploads/client-upload";
 
 type StudentConversationWorkbenchProps = {
   detail: ConversationDetail;
@@ -76,6 +75,22 @@ type CompleteRouteResponse =
       };
     };
 
+type RetryExtractionResponse =
+  | {
+      ok: true;
+      data: {
+        attachment: ConversationAttachmentRecord;
+        extractedTextBlock: string | null;
+        warningMessage: string | null;
+      };
+    }
+  | {
+      ok?: false;
+      error?: {
+        message?: string;
+      };
+    };
+
 function buildInitialWorkspace(detail: ConversationDetail): WorkspaceDraftState {
   return {
     assignmentText:
@@ -96,6 +111,7 @@ export function StudentConversationWorkbench({
 }: StudentConversationWorkbenchProps) {
   const [conversation, setConversation] = useState(detail.conversation);
   const [messages, setMessages] = useState(detail.messages);
+  const [attachments, setAttachments] = useState(detail.attachments);
   const [summaries, setSummaries] = useState(detail.summaries);
   const [workspace, setWorkspace] = useState<WorkspaceDraftState>(
     buildInitialWorkspace(detail),
@@ -108,6 +124,7 @@ export function StudentConversationWorkbench({
   const [completionError, setCompletionError] = useState<string | null>(null);
   const [isSending, startSending] = useTransition();
   const [isSaving, startSaving] = useTransition();
+  const [isUploading, startUploading] = useTransition();
   const [isCompleting, startCompleting] = useTransition();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const isReadOnly = conversation.status !== "active";
@@ -164,7 +181,43 @@ export function StudentConversationWorkbench({
     });
   }
 
-  function appendUploadReferencesToWorkspace(files: File[]) {
+  async function persistWorkspace(nextWorkspace: WorkspaceDraftState) {
+    const response = await fetch(`/api/conversations/${conversation.id}/workspace`, {
+      method: "PATCH",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(nextWorkspace),
+    });
+
+    const payload = (await response
+      .json()
+      .catch(() => null)) as WorkspaceRouteResponse | null;
+    const routeErrorMessage =
+      payload && "error" in payload ? payload.error?.message : null;
+
+    if (!response.ok || !payload?.ok || !payload.data?.workspace) {
+      throw new Error(
+        routeErrorMessage ?? "Impossible de sauvegarder l'espace de travail.",
+      );
+    }
+
+    const persistedWorkspace = {
+      assignmentText: payload.data.workspace.assignment_text ?? "",
+      editedExtractedText: payload.data.workspace.edited_extracted_text ?? "",
+      planText: payload.data.workspace.plan_text ?? "",
+      draftAnswerText: payload.data.workspace.draft_answer_text ?? "",
+      studentNotes: payload.data.workspace.student_notes ?? "",
+    };
+
+    setWorkspace(persistedWorkspace);
+    return persistedWorkspace;
+  }
+
+  function handleUploadReferencePick(event: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(event.target.files ?? []);
+    event.target.value = "";
+
     if (files.length === 0) {
       return;
     }
@@ -182,30 +235,55 @@ export function StudentConversationWorkbench({
       return;
     }
 
-    const lines = staged.acceptedFiles.map((file) => {
-      const kindLabel = file.category === "pdf" ? "PDF" : "image/capture";
-      return `- ${file.file.name} (${kindLabel}, ${formatBytes(file.file.size)})`;
+    startUploading(async () => {
+      try {
+        const results = await uploadConversationFiles({
+          conversationId: conversation.id,
+          files: staged.acceptedFiles.map((file) => file.file),
+        });
+        const nextAttachments = [...attachments];
+
+        for (const result of results) {
+          nextAttachments.push(result.attachment);
+        }
+
+        setAttachments(nextAttachments);
+
+        const extractedBlocks = results
+          .map((result) => result.extractedTextBlock)
+          .filter((value): value is string => Boolean(value));
+        const warningMessages = results
+          .map((result) => result.warningMessage)
+          .filter((value): value is string => Boolean(value));
+        const nextWorkspace: WorkspaceDraftState = {
+          ...workspace,
+          editedExtractedText:
+            extractedBlocks.length > 0
+              ? [workspace.editedExtractedText.trim(), ...extractedBlocks]
+                  .filter(Boolean)
+                  .join("\n\n")
+              : workspace.editedExtractedText,
+          studentNotes:
+            warningMessages.length > 0
+              ? [workspace.studentNotes.trim(), ...warningMessages]
+                  .filter(Boolean)
+                  .join("\n")
+              : workspace.studentNotes,
+        };
+
+        await persistWorkspace(nextWorkspace);
+        setWorkspaceMessage(
+          "Piece jointe confirmee et texte extrait synchronise dans l'espace de travail.",
+        );
+        setWorkspaceError(null);
+      } catch (error) {
+        setWorkspaceError(
+          error instanceof Error
+            ? error.message
+            : "Impossible d'ajouter cette piece jointe.",
+        );
+      }
     });
-    const block = [
-      "References ajoutees depuis la session:",
-      ...lines,
-    ].join("\n");
-
-    setWorkspace((currentWorkspace) => ({
-      ...currentWorkspace,
-      studentNotes: currentWorkspace.studentNotes.trim().length > 0
-        ? `${currentWorkspace.studentNotes.trim()}\n\n${block}`
-        : block,
-    }));
-    setWorkspaceMessage(
-      "References de fichiers ajoutees dans les notes. Sauvegarde l'espace pour les rendre durables.",
-    );
-    setWorkspaceError(null);
-  }
-
-  function handleUploadReferencePick(event: React.ChangeEvent<HTMLInputElement>) {
-    appendUploadReferencesToWorkspace(Array.from(event.target.files ?? []));
-    event.target.value = "";
   }
 
   function saveWorkspace() {
@@ -213,38 +291,16 @@ export function StudentConversationWorkbench({
     setWorkspaceMessage(null);
 
     startSaving(async () => {
-      const response = await fetch(
-        `/api/conversations/${conversation.id}/workspace`,
-        {
-          method: "PATCH",
-          headers: {
-            "content-type": "application/json",
-          },
-          body: JSON.stringify(workspace),
-        },
-      );
-
-      const payload = (await response
-        .json()
-        .catch(() => null)) as WorkspaceRouteResponse | null;
-      const routeErrorMessage =
-        payload && "error" in payload ? payload.error?.message : null;
-
-      if (!response.ok || !payload?.ok || !payload.data?.workspace) {
+      try {
+        await persistWorkspace(workspace);
+        setWorkspaceMessage("Espace de travail sauvegarde.");
+      } catch (error) {
         setWorkspaceError(
-          routeErrorMessage ?? "Impossible de sauvegarder l'espace de travail.",
+          error instanceof Error
+            ? error.message
+            : "Impossible de sauvegarder l'espace de travail.",
         );
-        return;
       }
-
-      setWorkspace({
-        assignmentText: payload.data.workspace.assignment_text ?? "",
-        editedExtractedText: payload.data.workspace.edited_extracted_text ?? "",
-        planText: payload.data.workspace.plan_text ?? "",
-        draftAnswerText: payload.data.workspace.draft_answer_text ?? "",
-        studentNotes: payload.data.workspace.student_notes ?? "",
-      });
-      setWorkspaceMessage("Espace de travail sauvegarde.");
     });
   }
 
@@ -281,6 +337,61 @@ export function StudentConversationWorkbench({
     });
   }
 
+  function retryAttachmentExtraction(attachmentId: string) {
+    setWorkspaceError(null);
+    setWorkspaceMessage(null);
+
+    startUploading(async () => {
+      const response = await fetch("/api/uploads/extract", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          conversationId: conversation.id,
+          attachmentId,
+        }),
+      });
+      const payload = (await response
+        .json()
+        .catch(() => null)) as RetryExtractionResponse | null;
+      const routeErrorMessage =
+        payload && "error" in payload ? payload.error?.message : null;
+
+      if (!response.ok || !payload?.ok || !payload.data?.attachment) {
+        setWorkspaceError(
+          routeErrorMessage ?? "Impossible de relancer l'extraction.",
+        );
+        return;
+      }
+
+      setAttachments((currentAttachments) =>
+        currentAttachments.map((attachment) =>
+          attachment.id === attachmentId ? payload.data.attachment : attachment,
+        ),
+      );
+      setWorkspace((currentWorkspace) => ({
+        ...currentWorkspace,
+        editedExtractedText:
+          payload.data.extractedTextBlock &&
+          !currentWorkspace.editedExtractedText.includes(
+            payload.data.extractedTextBlock,
+          )
+            ? [
+                currentWorkspace.editedExtractedText.trim(),
+                payload.data.extractedTextBlock,
+              ]
+                .filter(Boolean)
+                .join("\n\n")
+            : currentWorkspace.editedExtractedText,
+      }));
+      setWorkspaceMessage(
+        payload.data.warningMessage ??
+          "Extraction relancee. Pense a sauvegarder si le texte a change.",
+      );
+    });
+  }
+
   return (
     <div className="grid gap-6">
       <input
@@ -312,9 +423,9 @@ export function StudentConversationWorkbench({
               {conversation.title}
             </h1>
             <p className="text-sm leading-7 text-[color:var(--ink-soft)]">
-              La session garde maintenant un transcript reel, des actions
-              d&apos;indice et de resume, puis une vraie cloture avec resume
-              persiste avant l&apos;arrivee du moteur IA.
+              La session garde maintenant un transcript reel, des pieces jointes
+              durables, un texte extrait revu, et un coaching IA centre sur la
+              demarche.
             </p>
           </div>
         </article>
@@ -369,17 +480,23 @@ export function StudentConversationWorkbench({
             <StudentConversationComposer
               composerText={composerText}
               disabled={isReadOnly}
-              isSending={isSending}
+              isSending={isSending || isUploading}
               onComposerTextChange={setComposerText}
               onRequestHint={() => sendMessage("hint")}
               onRequestSummary={() => sendMessage("summarize")}
               onSendMessage={() => sendMessage("student_message")}
-              onUploadReferences={() => fileInputRef.current?.click()}
+              onUploadAttachments={() => fileInputRef.current?.click()}
             />
 
             {chatError ? (
               <p className="rounded-[1.25rem] border border-[#d07c5b] bg-[#fff0ea] px-4 py-3 text-sm leading-6 text-[#8d3b1f]">
                 {chatError}
+              </p>
+            ) : null}
+
+            {isUploading ? (
+              <p className="rounded-[1.25rem] border border-[color:var(--line)] bg-white px-4 py-3 text-sm leading-6 text-[color:var(--ink-soft)]">
+                Upload et extraction en cours...
               </p>
             ) : null}
 
@@ -402,9 +519,26 @@ export function StudentConversationWorkbench({
             summary={studentSummary}
           />
 
+          <aside className="grid gap-4 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]">
+            <div className="space-y-3">
+              <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
+                Pieces jointes
+              </p>
+              <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
+                Fichiers prives et statut d&apos;extraction
+              </h2>
+            </div>
+
+            <StudentAttachmentList
+              attachments={attachments}
+              disabled={isUploading || isReadOnly}
+              onRetryExtraction={retryAttachmentExtraction}
+            />
+          </aside>
+
           <StudentWorkspacePanel
             disabled={isReadOnly}
-            isSaving={isSaving}
+            isSaving={isSaving || isUploading}
             onSaveWorkspace={saveWorkspace}
             onWorkspaceChange={setWorkspace}
             saveMessage={workspaceError ?? workspaceMessage}

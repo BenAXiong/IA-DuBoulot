@@ -9,9 +9,13 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "seed:rls-fixtures": "node --env-file=.env.local scripts/seed-rls-fixtures.mjs",
-    "verify:rls-fixtures": "node --env-file=.env.local scripts/verify-rls-fixtures.mjs"
+    "verify:rls-fixtures": "node --env-file=.env.local scripts/verify-rls-fixtures.mjs",
+    "smoke:student-flow": "node --env-file=.env.local scripts/smoke-student-flow.mjs",
+    "smoke:adult-oversight": "node --env-file=.env.local scripts/smoke-adult-oversight.mjs",
+    "smoke:billing": "node --env-file=.env.local scripts/smoke-billing-webhook.mjs"
   },
   "dependencies": {
+    "@google/genai": "^1.44.0",
     "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.57.4",
     "next": "16.1.6",

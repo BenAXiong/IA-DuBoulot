@@ -8,10 +8,12 @@ import {
   buildExtractionDraftSeed,
   INTAKE_ACCEPT_ATTR,
   INTAKE_SUBJECT_OPTIONS,
+  isProvisionalExtractionDraft,
   stageIntakeFiles,
   type StagedIntakeFile,
 } from "@/lib/intake/intake-config";
 import type { StudentDashboardSnapshot } from "@/lib/server/student-dashboard/types";
+import { uploadConversationFiles } from "@/lib/uploads/client-upload";
 
 type NewHomeworkIntakeFormProps = {
   snapshot: StudentDashboardSnapshot;
@@ -31,6 +33,31 @@ type CreateConversationResponse =
         fieldErrors?: Record<string, string>;
       };
     };
+
+type WorkspaceRouteResponse =
+  | {
+      ok: true;
+      data: {
+        workspace: {
+          assignment_text: string | null;
+          edited_extracted_text: string | null;
+        };
+      };
+    }
+  | {
+      ok?: false;
+      error?: {
+        message?: string;
+      };
+    };
+
+function getWorkspaceRouteErrorMessage(payload: WorkspaceRouteResponse | null) {
+  if (!payload || payload.ok) {
+    return null;
+  }
+
+  return payload.error?.message ?? null;
+}
 
 function getResolvedSubjectTag(subjectChoice: string, customSubject: string) {
   if (subjectChoice === "autre") {
@@ -177,11 +204,7 @@ export function NewHomeworkIntakeForm({
           gradedHomework,
           pastedText,
           editedExtractedText: extractionDraft,
-          attachmentReferences: files.map((file) => ({
-            name: file.file.name,
-            category: file.category,
-            byteSize: file.file.size,
-          })),
+          attachmentReferences: [],
         }),
       });
 
@@ -199,7 +222,71 @@ export function NewHomeworkIntakeForm({
         return;
       }
 
-      setReviewMessage("Brouillon persiste. Redirection vers la session...");
+      try {
+        const uploadResults =
+          files.length > 0
+            ? await uploadConversationFiles({
+                conversationId: payload.data.conversationId,
+                files: files.map((file) => file.file),
+              })
+            : [];
+        const extractedBlocks = uploadResults
+          .map((result) => result.extractedTextBlock)
+          .filter((value): value is string => Boolean(value));
+        const warningMessages = uploadResults
+          .map((result) => result.warningMessage)
+          .filter((value): value is string => Boolean(value));
+        const baseExtractionDraft = extractionDraft.trim();
+        const mergedExtractionDraft =
+          extractedBlocks.length === 0
+            ? baseExtractionDraft
+            : !baseExtractionDraft || isProvisionalExtractionDraft(baseExtractionDraft)
+              ? extractedBlocks.join("\n\n")
+              : [baseExtractionDraft, ...extractedBlocks].join("\n\n");
+
+        if (mergedExtractionDraft !== extractionDraft.trim()) {
+          const workspaceResponse = await fetch(
+            `/api/conversations/${payload.data.conversationId}/workspace`,
+            {
+              method: "PATCH",
+              headers: {
+                "content-type": "application/json",
+              },
+              body: JSON.stringify({
+                assignmentText: pastedText,
+                editedExtractedText: mergedExtractionDraft,
+                planText: "",
+                draftAnswerText: "",
+                studentNotes: warningMessages.join("\n"),
+              }),
+            },
+          );
+          const workspacePayload = (await workspaceResponse
+            .json()
+            .catch(() => null)) as WorkspaceRouteResponse | null;
+
+          if (!workspaceResponse.ok || !workspacePayload?.ok) {
+            throw new Error(
+              getWorkspaceRouteErrorMessage(workspacePayload) ??
+                "La session a ete creee mais le texte extrait n'a pas pu etre synchronise.",
+            );
+          }
+        }
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "La session a ete creee, mais les pieces jointes n'ont pas toutes ete confirmees.";
+        setErrorMessage(message);
+        setReviewMessage(
+          "Le brouillon existe deja. Tu peux reprendre la session et relancer les pieces dans le chat.",
+        );
+        router.push(`/app/conversations/${payload.data.conversationId}`);
+        router.refresh();
+        return;
+      }
+
+      setReviewMessage("Session creee et pieces analysees. Redirection...");
       router.push(`/app/conversations/${payload.data.conversationId}`);
       router.refresh();
     });
@@ -276,9 +363,8 @@ export function NewHomeworkIntakeForm({
             <div className="space-y-2">
               <p className="text-sm font-medium">Fichiers autorises</p>
               <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-                Images, captures d&apos;ecran et PDF sont stages ici cote client.
-                L&apos;upload serveur et la confirmation arrivent avec `A3.3` et
-                les routes `/api/uploads/...`.
+                Images, captures d&apos;ecran et PDF sont verifies ici puis
+                transferes et analyses pendant la creation de session.
               </p>
             </div>
 
@@ -335,9 +421,8 @@ export function NewHomeworkIntakeForm({
                 Relis, corrige, puis laisse un texte propre a transmettre au chat.
               </h2>
               <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-                Aujourd&apos;hui le brouillon vient du texte colle ou d&apos;un
-                gabarit de transcription manuelle. Le vrai pipeline OCR et PDF
-                arrive plus tard en `A4.3`.
+                Le brouillon peut venir du texte colle, d&apos;une correction
+                manuelle, ou des pieces qui seront analysees a la creation.
               </p>
             </div>
 
@@ -370,7 +455,7 @@ export function NewHomeworkIntakeForm({
               {isSubmitting ? "Creation..." : "Creer la session"}
             </button>
             <span className="inline-flex items-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-2 text-sm text-[color:var(--ink-soft)]">
-              Le brouillon sera persiste dans `conversations` et `workspace_states`
+              La session sera persistee puis les pieces seront uploadees et extraites
             </span>
           </div>
 

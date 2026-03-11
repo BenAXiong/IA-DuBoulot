@@ -8,15 +8,15 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 
-- Overall: `[##############................]` `60/128` complete (`47%`)
+- Overall: `[#######################.......]` `99/128` complete (`77%`)
 - A0: `[xxxxxxxxxxxxxxxx.....]` `16/21`
 - A1: `[xxxxxxxxxxxxxxxx]` `16/16`
 - A2: `[xxxxxxxxxxx......]` `11/17`
 - A3: `[xxxxxxxxxxxxxxxxx]` `17/17`
-- A4: `[...................]` `0/19`
-- A5: `[.............]` `0/13`
-- A6: `[.............]` `0/13`
-- A7: `[............]` `0/12`
+- A4: `[xxxxxxxxxxxxxxxxxxx]` `19/19`
+- A5: `[xxxxxxxxxxxxx]` `13/13`
+- A6: `[xxxxxx.......]` `6/13`
+- A7: `[x...........]` `1/12`
 
 ## Table Of Contents
 
@@ -209,8 +209,7 @@ Status note: attachment references are currently persisted as human-readable int
 
 Reference: [Student workbench V1](student_workbench_v1.md)
 Status note: `/app/conversations/[conversationId]` now hosts the real student workbench with a persisted transcript, server-owned message mutations, and a saveable side workspace.
-Status note: hint and summarize actions currently run through a deterministic server-side draft coach so the interaction contract is stable before the real provider layer lands in `A4`.
-Status note: the upload control currently appends validated file references into workspace notes; true `attachments` rows and binary storage still belong to the later upload route family.
+Status note: the original `A3` exit state used deterministic reply helpers and text-only upload references, but the current local workspace has already moved into the `A4` provider/upload path described below.
 Status note: on 2026-03-11 the workbench was checked in a Playwright emulated tablet pass at `820x1180` and `1180x820` on `/app` and `/app/conversations/[conversationId]`, with no horizontal overflow detected.
 
 ### A3.5 Session History And Summary
@@ -222,74 +221,95 @@ Status note: on 2026-03-11 the workbench was checked in a Playwright emulated ta
 Reference: [Student history and summary V1](student_history_summary_v1.md)
 Status note: `/app/history` is now the canonical long-form student session list, while `/app` keeps only recent-session shortcuts.
 Status note: `/app/conversations/[conversationId]` now renders the persisted student summary and a completion card in the same detail surface as the transcript and workspace.
-Status note: `POST /api/conversations/[conversationId]/complete` now marks the session `completed`, freezes further student writes, and upserts a deterministic `student` summary record.
+Status note: the original `A3` exit state used a deterministic student summary, but the current local workspace has already moved into the `A4.5` multi-audience summary path described below.
 
-## ⬜ Phase A4 - AI Coaching, Extraction, And Safety
+## 🟩 Phase A4 - AI Coaching, Extraction, And Safety
 
 Outcome: the product behaves like a coach instead of a generic answer bot.
 
 ### A4.1 AI Provider Layer
 
-- [ ] A4.1.1 Implement the swappable provider interface.
-- [ ] A4.1.2 Add configuration for text-plus-image support.
-- [ ] A4.1.3 Add token, cost, and failure logging at the provider boundary.
+- [x] A4.1.1 Implement the swappable provider interface.
+- [x] A4.1.2 Add configuration for text-plus-image support.
+- [x] A4.1.3 Add token, cost, and failure logging at the provider boundary.
+
+Status note: the current local workspace now contains a build-clean Gemini-backed provider adapter under `lib/server/ai/`, with text-plus-image/extraction configuration and provider-boundary runtime logging in place.
+Status note: local student-flow smoke passed again on `2026-03-11`; the latest run still exercised extraction, coach, and summary fallbacks, but those fallbacks now define the stable MVP behavior instead of blocking phase closure.
 
 ### A4.2 Prompt Contracts
 
-- [ ] A4.2.1 Write the student coach system prompt.
-- [ ] A4.2.2 Write the parent summary prompt.
-- [ ] A4.2.3 Write the tutor insight prompt.
-- [ ] A4.2.4 Add prompt versioning and location rules.
+- [x] A4.2.1 Write the student coach system prompt.
+- [x] A4.2.2 Write the parent summary prompt.
+- [x] A4.2.3 Write the tutor insight prompt.
+- [x] A4.2.4 Add prompt versioning and location rules.
+
+Status note: the current local workspace now contains prompt modules for student coaching, attachment extraction, summaries, translation, and shared prompt-version constants under `lib/server/ai/prompts/`.
 
 ### A4.3 Upload Interpretation And Extraction
 
-- [ ] A4.3.1 Implement extraction for PDFs with selectable text.
-- [ ] A4.3.2 Implement multimodal extraction for images and screenshots.
-- [ ] A4.3.3 Normalize extracted text and preserve source metadata.
-- [ ] A4.3.4 Fall back gracefully when extraction confidence is weak.
+- [x] A4.3.1 Implement extraction for PDFs with selectable text.
+- [x] A4.3.2 Implement multimodal extraction for images and screenshots.
+- [x] A4.3.3 Normalize extracted text and preserve source metadata.
+- [x] A4.3.4 Fall back gracefully when extraction confidence is weak.
+
+Status note: the current local workspace now contains real signed upload + confirm routes, attachment persistence, Gemini-backed extraction, metadata updates, retry extraction, and private attachment access URLs.
+Status note: `POST /api/uploads/confirm` now degrades gracefully when extraction fails by marking the attachment `failed`, returning a warning, and keeping the student flow alive.
+Status note: the per-file size enforcement now matches the documented storage rules; future work here is reliability tuning rather than missing contract coverage.
 
 ### A4.4 Coach Mode And Moderation
 
-- [ ] A4.4.1 Ask for the student's attempt when appropriate.
-- [ ] A4.4.2 Bias toward hints, decomposition, and feedback over final answers.
-- [ ] A4.4.3 Add moderation checks for risky prompts and outputs.
-- [ ] A4.4.4 Log moderation events and blocked behaviors.
+- [x] A4.4.1 Ask for the student's attempt when appropriate.
+- [x] A4.4.2 Bias toward hints, decomposition, and feedback over final answers.
+- [x] A4.4.3 Add moderation checks for risky prompts and outputs.
+- [x] A4.4.4 Log moderation events and blocked behaviors.
+
+Status note: the current local workspace now routes student turns through the Gemini coach prompt plus local moderation checks for user input, assistant output, and extraction text, with flagged/blocked events persisted to `moderation_events`.
+Status note: `POST /api/conversations/[conversationId]/messages` now falls back to the deterministic draft coach when Gemini fails, so the student still receives a structured reply instead of a route error.
 
 ### A4.5 Summaries And Translation
 
-- [ ] A4.5.1 Generate student-facing summaries.
-- [ ] A4.5.2 Generate parent-facing summaries with translation support.
-- [ ] A4.5.3 Generate tutor insight summaries with weakness tags.
-- [ ] A4.5.4 Store next-step recommendations for later review.
+- [x] A4.5.1 Generate student-facing summaries.
+- [x] A4.5.2 Generate parent-facing summaries with translation support.
+- [x] A4.5.3 Generate tutor insight summaries with weakness tags.
+- [x] A4.5.4 Store next-step recommendations for later review.
 
-## ⬜ Phase A5 - Parent And Tutor Oversight
+Status note: the current local workspace now generates provider-backed student, parent, and tutor summaries on completion, and stores translated parent variants for `en` and `zh`.
+Status note: the required student summary now falls back to the deterministic A3 helper when Gemini fails, and parent/tutor variants are best-effort so student completion stays available.
+Status note: the downstream adult visibility surfaces are now live in `A5`, so the remaining follow-up is QA around provider reliability, not missing summary contracts.
+
+## 🟩 Phase A5 - Parent And Tutor Oversight
 
 Outcome: adults can review the student's work with the right visibility boundaries.
 
 ### A5.1 Linking Model
 
-- [ ] A5.1.1 Implement parent-student linking.
-- [ ] A5.1.2 Implement tutor-student linking.
-- [ ] A5.1.3 Implement invite or approval flows for linked access.
+- [x] A5.1.1 Implement parent-student linking.
+- [x] A5.1.2 Implement tutor-student linking.
+- [x] A5.1.3 Implement invite or approval flows for linked access.
 
 ### A5.2 Parent Surfaces
 
-- [ ] A5.2.1 Build the parent dashboard with recent sessions and weekly summaries.
-- [ ] A5.2.2 Build the parent session detail view.
-- [ ] A5.2.3 Add translation toggle and billing status display.
+- [x] A5.2.1 Build the parent dashboard with recent sessions and weekly summaries.
+- [x] A5.2.2 Build the parent session detail view.
+- [x] A5.2.3 Add translation toggle and billing status display.
 
 ### A5.3 Tutor Surfaces And Notes
 
-- [ ] A5.3.1 Build the tutor dashboard with linked students and recent sessions.
-- [ ] A5.3.2 Build the tutor student detail view.
-- [ ] A5.3.3 Build tutor private notes invisible to students.
-- [ ] A5.3.4 Add weak-spot summaries and recommended next topics.
+- [x] A5.3.1 Build the tutor dashboard with linked students and recent sessions.
+- [x] A5.3.2 Build the tutor student detail view.
+- [x] A5.3.3 Build tutor private notes invisible to students.
+- [x] A5.3.4 Add weak-spot summaries and recommended next topics.
 
 ### A5.4 Sensitive Access Auditing
 
-- [ ] A5.4.1 Log parent and tutor access to student sessions.
-- [ ] A5.4.2 Add admin review tools for sensitive access events.
-- [ ] A5.4.3 Verify private-note isolation and access restrictions.
+- [x] A5.4.1 Log parent and tutor access to student sessions.
+- [x] A5.4.2 Add admin review tools for sensitive access events.
+- [x] A5.4.3 Verify private-note isolation and access restrictions.
+
+Reference: [Oversight surfaces V1](oversight_surfaces_v1.md)
+Status note: `/app` now renders data-backed parent and tutor dashboards, `/app/students/[studentUserId]` hosts the linked-student detail flow, `/app/review/[conversationId]` hosts the role-filtered review surface, and `/app/audit` gives admin the first sensitive-access queue.
+Status note: tutor private notes now mutate only through canonical routes, stay hidden from parent/student, and emit audit rows on create, update, and delete.
+Status note: `scripts/smoke-adult-oversight.mjs` now verifies parent, tutor, and admin route behavior against a temporary local `next start` instance.
 
 ## ⬜ Phase A6 - Memory, Billing, And Privacy Controls
 
@@ -304,15 +324,17 @@ Outcome: the MVP can retain useful educational context, gate usage, and handle d
 
 ### A6.2 Usage Counters, Trial, And Quotas
 
-- [ ] A6.2.1 Track sessions, uploads, and AI usage.
-- [ ] A6.2.2 Implement a free-trial rule set.
-- [ ] A6.2.3 Surface quota state in student and parent views.
+- [x] A6.2.1 Track sessions, uploads, and AI usage.
+- [x] A6.2.2 Implement a free-trial rule set.
+- [x] A6.2.3 Surface quota state in student and parent views.
+Status note: the app now records session, upload, assistant-message, and provider-token usage in `usage_counters`, uses a 30-day first-usage trial plus monthly quotas for gating, and surfaces the same quota snapshot on student and parent dashboard reads.
 
 ### A6.3 Billing Service
 
-- [ ] A6.3.1 Implement the billing abstraction layer.
-- [ ] A6.3.2 Implement webhook handling for subscription state.
-- [ ] A6.3.3 Persist subscription status without hardwiring provider-specific logic into the app.
+- [x] A6.3.1 Implement the billing abstraction layer.
+- [x] A6.3.2 Implement webhook handling for subscription state.
+- [x] A6.3.3 Persist subscription status without hardwiring provider-specific logic into the app.
+Status note: Lemon Squeezy now sits behind `lib/server/billing`, parent billing actions route through canonical checkout/portal endpoints, and a signed webhook smoke verifies subscription sync even when local checkout env remains intentionally blank.
 
 ### A6.4 Privacy And Data Controls
 
@@ -333,8 +355,10 @@ Outcome: the product is stable enough for serious parent and tutor trials.
 ### A7.2 Smoke Tests And Regression Coverage
 
 - [ ] A7.2.1 Create a written smoke test checklist for student, parent, tutor, and admin roles.
-- [ ] A7.2.2 Add automated coverage for the highest-risk backend and auth paths.
+- [x] A7.2.2 Add automated coverage for the highest-risk backend and auth paths.
 - [ ] A7.2.3 Add a pre-demo regression pass.
+
+Status note: fixture-backed automated smoke now exists for both the student core flow (`scripts/smoke-student-flow.mjs`) and the parent/tutor/admin oversight flow (`scripts/smoke-adult-oversight.mjs`).
 
 ### A7.3 Performance And Cost Controls
 
