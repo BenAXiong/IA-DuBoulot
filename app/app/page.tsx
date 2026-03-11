@@ -1,9 +1,13 @@
+import Link from "next/link";
 import { AdminDashboard } from "@/components/dashboard/admin-dashboard";
 import { AccountSettingsForm } from "@/components/auth/account-settings-form";
 import { ParentDashboard } from "@/components/dashboard/parent-dashboard";
 import { StudentDashboard } from "@/components/dashboard/student-dashboard";
 import { TutorDashboard } from "@/components/dashboard/tutor-dashboard";
-import { requireAppPageContext } from "@/lib/server/auth/page-guards";
+import {
+  redirectDeletionRequestedAppUser,
+  requireAppPageContext,
+} from "@/lib/server/auth/page-guards";
 import type { AppUserRecord } from "@/lib/server/auth/types";
 import { loadAdminAccessAuditSnapshot } from "@/lib/server/oversight/admin-service";
 import { loadParentDashboardSnapshot } from "@/lib/server/oversight/parent-service";
@@ -45,6 +49,7 @@ async function renderRoleDashboard(
 
 export default async function AppHomePage() {
   const { appUser } = await requireAppPageContext();
+  redirectDeletionRequestedAppUser(appUser);
 
   return (
     <div className="grid gap-6">
@@ -65,6 +70,12 @@ export default async function AppHomePage() {
             Cette surface reste simple, mais elle exerce deja la persistence
             du profil applicatif et la synchronisation de metadata cote auth.
           </p>
+          <Link
+            className="inline-flex rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5"
+            href="/app/settings"
+          >
+            Ouvrir les reglages complets
+          </Link>
         </article>
 
         <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5">

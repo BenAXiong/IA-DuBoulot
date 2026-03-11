@@ -1,4 +1,3 @@
-import { createHmac } from "node:crypto";
 import { spawn } from "node:child_process";
 import { access } from "node:fs/promises";
 import net from "node:net";
@@ -24,11 +23,8 @@ const nextBinPath = path.join(
   "next",
 );
 const buildIdPath = path.join(repoRoot, ".next", "BUILD_ID");
-const requestPrefix = `smoke_billing_${Date.now()}`;
+const requestPrefix = `smoke_privacy_${Date.now()}`;
 const requestTimeoutMs = 90000;
-const webhookSecret = "smoke-billing-secret";
-const providerSubscriptionId = "smoke-billing-subscription";
-const providerCustomerId = "smoke-billing-customer";
 
 function assert(condition, message) {
   if (!condition) {
@@ -52,7 +48,7 @@ async function ensureBuildArtifact() {
     await access(buildIdPath);
   } catch {
     throw new Error(
-      "Missing .next build output. Run `npm run build` before `npm run smoke:billing`.",
+      "Missing .next build output. Run `npm run build` before `npm run smoke:privacy`.",
     );
   }
 }
@@ -110,7 +106,7 @@ function createCookieJar() {
   };
 }
 
-async function findAvailablePort(startPort = 3155) {
+async function findAvailablePort(startPort = 3185) {
   let port = startPort;
 
   while (port < startPort + 50) {
@@ -144,7 +140,7 @@ async function findAvailablePort(startPort = 3155) {
     }
   }
 
-  throw new Error("Unable to find an open local port for the billing smoke server.");
+  throw new Error("Unable to find an open local port for the privacy smoke server.");
 }
 
 async function waitForServerReady(baseUrl, childProcess) {
@@ -186,10 +182,7 @@ async function startLocalServer() {
       cwd: repoRoot,
       env: {
         ...process.env,
-        LEMON_SQUEEZY_API_KEY: "",
-        LEMON_SQUEEZY_STORE_ID: "",
-        LEMON_SQUEEZY_VARIANT_ID_FAMILY_MONTHLY: "",
-        LEMON_SQUEEZY_WEBHOOK_SECRET: webhookSecret,
+        NEXT_PUBLIC_APP_URL: baseUrl,
       },
       stdio: ["ignore", "pipe", "pipe"],
     },
@@ -219,19 +212,18 @@ async function stopLocalServer(childProcess) {
   }
 }
 
-function readErrorMessage(payload, fallbackMessage) {
-  if (
-    payload &&
-    typeof payload === "object" &&
-    payload.error &&
-    typeof payload.error === "object" &&
-    "message" in payload.error &&
-    typeof payload.error.message === "string"
-  ) {
-    return payload.error.message;
-  }
-
-  return fallbackMessage;
+function buildAuthMetadata(user) {
+  return {
+    app_role: user.role,
+    display_name: user.display_name,
+    preferred_ui_language: user.preferred_ui_language,
+    ai_help_language: user.ai_help_language,
+    age_band: user.age_band,
+    is_under_13: user.is_under_13,
+    account_status: user.account_status,
+    onboarding_completed: true,
+    app_profile_version: 1,
+  };
 }
 
 function buildHttpClient(baseUrl, roleLabel) {
@@ -317,6 +309,7 @@ function buildHttpClient(baseUrl, roleLabel) {
         requestId,
         response,
         payload,
+        location: response.headers.get("location"),
       };
     },
     async requestText(pathname, init = {}) {
@@ -343,130 +336,172 @@ function buildHttpClient(baseUrl, roleLabel) {
         requestId,
         response,
         text,
+        location: response.headers.get("location"),
       };
     },
   };
 }
 
-async function cleanupSubscription(adminClient) {
-  await adminClient
-    .from("subscriptions")
-    .delete()
-    .eq("provider_subscription_id", providerSubscriptionId);
+async function resetFixtureDeletionState(adminClient, fixtureUserIds, studentRow) {
+  const { error: studentResetError } = await adminClient
+    .from("users")
+    .update({
+      account_status: "active",
+      deletion_requested_at: null,
+    })
+    .eq("id", fixtureUserIds.student);
+
+  if (studentResetError) {
+    throw studentResetError;
+  }
+
+  const { error: tutorLinkError } = await adminClient
+    .from("tutor_student_links")
+    .update({
+      link_status: "active",
+    })
+    .eq("id", FIXTURE.ids.tutorLink);
+
+  if (tutorLinkError) {
+    throw tutorLinkError;
+  }
+
+  const { error: authError } = await adminClient.auth.admin.updateUserById(
+    fixtureUserIds.student,
+    {
+      user_metadata: buildAuthMetadata({
+        ...studentRow,
+        account_status: "active",
+      }),
+    },
+  );
+
+  if (authError) {
+    throw authError;
+  }
 }
 
 async function main() {
   const adminClient = createAdminClient();
   const fixtureUserIds = await resolveFixtureUserIds(adminClient);
   assert(fixtureUserIds.parent, "Missing fixture parent user id.");
+  assert(fixtureUserIds.student, "Missing fixture student user id.");
 
-  let startedServer = false;
+  const { data: studentRow, error: studentLoadError } = await adminClient
+    .from("users")
+    .select(
+      "id, role, account_status, display_name, preferred_ui_language, ai_help_language, age_band, is_under_13",
+    )
+    .eq("id", fixtureUserIds.student)
+    .single();
+
+  if (studentLoadError || !studentRow) {
+    throw studentLoadError ?? new Error("Missing fixture student profile.");
+  }
+
   let childProcess = null;
 
   try {
-    await cleanupSubscription(adminClient);
+    await resetFixtureDeletionState(adminClient, fixtureUserIds, studentRow);
     const server = await startLocalServer();
-    startedServer = true;
     childProcess = server.childProcess;
 
     const parent = buildHttpClient(server.baseUrl, "parent");
     await parent.signInFixture(FIXTURE.emails.parent);
 
-    const checkoutResult = await parent.requestJson("/api/billing/checkout", {
-      method: "POST",
-      body: JSON.stringify({
-        planKey: "family_monthly",
-      }),
-    });
-
+    const settingsResult = await parent.requestText("/app/settings");
+    assert(settingsResult.response.ok, "Parent settings page did not render.");
     assert(
-      checkoutResult.response.status === 503,
-      `Expected checkout to fail with 503 while Lemon checkout config is blank, got ${checkoutResult.response.status}.`,
-    );
-    assert(
-      normalizeAssertionText(
-        readErrorMessage(checkoutResult.payload, "unknown error"),
-      ).includes("billing checkout is not configured yet"),
-      "Checkout route did not return the expected provider-config failure message.",
+      normalizeAssertionText(settingsResult.text).includes(
+        "reglages et confidentialite",
+      ) &&
+        normalizeAssertionText(settingsResult.text).includes("suppression et gel"),
+      "Parent settings page did not surface the privacy controls copy.",
     );
 
-    const now = new Date();
-    const renewsAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-    const webhookPayload = JSON.stringify({
-      meta: {
-        event_name: "subscription_created",
-        custom_data: {
-          payer_user_id: fixtureUserIds.parent,
-          plan_key: "family_monthly",
-        },
-      },
-      data: {
-        type: "subscriptions",
-        id: providerSubscriptionId,
-        attributes: {
-          customer_id: providerCustomerId,
-          variant_id: "smoke-variant",
-          status: "active",
-          created_at: now.toISOString(),
-          updated_at: now.toISOString(),
-          renews_at: renewsAt.toISOString(),
-          trial_ends_at: null,
-          ends_at: null,
-        },
-      },
-    });
-    const signature = createHmac("sha256", webhookSecret)
-      .update(webhookPayload)
-      .digest("hex");
-    const webhookResponse = await fetch(
-      `${server.baseUrl}/api/billing/webhooks/lemonsqueezy`,
+    const deletionResult = await parent.requestJson(
+      "/api/privacy/deletion-requests",
       {
         method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "x-request-id": `${requestPrefix}_webhook`,
-          "x-signature": signature,
-        },
-        body: webhookPayload,
-        signal: AbortSignal.timeout(requestTimeoutMs),
+        body: JSON.stringify({
+          targetUserId: fixtureUserIds.student,
+        }),
       },
     );
-    const webhookPayloadJson = await webhookResponse.json();
 
-    assert(webhookResponse.ok, "Billing webhook route returned a non-OK response.");
     assert(
-      webhookPayloadJson?.ok === true &&
-        webhookPayloadJson?.data?.handled === true &&
-        webhookPayloadJson?.data?.status === "active",
-      "Billing webhook route did not report a handled active subscription sync.",
+      deletionResult.response.ok &&
+        deletionResult.payload?.ok === true &&
+        deletionResult.payload?.data?.targetUserId === fixtureUserIds.student &&
+        deletionResult.payload?.data?.status === "deletion_requested",
+      "Parent-linked student deletion request did not return the expected queued result.",
     );
 
-    const { data: persistedSubscription, error: subscriptionError } = await adminClient
-      .from("subscriptions")
-      .select("payer_user_id, plan_key, status, provider_subscription_id")
-      .eq("provider_subscription_id", providerSubscriptionId)
-      .maybeSingle();
+    const { data: deletedStudentRow, error: deletedStudentError } = await adminClient
+      .from("users")
+      .select("account_status, deletion_requested_at")
+      .eq("id", fixtureUserIds.student)
+      .single();
 
-    if (subscriptionError) {
-      throw subscriptionError;
+    if (deletedStudentError) {
+      throw deletedStudentError;
     }
 
-    assert(persistedSubscription, "Billing webhook did not persist a subscription row.");
     assert(
-      persistedSubscription.payer_user_id === fixtureUserIds.parent,
-      "Persisted billing row was not linked back to the fixture parent.",
-    );
-    assert(
-      persistedSubscription.plan_key === "family_monthly" &&
-        persistedSubscription.status === "active",
-      "Persisted billing row did not keep the expected plan or status.",
+      deletedStudentRow.account_status === "deletion_requested" &&
+        deletedStudentRow.deletion_requested_at,
+      "Student profile was not marked deletion_requested.",
     );
 
-    const parentDashboard = await parent.requestText("/app");
-    assert(parentDashboard.response.ok, "Parent dashboard did not render after billing sync.");
+    const { data: tutorLinkRow, error: tutorLinkLoadError } = await adminClient
+      .from("tutor_student_links")
+      .select("link_status")
+      .eq("id", FIXTURE.ids.tutorLink)
+      .single();
+
+    if (tutorLinkLoadError) {
+      throw tutorLinkLoadError;
+    }
+
     assert(
-      normalizeAssertionText(parentDashboard.text).includes("plan family_monthly"),
-      "Parent dashboard did not surface the synced billing plan.",
+      tutorLinkRow.link_status === "revoked",
+      "Tutor access was not revoked when the student deletion request was queued.",
+    );
+
+    const student = buildHttpClient(server.baseUrl, "student");
+    await student.signInFixture(FIXTURE.emails.student);
+
+    const studentPageResult = await student.requestText("/app/new", {
+      redirect: "manual",
+    });
+    assert(
+      studentPageResult.response.status >= 300 &&
+        studentPageResult.response.status < 400 &&
+        String(studentPageResult.location ?? "").includes("/app/settings"),
+      "Deletion-requested student was not redirected to /app/settings.",
+    );
+
+    const blockedConversationResult = await student.requestJson(
+      "/api/conversations",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          title: "Smoke privacy flow",
+          subjectTag: "Maths",
+          gradedHomework: true,
+          pastedText: "Je veux tester le blocage apres suppression.",
+          editedExtractedText: "",
+          attachmentReferences: [],
+        }),
+      },
+    );
+
+    assert(
+      blockedConversationResult.response.status === 409 &&
+        normalizeAssertionText(
+          blockedConversationResult.payload?.error?.message ?? "",
+        ).includes("queued for deletion"),
+      "Deletion-requested student could still create a conversation.",
     );
 
     console.log(
@@ -474,11 +509,13 @@ async function main() {
         {
           ok: true,
           baseUrl: server.baseUrl,
-          startedServer,
           checks: [
-            "checkout route fails cleanly while Lemon checkout config is blank",
-            "signed webhook persisted the subscription row",
-            "parent dashboard surfaced the synced billing state",
+            "parent settings page renders the new privacy controls",
+            "parent can queue linked-student deletion",
+            "student account is marked deletion_requested",
+            "student tutor access is revoked immediately",
+            "deletion-requested student is redirected to /app/settings",
+            "deletion-requested student cannot create a new conversation",
           ],
         },
         null,
@@ -486,7 +523,9 @@ async function main() {
       ),
     );
   } finally {
-    await cleanupSubscription(adminClient).catch(() => {});
+    await resetFixtureDeletionState(adminClient, fixtureUserIds, studentRow).catch(
+      () => {},
+    );
     await stopLocalServer(childProcess);
   }
 }

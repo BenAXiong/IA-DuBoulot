@@ -7,6 +7,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AuthenticatedUserContext } from "@/lib/server/auth/types";
 import {
+  requireActiveAppUser,
   requireAppUserContext,
   requireAppUserRole,
 } from "@/lib/server/auth/authorization";
@@ -373,6 +374,7 @@ export async function createConversationDraft(input: {
 }): Promise<CreateConversationDraftResult> {
   const appUser = requireAppUserContext(input.context);
   requireAppUserRole(appUser, ["student"]);
+  requireActiveAppUser(appUser);
   await assertStudentUsageActionAllowed({
     studentUserId: appUser.id,
     action: "create_conversation",
@@ -492,6 +494,7 @@ async function requireWritableStudentConversation(input: {
 }) {
   const appUser = requireAppUserContext(input.context);
   requireAppUserRole(appUser, ["student"]);
+  requireActiveAppUser(appUser);
 
   const supabase = await createSupabaseServerClient();
   const { data: conversation, error } = await supabase

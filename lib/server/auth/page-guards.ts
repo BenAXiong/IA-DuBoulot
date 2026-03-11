@@ -52,3 +52,13 @@ export async function requireAppPageContext(): Promise<{
     appUser: context.appUser,
   };
 }
+
+export function redirectDeletionRequestedAppUser(appUser: AppUserRecord) {
+  if (appUser.role === "admin") {
+    return;
+  }
+
+  if (appUser.account_status === "deletion_requested") {
+    redirect("/app/settings");
+  }
+}

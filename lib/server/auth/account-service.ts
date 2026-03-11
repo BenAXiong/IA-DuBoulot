@@ -14,6 +14,7 @@ import {
   type AgeBand,
   type UpdateProfileInput,
 } from "@/lib/server/auth/types";
+import { requireActiveAppUser } from "@/lib/server/auth/authorization";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { recordAuditEvent } from "@/lib/server/audit/audit-service";
 import { logRuntimeInfo } from "@/lib/server/audit/runtime-logger";
@@ -514,6 +515,7 @@ export async function updateProfile(
   input: UpdateProfileInput,
   requestId: string,
 ) {
+  requireActiveAppUser(appUser);
   const supabase = createSupabaseAdminClient();
   const { data: updatedUser, error } = await supabase
     .from("users")

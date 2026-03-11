@@ -1,10 +1,14 @@
 import { redirect } from "next/navigation";
 import { NewHomeworkEntry } from "@/components/dashboard/student/new-homework-entry";
-import { requireAppPageContext } from "@/lib/server/auth/page-guards";
+import {
+  redirectDeletionRequestedAppUser,
+  requireAppPageContext,
+} from "@/lib/server/auth/page-guards";
 import { loadStudentDashboardSnapshot } from "@/lib/server/student-dashboard/student-dashboard-service";
 
 export default async function NewHomeworkPage() {
   const { appUser } = await requireAppPageContext();
+  redirectDeletionRequestedAppUser(appUser);
 
   if (appUser.role !== "student") {
     redirect("/app");

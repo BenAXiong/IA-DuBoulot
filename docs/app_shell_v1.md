@@ -1,6 +1,6 @@
 # App Shell V1
 
-Related: [README](../README.md) | [MVP to-do list](mvp_todo.md) | [API route map](api_route_map.md) | [Invitation flows V1](invitation_flows_v1.md) | [Service interfaces](service_interfaces.md)
+Related: [README](../README.md) | [MVP to-do list](mvp_todo.md) | [API route map](api_route_map.md) | [Invitation flows V1](invitation_flows_v1.md) | [Privacy controls V1](privacy_controls_v1.md) | [Service interfaces](service_interfaces.md)
 
 ## Purpose
 
@@ -34,7 +34,7 @@ Rules:
 
 - public routes share one branded header and footer
 - auth and invite flows should feel like the same product as the landing page
-- pricing remains intentionally provisional until Lemon Squeezy is wired
+- pricing remains intentionally provisional while the MVP still exposes only one wired Family monthly plan
 
 ## Authenticated App Shell
 
@@ -49,6 +49,7 @@ Current routes using it:
 - `/app/history`
 - `/app/new`
 - `/app/conversations/[conversationId]`
+- `/app/settings`
 - `/app/students/[studentUserId]`
 - `/app/review/[conversationId]`
 - `/app/audit`
@@ -58,6 +59,7 @@ Rules:
 - the shell owns responsive navigation and session chrome
 - page content under `/app` should focus on role-specific panels, not duplicate nav/header code
 - the shell is role-aware, but not role-bloated: role-specific content lives in dashboard modules, not inside the chrome component
+- non-admin accounts already queued for deletion are redirected back toward `/app/settings`, and the shell repeats that frozen-state warning in the shared header
 
 ## Role Dashboard Variants
 
@@ -84,19 +86,19 @@ The authenticated shell now mixes stable sub-routes with a few local anchors:
   - `/app/new`
   - `/app/history`
   - `/app/conversations/[conversationId]`
+  - `/app/settings`
 - adult oversight routes:
   - `/app/students/[studentUserId]`
   - `/app/review/[conversationId]`
   - `/app/audit`
-- local anchors still used for sections that remain on the dashboard page:
+- local anchors still used for dashboard sections that have not earned their own route:
   - `#students`
-  - `#operations`
   - `#account`
 
 Why:
 
-- the student workflow and adult review flow now both have enough depth to deserve stable URLs
-- the shell still avoids exploding into route sprawl for every small card or metric panel
+- the student workflow, settings/privacy controls, and adult review flow now all have enough depth to deserve stable URLs
+- the shell still avoids exploding into route sprawl for every small metric or summary card that can remain dashboard-local
 
 ## iPad Validation
 

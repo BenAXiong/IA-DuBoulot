@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getAiProvider } from "@/lib/server/ai/provider";
 import type { ConversationAttachmentRecord } from "@/lib/server/ai/types";
 import {
+  requireActiveAppUser,
   requireAppUserContext,
   requireAppUserRole,
 } from "@/lib/server/auth/authorization";
@@ -263,6 +264,7 @@ async function requireWritableConversation(input: {
 }) {
   const appUser = requireAppUserContext(input.context);
   requireAppUserRole(appUser, ["student"]);
+  requireActiveAppUser(appUser);
 
   const supabase = await createSupabaseServerClient();
   const { data: conversation, error } = await supabase
@@ -701,7 +703,8 @@ export async function retryAttachmentExtraction(
 export async function createAttachmentAccessUrl(
   input: AttachmentAccessInput,
 ): Promise<AttachmentAccessResult> {
-  requireAppUserContext(input.context);
+  const appUser = requireAppUserContext(input.context);
+  requireActiveAppUser(appUser);
   const supabase = await createSupabaseServerClient();
   const { data: attachment, error } = await supabase
     .from("attachments")

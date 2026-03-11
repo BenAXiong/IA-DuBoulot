@@ -1,6 +1,7 @@
 import "server-only";
 
 import {
+  requireActiveAppUser,
   requireAppUserContext,
   requireAppUserRole,
 } from "@/lib/server/auth/authorization";
@@ -237,6 +238,7 @@ export async function createTutorNote(input: {
 }): Promise<TutorNoteRecord> {
   const appUser = requireAppUserContext(input.context);
   requireAppUserRole(appUser, ["tutor"]);
+  requireActiveAppUser(appUser);
   await requireViewerCanAccessStudent(appUser, input.payload.studentUserId);
   await requireConversationOwnership({
     tutorUserId: appUser.id,
@@ -310,6 +312,7 @@ export async function updateTutorNote(input: {
 }): Promise<TutorNoteRecord> {
   const appUser = requireAppUserContext(input.context);
   requireAppUserRole(appUser, ["tutor"]);
+  requireActiveAppUser(appUser);
   const note = await loadOwnedTutorNote(appUser.id, input.noteId);
   await requireViewerCanAccessStudent(appUser, note.student_user_id);
 
@@ -377,6 +380,7 @@ export async function deleteTutorNote(input: {
 }): Promise<void> {
   const appUser = requireAppUserContext(input.context);
   requireAppUserRole(appUser, ["tutor"]);
+  requireActiveAppUser(appUser);
   const note = await loadOwnedTutorNote(appUser.id, input.noteId);
   await requireViewerCanAccessStudent(appUser, note.student_user_id);
 

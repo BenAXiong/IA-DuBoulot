@@ -4,7 +4,10 @@ import { BillingStatusCard } from "@/components/dashboard/oversight/billing-stat
 import { SummaryLanguagePanel } from "@/components/dashboard/oversight/summary-language-panel";
 import { TutorNotesPanel } from "@/components/dashboard/oversight/tutor-notes-panel";
 import { TutorSummaryPanel } from "@/components/dashboard/oversight/tutor-summary-panel";
-import { requireAppPageContext } from "@/lib/server/auth/page-guards";
+import {
+  redirectDeletionRequestedAppUser,
+  requireAppPageContext,
+} from "@/lib/server/auth/page-guards";
 import { loadParentConversationReview } from "@/lib/server/oversight/parent-service";
 import { loadTutorConversationReview } from "@/lib/server/oversight/tutor-service";
 
@@ -16,6 +19,7 @@ export default async function OversightConversationReviewPage({
   params: Params;
 }) {
   const { appUser } = await requireAppPageContext();
+  redirectDeletionRequestedAppUser(appUser);
   const resolvedParams = await params;
 
   if (appUser.role === "parent") {

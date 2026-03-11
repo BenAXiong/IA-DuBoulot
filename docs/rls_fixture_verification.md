@@ -15,6 +15,7 @@ The goal is to test the policies that are actually deployed, not just read the S
 - Shared helpers: `scripts/rls-fixture-shared.mjs`
 - Student-flow smoke: `scripts/smoke-student-flow.mjs`
 - Adult-oversight smoke: `scripts/smoke-adult-oversight.mjs`
+- Privacy smoke: `scripts/smoke-privacy-controls.mjs`
 - Billing smoke: `scripts/smoke-billing-webhook.mjs`
 
 ## Local Secret
@@ -62,6 +63,7 @@ Run these from the repo root:
 npm run seed:rls-fixtures
 npm run verify:rls-fixtures
 npm run build
+npm run smoke:privacy
 npm run smoke:student-flow
 npm run smoke:adult-oversight
 npm run smoke:billing
@@ -110,9 +112,18 @@ The adult-oversight smoke script currently checks that:
 
 The billing smoke script currently checks that:
 
-- the parent-authenticated billing checkout route fails cleanly with `503` while local Lemon checkout config is still blank
+- the parent-authenticated billing checkout route fails cleanly with `503` while the smoke intentionally blanks local Lemon checkout config
 - a signed Lemon webhook can persist a subscription row through the real webhook route
 - the parent dashboard surfaces the synced billing state after that webhook
+
+The privacy smoke script currently checks that:
+
+- the parent settings page renders through the real `/app/settings` route
+- a linked parent can queue child deletion through the canonical privacy route
+- the child account is marked `deletion_requested`
+- tutor access is revoked immediately for that child
+- the deletion-requested child is redirected back to `/app/settings`
+- the deletion-requested child cannot create a new conversation
 
 ## Safety Rules
 
@@ -128,8 +139,9 @@ The billing smoke script currently checks that:
 - 2026-03-10 hosted reseed: success
 - 2026-03-10 hosted verification: `17` checks passed, `0` failed
 - 2026-03-11 local student-flow smoke: success against a temporary local `next start` instance
-- 2026-03-11 local student-flow smoke warnings: Gemini extraction, coach, and student-summary fallbacks were exercised in the latest pass, and adult summary variants were missing in that run because those derivations are now best-effort
+- 2026-03-11 local student-flow smoke warnings: the latest pass completed successfully with optional adult summary variants missing in that run, and earlier passes have also exercised the Gemini fallback paths now kept in the student contract
 - 2026-03-11 local adult-oversight smoke: success against a temporary local `next start` instance across parent, tutor, and admin routes
+- 2026-03-11 local privacy smoke: success against a temporary local `next start` instance for `/app/settings`, linked-child deletion queueing, tutor-link revocation, redirect-to-settings behavior, and write blocking after deletion request
 - 2026-03-11 local billing smoke: success against a temporary local `next start` instance for checkout-config failure handling, signed webhook sync, and parent dashboard billing visibility
 - 2026-03-11 deployed billing verification: success on `https://ia-du-boulot.vercel.app` with real Lemon test-mode checkout open, completed payment, redirect back to `/app`, parent dashboard subscription visibility, Lemon confirmation email, and Lemon dashboard order logging
 

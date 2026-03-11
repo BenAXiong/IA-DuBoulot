@@ -1,6 +1,6 @@
 # Service Interfaces
 
-Related: [README](../README.md) | [API route map](api_route_map.md) | [Invitation flows V1](invitation_flows_v1.md) | [Oversight surfaces V1](oversight_surfaces_v1.md) | [Environment matrix](environment_matrix.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md)
+Related: [README](../README.md) | [API route map](api_route_map.md) | [Invitation flows V1](invitation_flows_v1.md) | [Oversight surfaces V1](oversight_surfaces_v1.md) | [Privacy controls V1](privacy_controls_v1.md) | [Environment matrix](environment_matrix.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md)
 
 ## Purpose
 
@@ -19,8 +19,10 @@ Current local status:
 - `lib/server/uploads/` now contains the signed-upload, confirm, extraction, and read-access service layer
 - `lib/server/moderation/`, `lib/server/summaries/`, and `lib/server/translations/` now exist in code
 - `lib/server/oversight/` now contains parent/tutor/admin read services plus tutor-note mutation handling
+- `lib/server/privacy/` now owns the `/app/settings` snapshot plus queued deletion request flow
 - `scripts/smoke-student-flow.mjs` now verifies the real student route flow against a temporary local `next start` instance
 - `scripts/smoke-adult-oversight.mjs` now verifies parent, tutor, and admin oversight routes against the same local server model
+- `scripts/smoke-privacy-controls.mjs` now verifies settings rendering, linked-child deletion queueing, tutor-access revocation, and deletion-requested write blocking
 - provider-unavailable fallbacks now exist for attachment extraction, coach replies, and the required student summary, while adult summary variants remain best-effort
 
 ## Interface Rules
@@ -214,6 +216,22 @@ interface MemoryService {
 }
 ```
 
+### Privacy Service
+
+```ts
+interface PrivacyService {
+  loadSettingsSnapshot(input: LoadPrivacySettingsInput): Promise<PrivacySettingsSnapshot>;
+  requestDeletion(input: RequestPrivacyDeletionInput): Promise<PrivacyDeletionRequestResult>;
+}
+```
+
+Rules:
+
+- the request path should queue and freeze deletion, not silently hard-delete inside a route handler
+- linked-child deletion must explicitly revalidate the active parent link server-side
+- auth metadata sync and access revocation should happen in the same service boundary as the queued request
+- retention timing and any billing/security carve-outs must stay explicit in the returned snapshot and product copy
+
 ### Audit Service
 
 ```ts
@@ -274,6 +292,7 @@ lib/server/links/
 lib/server/memory/
 lib/server/moderation/
 lib/server/oversight/
+lib/server/privacy/
 lib/server/summaries/
 lib/server/translations/
 lib/server/usage/
@@ -298,7 +317,8 @@ Inside each domain:
 
 ## Immediate Next Implementations
 
-- confirm deployed environment parity for the fallback-aware student flow instead of relying only on the local smoke
+- implement `A6.1` memory profile behavior with explicit sensitive-profiling filters and user-facing edit/delete controls
+- operationalize queued deletion execution so the current 30-day target is backed by a real purge worker or operator workflow before external beta
 - improve provider reliability or add a second provider path so the student flow uses the fallbacks less often
 - tighten upload guardrails to match the documented per-file limits and capture any missing metadata fields such as image dimensions and PDF page counts
 - broaden the admin audit surface only when moderation/support workflows justify it

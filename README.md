@@ -25,6 +25,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Student history and summary V1](docs/student_history_summary_v1.md)
 - [Invitation flows V1](docs/invitation_flows_v1.md)
 - [Oversight surfaces V1](docs/oversight_surfaces_v1.md)
+- [Privacy controls V1](docs/privacy_controls_v1.md)
 - [Service interfaces](docs/service_interfaces.md)
 - [Error and audit conventions](docs/error_audit_conventions.md)
 - [Storage and attachment rules](docs/storage_attachment_rules.md)
@@ -71,7 +72,9 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - a second fixture-backed smoke script now exists at `scripts/smoke-adult-oversight.mjs` and passed on 2026-03-11 against the real parent/tutor/admin oversight routes.
 - usage tracking, trial/quota enforcement, and Lemon Squeezy billing routes now live behind dedicated `lib/server/usage/` and `lib/server/billing/` services, with student and parent dashboards reading the same server-owned quota snapshot.
 - a third fixture-backed billing smoke script now exists at `scripts/smoke-billing-webhook.mjs` and passed on 2026-03-11 against the real webhook route plus the parent dashboard billing surface.
-- the latest student smoke still exercised Gemini fallbacks in extraction, coaching, and summary generation, so provider reliability remains a QA follow-up even though the Phase A4 flow is now stable enough to stay usable.
+- `/app/settings` now provides the stable profile, billing, privacy, and deletion-control surface for every role, backed by `lib/server/privacy/` plus `POST /api/privacy/deletion-requests`.
+- a fourth fixture-backed privacy smoke script now exists at `scripts/smoke-privacy-controls.mjs` and passed on 2026-03-11 against the real settings route, linked-child deletion queueing, immediate tutor-access revocation, redirect-to-settings behavior, and write blocking for deletion-requested accounts.
+- the latest student smoke completed successfully with only optional adult summary variants missing in that run; provider reliability remains a QA follow-up even though the student flow stays stable.
 
 ## Working Conventions
 

@@ -8,14 +8,14 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 
-- Overall: `[#######################.......]` `99/128` complete (`77%`)
+- Overall: `[########################......]` `102/128` complete (`80%`)
 - A0: `[xxxxxxxxxxxxxxxx.....]` `16/21`
 - A1: `[xxxxxxxxxxxxxxxx]` `16/16`
 - A2: `[xxxxxxxxxxx......]` `11/17`
 - A3: `[xxxxxxxxxxxxxxxxx]` `17/17`
 - A4: `[xxxxxxxxxxxxxxxxxxx]` `19/19`
 - A5: `[xxxxxxxxxxxxx]` `13/13`
-- A6: `[xxxxxx.......]` `6/13`
+- A6: `[xxxxxxxxx....]` `9/13`
 - A7: `[x...........]` `1/12`
 
 ## Table Of Contents
@@ -311,7 +311,7 @@ Status note: `/app` now renders data-backed parent and tutor dashboards, `/app/s
 Status note: tutor private notes now mutate only through canonical routes, stay hidden from parent/student, and emit audit rows on create, update, and delete.
 Status note: `scripts/smoke-adult-oversight.mjs` now verifies parent, tutor, and admin route behavior against a temporary local `next start` instance.
 
-## ⬜ Phase A6 - Memory, Billing, And Privacy Controls
+## 🟨 Phase A6 - Memory, Billing, And Privacy Controls
 
 Outcome: the MVP can retain useful educational context, gate usage, and handle data responsibly.
 
@@ -339,11 +339,12 @@ Status note: on 2026-03-11 the deployed Vercel app also completed a real Lemon t
 
 ### A6.4 Privacy And Data Controls
 
-- [ ] A6.4.1 Build billing/settings and privacy/data control screens.
-- [ ] A6.4.2 Implement account-linked data deletion flows.
-- [ ] A6.4.3 Write clear user-facing privacy copy for the MVP.
+- [x] A6.4.1 Build billing/settings and privacy/data control screens.
+- [x] A6.4.2 Implement account-linked data deletion flows.
+- [x] A6.4.3 Write clear user-facing privacy copy for the MVP.
+Status note: `/app/settings` now hosts the stable profile, billing, privacy, and deletion-control surface for every role; `POST /api/privacy/deletion-requests` queues self or linked-child deletion requests through `lib/server/privacy/`; linked-child deletion revokes tutor access immediately; deletion-requested non-admin accounts are redirected back to `/app/settings`; and `npm run smoke:privacy` now covers the real route flow.
 
-## ⬜ Phase A7 - QA, iPad Polish, And Launch Readiness
+## 🟨 Phase A7 - QA, iPad Polish, And Launch Readiness
 
 Outcome: the product is stable enough for serious parent and tutor trials.
 

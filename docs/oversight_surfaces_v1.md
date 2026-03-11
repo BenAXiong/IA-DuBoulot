@@ -83,7 +83,8 @@ Dashboard:
 - shows cross-student recent sessions
 - shows a 7-day parent-summary rollup
 - shows payer subscription status from `subscriptions`
-- shows each linked student's quota state from the shared usage service and exposes billing action buttons
+- shows each linked student's quota state from the shared usage service
+- leaves the richer billing/privacy controls to `/app/settings`, while still surfacing the parent billing status inside the dashboard
 
 Student detail:
 
@@ -155,11 +156,12 @@ Latest local result on 2026-03-11:
 - RLS fixture verification passed with `17` checks and `0` failures
 - student-flow smoke passed with provider-fallback warnings
 - adult-oversight smoke passed across parent, tutor, and admin surfaces
-- billing smoke passed against the signed Lemon webhook route and the parent dashboard billing surface, while the checkout route still failed cleanly in local because the Lemon checkout env remains blank
+- billing smoke passed against the signed Lemon webhook route and the parent dashboard billing surface, while intentionally blanking local checkout env to keep the graceful `503` branch covered
+- deployed Vercel billing verification also passed in Lemon test mode, including checkout open, payment completion, redirect back to `/app`, dashboard subscription visibility, confirmation email, and Lemon order logging
 
 ## Known Boundaries
 
-- parent billing actions now exist, but local `/api/billing/checkout` still returns `503` until the Lemon API key, store id, and Family variant id are provisioned
+- the local billing smoke still forces `/api/billing/checkout` through the explicit `503` path even though real Lemon env can now be provisioned locally or in Vercel
 - parent summary translation depends on the available stored summary variants; no on-demand translation UI exists yet
 - tutor notes do not yet support rich categorization, attachments, or admin annotation
 - admin audit review is intentionally narrow and does not replace broader moderation or support tooling

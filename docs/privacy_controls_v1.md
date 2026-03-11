@@ -1,0 +1,156 @@
+# Privacy Controls V1
+
+Related: [README](../README.md) | [Minors privacy baseline](minors_privacy_baseline.md) | [App shell V1](app_shell_v1.md) | [API route map](api_route_map.md) | [Service interfaces](service_interfaces.md) | [MVP to-do list](mvp_todo.md)
+
+## Purpose
+
+This document records the first real billing/settings and privacy-control surface delivered in `A6.4`.
+
+It exists so later sessions do not have to reconstruct:
+
+- where profile, billing, privacy, and deletion controls now live
+- which roles can request deletion for themselves or linked children
+- how queued deletion changes access immediately
+- what the current MVP promises about retention and provider disclosures
+
+## Scope
+
+This V1 covers:
+
+- `A6.4.1` through `/app/settings` as the stable settings surface for all roles
+- `A6.4.2` through queued deletion requests, account freeze, linked-child handling, and immediate tutor-access revocation
+- `A6.4.3` through explicit user-facing copy for data categories, retention windows, and provider involvement
+
+## Canonical Routes
+
+Pages:
+
+- `/app/settings`
+
+APIs:
+
+- `POST /api/privacy/deletion-requests`
+
+Protected-route behavior:
+
+- `/app`
+- `/app/history`
+- `/app/new`
+- `/app/conversations/[conversationId]`
+- `/app/students/[studentUserId]`
+- `/app/review/[conversationId]`
+
+Current rule:
+
+- non-admin accounts already marked `deletion_requested` are redirected back to `/app/settings`
+
+## Source Files
+
+Pages and UI:
+
+- `app/app/settings/page.tsx`
+- `components/dashboard/settings/privacy-settings-view.tsx`
+- `components/dashboard/settings/deletion-request-form.tsx`
+
+Server routes and services:
+
+- `app/api/privacy/deletion-requests/route.ts`
+- `lib/server/privacy/service.ts`
+- `lib/server/privacy/types.ts`
+
+Shared auth and mutation gates:
+
+- `lib/server/auth/page-guards.ts`
+- `lib/server/auth/authorization.ts`
+- `lib/server/auth/account-service.ts`
+- `lib/server/conversations/conversation-service.ts`
+- `lib/server/uploads/service.ts`
+- `lib/server/oversight/tutor-note-service.ts`
+- `lib/server/billing/service.ts`
+
+Verification:
+
+- `scripts/smoke-privacy-controls.mjs`
+
+## Settings Surface Rules
+
+For every role, `/app/settings` now owns:
+
+- editable app-profile fields when the account is still active
+- a billing/privacy explainer card even when the role has no billing actions
+- user-facing data-category and retention copy
+- the self-deletion request entry point when that role is eligible
+
+Parent-specific additions:
+
+- the canonical Family billing card
+- one deletion control per active linked child account
+
+Admin-specific limit:
+
+- no self-service deletion button is exposed
+
+## Deletion Request Rules
+
+Self-deletion:
+
+- student `13+` may request deletion for self
+- under-13 student self-deletion is blocked and must come from a linked parent
+- tutor may request deletion for self
+- parent self-deletion is blocked while active linked students or an active billing relationship remain
+- admin self-deletion is blocked from the product UI
+
+Linked-child deletion:
+
+- only a linked parent may request deletion for a child
+- the parent link must still be active at request time
+- only student accounts are valid child-delete targets
+
+Queued-deletion behavior:
+
+- `users.account_status` becomes `deletion_requested`
+- `users.deletion_requested_at` is stored immediately
+- auth metadata is synchronized immediately
+- tutor links for the affected student are revoked immediately
+- new write workflows are blocked through explicit service-layer checks
+- the UI shows a 30-day target purge date based on the queued timestamp
+
+## User-Facing Privacy Copy
+
+The current settings surface explicitly explains:
+
+- the main stored categories for the signed-in role
+- retention windows for pending approvals, inactive student content, sensitive-access audit logs, and queued deletion
+- provider involvement across Supabase, Gemini, Lemon Squeezy, and future PostHog/Resend usage
+
+Current copy rule:
+
+- keep the language concrete and operational rather than legalistic
+
+## Verification
+
+Current automated coverage:
+
+- `npm run typecheck`
+- `npm run lint`
+- `npm run build`
+- `npm run smoke:privacy`
+- `npm run smoke:student-flow`
+- `npm run smoke:adult-oversight`
+- `npm run smoke:billing`
+
+Latest local result on 2026-03-11:
+
+- the settings page rendered for the fixture parent
+- a linked parent successfully queued student deletion through the real route
+- the student account moved to `deletion_requested`
+- the linked tutor access was revoked immediately
+- the deletion-requested student was redirected back to `/app/settings`
+- the deletion-requested student could no longer create a new conversation
+
+## Known Boundaries
+
+- the current MVP queues deletion and freezes access immediately, but the final purge execution still needs a real worker or operator workflow
+- parent self-deletion remains intentionally conservative while linked students or billing state still exist
+- admin deletion stays manual and audited
+- the privacy copy is currently hardcoded in the settings component and not yet localized through a dedicated content system

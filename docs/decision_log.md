@@ -457,3 +457,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Implement billing through `lib/server/billing/`, keep the MVP payer role limited to `parent`, route checkout and portal actions through canonical server endpoints, and make those endpoints return an explicit `503` when Lemon checkout config is incomplete instead of failing opaquely. Subscription lifecycle state is now persisted only through the billing service and synced from signed Lemon webhooks, with a dedicated billing smoke covering both graceful checkout failure and webhook-driven persistence.
 - Why: This preserves the thin-route architecture, keeps provider payload details out of route handlers and UI code, and gives the repo a verifiable subscription sync path even before the real Lemon checkout credentials are provisioned locally.
 - Follow-up: Provision `LEMON_SQUEEZY_API_KEY`, `LEMON_SQUEEZY_STORE_ID`, `LEMON_SQUEEZY_VARIANT_ID_FAMILY_MONTHLY`, and the webhook secret in Vercel and local `.env.local`, then replace the current config-failure branch with a real parent checkout round-trip smoke.
+
+### D-20260311-45 - Privacy Controls Use One Settings Surface And Queue Deletion Before Purge
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A6.4.1`, `A6.4.2`, `A6.4.3`
+- Context: The repo already had profile editing, parent billing, and the minors/privacy baseline, but there was no stable in-product place to explain retention rules, gate deletion-requested accounts, or let a parent request deletion for a linked child without bypassing audit and access checks.
+- Decision: Implement privacy/data controls through a dedicated `/app/settings` route backed by `lib/server/privacy/`. Queue deletion by setting `users.account_status = deletion_requested` plus `deletion_requested_at`, sync auth metadata immediately, revoke tutor access immediately for linked-child deletion, redirect deletion-requested non-admin accounts back to `/app/settings`, and freeze new writes through explicit `requireActiveAppUser` checks in the relevant services. Keep the user-facing privacy copy, retention windows, and provider disclosures inside the same settings surface.
+- Why: This keeps billing, profile, privacy copy, and deletion controls discoverable in one stable place, preserves explicit server-owned authorization for linked-child deletion, and gives the MVP a reversible queued-deletion contract instead of an opaque hard-delete button.
+- Follow-up: Add the real purge worker or operator workflow that executes the queued deletion target once the 30-day window elapses, and keep `scripts/smoke-privacy-controls.mjs` in the regression pass.

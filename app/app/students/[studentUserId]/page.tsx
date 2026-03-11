@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation";
 import { ParentStudentDetailView } from "@/components/dashboard/oversight/parent-student-detail";
 import { TutorStudentDetailView } from "@/components/dashboard/oversight/tutor-student-detail";
-import { requireAppPageContext } from "@/lib/server/auth/page-guards";
+import {
+  redirectDeletionRequestedAppUser,
+  requireAppPageContext,
+} from "@/lib/server/auth/page-guards";
 import { loadParentStudentDetail } from "@/lib/server/oversight/parent-service";
 import { loadTutorStudentDetail } from "@/lib/server/oversight/tutor-service";
 
@@ -13,6 +16,7 @@ export default async function OversightStudentPage({
   params: Params;
 }) {
   const { appUser } = await requireAppPageContext();
+  redirectDeletionRequestedAppUser(appUser);
   const resolvedParams = await params;
 
   if (appUser.role === "parent") {

@@ -1,6 +1,6 @@
 # API Route Map
 
-Related: [README](../README.md) | [Access rules V1](access_rules_v1.md) | [Supabase schema V1](supabase_schema_v1.md) | [Invitation flows V1](invitation_flows_v1.md) | [Oversight surfaces V1](oversight_surfaces_v1.md) | [Service interfaces](service_interfaces.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md)
+Related: [README](../README.md) | [Access rules V1](access_rules_v1.md) | [Supabase schema V1](supabase_schema_v1.md) | [Invitation flows V1](invitation_flows_v1.md) | [Oversight surfaces V1](oversight_surfaces_v1.md) | [Privacy controls V1](privacy_controls_v1.md) | [Service interfaces](service_interfaces.md) | [Error and audit conventions](error_audit_conventions.md) | [Storage and attachment rules](storage_attachment_rules.md) | [MVP to-do list](mvp_todo.md)
 
 ## Purpose
 
@@ -18,6 +18,9 @@ Current implemented routes:
 - `POST /api/tutor/notes`
 - `PATCH /api/tutor/notes/[noteId]`
 - `DELETE /api/tutor/notes/[noteId]`
+- `POST /api/billing/checkout`
+- `POST /api/billing/portal`
+- `POST /api/billing/webhooks/lemonsqueezy`
 - `GET /api/conversations`
 - `POST /api/conversations`
 - `GET /api/conversations/[conversationId]`
@@ -25,6 +28,7 @@ Current implemented routes:
 - `POST /api/conversations/[conversationId]/messages`
 - `PATCH /api/conversations/[conversationId]/workspace`
 - `GET /api/admin/audit/access-events`
+- `POST /api/privacy/deletion-requests`
 - `POST /api/uploads/create`
 - `POST /api/uploads/confirm`
 - `POST /api/uploads/extract`
@@ -123,7 +127,15 @@ These routes isolate provider-specific billing behavior from the rest of the app
 | --- | --- | --- | --- | --- |
 | `/api/billing/checkout` | `POST` | parent | create a Lemon Squeezy checkout redirect or JSON payload | MVP payer role is `parent`; explicit `503` when Lemon checkout config is still blank |
 | `/api/billing/portal` | `POST` | parent | open customer management flow | route may redirect directly for form submits or return JSON for scripted callers |
-| `/api/billing/webhooks/lemonsqueezy` | `POST` | Lemon Squeezy | receive subscription lifecycle webhooks | signature verification required; sync persists `subscriptions` through the billing service |
+| `/api/billing/webhooks/lemonsqueezy` | `POST` | Lemon Squeezy | receive subscription lifecycle webhooks | signature verification required; sync persists `subscriptions` through the billing service; the deployed Vercel app has now also completed a real Lemon test-mode checkout |
+
+### Privacy And Data Controls
+
+These routes own user-facing privacy controls and queued deletion requests.
+
+| Route | Method | Caller | Purpose | Notes |
+| --- | --- | --- | --- | --- |
+| `/api/privacy/deletion-requests` | `POST` | authenticated user or linked parent | queue deletion for the caller or a linked child account | updates `users.account_status`, syncs auth metadata, revokes tutor access for child deletion, and returns the queued purge target date |
 
 ### Admin And Operations
 
@@ -148,9 +160,11 @@ app/api/auth/profile/route.ts
 app/api/auth/parent-approval/request/route.ts
 app/api/auth/parent-approval/confirm/route.ts
 app/api/auth/invitations/accept/route.ts
+app/api/attachments/[attachmentId]/access/route.ts
 app/api/uploads/create/route.ts
 app/api/uploads/confirm/route.ts
 app/api/uploads/extract/route.ts
+app/api/privacy/deletion-requests/route.ts
 app/api/conversations/route.ts
 app/api/conversations/[conversationId]/route.ts
 app/api/conversations/[conversationId]/messages/route.ts

@@ -4,6 +4,7 @@ import { env } from "@/lib/env";
 import { recordAuditEvent } from "@/lib/server/audit/audit-service";
 import { logRuntimeInfo } from "@/lib/server/audit/runtime-logger";
 import {
+  requireActiveAppUser,
   requireAppUserContext,
   requireAppUserRole,
 } from "@/lib/server/auth/authorization";
@@ -341,6 +342,7 @@ export async function createBillingCheckout(
 ): Promise<CreateBillingCheckoutResult> {
   const appUser = requireAppUserContext(input.context);
   requireAppUserRole(appUser, ["parent"]);
+  requireActiveAppUser(appUser);
 
   const planKey = normalizeBillingPlanKey(input.planKey);
   const existingSubscription = await loadLatestSubscriptionForPayer(appUser.id);
@@ -400,6 +402,7 @@ export async function createBillingPortalSession(
 ): Promise<CreateBillingPortalSessionResult> {
   const appUser = requireAppUserContext(input.context);
   requireAppUserRole(appUser, ["parent"]);
+  requireActiveAppUser(appUser);
 
   const subscription = await loadLatestSubscriptionForPayer(appUser.id);
 

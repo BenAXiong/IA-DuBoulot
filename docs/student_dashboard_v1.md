@@ -79,7 +79,7 @@ Current role:
 
 What it does not do yet:
 
-- no in-dashboard billing or privacy settings yet
+- billing and privacy controls now live on `/app/settings` instead of expanding the student dashboard itself
 - no parent/tutor management actions on the student side
 - no memory editing controls yet
 
@@ -88,7 +88,7 @@ Those belong to later business and privacy phases rather than the dashboard shel
 ## Known Boundaries
 
 - recent sessions on `/app` are intentionally short; the canonical long-form list now lives at `/app/history`
-- the student dashboard now shows the same quota state the mutation routes enforce, but the actual Family checkout still depends on Lemon Squeezy environment provisioning
+- the student dashboard now shows the same quota state the mutation routes enforce, but billing remains a parent-owned workflow surfaced on `/app/settings`
 - under-13 blocking still depends on the existing parent-approval flow documented in [Invitation flows V1](invitation_flows_v1.md)
 
 ## Next Extension Points

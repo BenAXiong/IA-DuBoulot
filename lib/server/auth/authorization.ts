@@ -100,6 +100,26 @@ export function requireAppUserRole(
   return appUser;
 }
 
+export function requireActiveAppUser(appUser: AppUserRecord) {
+  if (appUser.account_status === "active") {
+    return appUser;
+  }
+
+  const messageByStatus = {
+    pending_parent_approval:
+      "Finish parent approval before using this action.",
+    suspended: "This account is suspended and cannot perform this action.",
+    deletion_requested:
+      "This account is queued for deletion and cannot perform new actions.",
+  } as const;
+
+  throw new AppError({
+    code: "conflict",
+    message: messageByStatus[appUser.account_status],
+    status: 409,
+  });
+}
+
 export function requireSelfAccess(
   context: AuthenticatedUserContext,
   targetUserId: string,

@@ -18,22 +18,38 @@ const navByRole: Record<AppUserRecord["role"], NavItem[]> = {
   student: [
     { href: "/app/new", label: "Nouveau", hint: "point d'entree devoir" },
     { href: "/app/history", label: "Sessions", hint: "historique et resumes" },
-    { href: "/app#account", label: "Compte", hint: "profil et preferences" },
+    {
+      href: "/app/settings",
+      label: "Reglages",
+      hint: "profil et confidentialite",
+    },
   ],
   parent: [
     { href: "/app", label: "Overview", hint: "vision generale" },
     { href: "/app#students", label: "Eleves", hint: "liens et supervision" },
-    { href: "/app#account", label: "Compte", hint: "preferences" },
+    {
+      href: "/app/settings",
+      label: "Reglages",
+      hint: "billing, profil et confidentialite",
+    },
   ],
   tutor: [
     { href: "/app", label: "Overview", hint: "surface tuteur" },
     { href: "/app#students", label: "Eleves", hint: "sessions et notes" },
-    { href: "/app#account", label: "Compte", hint: "preferences" },
+    {
+      href: "/app/settings",
+      label: "Reglages",
+      hint: "profil et confidentialite",
+    },
   ],
   admin: [
     { href: "/app", label: "Overview", hint: "etat global" },
     { href: "/app/audit", label: "Audit", hint: "lectures sensibles" },
-    { href: "/app#account", label: "Compte", hint: "profil admin" },
+    {
+      href: "/app/settings",
+      label: "Reglages",
+      hint: "profil et limites admin",
+    },
   ],
 };
 
@@ -119,6 +135,13 @@ export function AppShell({ children, email, appUser }: AppShellProps) {
                 <SignOutButton />
               </div>
             </div>
+
+            {appUser.account_status === "deletion_requested" ? (
+              <div className="mt-5 rounded-[1.5rem] border border-[#d6c48d] bg-[#fff8e5] px-4 py-4 text-sm leading-6 text-[#6b5320]">
+                Une suppression est deja en file pour ce compte. Les autres
+                workflows sont geles tant que la file n&apos;est pas relevee.
+              </div>
+            ) : null}
 
             <nav className="mt-5 flex gap-3 overflow-x-auto pb-1 lg:hidden">
               {navItems.map((item) => (
