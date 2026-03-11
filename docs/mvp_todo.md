@@ -8,7 +8,7 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 
-- Overall: `[###########################...]` `116/130` complete (`89%`)
+- Overall: `[############################..]` `117/130` complete (`90%`)
 - A0: `[xxxxxxxxxxxxxxxxxx....]` `18/22`
 - A1: `[xxxxxxxxxxxxxxxx]` `16/16`
 - A2: `[xxxxxxxxxxx......]` `11/17`
@@ -16,7 +16,7 @@ Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 - A4: `[xxxxxxxxxxxxxxxxxxx]` `19/19`
 - A5: `[xxxxxxxxxxxxx]` `13/13`
 - A6: `[xxxxxxxxxxxxx]` `13/13`
-- A7: `[xxxxxxxxx....]` `9/13`
+- A7: `[xxxxxxxxxx...]` `10/13`
 
 ## Table Of Contents
 
@@ -371,9 +371,9 @@ Status note: fixture-backed automated smoke now exists for student, memory, adul
 - [x] A7.3.1 Add request caps and guardrails for expensive AI usage.
 - [x] A7.3.2 Add caching or summarization where it lowers cost without harming behavior.
 - [x] A7.3.3 Review storage and upload limits against trial economics.
-- [ ] A7.3.4 Publish a consolidated AI ops and economics note covering quota windows, prompt pipeline, guardrails, per-activity usage estimates, and the paid-vs-trial policy for parent-facing AI value.
+- [x] A7.3.4 Publish a consolidated AI ops and economics note covering quota windows, prompt pipeline, guardrails, per-activity usage estimates, and the paid-vs-trial policy for parent-facing AI value.
 
-Status note: the current Gemini-backed path now enforces bounded prompt context and output-token caps, reuses existing upload-extraction and completion artifacts instead of repeating provider calls, and keeps the current upload byte limits after an explicit review against the 30-day trial quotas.
+Status note: the current Gemini-backed path now enforces bounded prompt context and output-token caps, reuses existing upload-extraction and completion artifacts instead of repeating provider calls, keeps the current upload byte limits after an explicit review against the 30-day trial quotas, and now has a consolidated operating note in `docs/ai_ops_economics_v1.md`.
 
 ### A7.4 Launch Candidate
 

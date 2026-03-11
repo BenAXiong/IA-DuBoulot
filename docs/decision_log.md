@@ -517,3 +517,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Keep [docs/work_sessions.md](work_sessions.md) as the mandatory canonical session log, and add [docs/work_prompt_log.md](work_prompt_log.md) as an experimental parallel trace with one row per handled user prompt. The prompt log records timestamps, duration, task IDs, scope, and a manual `Credits Left` column when the usage percentage is operator-visible.
 - Why: This tests a finer-grained traceability method without breaking the existing session protocol or losing compatibility with the current operating rules.
 - Follow-up: Compare the usefulness and maintenance cost of the prompt log after a few sessions before deciding whether it becomes permanent, optional, or retired.
+
+### D-20260311-51 - Parent-Initiated AI Should Be Paid, While Passive Parent Oversight Stays In The MVP Baseline
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A7.3.4`
+- Context: The current product already generates parent-facing value indirectly through the student completion flow, but it still has no direct parent-triggered AI route. Monetization pressure is real, yet changing the existing student completion contract just before MVP closure would create risk in the most stable cross-role slice.
+- Decision: Publish `docs/ai_ops_economics_v1.md` as the canonical AI ops and economics note. Keep passive parent oversight in the MVP baseline, including stored parent summary variants when they already exist as a byproduct of student completion. Reserve any future parent-initiated AI action for the paid `Family` plan, such as on-demand summary regeneration, translation refresh, or parent-side coaching tools.
+- Why: This keeps the current student-first contract stable, avoids weakening the free oversight story that helps parents evaluate the product, and creates a clear monetization boundary once adult-triggered AI actions are added.
+- Follow-up: If parent-triggered AI routes are introduced after MVP, gate them explicitly through billing and usage services instead of relying on passive visibility rules or ad hoc UI hiding.

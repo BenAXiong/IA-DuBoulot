@@ -30,6 +30,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Invitation flows V1](docs/invitation_flows_v1.md)
 - [Oversight surfaces V1](docs/oversight_surfaces_v1.md)
 - [Privacy controls V1](docs/privacy_controls_v1.md)
+- [AI ops and economics V1](docs/ai_ops_economics_v1.md)
 - [Service interfaces](docs/service_interfaces.md)
 - [Error and audit conventions](docs/error_audit_conventions.md)
 - [Storage and attachment rules](docs/storage_attachment_rules.md)
@@ -85,6 +86,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - `A7.3` cost-control guardrails now bound the Gemini-backed path through request-size caps, prompt-context truncation, output-token caps, and idempotent reuse of existing upload-extraction and completion artifacts instead of repeating expensive provider calls.
 - launch-candidate operating docs now exist at `docs/founder_walkthrough_v1.md` and `docs/launch_checklist_v1.md`, and the current scope decision explicitly defers PWA installability until after real iPad Safari validation and early beta feedback.
 - an experimental prompt-level trace now also exists at `docs/work_prompt_log.md`, while `docs/work_sessions.md` remains the canonical session log.
+- a consolidated AI operations and economics note now exists at `docs/ai_ops_economics_v1.md`, including the current quota model, prompt pipeline, guardrails, token-cost ceilings, and the recommended parent-paid policy for future adult-triggered AI features.
 - the latest `npm run regress:mvp` pass succeeded on 2026-03-11; the current non-blocking warning profile still consists of documented Gemini fallback usage and optional adult summary variants missing in some student-flow runs.
 - the latest student smoke completed successfully while also verifying repeated upload confirmation and repeated completion reuse the existing expensive artifacts; provider reliability remains a QA follow-up even though the student flow stays stable.
 

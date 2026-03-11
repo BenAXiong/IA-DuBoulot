@@ -1,6 +1,6 @@
 # Launch Checklist V1
 
-Related: [README](../README.md) | [Implementation plan](implementation_plan.md) | [Smoke checklist V1](smoke_checklist_v1.md) | [Founder walkthrough V1](founder_walkthrough_v1.md) | [Environment matrix](environment_matrix.md) | [RLS fixture verification](rls_fixture_verification.md) | [MVP to-do list](mvp_todo.md) | [Decision log](decision_log.md)
+Related: [README](../README.md) | [Implementation plan](implementation_plan.md) | [Smoke checklist V1](smoke_checklist_v1.md) | [Founder walkthrough V1](founder_walkthrough_v1.md) | [AI ops and economics V1](ai_ops_economics_v1.md) | [Environment matrix](environment_matrix.md) | [RLS fixture verification](rls_fixture_verification.md) | [MVP to-do list](mvp_todo.md) | [Decision log](decision_log.md)
 
 ## Purpose
 
@@ -80,9 +80,6 @@ Explicitly defer beyond this launch candidate:
 
 ## Current Remaining Blocker
 
-The remaining open work inside `A7` is:
+The only remaining open work inside `A7` is `A7.1` real iPad Safari validation.
 
-- `A7.1` real iPad Safari validation
-- `A7.3.4` consolidated AI ops/economics and parent-AI policy note
-
-The main product blocker is still the real iPad Safari pass. The new `A7.3.4` item is a documentation and policy follow-up, not a broad code-slice blocker.
+The AI ops/economics and parent-AI policy note is now published in [AI ops and economics V1](ai_ops_economics_v1.md), so the main product blocker returns to the real iPad Safari pass.
