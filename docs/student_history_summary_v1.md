@@ -42,12 +42,14 @@ When the student marks a session complete, the app now:
 3. generates a required student summary, with a deterministic fallback if the provider call fails
 4. attempts provider-backed parent and tutor summaries plus translated parent variants for `en` and `zh`, but treats those adult artifacts as best-effort during the student completion path
 5. turns the session read-only for student message/workspace writes
+6. reuses the persisted student summary on repeated completion calls instead of regenerating summaries or refreshing memory again
 
 ## Important Boundaries
 
 - the summary path is now provider-backed in the current local workspace, but the required student artifact has a deterministic fallback and adult artifacts are best-effort
 - parent and tutor summary data now feeds the dedicated adult review surfaces documented in [Oversight surfaces V1](oversight_surfaces_v1.md)
 - completed sessions stay readable, but the student must start a new session to keep working
+- repeated completion of an already-completed session should be a cheap read of the stored student artifact, not a second expensive generation pass
 
 ## Why The Completion Contract Still Matters
 
@@ -67,10 +69,11 @@ The newer provider-backed path keeps the same product contract stable:
 - Checked:
   - `/api/conversations` creates a fresh student draft
   - the flow reaches upload, workspace save, chat, and completion through the real API routes
+  - repeated upload confirmation and repeated completion reuse the existing expensive artifacts
   - `POST /api/conversations/[conversationId]/complete` returns only the student-visible summary audience
   - the completed session rejects new student turns
   - stored summaries retain the required student variant and report any missing adult variants as warnings
-- Result: the local smoke now passes, but the latest run exercised the deterministic student-summary fallback and skipped adult variants after provider failures
+- Result: the local smoke now passes, with repeated completion staying idempotent; the latest run may still exercise deterministic student-summary fallback and skip adult variants after provider failures
 - Cleanup: the smoke script removes the temporary conversation, attachments, audit rows, and uploaded object before exit
 
 ## Next Extension Points

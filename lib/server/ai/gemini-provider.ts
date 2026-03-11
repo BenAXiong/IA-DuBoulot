@@ -20,6 +20,11 @@ import {
   GEMINI_UPLOAD_POLL_ATTEMPTS,
   GEMINI_UPLOAD_POLL_DELAY_MS,
 } from "@/lib/server/ai/config";
+import {
+  AI_CONTEXT_LIMITS,
+  AI_OUTPUT_TOKEN_LIMITS,
+  truncateForAiContext,
+} from "@/lib/server/ai/guardrails";
 import { buildAttachmentExtractionPrompt } from "@/lib/server/ai/prompts/attachment-extraction";
 import { buildMemoryProfilePrompt } from "@/lib/server/ai/prompts/memory-profile";
 import { buildStudentCoachSystemPrompt } from "@/lib/server/ai/prompts/student-coach";
@@ -134,7 +139,11 @@ function buildAttachmentParts(attachments: ConversationAttachmentRecord[]) {
     .filter((attachment) => attachment.raw_extracted_text?.trim())
     .slice(-GEMINI_ATTACHMENT_CONTEXT_LIMIT)
     .map((attachment) => {
-      const extractedText = attachment.raw_extracted_text?.trim() ?? "";
+      const extractedText =
+        truncateForAiContext(
+          attachment.raw_extracted_text,
+          AI_CONTEXT_LIMITS.attachmentPartChars,
+        ) ?? "";
 
       return [
         `Piece jointe: ${attachment.original_filename} (${attachment.mime_type})`,
@@ -241,6 +250,7 @@ export class GeminiAiProvider implements AiProvider {
     requestContext: AiProviderLogContext;
     operation: string;
     extraLogDetails?: Record<string, unknown>;
+    maxOutputTokens?: number;
   }): Promise<T & GeneratedUsageResult> {
     const inputTokens = await this.countContentTokens(input.model, input.contents);
 
@@ -254,6 +264,7 @@ export class GeminiAiProvider implements AiProvider {
           systemInstruction: input.systemInstruction,
           responseMimeType: "application/json",
           responseSchema: input.responseSchema,
+          maxOutputTokens: input.maxOutputTokens,
         },
       });
       const responseText = response.text?.trim();
@@ -368,6 +379,7 @@ export class GeminiAiProvider implements AiProvider {
       },
       requestContext: input.requestContext,
       operation: "coach_reply",
+      maxOutputTokens: AI_OUTPUT_TOKEN_LIMITS.coachReply,
       extraLogDetails: {
         intent: input.intent,
       },
@@ -518,6 +530,7 @@ export class GeminiAiProvider implements AiProvider {
       },
       requestContext: input.requestContext,
       operation: "summary",
+      maxOutputTokens: AI_OUTPUT_TOKEN_LIMITS.summary,
       extraLogDetails: {
         audience: input.audience,
         language_code: input.languageCode,
@@ -593,6 +606,7 @@ export class GeminiAiProvider implements AiProvider {
       },
       requestContext: input.requestContext,
       operation: "memory_profile",
+      maxOutputTokens: AI_OUTPUT_TOKEN_LIMITS.memoryProfile,
       extraLogDetails: {
         language_code: input.languageCode,
         summary_count: input.summaries.length,
@@ -639,6 +653,7 @@ export class GeminiAiProvider implements AiProvider {
         config: {
           temperature: 0.1,
           safetySettings: GEMINI_DEFAULT_SAFETY_SETTINGS,
+          maxOutputTokens: AI_OUTPUT_TOKEN_LIMITS.translation,
         },
       });
 

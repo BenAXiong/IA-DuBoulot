@@ -85,6 +85,7 @@ Recommended canonical keys:
 | `extraction_version` | string | no | extraction pipeline version |
 | `ocr_confidence` | number | no | optional normalized confidence score |
 | `detected_language` | string | no | source language guess when available |
+| `needs_manual_review` | boolean | no | whether the extracted text should be treated as partial or low-confidence |
 | `preview_generated` | boolean | no | whether a preview artifact exists |
 
 Rules:
@@ -114,7 +115,7 @@ For `homework-attachments`:
 
 - private bucket
 - MIME restrictions should match the MVP allowlist
-- file-size limit should match the route guardrails
+- file-size limit should match the highest single-object route limit across the allowlist, while the upload service keeps enforcing the stricter per-MIME limits
 
 For `processing-artifacts`:
 
@@ -138,9 +139,20 @@ Expected service behavior:
 - bucket names should live in a storage constants module later, not repeated inline
 - use the source-controlled files in [sample_attachment_corpus.md](sample_attachment_corpus.md) before inventing new ad hoc upload fixtures
 
+## Trial Economics Review
+
+Reviewed in `A7.3.3` against the current trial and upload quotas.
+
+- trial quota currently allows `40` uploads per `30`-day trial window
+- current per-file caps remain `10 MB` for images and `20 MB` for PDFs
+- current per-conversation caps remain `5` attachments and `50 MB`
+- worst-case raw upload ingress per trial period is therefore bounded at roughly `800 MB` per student (`40 * 20 MB`), which stays below the looser per-conversation aggregate ceiling across the full trial
+- AI spend is further bounded separately by prompt-context truncation, output-token caps, and idempotent reuse of already-resolved extraction and completion artifacts
+- decision for the current MVP: keep the existing byte limits unchanged until real pilot usage shows they are too strict for legibility or too loose for cost control
+
 Current local status:
 
 - the upload route family now exists in `app/api/uploads/...`
 - the canonical storage constants now live in `lib/server/uploads/constants.ts`
-- the current local flow creates real `attachments` rows, signed upload targets, extraction updates, and short-lived attachment access URLs
-- remaining stability work is to align per-file route enforcement and metadata capture fully with the documented contract
+- the current local flow creates real `attachments` rows, signed upload targets, extraction updates, short-lived attachment access URLs, and `needs_manual_review` extraction metadata when extraction confidence is low or partial
+- the upload service now enforces the documented per-MIME byte limits and reuses existing extraction results on repeated confirmation instead of repeating provider work

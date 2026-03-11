@@ -11,6 +11,10 @@ import type {
   WorkspaceStateRecord,
 } from "@/lib/server/conversations/types";
 import type { AiLanguageCode, UiLanguageCode } from "@/lib/server/auth/types";
+import {
+  AI_CONTEXT_LIMITS,
+  truncateForAiContext,
+} from "@/lib/server/ai/guardrails";
 
 export const STUDENT_COACH_PROMPT_VERSION = "student-coach-v1";
 export const STUDENT_SUMMARY_PROMPT_VERSION = "student-summary-v1";
@@ -51,7 +55,10 @@ export function buildAttachmentContextLines(
         : attachment.extraction_status === "failed"
           ? "extraction a revoir"
           : "extraction en attente";
-    const extractedText = normalizeText(attachment.raw_extracted_text);
+    const extractedText = truncateForAiContext(
+      normalizeText(attachment.raw_extracted_text),
+      AI_CONTEXT_LIMITS.attachmentExtractChars,
+    );
 
     return [
       `- ${attachment.original_filename} (${attachment.mime_type}, ${attachment.attachment_kind}, ${Math.max(
@@ -66,28 +73,51 @@ export function buildAttachmentContextLines(
 }
 
 export function buildTranscriptExcerpt(messages: ConversationMessageRecord[]) {
-  const recentMessages = messages.slice(-8);
+  const recentMessages = messages.slice(-AI_CONTEXT_LIMITS.transcriptMessageCount);
 
   if (recentMessages.length === 0) {
     return "- aucun historique";
   }
 
   return recentMessages
-    .map((message) => `[${message.role}] ${message.content_text}`)
+    .map((message) => {
+      const content =
+        truncateForAiContext(
+          message.content_text,
+          AI_CONTEXT_LIMITS.transcriptMessageChars,
+        ) ?? "";
+      return `[${message.role}] ${content}`;
+    })
     .join("\n\n");
 }
 
 export function buildWorkspaceContext(workspace: WorkspaceStateRecord | null) {
   return {
     assignmentText:
-      normalizeText(workspace?.assignment_text) ?? "non renseigne",
+      truncateForAiContext(
+        normalizeText(workspace?.assignment_text),
+        AI_CONTEXT_LIMITS.assignmentTextChars,
+      ) ?? "non renseigne",
     editedExtractedText:
-      normalizeText(workspace?.edited_extracted_text) ?? "non renseigne",
-    planText: normalizeText(workspace?.plan_text) ?? "aucun plan note",
+      truncateForAiContext(
+        normalizeText(workspace?.edited_extracted_text),
+        AI_CONTEXT_LIMITS.editedExtractedTextChars,
+      ) ?? "non renseigne",
+    planText:
+      truncateForAiContext(
+        normalizeText(workspace?.plan_text),
+        AI_CONTEXT_LIMITS.planTextChars,
+      ) ?? "aucun plan note",
     draftAnswerText:
-      normalizeText(workspace?.draft_answer_text) ?? "aucun brouillon note",
+      truncateForAiContext(
+        normalizeText(workspace?.draft_answer_text),
+        AI_CONTEXT_LIMITS.draftAnswerTextChars,
+      ) ?? "aucun brouillon note",
     studentNotes:
-      normalizeText(workspace?.student_notes) ?? "aucune note etudiante",
+      truncateForAiContext(
+        normalizeText(workspace?.student_notes),
+        AI_CONTEXT_LIMITS.studentNotesChars,
+      ) ?? "aucune note etudiante",
   };
 }
 
@@ -140,13 +170,19 @@ export function buildMemorySourceContext(input: GenerateMemoryProfileInput) {
   const summaryLines =
     input.summaries.length === 0
       ? ["- aucun resume de session encore disponible"]
-      : input.summaries.map((summary) => {
+      : input.summaries.slice(0, AI_CONTEXT_LIMITS.summaryCount).map((summary) => {
           const weaknessTags =
             summary.weakness_tags.length > 0
               ? ` | tags: ${summary.weakness_tags.join(", ")}`
               : "";
 
-          return `- [${summary.audience}/${summary.language_code}] ${summary.summary_text}${weaknessTags}`;
+          const summaryText =
+            truncateForAiContext(
+              summary.summary_text,
+              AI_CONTEXT_LIMITS.summaryTextChars,
+            ) ?? "resume indisponible";
+
+          return `- [${summary.audience}/${summary.language_code}] ${summaryText}${weaknessTags}`;
         });
 
   return [

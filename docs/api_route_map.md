@@ -72,8 +72,8 @@ These routes reserve storage locations, confirm uploaded files, and trigger extr
 
 | Route | Method | Caller | Purpose | Notes |
 | --- | --- | --- | --- | --- |
-| `/api/uploads/create` | `POST` | student | create an upload record + signed upload target | route owns file limits, bucket choice, and the upload quota gate |
-| `/api/uploads/confirm` | `POST` | student | mark upload complete and attach to conversation | validates ownership + upload metadata; provider extraction failure now returns a warning plus attachment `failed` instead of a hard route error |
+| `/api/uploads/create` | `POST` | student | create an upload record + signed upload target | route owns per-MIME file limits, bucket choice, and the upload quota gate |
+| `/api/uploads/confirm` | `POST` | student | mark upload complete and attach to conversation | validates ownership + upload metadata; provider extraction failure now returns a warning plus attachment `failed` instead of a hard route error; repeated confirmation reuses the stored extraction result instead of re-running Gemini |
 | `/api/uploads/extract` | `POST` | server-triggered or student | request text extraction for an attachment | should enqueue or async-trigger later |
 | `/api/attachments/[attachmentId]/access` | `GET` | visible role | mint short-lived read access for an attachment | required because buckets stay private |
 
@@ -86,9 +86,9 @@ These routes power the student core flow.
 | `/api/conversations` | `GET` | authenticated user | list visible conversations for the caller role | role-aware filtering required |
 | `/api/conversations` | `POST` | student | create a new conversation | creates initial conversation shell and enforces the session quota gate |
 | `/api/conversations/[conversationId]` | `GET` | visible role | load a conversation with messages, attachments, workspace, summaries | server-side auth check now explicitly revalidates adult links and audits parent/tutor review reads |
-| `/api/conversations/[conversationId]/messages` | `POST` | student | append a student message and trigger assistant response flow | current local workspace uses the Gemini-backed provider plus moderation, with deterministic coach fallback if the provider call fails and a quota gate before new assistant turns |
+| `/api/conversations/[conversationId]/messages` | `POST` | student | append a student message and trigger assistant response flow | current local workspace uses the Gemini-backed provider plus moderation, with deterministic coach fallback if the provider call fails, bounded request/body sizes, and a quota gate before new assistant turns |
 | `/api/conversations/[conversationId]/workspace` | `PATCH` | student | save workspace state | supports draft restoration, extracted-text sync, and attachment follow-up notes |
-| `/api/conversations/[conversationId]/complete` | `POST` | student | mark conversation complete | returns only the student-visible summary; adult variants are generated best-effort and do not block student completion |
+| `/api/conversations/[conversationId]/complete` | `POST` | student | mark conversation complete | returns only the student-visible summary; adult variants are generated best-effort and do not block student completion; repeated completion reuses the stored student summary instead of regenerating summaries or memory |
 
 ### Summaries And Memory
 

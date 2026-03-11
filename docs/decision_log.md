@@ -487,3 +487,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Add `docs/smoke_checklist_v1.md` as the canonical acceptance checklist, covering automated and manual role-based smoke expectations, explicit blocking versus non-blocking outcomes, and the remaining device/deployment checks. Add `npm run regress:mvp` as the canonical pre-demo regression command that chains typecheck, lint, build, RLS verification, and the full current smoke suite.
 - Why: This turns the existing smoke scripts into a repeatable release gate, reduces the chance of skipping an important cross-role check before demos, and makes later sessions inherit one stable definition of regression coverage instead of reconstructing it from scattered docs and package scripts.
 - Follow-up: Record real iPad Safari results against this checklist as `A7.1` progresses, and tighten the regression command further if new high-risk flows are added later.
+
+### D-20260311-48 - Cost Control Uses Bounded AI Context Plus Idempotent Artifact Reuse
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A7.3.1`, `A7.3.2`, `A7.3.3`
+- Context: The MVP student path was stable, but repeated upload confirmation or completion could still risk duplicate Gemini work, and prompt size still scaled too directly with raw workspace, attachment, transcript, and translation text. The remaining `A7.3` question was how to lower cost without weakening the student contract or introducing a second hidden caching system.
+- Decision: Centralize AI prompt-context truncation and output-token caps in `lib/server/ai/guardrails.ts`, enforce body-size caps before expensive student routes, and treat persisted extraction and completion artifacts as the primary cache layer. `POST /api/uploads/confirm` now reuses an already-resolved extraction result, and `POST /api/conversations/[conversationId]/complete` now reuses the stored student summary when the conversation is already completed. After reviewing upload economics against the current trial quotas, keep the existing `10 MB` image, `20 MB` PDF, `5` attachment, and `50 MB` per-conversation limits unchanged for the MVP.
+- Why: This lowers provider spend with explicit, reviewable boundaries instead of adding a broad implicit cache, preserves stable student behavior, and keeps the storage contract aligned with the current trial model.
+- Follow-up: Revisit `A7.3.2` with richer summary compaction or cross-request caching only if real production telemetry shows the current guardrails are still insufficient.

@@ -21,11 +21,13 @@ Current local status:
 - `lib/server/oversight/` now contains parent/tutor/admin read services plus tutor-note mutation handling
 - `lib/server/privacy/` now owns the `/app/settings` snapshot plus queued deletion request flow
 - `lib/server/memory/` now owns visible memory reads, manual mutations, and completion-triggered refresh
+- `lib/server/ai/guardrails.ts` now centralizes prompt-context truncation and output-token caps for the Gemini-backed path
 - `scripts/smoke-student-flow.mjs` now verifies the real student route flow against a temporary local `next start` instance
 - `scripts/smoke-adult-oversight.mjs` now verifies parent, tutor, and admin oversight routes against the same local server model
 - `scripts/smoke-privacy-controls.mjs` now verifies settings rendering, linked-child deletion queueing, tutor-access revocation, and deletion-requested write blocking
 - `scripts/smoke-memory-profile.mjs` now verifies the live memory route, student dashboard memory panel, parent linked-student panel, and tutor-access denial
 - provider-unavailable fallbacks now exist for attachment extraction, coach replies, the required student summary, and memory refresh, while adult summary variants remain best-effort
+- the current `A7.3` cost-control pass now prefers idempotent reuse of persisted extraction and completion artifacts over duplicate provider calls
 
 ## Interface Rules
 
@@ -61,6 +63,7 @@ Rules:
 - do not leak provider SDK types beyond the adapter
 - return normalized token/cost/failure metadata
 - prompt selection/versioning belongs to prompt config, not route handlers
+- prompt-context truncation and output-token caps belong to the AI guardrails module, not route handlers or UI code
 
 ### Upload Storage Service
 
@@ -81,6 +84,7 @@ Rules:
 - MIME, byte-size, and extension rules are enforced here
 - signed read URL issuance lives here
 - storage cleanup should be callable from deletion flows and failure recovery
+- upload confirmation should be idempotent and return the stored extraction result when the attachment is already resolved
 
 ### Translation Service
 
@@ -179,6 +183,11 @@ interface ConversationService {
   completeConversation(input: CompleteConversationInput): Promise<CompleteConversationResult>;
 }
 ```
+
+Rules:
+
+- student-facing completion must stay idempotent once a required student summary already exists
+- expensive provider-backed work should reuse persisted artifacts when the stable product contract is already satisfied
 
 ### Summary Service
 

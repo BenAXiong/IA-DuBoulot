@@ -79,8 +79,9 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - the student dashboard and linked-parent student detail now expose a pedagogical memory panel backed by `lib/server/memory/`, with completion-triggered refresh, manual edit/delete controls, and tutor raw-memory access explicitly blocked.
 - a fifth fixture-backed smoke script now exists at `scripts/smoke-memory-profile.mjs` and passed on 2026-03-11 against the real memory route, dashboard surfaces, manual mutation flow, and tutor-access boundary.
 - a written operator smoke checklist now exists at `docs/smoke_checklist_v1.md`, and `npm run regress:mvp` now gives the canonical pre-demo regression pass across typecheck, build, RLS verification, and all current smoke scripts.
+- `A7.3` cost-control guardrails now bound the Gemini-backed path through request-size caps, prompt-context truncation, output-token caps, and idempotent reuse of existing upload-extraction and completion artifacts instead of repeating expensive provider calls.
 - the latest `npm run regress:mvp` pass succeeded on 2026-03-11; the current non-blocking warning profile still consists of documented Gemini fallback usage and optional adult summary variants missing in some student-flow runs.
-- the latest student smoke completed successfully with only optional adult summary variants missing in that run; provider reliability remains a QA follow-up even though the student flow stays stable.
+- the latest student smoke completed successfully while also verifying repeated upload confirmation and repeated completion reuse the existing expensive artifacts; provider reliability remains a QA follow-up even though the student flow stays stable.
 
 ## Working Conventions
 

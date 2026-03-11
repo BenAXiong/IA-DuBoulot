@@ -18,7 +18,8 @@ As of 2026-03-11:
 
 - phases `A1`, `A3`, `A4`, `A5`, and `A6` are now complete in the local workspace
 - `A7.2` is now complete through the written smoke checklist, the aggregated regression pass, and the existing automated smoke scripts
-- the next active product phase is still `A7`, with `A7.1` manual iPad Safari validation and `A7.3.*` cost-control follow-ups now the highest-leverage remaining repo-owned tasks
+- `A7.3` is now complete through AI request caps, artifact-reuse guardrails, and the upload-economics review
+- the next active product work inside `A7` is now `A7.1` manual iPad Safari validation plus the `A7.4` launch-candidate checklist and demo-prep tasks
 - `A0` and `A2` still contain governance and app-foundation follow-ups, but they are no longer the critical path for the current MVP slice
 
 ## Week-By-Week Plan

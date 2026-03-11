@@ -546,6 +546,41 @@ async function main() {
       );
     }
 
+    const repeatedConfirmResult = await http.requestJson("/api/uploads/confirm", {
+      method: "POST",
+      body: JSON.stringify({
+        conversationId,
+        attachmentId: attachment.id,
+      }),
+    });
+    const repeatedConfirmPayload = expectOkJson(
+      repeatedConfirmResult,
+      "Failed to reuse the confirmed attachment extraction",
+    );
+    const repeatedConfirmAttachment =
+      repeatedConfirmPayload.data?.attachment ?? null;
+    const repeatedExtractedTextBlock =
+      repeatedConfirmPayload.data?.extractedTextBlock ?? null;
+    const repeatedWarningMessage =
+      repeatedConfirmPayload.data?.warningMessage ?? null;
+
+    assert(
+      repeatedConfirmAttachment?.updated_at === confirmedAttachment.updated_at,
+      "Repeated upload confirmation should reuse the existing extraction result.",
+    );
+    assert(
+      repeatedConfirmAttachment?.extraction_status === extractionStatus,
+      "Repeated upload confirmation changed the extraction status unexpectedly.",
+    );
+    assert(
+      repeatedExtractedTextBlock === extractedTextBlock,
+      "Repeated upload confirmation changed the extracted text block unexpectedly.",
+    );
+    assert(
+      repeatedWarningMessage === warningMessage,
+      "Repeated upload confirmation changed the extraction warning unexpectedly.",
+    );
+
     const workspaceExtractedText =
       extractedTextBlock ?? "Brouillon initial avant upload et extraction du PDF.";
 
@@ -666,6 +701,59 @@ async function main() {
       warnings.push("Student summary used the deterministic fallback.");
     }
 
+    const { data: initialSummaryRows, error: initialSummaryError } =
+      await adminClient
+        .from("session_summaries")
+        .select("audience, language_code")
+        .eq("conversation_id", conversationId);
+
+    if (initialSummaryError) {
+      throw initialSummaryError;
+    }
+
+    const initialStoredSummarySnapshot = (initialSummaryRows ?? [])
+      .map((row) => `${row.audience}:${row.language_code}`)
+      .sort()
+      .join("|");
+    const { data: initialMemoryProfile, error: initialMemoryProfileError } =
+      await adminClient
+        .from("student_memory_profiles")
+        .select("updated_at")
+        .eq("student_user_id", completedConversation.student_user_id)
+        .maybeSingle();
+
+    if (initialMemoryProfileError) {
+      throw initialMemoryProfileError;
+    }
+
+    const repeatedCompleteResult = await http.requestJson(
+      `/api/conversations/${conversationId}/complete`,
+      {
+        method: "POST",
+      },
+    );
+    const repeatedCompletePayload = expectOkJson(
+      repeatedCompleteResult,
+      "Failed to reuse the completed conversation",
+    );
+    const repeatedReturnedSummaries =
+      repeatedCompletePayload.data?.summaries ?? [];
+
+    assert(
+      repeatedCompletePayload.data?.conversation?.status === "completed",
+      "Repeated completion should still report completed status.",
+    );
+    assert(
+      Array.isArray(repeatedReturnedSummaries) &&
+        repeatedReturnedSummaries.length === 1 &&
+        repeatedReturnedSummaries[0]?.audience === "student",
+      "Repeated completion should stay filtered to the existing student summary.",
+    );
+    assert(
+      repeatedReturnedSummaries[0]?.summary_text === returnedSummaries[0]?.summary_text,
+      "Repeated completion should reuse the stored student summary.",
+    );
+
     const readOnlyMessageResult = await http.requestJson(
       `/api/conversations/${conversationId}/messages`,
       {
@@ -754,6 +842,32 @@ async function main() {
       );
     }
 
+    const storedSummarySnapshot = (summaryRows ?? [])
+      .map((row) => `${row.audience}:${row.language_code}`)
+      .sort()
+      .join("|");
+    assert(
+      storedSummarySnapshot === initialStoredSummarySnapshot,
+      "Repeated completion should not create or remove stored summary variants.",
+    );
+
+    const { data: repeatedMemoryProfile, error: repeatedMemoryProfileError } =
+      await adminClient
+        .from("student_memory_profiles")
+        .select("updated_at")
+        .eq("student_user_id", completedConversation.student_user_id)
+        .maybeSingle();
+
+    if (repeatedMemoryProfileError) {
+      throw repeatedMemoryProfileError;
+    }
+
+    assert(
+      (repeatedMemoryProfile?.updated_at ?? null) ===
+        (initialMemoryProfile?.updated_at ?? null),
+      "Repeated completion should not refresh the student memory profile again.",
+    );
+
     const { data: moderationRows, error: moderationError } = await adminClient
       .from("moderation_events")
       .select("event_source, status")
@@ -821,18 +935,19 @@ async function main() {
           startedServer,
           conversationId,
           checks: [
-          "student auth cookie established",
-          "draft conversation created",
-          "PDF upload confirmed with extraction or graceful manual-review fallback",
-          "workspace synced with extracted text",
-          "coach reply appended",
+            "student auth cookie established",
+            "draft conversation created",
+            "PDF upload confirmed with extraction or graceful manual-review fallback",
+            "repeated confirm and complete calls reused existing expensive artifacts",
+            "workspace synced with extracted text",
+            "coach reply appended",
             "student completion response filtered to one summary",
-          "completed conversation became read-only",
-          "stored summaries include the required student variant and any available adult variants",
-          "moderation and audit rows persisted",
-        ],
-        warnings,
-        storedSummaryVariants: Array.from(summaryKeys).sort(),
+            "completed conversation became read-only",
+            "stored summaries include the required student variant and any available adult variants",
+            "moderation and audit rows persisted",
+          ],
+          warnings,
+          storedSummaryVariants: Array.from(summaryKeys).sort(),
         },
         null,
         2,

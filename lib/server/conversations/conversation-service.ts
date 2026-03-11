@@ -61,6 +61,9 @@ const ATTACHMENT_SELECT =
   "id, conversation_id, uploaded_by_user_id, storage_bucket, storage_path, attachment_kind, mime_type, original_filename, byte_size, page_count, extraction_status, raw_extracted_text, source_language, metadata, created_at, updated_at";
 const SUMMARY_SELECT =
   "id, conversation_id, audience, language_code, summary_text, weakness_tags, next_step_recommendation, generated_model_name, created_at, updated_at";
+const MAX_CONVERSATION_SOURCE_TEXT_CHARS = 12_000;
+const MAX_WORKSPACE_SUPPORT_TEXT_CHARS = 8_000;
+const MAX_STUDENT_MESSAGE_CHARS = 4_000;
 
 function toServiceError(message: string, cause: unknown) {
   return new AppError({
@@ -173,6 +176,21 @@ export async function parseCreateConversationDraftInput(
   }
 
   if (
+    pastedText.length > MAX_CONVERSATION_SOURCE_TEXT_CHARS ||
+    editedExtractedText.length > MAX_CONVERSATION_SOURCE_TEXT_CHARS
+  ) {
+    throw new AppError({
+      code: "validation_error",
+      message: "One or more fields are invalid.",
+      status: 400,
+      fieldErrors: {
+        pastedText:
+          "Pasted and extracted text fields must stay under 12000 characters.",
+      },
+    });
+  }
+
+  if (
     !normalizeText(pastedText) &&
     !normalizeText(editedExtractedText) &&
     attachmentReferences.length === 0
@@ -233,7 +251,7 @@ export async function parseAppendConversationMessageInput(
     });
   }
 
-  if (contentText.trim().length > 4000) {
+  if (contentText.trim().length > MAX_STUDENT_MESSAGE_CHARS) {
     throw new AppError({
       code: "validation_error",
       message: "One or more fields are invalid.",
@@ -280,7 +298,10 @@ export async function parseUpdateWorkspaceInput(
   const studentNotes =
     typeof payload.studentNotes === "string" ? payload.studentNotes : "";
 
-  if (assignmentText.length > 12000 || editedExtractedText.length > 12000) {
+  if (
+    assignmentText.length > MAX_CONVERSATION_SOURCE_TEXT_CHARS ||
+    editedExtractedText.length > MAX_CONVERSATION_SOURCE_TEXT_CHARS
+  ) {
     throw new AppError({
       code: "validation_error",
       message: "One or more fields are invalid.",
@@ -291,7 +312,11 @@ export async function parseUpdateWorkspaceInput(
     });
   }
 
-  if (planText.length > 8000 || draftAnswerText.length > 8000 || studentNotes.length > 8000) {
+  if (
+    planText.length > MAX_WORKSPACE_SUPPORT_TEXT_CHARS ||
+    draftAnswerText.length > MAX_WORKSPACE_SUPPORT_TEXT_CHARS ||
+    studentNotes.length > MAX_WORKSPACE_SUPPORT_TEXT_CHARS
+  ) {
     throw new AppError({
       code: "validation_error",
       message: "One or more fields are invalid.",
@@ -998,7 +1023,7 @@ export async function completeConversation(input: {
     });
   }
 
-  const [workspaceResult, messagesResult, attachmentsResult] = await Promise.all([
+  const [workspaceResult, messagesResult, attachmentsResult, summariesResult] = await Promise.all([
     supabase
       .from("workspace_states")
       .select(WORKSPACE_SELECT)
@@ -1014,6 +1039,11 @@ export async function completeConversation(input: {
       .select(ATTACHMENT_SELECT)
       .eq("conversation_id", input.conversationId)
       .order("created_at", { ascending: true }),
+    supabase
+      .from("session_summaries")
+      .select(SUMMARY_SELECT)
+      .eq("conversation_id", input.conversationId)
+      .order("created_at", { ascending: false }),
   ]);
 
   if (workspaceResult.error) {
@@ -1029,6 +1059,36 @@ export async function completeConversation(input: {
       "Unable to load existing attachments before completion.",
       attachmentsResult.error,
     );
+  }
+
+  if (summariesResult.error) {
+    throw toServiceError("Unable to load existing summaries before completion.", summariesResult.error);
+  }
+
+  const existingVisibleSummaries =
+    (summariesResult.data ?? []) as SessionSummaryRecord[];
+  const existingStudentSummary =
+    existingVisibleSummaries.find((summary) => summary.audience === "student") ?? null;
+
+  if (conversation.status === "completed" && existingStudentSummary) {
+    logRuntimeInfo({
+      message: "Reused existing completion artifacts",
+      requestId: input.requestId,
+      route: input.route,
+      method: "POST",
+      actorUserId: appUser.id,
+      actorRole: appUser.role,
+      targetStudentUserId: appUser.id,
+      details: {
+        conversationId: input.conversationId,
+        summaryCount: existingVisibleSummaries.length,
+      },
+    });
+
+    return {
+      conversation,
+      summaries: [existingStudentSummary],
+    };
   }
 
   const now = new Date().toISOString();

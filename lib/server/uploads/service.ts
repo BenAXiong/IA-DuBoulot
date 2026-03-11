@@ -14,6 +14,7 @@ import {
   moderateExtraction,
   recordModerationEvent,
 } from "@/lib/server/moderation/service";
+import { logRuntimeInfo } from "@/lib/server/audit/runtime-logger";
 import {
   assertStudentUsageActionAllowed,
   recordStudentAiUsageBestEffort,
@@ -114,6 +115,47 @@ function buildExtractedTextBlock(input: {
 
 function buildExtractionWarningMessage() {
   return "Le texte n'a pas pu etre extrait proprement. Garde la piece jointe et relis manuellement la zone utile.";
+}
+
+function buildPartialExtractionWarningMessage() {
+  return "Extraction partielle: relis le texte avant de t'appuyer dessus.";
+}
+
+function buildStoredExtractionWarningMessage(
+  attachment: ConversationAttachmentRecord,
+) {
+  if (attachment.extraction_status === "failed") {
+    return buildExtractionWarningMessage();
+  }
+
+  const metadata = normalizeMetadata(attachment.metadata);
+  const needsManualReview = metadata.needs_manual_review === true;
+  const confidence =
+    typeof metadata.ocr_confidence === "number"
+      ? metadata.ocr_confidence
+      : null;
+
+  if (needsManualReview || (confidence !== null && confidence < 0.55)) {
+    return buildPartialExtractionWarningMessage();
+  }
+
+  return null;
+}
+
+function buildExistingExtractionResult(
+  attachment: ConversationAttachmentRecord,
+): ConfirmUploadResult {
+  return {
+    attachment,
+    extractedTextBlock:
+      attachment.extraction_status === "ready"
+        ? buildExtractedTextBlock({
+            filename: attachment.original_filename,
+            extractedText: attachment.raw_extracted_text,
+          })
+        : null,
+    warningMessage: buildStoredExtractionWarningMessage(attachment),
+  };
 }
 
 type ParsedCreateUploadTargetRequest = Pick<
@@ -317,8 +359,8 @@ async function loadAttachmentForOwner(input: {
     context: input.context,
     conversationId: input.conversationId,
   });
-  const supabase = await createSupabaseServerClient();
-  const { data: attachment, error } = await supabase
+  const admin = createSupabaseAdminClient();
+  const { data: attachment, error } = await admin
     .from("attachments")
     .select(ATTACHMENT_SELECT)
     .eq("id", input.attachmentId)
@@ -556,6 +598,7 @@ async function runAttachmentExtraction(input: {
           sha256,
           extraction_engine: "gemini_file_understanding",
           extraction_error: "provider_failure",
+          needs_manual_review: true,
         },
       })
       .eq("id", input.attachment.id)
@@ -603,7 +646,7 @@ async function runAttachmentExtraction(input: {
   const warningMessage = shouldFailExtraction
     ? buildExtractionWarningMessage()
     : extraction.needsManualReview || (extraction.confidenceScore ?? 0) < 0.55
-      ? "Extraction partielle: relis le texte avant de t'appuyer dessus."
+      ? buildPartialExtractionWarningMessage()
       : null;
 
   const { data: updatedAttachment, error: updateError } = await admin
@@ -620,6 +663,7 @@ async function runAttachmentExtraction(input: {
         extraction_version: extraction.promptVersion,
         ocr_confidence: extraction.confidenceScore,
         detected_language: extraction.detectedLanguage,
+        needs_manual_review: extraction.needsManualReview,
       },
     })
     .eq("id", input.attachment.id)
@@ -671,11 +715,46 @@ export async function confirmUpload(
     });
   }
 
+  const { data: currentAttachmentRow, error: currentAttachmentError } = await admin
+    .from("attachments")
+    .select(ATTACHMENT_SELECT)
+    .eq("id", attachment.id)
+    .single();
+
+  if (currentAttachmentError || !currentAttachmentRow) {
+    throw toServiceError("Unable to reload the attachment after upload.", currentAttachmentError);
+  }
+
+  const currentAttachment = currentAttachmentRow as ConversationAttachmentRecord;
+
+  if (
+    currentAttachment.extraction_status === "failed" ||
+    (currentAttachment.extraction_status === "ready" &&
+      typeof currentAttachment.raw_extracted_text === "string")
+  ) {
+    logRuntimeInfo({
+      message: "Reused existing attachment extraction result",
+      requestId: input.requestId,
+      route: input.route,
+      method: "POST",
+      actorUserId: appUser.id,
+      actorRole: "student",
+      targetStudentUserId: appUser.id,
+      details: {
+        attachmentId: currentAttachment.id,
+        conversationId: conversation.id,
+        extractionStatus: currentAttachment.extraction_status,
+      },
+    });
+
+    return buildExistingExtractionResult(currentAttachment);
+  }
+
   return runAttachmentExtraction({
     appUserId: appUser.id,
     appUserRole: "student",
     conversationId: conversation.id,
-    attachment,
+    attachment: currentAttachment,
     requestId: input.requestId,
     route: input.route,
   });

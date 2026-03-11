@@ -64,9 +64,11 @@ Current blocking failure class:
 
 - authenticated student can create a conversation draft
 - file upload confirmation succeeds or degrades to manual review without breaking the flow
+- repeated upload confirmation reuses the stored extraction result instead of re-running provider extraction
 - workspace persists extracted or manual text
 - assistant reply appends successfully, with fallback allowed
 - completion produces at least the required student summary and leaves the conversation read-only
+- repeated completion reuses the stored student summary and does not regenerate memory
 - completion-triggered memory refresh succeeds, with fallback allowed
 
 ### Parent
