@@ -1,6 +1,6 @@
 # RLS Fixture Verification
 
-Related: [README](../README.md) | [Environment matrix](environment_matrix.md) | [Supabase schema V1](supabase_schema_v1.md) | [Access rules V1](access_rules_v1.md) | [Student memory profile V1](student_memory_profile_v1.md) | [Smoke checklist V1](smoke_checklist_v1.md) | [MVP to-do list](mvp_todo.md) | [Decision log](decision_log.md)
+Related: [README](../README.md) | [Environment matrix](environment_matrix.md) | [Supabase schema V1](supabase_schema_v1.md) | [Access rules V1](access_rules_v1.md) | [Student memory profile V1](student_memory_profile_v1.md) | [Smoke checklist V1](smoke_checklist_v1.md) | [Founder walkthrough V1](founder_walkthrough_v1.md) | [MVP to-do list](mvp_todo.md) | [Decision log](decision_log.md)
 
 ## Purpose
 
@@ -34,6 +34,8 @@ The goal is to test the policies that are actually deployed, not just read the S
 - admin: `rls-admin@iaduboulot.local`
 
 These accounts are deterministic and may be recreated by rerunning the seed script.
+
+They also form the default role-demo set used by the founder walkthrough, with the billing exception documented in [Founder walkthrough V1](founder_walkthrough_v1.md).
 
 ## Seeded Data
 

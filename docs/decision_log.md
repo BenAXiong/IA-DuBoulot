@@ -497,3 +497,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Centralize AI prompt-context truncation and output-token caps in `lib/server/ai/guardrails.ts`, enforce body-size caps before expensive student routes, and treat persisted extraction and completion artifacts as the primary cache layer. `POST /api/uploads/confirm` now reuses an already-resolved extraction result, and `POST /api/conversations/[conversationId]/complete` now reuses the stored student summary when the conversation is already completed. After reviewing upload economics against the current trial quotas, keep the existing `10 MB` image, `20 MB` PDF, `5` attachment, and `50 MB` per-conversation limits unchanged for the MVP.
 - Why: This lowers provider spend with explicit, reviewable boundaries instead of adding a broad implicit cache, preserves stable student behavior, and keeps the storage contract aligned with the current trial model.
 - Follow-up: Revisit `A7.3.2` with richer summary compaction or cross-request caching only if real production telemetry shows the current guardrails are still insufficient.
+
+### D-20260311-49 - Launch Candidate Stays Web-First And Defers PWA Before Beta
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A7.4.1`, `A7.4.2`, `A7.4.3`
+- Context: The product now has a real deployed web flow, a regression gate, and a founder-ready billing path in Lemon test mode, but the last meaningful manual risk is still real iPad Safari behavior. The repo also has no PWA manifest or service-worker foundation, so adding installability now would create a new branch of launch work without evidence that it matters more than device validation or demo operations.
+- Decision: Freeze the launch candidate around the current web MVP, defer PWA installability until after beta, and treat `docs/founder_walkthrough_v1.md` plus `docs/launch_checklist_v1.md` as the canonical operating docs for demos and launch-readiness. Use the deterministic fixture accounts as the default role-demo set, while keeping real Lemon checkout demos on a separate fresh parent account instead of the seeded fixture parent.
+- Why: This keeps the launch surface small, focuses attention on the flows that already exist and are regression-covered, and avoids spending launch time on installability plumbing before the web experience is fully validated on the target device.
+- Follow-up: Revisit PWA only after `A7.1` closes on a real iPad Safari pass and early beta usage shows that installability would materially improve retention or return frequency.

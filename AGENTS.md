@@ -46,13 +46,15 @@ Read these in order before any substantial implementation work:
 23. [docs/storage_attachment_rules.md](docs/storage_attachment_rules.md)
 24. [docs/rls_fixture_verification.md](docs/rls_fixture_verification.md) when auth, schema, or RLS work is in scope
 25. [docs/smoke_checklist_v1.md](docs/smoke_checklist_v1.md) when QA, demo readiness, or launch-readiness work is in scope
-26. [docs/sample_attachment_corpus.md](docs/sample_attachment_corpus.md) when upload, extraction, or demo fixture work is in scope
-27. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
-28. [docs/mvp_todo.md](docs/mvp_todo.md)
-29. [docs/mvp_timeline.md](docs/mvp_timeline.md)
-30. [docs/decision_log.md](docs/decision_log.md)
-31. [docs/work_sessions.md](docs/work_sessions.md)
-32. The relevant code, SQL, prompt, or UI files for the task being worked on
+26. [docs/founder_walkthrough_v1.md](docs/founder_walkthrough_v1.md) when demo prep or external walkthrough work is in scope
+27. [docs/launch_checklist_v1.md](docs/launch_checklist_v1.md) when launch-candidate or beta-readiness work is in scope
+28. [docs/sample_attachment_corpus.md](docs/sample_attachment_corpus.md) when upload, extraction, or demo fixture work is in scope
+29. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
+30. [docs/mvp_todo.md](docs/mvp_todo.md)
+31. [docs/mvp_timeline.md](docs/mvp_timeline.md)
+32. [docs/decision_log.md](docs/decision_log.md)
+33. [docs/work_sessions.md](docs/work_sessions.md)
+34. The relevant code, SQL, prompt, or UI files for the task being worked on
 
 If a file above is outdated, update it before or alongside the code change that depends on it.
 

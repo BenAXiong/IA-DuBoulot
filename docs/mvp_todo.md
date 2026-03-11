@@ -8,7 +8,7 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 
-- Overall: `[###########################...]` `112/128` complete (`88%`)
+- Overall: `[###########################...]` `115/128` complete (`90%`)
 - A0: `[xxxxxxxxxxxxxxxxx....]` `17/21`
 - A1: `[xxxxxxxxxxxxxxxx]` `16/16`
 - A2: `[xxxxxxxxxxx......]` `11/17`
@@ -16,7 +16,7 @@ Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 - A4: `[xxxxxxxxxxxxxxxxxxx]` `19/19`
 - A5: `[xxxxxxxxxxxxx]` `13/13`
 - A6: `[xxxxxxxxxxxxx]` `13/13`
-- A7: `[xxxxxx......]` `6/12`
+- A7: `[xxxxxxxxx...]` `9/12`
 
 ## Table Of Contents
 
@@ -374,6 +374,8 @@ Status note: the current Gemini-backed path now enforces bounded prompt context 
 
 ### A7.4 Launch Candidate
 
-- [ ] A7.4.1 Decide whether PWA installability is worth doing before beta.
-- [ ] A7.4.2 Prepare demo accounts and a founder walkthrough script.
-- [ ] A7.4.3 Freeze the MVP scope and publish the launch checklist.
+- [x] A7.4.1 Decide whether PWA installability is worth doing before beta.
+- [x] A7.4.2 Prepare demo accounts and a founder walkthrough script.
+- [x] A7.4.3 Freeze the MVP scope and publish the launch checklist.
+
+Status note: PWA installability is now explicitly deferred before beta, the canonical demo-account and founder walkthrough script now live in `docs/founder_walkthrough_v1.md`, and the frozen launch-candidate scope plus exit checklist now live in `docs/launch_checklist_v1.md`.

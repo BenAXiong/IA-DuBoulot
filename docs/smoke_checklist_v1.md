@@ -1,6 +1,6 @@
 # Smoke Checklist V1
 
-Related: [README](../README.md) | [RLS fixture verification](rls_fixture_verification.md) | [Student dashboard V1](student_dashboard_v1.md) | [Student workbench V1](student_workbench_v1.md) | [Oversight surfaces V1](oversight_surfaces_v1.md) | [Privacy controls V1](privacy_controls_v1.md) | [Student memory profile V1](student_memory_profile_v1.md) | [MVP to-do list](mvp_todo.md)
+Related: [README](../README.md) | [RLS fixture verification](rls_fixture_verification.md) | [Founder walkthrough V1](founder_walkthrough_v1.md) | [Launch checklist V1](launch_checklist_v1.md) | [Student dashboard V1](student_dashboard_v1.md) | [Student workbench V1](student_workbench_v1.md) | [Oversight surfaces V1](oversight_surfaces_v1.md) | [Privacy controls V1](privacy_controls_v1.md) | [Student memory profile V1](student_memory_profile_v1.md) | [MVP to-do list](mvp_todo.md)
 
 ## Purpose
 
