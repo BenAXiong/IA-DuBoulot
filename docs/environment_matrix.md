@@ -43,7 +43,7 @@ Keep environment configuration explicit so local development, Vercel, and provid
 - planned storage buckets are now created automatically by the fixture seed script, and the upload route family now exists locally, but deployed route-level verification still needs a targeted smoke pass
 - `GEMINI_API_KEY` is present locally; confirm the same key is mirrored in Vercel before relying on deployed `A4` behavior
 - PostHog and Resend values still need to be provisioned
-- local `.env.local` now carries Lemon Squeezy test-mode config, and Vercel production env has been populated; redeploy plus a deployed checkout/webhook verification pass are still required before treating billing as operational
+- Lemon Squeezy is now verified in deployed production with `LEMON_SQUEEZY_TEST_MODE=true`; the remaining billing follow-up is a later live-mode cutover, not missing MVP wiring
 
 ## Lemon Squeezy Provisioning Names
 

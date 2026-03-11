@@ -335,6 +335,7 @@ Status note: the app now records session, upload, assistant-message, and provide
 - [x] A6.3.2 Implement webhook handling for subscription state.
 - [x] A6.3.3 Persist subscription status without hardwiring provider-specific logic into the app.
 Status note: Lemon Squeezy now sits behind `lib/server/billing`, parent billing actions route through canonical checkout/portal endpoints, and a signed webhook smoke verifies subscription sync even when local checkout env remains intentionally blank.
+Status note: on 2026-03-11 the deployed Vercel app also completed a real Lemon test-mode checkout end to end, returned the parent to `/app`, and surfaced the synced subscription state without errors.
 
 ### A6.4 Privacy And Data Controls
 

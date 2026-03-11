@@ -131,6 +131,7 @@ The billing smoke script currently checks that:
 - 2026-03-11 local student-flow smoke warnings: Gemini extraction, coach, and student-summary fallbacks were exercised in the latest pass, and adult summary variants were missing in that run because those derivations are now best-effort
 - 2026-03-11 local adult-oversight smoke: success against a temporary local `next start` instance across parent, tutor, and admin routes
 - 2026-03-11 local billing smoke: success against a temporary local `next start` instance for checkout-config failure handling, signed webhook sync, and parent dashboard billing visibility
+- 2026-03-11 deployed billing verification: success on `https://ia-du-boulot.vercel.app` with real Lemon test-mode checkout open, completed payment, redirect back to `/app`, parent dashboard subscription visibility, Lemon confirmation email, and Lemon dashboard order logging
 
 ## Scope Notes
 
