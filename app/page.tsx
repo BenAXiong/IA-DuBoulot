@@ -113,23 +113,29 @@ export default async function Home({
           </section>
 
           {featureRows.map((row, index) => {
-            const previewColumn = row.reverse ? "lg:col-start-2" : "lg:col-start-1";
-            const cardsColumn = row.reverse ? "lg:col-start-1" : "lg:col-start-2";
+            const sectionLayout = row.reverse
+              ? "lg:grid-cols-[minmax(21rem,0.95fr)_minmax(0,1.55fr)]"
+              : "lg:grid-cols-[minmax(0,1.55fr)_minmax(21rem,0.95fr)]";
+            const mediaBlock = (
+              <div className="h-full lg:h-[34rem]">
+                <MediaPreview alt={row.preview.title} src={row.mediaSrc} />
+              </div>
+            );
+            const cardsBlock = (
+              <div className="grid h-full gap-4 auto-rows-fr lg:h-[34rem] lg:grid-rows-3">
+                {row.cards.map((card) => (
+                  <FeatureCard body={card.body} key={card.title} title={card.title} />
+                ))}
+              </div>
+            );
 
             return (
               <section
-                className={`${index === 0 ? "" : "mt-16 sm:mt-20"} grid items-stretch gap-6 lg:min-h-[34rem] lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] xl:gap-8`}
+                className={`${index === 0 ? "" : "mt-24 sm:mt-28 lg:mt-32"} grid items-stretch gap-6 lg:min-h-[34rem] ${sectionLayout} xl:gap-8`}
                 key={row.preview.title}
               >
-                <div className={`${previewColumn} h-full lg:h-[34rem]`}>
-                  <MediaPreview alt={row.preview.title} src={row.mediaSrc} />
-                </div>
-
-                <div className={`grid h-full gap-4 auto-rows-fr lg:col-span-1 lg:h-[34rem] lg:grid-rows-3 ${cardsColumn}`}>
-                  {row.cards.map((card) => (
-                    <FeatureCard body={card.body} key={card.title} title={card.title} />
-                  ))}
-                </div>
+                {row.reverse ? cardsBlock : mediaBlock}
+                {row.reverse ? mediaBlock : cardsBlock}
               </section>
             );
           })}
