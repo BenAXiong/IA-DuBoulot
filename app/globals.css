@@ -503,7 +503,7 @@ code {
   background-size: 220% 220%;
   color: var(--foreground-inverse);
   box-shadow: 0 16px 34px rgba(16, 41, 69, 0.18);
-  animation: cta-shift 16s ease-in-out infinite;
+  animation: cta-shift 8s ease-in-out infinite;
 }
 
 .button-primary:hover {

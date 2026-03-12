@@ -113,19 +113,19 @@ export default async function Home({
           </section>
 
           {featureRows.map((row, index) => {
-            const previewOrder = row.reverse ? "lg:order-2" : "lg:order-1";
-            const cardsOrder = row.reverse ? "lg:order-1" : "lg:order-2";
+            const previewColumn = row.reverse ? "lg:col-start-2" : "lg:col-start-1";
+            const cardsColumn = row.reverse ? "lg:col-start-1" : "lg:col-start-2";
 
             return (
               <section
-                className={`${index === 0 ? "" : "mt-10"} grid items-stretch gap-6 lg:min-h-[34rem] lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] xl:gap-8`}
+                className={`${index === 0 ? "" : "mt-16 sm:mt-20"} grid items-stretch gap-6 lg:min-h-[34rem] lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] xl:gap-8`}
                 key={row.preview.title}
               >
-                <div className={`${previewOrder} h-full lg:h-[34rem]`}>
+                <div className={`${previewColumn} h-full lg:h-[34rem]`}>
                   <MediaPreview alt={row.preview.title} src={row.mediaSrc} />
                 </div>
 
-                <div className={`grid h-full gap-4 auto-rows-fr lg:h-[34rem] lg:grid-rows-3 ${cardsOrder}`}>
+                <div className={`grid h-full gap-4 auto-rows-fr lg:col-span-1 lg:h-[34rem] lg:grid-rows-3 ${cardsColumn}`}>
                   {row.cards.map((card) => (
                     <FeatureCard body={card.body} key={card.title} title={card.title} />
                   ))}

@@ -767,3 +767,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Remove the subtitle from the public-shell wordmark, widen the public header rail to match the broader landing canvas, lock the three landing GIF rows to the same height, and move the CTA motion into the shared `button-primary` token layer as a slow background-position drift with reduced-motion fallback.
 - Why: This makes the header feel less like a product brochure masthead, keeps the story rows visually disciplined, and adds a small amount of energy without scattering bespoke animation logic across routes.
 - Follow-up: Reassess whether the shared CTA drift should remain global once more authenticated app surfaces are visually tuned, and decide later whether any pointer-following background effect belongs on the landing at all or should remain a pilot-only experiment.
+
+### D-20260312-76 - Subject Handling Stays Flat In MVP While Adult Verification Remains Operational
+
+- Date: 2026-03-12
+- Status: accepted
+- Related tasks: `P2.4`, `P4.5`
+- Context: The current repo already stores `subject_tag`, exposes recent-subject rollups, and allows a custom subject through the intake flow, but the founder asked whether subject-specific conversation modes, subject-shaped memory, and adult verification for parent accounts were already designed in a stronger way.
+- Decision: Keep the MVP subject model intentionally flat for now: one shared coaching workflow, one subject tag per conversation, custom subjects allowed through the existing `Other subject` intake path, and no subject-family-specific prompt or memory forks yet. Also treat parent adulthood verification as an operational pilot question rather than a solved product mechanism: the current system knows roles and links, not real-world age or guardianship.
+- Why: This matches the implemented product reality, avoids inventing fake subject specialization late in MVP, and keeps a real compliance or trust gap visible instead of pretending role selection proves adulthood.
+- Follow-up: Use `P2.4` to decide which subject families need distinct coaching modes or normalization, and use `P4.5` to define whether pilot parent trust comes from founder review, payment-method ownership, support verification, or a stronger later verification layer.

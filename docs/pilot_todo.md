@@ -52,6 +52,9 @@ Status note: the shared shell and primitive layer now has a real multi-theme sys
 - [ ] P2.1 Review the first-run student journey end to end from landing or auth through completed session.
 - [ ] P2.2 Review the parent and tutor journeys from invite or approval through oversight and settings.
 - [ ] P2.3 Convert friction findings into bounded fixes with before or after notes, screenshots, or smoke evidence.
+- [ ] P2.4 Map which conversation or coaching modes should exist per subject family, and decide which ones stay universal versus subject-specific before the pilot broadens.
+
+Status note: the current MVP still runs one shared coaching workflow across subjects. The product already stores a `subject_tag`, shows recent-subject rollups, uses subject text inside prompts and summaries, and allows a custom subject through the intake `Other subject` path, but memory, prompts, and UI flows are not yet specialized by subject family. Pilot work should decide whether math/science/humanities/language-study need different coaching modes, and whether custom subjects stay free-text, become admin-curated, or need alias normalization.
 
 ### P3 Device, Accessibility, And Reliability
 
@@ -65,8 +68,9 @@ Status note: the shared shell and primitive layer now has a real multi-theme sys
 - [ ] P4.2 Add a lightweight operator change log for pilot-facing fixes, regressions, and known issues.
 - [ ] P4.3 Define exit criteria for moving from Pilot to Beta, including UX, support load, and regression confidence.
 - [ ] P4.4 Add a dev-only mock-AI mode and explicit dev-versus-pilot Gemini project guidance so UI iteration does not burn pilot quota.
+- [ ] P4.5 Define how the pilot verifies or operationally trusts that a `parent` account really belongs to an adult, and when stronger checks are required before wider rollout.
 
-Status note: `docs/pilot_todo.md` maintenance is now mandatory whenever a session changes pilot-facing polish, UX findings, release-ops assumptions, or `P*` task status, and a verified coherent slice should now also be committed and pushed in the same session. `P4` stays open because the triage cadence, operator-facing change log, and Pilot-to-Beta exit criteria are still not defined.
+Status note: `docs/pilot_todo.md` maintenance is now mandatory whenever a session changes pilot-facing polish, UX findings, release-ops assumptions, or `P*` task status, and a verified coherent slice should now also be committed and pushed in the same session. `P4` stays open because the triage cadence, operator-facing change log, Pilot-to-Beta exit criteria, and the current parent-account adulthood-verification posture are still not fully defined.
 
 ### P5 Structural Audit And Refactor Discipline
 
