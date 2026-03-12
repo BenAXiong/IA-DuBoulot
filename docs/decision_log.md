@@ -717,3 +717,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Close that slice by extending the existing focused copy modules instead of introducing a new global server-i18n layer. `lib/i18n/ui-copy.ts` now owns auth/profile and invitation server-copy helpers, `lib/i18n/dashboard-copy.ts` owns memory server-copy helpers plus deterministic memory fallback text, and `lib/i18n/oversight-copy.ts` owns tutor-note and billing-management server-copy helpers. The affected routes and services now thread `preferred_ui_language` into their parsers and user-facing error branches.
 - Why: This closes the visible launch-blocking leaks with a bounded change set, keeps the i18n architecture narrow and reviewable, and avoids turning generic server-error handling into a second translation framework before the MVP launch gate.
 - Follow-up: Finish the broader accented-French and Unicode audit, keep narrowing any residual generic provider or service fallback strings, and complete the remaining parent-summary default plus real-device language-switch verification.
+
+### D-20260312-71 - The Public Landing Stops Acting Like A Toolbox
+
+- Date: 2026-03-12
+- Status: accepted
+- Related tasks: `A7.4.7`, `P1.1`, `P1.2`, `P1.3`
+- Context: The previous `/` page still behaved like an operator toolbox. It exposed too many direct shortcuts at once, mixed product framing with repo links, and made the public entry feel closer to an internal project hub than to a calm parent- or student-facing product page.
+- Decision: Keep the shared public shell, but reshape `/` into a concise product landing with one clear hero, a short flow explanation, role framing, and a quieter closing CTA. Move the old quick-access shortcuts into a floating helper button positioned above the Vercel helper area, and simplify the shared public theme control to a single light-or-dark icon toggle instead of a labeled segmented control.
+- Why: This preserves fast operator access without making the public page feel like a dev console, keeps the most visible entry route aligned with the current trust-oriented visual direction, and reduces cognitive noise for first-time visitors.
+- Follow-up: Iterate on the landing copy after user review, audit the same calmness standard on the pricing and auth pages, and validate the helper-button placement against the real deployed Vercel helper plus real tablet hardware.

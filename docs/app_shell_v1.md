@@ -36,7 +36,8 @@ Rules:
 - auth and invite flows should feel like the same product as the landing page
 - pricing remains intentionally provisional while the MVP still exposes only one wired Family monthly plan
 - the shell now carries the active UI language through shared dictionaries and a small client-side `document.documentElement.lang` sync instead of hardcoded French-only chrome
-- the shell now also exposes the shared light or dark theme toggle instead of leaving theme preference implicit in CSS alone
+- the shell now also exposes the shared light or dark theme toggle instead of leaving theme preference implicit in CSS alone, but the public chrome keeps it to a single icon button rather than a labeled segmented control
+- the landing route now keeps operator and deep-link shortcuts behind a floating helper button so the user-facing page can stay calmer than the previous toolbox-style entry
 
 ## Authenticated App Shell
 

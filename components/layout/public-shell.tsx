@@ -57,12 +57,6 @@ export function PublicShell({
             >
               {copy.nav.pricing}
             </Link>
-            <Link
-              className="shell-nav-link"
-              href={withUiLanguage("/auth", languageCode)}
-            >
-              {copy.nav.auth}
-            </Link>
           </nav>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -82,13 +76,7 @@ export function PublicShell({
                 </Link>
               ))}
             </div>
-            <span className="brand-pill hidden xl:inline-flex">{copy.pilotBadge}</span>
-            <Link
-              className="button-base button-secondary interactive-card"
-              href={withUiLanguage("/auth?mode=sign_up&role=student", languageCode)}
-            >
-              {copy.start}
-            </Link>
+            <span className="brand-pill hidden lg:inline-flex">{copy.pilotBadge}</span>
             <Link
               className="button-base button-primary interactive-card"
               href={withUiLanguage("/auth", languageCode)}

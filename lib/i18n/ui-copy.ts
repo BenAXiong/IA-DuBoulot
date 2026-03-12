@@ -32,7 +32,7 @@ export function getThemeToggleCopy(languageCode: UiLanguageCode) {
 export function getPublicShellCopy(languageCode: UiLanguageCode) {
   return pickLocalizedValue(languageCode, {
     fr: {
-      tagline: "Devoirs guidés. Adultes informés.",
+      tagline: "Aide guidée. Visibilité adulte.",
       nav: {
         product: "Produit",
         pricing: "Tarifs",
@@ -40,41 +40,41 @@ export function getPublicShellCopy(languageCode: UiLanguageCode) {
       },
       pilotBadge: "Pilot privé",
       start: "Commencer",
-      openApp: "Entrer dans l'app",
+      openApp: "Connexion",
       footerBadge: "Pilot supervisé",
       footerTitle:
-        "Une base publique calme pendant que les flux métier gagnent en maturité.",
+        "Une base simple et lisible pour les premières familles.",
       footerBody:
-        "Cette couche couvre le landing, les tarifs, l'auth, l'onboarding et les liens d'invitation sans dupliquer la navigation ni le cadre de confiance.",
+        "Le produit avance par petits pas: guidance côté élève, visibilité côté adulte, et un cadre clair avant d'ouvrir plus largement le service.",
       footerColumns: [
         {
-          title: "Produit",
+          title: "Élève",
           items: [
-            "Aide aux devoirs supervisée",
-            "Parcours élève, parent et tuteur",
-            "Interface FR / EN / ZH en cours de finition",
+            "Commencer avec un devoir réel",
+            "Recevoir des indices avant la réponse",
+            "Retrouver son travail d'une session à l'autre",
           ],
         },
         {
-          title: "État du build",
+          title: "Parent",
           items: [
-            "Auth SSR Supabase reliée",
-            "Invitations parent / tuteur traçables",
-            "Vercel et schéma live déjà branchés",
+            "Voir l'historique et les résumés",
+            "Suivre le quota et le statut du compte",
+            "Garder la main sur la confidentialité",
           ],
         },
         {
-          title: "Trajectoire",
+          title: "Tuteur",
           items: [
-            "Pilot fermé d'abord",
-            "Polish UX et tablette ensuite",
-            "Facturation parent via Lemon",
+            "Retrouver le contexte d'un élève lié",
+            "Lire une synthèse dédiée au suivi",
+            "Conserver des notes privées",
           ],
         },
       ],
     },
     en: {
-      tagline: "Guided homework. Adults kept informed.",
+      tagline: "Guided help. Adult visibility.",
       nav: {
         product: "Product",
         pricing: "Pricing",
@@ -82,41 +82,41 @@ export function getPublicShellCopy(languageCode: UiLanguageCode) {
       },
       pilotBadge: "Private pilot",
       start: "Get started",
-      openApp: "Open the app",
+      openApp: "Sign in",
       footerBadge: "Supervised pilot",
       footerTitle:
-        "A calmer public baseline while the product flows mature.",
+        "A simple public entry for the first families.",
       footerBody:
-        "This layer covers landing, pricing, auth, onboarding, and invitation links without duplicating navigation or the trust frame.",
+        "The product stays intentionally focused: guided student help, adult visibility, and a clear trust frame before access widens.",
       footerColumns: [
         {
-          title: "Product",
+          title: "Student",
           items: [
-            "Supervised homework support",
-            "Student, parent, and tutor journeys",
-            "FR / EN / ZH interface in progress",
+            "Start from a real homework task",
+            "Get guidance before full answers",
+            "Return to the same work later",
           ],
         },
         {
-          title: "Build status",
+          title: "Parent",
           items: [
-            "Supabase SSR auth connected",
-            "Traceable parent and tutor invitations",
-            "Vercel and live schema already wired",
+            "Review summaries and history",
+            "Track quota and account status",
+            "Keep privacy controls close",
           ],
         },
         {
-          title: "Trajectory",
+          title: "Tutor",
           items: [
-            "Closed pilot first",
-            "UX and tablet polish next",
-            "Parent billing through Lemon",
+            "Pick up the linked student context",
+            "Read a tutor-specific summary",
+            "Keep private support notes",
           ],
         },
       ],
     },
     zh: {
-      tagline: "引導式作業協助，讓家長與大人保持知情。",
+      tagline: "有引導的協助，保留大人視角。",
       nav: {
         product: "產品",
         pricing: "方案",
@@ -124,34 +124,34 @@ export function getPublicShellCopy(languageCode: UiLanguageCode) {
       },
       pilotBadge: "封閉 Pilot",
       start: "開始使用",
-      openApp: "進入 App",
+      openApp: "登入",
       footerBadge: "受監督 Pilot",
-      footerTitle: "在產品流程逐步成熟時，先把公開入口做得安定清楚。",
+      footerTitle: "先把公開入口做得簡單、清楚、可被信任。",
       footerBody:
-        "這一層涵蓋首頁、方案、登入、onboarding 與邀請連結，不必重複導覽與信任框架。",
+        "產品刻意保持聚焦：學生端有引導，大人端有可見性，在更廣泛開放之前先把信任框架建立好。",
       footerColumns: [
         {
-          title: "產品",
+          title: "學生",
           items: [
-            "受監督的作業協助",
-            "學生、家長、家教三種旅程",
-            "FR / EN / ZH 介面持續補完中",
+            "從真實作業開始",
+            "先得到引導，再接近答案",
+            "可以回到同一份作業繼續",
           ],
         },
         {
-          title: "建置狀態",
+          title: "家長",
           items: [
-            "Supabase SSR 驗證已接通",
-            "家長 / 家教邀請可追蹤",
-            "Vercel 與正式 schema 已接好",
+            "查看摘要與歷史紀錄",
+            "掌握配額與帳號狀態",
+            "把隱私控制留在手邊",
           ],
         },
         {
-          title: "下一步",
+          title: "家教",
           items: [
-            "先做封閉 Pilot",
-            "再補 UX 與平板細節",
-            "家長付費流程走 Lemon",
+            "接手已連結學生的脈絡",
+            "閱讀家教專用摘要",
+            "保留私人教學筆記",
           ],
         },
       ],
@@ -162,151 +162,263 @@ export function getPublicShellCopy(languageCode: UiLanguageCode) {
 export function getHomePageCopy(languageCode: UiLanguageCode) {
   return pickLocalizedValue(languageCode, {
     fr: {
-      badges: ["IA DuBoulot", "IA d'aide en français", "UI FR / EN / ZH", "Prêt pour Vercel"],
-      eyebrow: "Build scaffold",
+      badges: ["Pilot privé", "FR / EN / ZH"],
+      eyebrow: "Aide aux devoirs supervisée",
       title:
-        "Un coach de devoirs IA supervisé pour les élèves, les parents et les tuteurs.",
+        "Une aide IA qui guide l'élève sans sortir les adultes du cadre.",
       body:
-        "Le repo dispose déjà de la colonne vertébrale de planification, du modèle de rôles, du cadre mineurs et du scaffold Next.js nécessaires pour faire avancer le MVP réel.",
+        "L'élève avance étape par étape, le parent garde de la visibilité, et le tuteur retrouve le fil du travail. Le produit reste volontairement simple, calme et pensé pour de vrais devoirs.",
       ctas: {
-        auth: "Ouvrir l'auth",
-        student: "Commencer comme élève",
-        parent: "Commencer comme parent",
-        tutor: "Commencer comme tuteur",
-        github: "Ouvrir le repo GitHub",
-        vercel: "Ouvrir le projet Vercel",
+        primary: "Entrer dans l'app",
+        secondary: "Voir les tarifs",
+        journey: "Comprendre le parcours",
       },
-      currentTrackTitle: "Piste actuelle",
-      buildTrack: [
-        "Projet Vercel créé et prêt pour un déploiement racine.",
-        "Pile IA Gemini prioritaire avec frontière fournisseur interchangeable.",
-        "Lemon Squeezy choisi pour la facturation.",
-        "Cadre MVP pour les moins de 13 ans documenté avant auth et schéma.",
-      ],
-      pillars: [
-        {
-          title: "Supervisé par design",
-          body: "L'aide donnée à l'élève reste visible pour les parents et les tuteurs au lieu de disparaître dans un chatbot privé.",
-        },
-        {
-          title: "Coach, pas machine à réponses",
-          body: "Le produit se construit autour des indices, des tentatives et des signaux d'apprentissage avant les solutions complètes.",
-        },
-        {
-          title: "Pensé pour les vrais devoirs",
-          body: "Photos, captures et PDF sont des entrées de premier rang parce que les élèves travaillent entre iPad et laptop.",
-        },
-      ],
-      publicTrackEyebrow: "Piste publique",
-      publicTrackTitle:
-        "La couche publique ne dépend plus d'une simple page placeholder.",
-      publicTrackBody:
-        "Landing, tarifs et auth partagent maintenant le même squelette, ce qui réduit le risque de dérive visuelle avant les phases produit plus lourdes.",
-      appShell: {
-        title: "App shell",
-        body: "Le shell protégé bascule vers une vraie navigation responsive avec variantes élève, parent, tuteur et admin.",
+      supportCard: {
+        eyebrow: "Ce que le produit apporte",
+        title: "Un cadre clair pour chaque rôle.",
+        items: [
+          "L'élève travaille avec des indices, un espace de brouillon et un historique.",
+          "Le parent voit les résumés, le statut du compte et les contrôles de confidentialité.",
+          "Le tuteur retrouve un élève lié sans accéder à toute la mémoire brute.",
+        ],
       },
-      pricingShell: {
-        title: "Pricing shell",
-        body: "Le pricing MVP reste volontairement simple pour ne pas inventer de packaging définitif avant Lemon Squeezy.",
+      proof: [
+        {
+          title: "Côté élève",
+          body: "Le produit aide à avancer sans transformer le devoir en simple machine à réponses.",
+        },
+        {
+          title: "Côté adulte",
+          body: "Les parents et les tuteurs gardent de la visibilité au lieu d'être exclus du travail fait avec l'IA.",
+        },
+        {
+          title: "Côté produit",
+          body: "Le MVP reste resserré: parcours simple, ton calme, et pilot fermé avant toute ouverture plus large.",
+        },
+      ],
+      journeyEyebrow: "Parcours",
+      journeyTitle: "Trois étapes simples pour garder le devoir lisible.",
+      journeySteps: [
+        {
+          title: "1. Importer le devoir",
+          body: "PDF, capture, photo ou texte libre: l'entrée suit la réalité du travail scolaire.",
+        },
+        {
+          title: "2. Travailler avec l'IA",
+          body: "L'élève avance avec des indices, un espace de brouillon et des réponses orientées apprentissage.",
+        },
+        {
+          title: "3. Garder les adultes alignés",
+          body: "Résumés, revue et notes privées permettent un suivi sans ouvrir tout le contexte à tout le monde.",
+        },
+      ],
+      rolesEyebrow: "Rôles",
+      rolesTitle: "Trois rôles, une même base de confiance.",
+      roles: [
+        {
+          title: "Élève",
+          body: "Commencer un devoir, reprendre une session, et obtenir une aide qui reste pédagogique.",
+        },
+        {
+          title: "Parent",
+          body: "Voir la progression, comprendre les points fragiles et garder la main sur le compte.",
+        },
+        {
+          title: "Tuteur",
+          body: "Relire une session, suivre les besoins et conserver des notes privées de continuité.",
+        },
+      ],
+      closing: {
+        eyebrow: "Pilot",
+        title: "Le pilot reste volontairement fermé.",
+        body: "Le bon objectif pour maintenant n'est pas d'ajouter du bruit, mais de rendre l'expérience assez nette pour les premières familles réelles.",
+        cta: "Commencer",
+      },
+      helper: {
+        buttonLabel: "Accès rapide",
+        title: "Accès rapide",
+        body: "Les raccourcis produit et opérateur sont regroupés ici pour garder la page d'accueil plus calme.",
+        links: {
+          auth: "Connexion",
+          student: "Inscription élève",
+          parent: "Inscription parent",
+          tutor: "Inscription tuteur",
+          github: "Repo GitHub",
+          vercel: "Projet Vercel",
+        },
       },
     },
     en: {
-      badges: ["IA DuBoulot", "French-first AI help", "FR / EN / ZH UI", "Vercel-ready"],
-      eyebrow: "Build scaffold",
+      badges: ["Private pilot", "FR / EN / ZH"],
+      eyebrow: "Supervised homework help",
       title:
-        "A supervised AI homework coach for students, parents, and tutors.",
+        "AI homework help that guides the student without cutting adults out.",
       body:
-        "The repo already has the planning spine, role model, minors baseline, and Next.js scaffold needed to keep the real MVP moving.",
+        "The student moves step by step, the parent keeps visibility, and the tutor can pick up the thread. The product stays intentionally simple, calm, and built for real homework.",
       ctas: {
-        auth: "Open auth",
-        student: "Start as student",
-        parent: "Start as parent",
-        tutor: "Start as tutor",
-        github: "Open GitHub repo",
-        vercel: "Open Vercel project",
+        primary: "Open the app",
+        secondary: "See pricing",
+        journey: "See the flow",
       },
-      currentTrackTitle: "Current track",
-      buildTrack: [
-        "Vercel project created and ready for root deployment.",
-        "Gemini-first AI path with a swappable provider boundary.",
-        "Lemon Squeezy selected for billing.",
-        "Under-13 MVP baseline documented before auth and schema work.",
-      ],
-      pillars: [
-        {
-          title: "Supervised by design",
-          body: "Student help stays visible to parents and tutors instead of disappearing inside a private chatbot.",
-        },
-        {
-          title: "Coach, not answer machine",
-          body: "The product is being shaped around hints, attempts, and learning signals before full solutions.",
-        },
-        {
-          title: "Built for real homework intake",
-          body: "Photos, screenshots, and PDFs are first-class inputs because students work across iPad and laptop flows.",
-        },
-      ],
-      publicTrackEyebrow: "Public track",
-      publicTrackTitle:
-        "The public layer no longer depends on a placeholder page.",
-      publicTrackBody:
-        "Landing, pricing, and auth now share the same frame, which lowers visual drift before heavier product phases.",
-      appShell: {
-        title: "App shell",
-        body: "The protected shell now uses real responsive navigation with student, parent, tutor, and admin variants.",
+      supportCard: {
+        eyebrow: "What the product does",
+        title: "A clear frame for each role.",
+        items: [
+          "The student works with hints, a scratchpad, and session history.",
+          "The parent sees summaries, account state, and privacy controls.",
+          "The tutor can pick up a linked student without getting full raw memory access.",
+        ],
       },
-      pricingShell: {
-        title: "Pricing shell",
-        body: "The MVP pricing layer stays intentionally simple so it does not invent a final package before Lemon Squeezy.",
+      proof: [
+        {
+          title: "Student side",
+          body: "The product helps the student move forward without becoming a pure answer machine.",
+        },
+        {
+          title: "Adult side",
+          body: "Parents and tutors keep visibility instead of being pushed out of the AI-assisted work.",
+        },
+        {
+          title: "Product side",
+          body: "The MVP stays tight: simple flow, calm tone, and a closed pilot before any wider rollout.",
+        },
+      ],
+      journeyEyebrow: "Flow",
+      journeyTitle: "Three simple steps that keep the homework readable.",
+      journeySteps: [
+        {
+          title: "1. Bring the homework in",
+          body: "PDF, screenshot, photo, or pasted text: intake follows how students actually work.",
+        },
+        {
+          title: "2. Work with guided help",
+          body: "The student gets hints, a workspace, and learning-oriented replies instead of instant full solutions.",
+        },
+        {
+          title: "3. Keep adults aligned",
+          body: "Summaries, review, and private notes support follow-up without exposing every surface to every role.",
+        },
+      ],
+      rolesEyebrow: "Roles",
+      rolesTitle: "Three roles, one trust frame.",
+      roles: [
+        {
+          title: "Student",
+          body: "Start homework, return to a session later, and get help that stays pedagogical.",
+        },
+        {
+          title: "Parent",
+          body: "Review progress, understand fragile points, and keep control of the account.",
+        },
+        {
+          title: "Tutor",
+          body: "Review a session, follow recurring needs, and keep private continuity notes.",
+        },
+      ],
+      closing: {
+        eyebrow: "Pilot",
+        title: "The pilot stays intentionally closed.",
+        body: "The right goal for now is not more noise. It is a calmer experience that is strong enough for the first real families.",
+        cta: "Get started",
+      },
+      helper: {
+        buttonLabel: "Quick access",
+        title: "Quick access",
+        body: "Product and operator shortcuts live here so the landing page can stay quieter.",
+        links: {
+          auth: "Sign in",
+          student: "Student sign-up",
+          parent: "Parent sign-up",
+          tutor: "Tutor sign-up",
+          github: "GitHub repo",
+          vercel: "Vercel project",
+        },
       },
     },
     zh: {
-      badges: ["IA DuBoulot", "法文優先 AI 協助", "FR / EN / ZH 介面", "Vercel 就緒"],
-      eyebrow: "Build scaffold",
-      title: "為學生、家長與家教設計的受監督 AI 作業教練。",
+      badges: ["封閉 Pilot", "FR / EN / ZH"],
+      eyebrow: "受監督的作業協助",
+      title: "用 AI 引導學生做作業，同時不把大人排除在外。",
       body:
-        "這個 repo 已經具備規劃主軸、角色模型、未成年人基線與 Next.js scaffold，可以繼續推進真正的 MVP。",
+        "學生可以一步一步前進，家長保有可見性，家教也能接上脈絡。產品刻意保持簡單、安定，而且是為真實作業情境而設計。",
       ctas: {
-        auth: "前往登入",
-        student: "以學生身分開始",
-        parent: "以家長身分開始",
-        tutor: "以家教身分開始",
-        github: "打開 GitHub repo",
-        vercel: "打開 Vercel 專案",
+        primary: "進入 App",
+        secondary: "查看方案",
+        journey: "了解流程",
       },
-      currentTrackTitle: "目前進度",
-      buildTrack: [
-        "Vercel 專案已建立，可直接從根目錄部署。",
-        "目前以 Gemini 為主，供應商邊界可替換。",
-        "Lemon Squeezy 已選作付費方案。",
-        "13 歲以下 MVP 基線已先於 auth 與 schema 文件化。",
-      ],
-      pillars: [
-        {
-          title: "從設計上就可監督",
-          body: "學生得到的協助不會躲進私密聊天機器人，而是能讓家長與家教看見。",
-        },
-        {
-          title: "是教練，不是答案機器",
-          body: "產品優先強化提示、嘗試與學習訊號，而不是直接丟出完整解答。",
-        },
-        {
-          title: "針對真實作業輸入設計",
-          body: "照片、截圖與 PDF 都是一級輸入，因為學生真的會在 iPad 和筆電之間切換。",
-        },
-      ],
-      publicTrackEyebrow: "公開入口",
-      publicTrackTitle: "公開層已不再只是暫時 placeholder。",
-      publicTrackBody:
-        "首頁、方案與登入共用同一套框架，能在之後進入更重的產品階段前，先降低視覺漂移。",
-      appShell: {
-        title: "App shell",
-        body: "受保護區現在已有真正的響應式導覽，並區分學生、家長、家教與管理員。",
+      supportCard: {
+        eyebrow: "產品帶來什麼",
+        title: "為每個角色保留清楚的框架。",
+        items: [
+          "學生可用提示、草稿空間與歷史紀錄來完成作業。",
+          "家長可看到摘要、帳號狀態與隱私控制。",
+          "家教可以接手已連結學生的情境，但不會直接看到完整原始記憶。",
+        ],
       },
-      pricingShell: {
-        title: "Pricing shell",
-        body: "MVP 的方案頁刻意維持簡潔，不在 Lemon Squeezy 完整接好前過早定義最終包裝。",
+      proof: [
+        {
+          title: "學生端",
+          body: "產品幫助學生向前推進，但不會變成單純吐答案的機器。",
+        },
+        {
+          title: "大人端",
+          body: "家長與家教保有可見性，而不是被排除在 AI 協助之外。",
+        },
+        {
+          title: "產品端",
+          body: "MVP 刻意收斂：流程簡單、語氣安定，並先以封閉 Pilot 驗證。",
+        },
+      ],
+      journeyEyebrow: "流程",
+      journeyTitle: "三個簡單步驟，讓作業過程保持清楚。",
+      journeySteps: [
+        {
+          title: "1. 帶入作業",
+          body: "PDF、截圖、照片或貼上文字都可以，符合學生真實的使用方式。",
+        },
+        {
+          title: "2. 在引導下完成",
+          body: "學生會得到提示、工作區與偏向學習的回應，而不是立即拿到完整答案。",
+        },
+        {
+          title: "3. 讓大人保持同步",
+          body: "摘要、回顧與私人筆記讓後續追蹤可行，同時不把每個面向都暴露給所有角色。",
+        },
+      ],
+      rolesEyebrow: "角色",
+      rolesTitle: "三種角色，共用同一套信任框架。",
+      roles: [
+        {
+          title: "學生",
+          body: "開始一份作業、之後再回來續做，並得到仍然具有教學性的協助。",
+        },
+        {
+          title: "家長",
+          body: "查看進度、理解脆弱點，並保有對帳號與資料的控制。",
+        },
+        {
+          title: "家教",
+          body: "回顧作業過程、追蹤反覆需求，並留下私人連續性筆記。",
+        },
+      ],
+      closing: {
+        eyebrow: "Pilot",
+        title: "目前的 Pilot 會刻意維持封閉。",
+        body: "現在真正重要的不是更多噪音，而是把體驗整理得夠穩、夠清楚，讓第一批真實家庭敢用。",
+        cta: "開始使用",
+      },
+      helper: {
+        buttonLabel: "快速入口",
+        title: "快速入口",
+        body: "產品與操作捷徑先收在這裡，讓首頁保持更安靜。",
+        links: {
+          auth: "登入",
+          student: "學生註冊",
+          parent: "家長註冊",
+          tutor: "家教註冊",
+          github: "GitHub repo",
+          vercel: "Vercel 專案",
+        },
       },
     },
   });
