@@ -39,9 +39,11 @@ Rules:
 - the shell now also exposes the shared multi-theme system instead of leaving theme preference implicit in CSS alone, but the public chrome keeps its quick toggle to a single icon button while the floater owns the fuller preset or custom-theme menu
 - the landing route now keeps operator and deep-link shortcuts behind a floating helper button so the user-facing page can stay calmer than the previous toolbox-style entry
 - the public chrome now uses a compact globe-menu language selector instead of always-visible inline language pills, and the control geometry must stay unclipped at small shell sizes
+- the public shell no longer renders the subtitle under the wordmark on `/`, and the top bar now runs nearly the full landing width instead of staying on the narrower `6xl` rail
 - the home route may opt out of the shared public footer when a page-owned closing CTA gives a cleaner public narrative than the heavier shell footer
 - the home route now also uses a wider canvas with centered hero and closing CTA copy, while the product-story body alternates `1 preview + 3 glass cards` rows so future GIFs can scale without collapsing text legibility
 - the current landing media frames now use neutral moving placeholder GIFs from public sources, stored locally in `public/landing/`, so the layout can be judged with real motion before actual product captures are ready
+- the shared primary CTA now uses a slow background-position drift, so motion stays at the token layer instead of becoming page-local decoration
 
 ## Authenticated App Shell
 

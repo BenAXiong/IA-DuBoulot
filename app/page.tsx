@@ -24,7 +24,7 @@ type FeatureCardProps = {
 
 function MediaPreview({ alt, src }: MediaPreviewProps) {
   return (
-    <div className="relative h-full min-h-[21rem] overflow-hidden rounded-[2rem] border border-[color:var(--line)] bg-[#0b1020] sm:min-h-[25rem] lg:min-h-[34rem]">
+    <div className="relative h-full min-h-[21rem] overflow-hidden rounded-[2rem] border border-[color:var(--line)] bg-[#0b1020] sm:min-h-[25rem] lg:min-h-0">
       <Image
         alt={alt}
         className="h-full w-full object-cover"
@@ -118,14 +118,14 @@ export default async function Home({
 
             return (
               <section
-                className={`${index === 0 ? "" : "mt-10"} grid items-stretch gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] xl:gap-8`}
+                className={`${index === 0 ? "" : "mt-10"} grid items-stretch gap-6 lg:min-h-[34rem] lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] xl:gap-8`}
                 key={row.preview.title}
               >
-                <div className={`${previewOrder} h-full`}>
+                <div className={`${previewOrder} h-full lg:h-[34rem]`}>
                   <MediaPreview alt={row.preview.title} src={row.mediaSrc} />
                 </div>
 
-                <div className={`grid h-full gap-4 auto-rows-fr lg:grid-rows-3 ${cardsOrder}`}>
+                <div className={`grid h-full gap-4 auto-rows-fr lg:h-[34rem] lg:grid-rows-3 ${cardsOrder}`}>
                   {row.cards.map((card) => (
                     <FeatureCard body={card.body} key={card.title} title={card.title} />
                   ))}

@@ -31,20 +31,15 @@ export function PublicShell({
       <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[radial-gradient(circle_at_top,rgba(203,95,44,0.17),transparent_62%)]" />
 
       <header className="px-5 py-5 sm:px-8 lg:px-12">
-        <div className="shell-panel mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 rounded-[2rem] px-5 py-4">
+        <div className="shell-panel mx-auto flex max-w-[92rem] flex-wrap items-center justify-between gap-4 rounded-[2rem] px-5 py-4 sm:px-6">
           <Link
             className="flex items-center gap-3"
             href={withUiLanguage("/", languageCode)}
           >
             <span className="brand-mark" />
-            <div className="space-y-1">
-              <p className="brand-wordmark text-sm text-[color:var(--foreground)]">
-                IA DuBoulot
-              </p>
-              <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--ink-muted)]">
-                {copy.tagline}
-              </p>
-            </div>
+            <p className="brand-wordmark text-sm text-[color:var(--foreground)]">
+              IA DuBoulot
+            </p>
           </Link>
 
           <div className="flex flex-wrap items-center gap-2">

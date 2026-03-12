@@ -493,9 +493,17 @@ code {
 }
 
 .button-primary {
-  background: linear-gradient(135deg, var(--accent) 0%, var(--brand) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--accent) 0%,
+    var(--brand) 38%,
+    var(--highlight) 68%,
+    var(--accent) 100%
+  );
+  background-size: 220% 220%;
   color: var(--foreground-inverse);
   box-shadow: 0 16px 34px rgba(16, 41, 69, 0.18);
+  animation: cta-shift 16s ease-in-out infinite;
 }
 
 .button-primary:hover {
@@ -730,6 +738,17 @@ html[data-theme="custom"] .bg-\[\#cb5d3c\] {
   }
 }
 
+@keyframes cta-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -742,5 +761,9 @@ html[data-theme="custom"] .bg-\[\#cb5d3c\] {
   .theme-toggle-option {
     animation: none;
     transition: none;
+  }
+
+  .button-primary {
+    background-position: 50% 50%;
   }
 }

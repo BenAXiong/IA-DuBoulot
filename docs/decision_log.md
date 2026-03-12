@@ -757,3 +757,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Keep the story-first landing, but widen the page canvas, center the hero and closing CTA, remove the outer wrapper panels around the preview rows, and standardize the body into three alternating `1 preview + 3 glass cards` sections. Replace the old text-heavy preview blocks with locally hosted neutral abstract GIF placeholders from public sources inside `public/landing/`, and tighten the utility interactions by forcing the theme submenu to open to the left of the floater and correcting the language-button icon geometry.
 - Why: This preserves readability for the text while giving future product media more horizontal room, makes the repeated sections feel intentional instead of ad hoc, and removes two visible UI rough edges from the highest-traffic public controls.
 - Follow-up: Replace the placeholder GIFs with real captured product media, validate the widened layout against the deployed site on large monitors, and keep checking the compact utility controls against tablet and touch-device behavior.
+
+### D-20260312-75 - Public Shell Chrome Simplifies While Shared CTA Motion Stays Global
+
+- Date: 2026-03-12
+- Status: accepted
+- Related tasks: `A0.3.7`, `A7.4.7`, `P1.1`, `P1.2`, `P1.3`
+- Context: The landing still carried a little too much header chrome, the media rows needed a stricter same-size rhythm, and the CTA emphasis needed more life without introducing loud page-local animation.
+- Decision: Remove the subtitle from the public-shell wordmark, widen the public header rail to match the broader landing canvas, lock the three landing GIF rows to the same height, and move the CTA motion into the shared `button-primary` token layer as a slow background-position drift with reduced-motion fallback.
+- Why: This makes the header feel less like a product brochure masthead, keeps the story rows visually disciplined, and adds a small amount of energy without scattering bespoke animation logic across routes.
+- Follow-up: Reassess whether the shared CTA drift should remain global once more authenticated app surfaces are visually tuned, and decide later whether any pointer-following background effect belongs on the landing at all or should remain a pilot-only experiment.

@@ -56,12 +56,14 @@ Rules:
 - keep preset and custom theme behavior in the shared theme layer instead of duplicating page-local color variants
 - use `SurfaceCard` and the shared shell classes before adding page-local decorative wrappers
 - keep the tone calm, reassuring, and low-noise on both student and adult surfaces
+- keep subtle motion such as CTA background drift in shared token or primitive classes, not in page-local one-off effects
 - reserve route-by-route redesign work for [Pilot_todo](pilot_todo.md) once a concrete UX problem is identified
 
 Current MVP boundary:
 
 - the repo now has one branded baseline for shared shells and cards
 - the repo now also has a shared multi-theme bootstrap plus public or authenticated shell controls, including `light`, a ChatGPT-like inferred `dark`, the current `smooth` dark preset, a warmer `warm` preset, and a saved `custom` variant that overrides the shared global tokens
+- the shared primary CTA now carries a slow gradient drift by default, with reduced-motion fallback still handled at the global CSS layer
 - deeper route redesign, flow experimentation, and broader UX polishing belong to the pilot lane
 
 ## Form Conventions
