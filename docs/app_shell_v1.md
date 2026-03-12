@@ -36,7 +36,7 @@ Rules:
 - auth and invite flows should feel like the same product as the landing page
 - pricing remains intentionally provisional while the MVP still exposes only one wired Family monthly plan
 - the shell now carries the active UI language through shared dictionaries and a small client-side `document.documentElement.lang` sync instead of hardcoded French-only chrome
-- the shell now also exposes the shared light or dark theme toggle instead of leaving theme preference implicit in CSS alone, but the public chrome keeps it to a single icon button rather than a labeled segmented control
+- the shell now also exposes the shared multi-theme system instead of leaving theme preference implicit in CSS alone, but the public chrome keeps its quick toggle to a single icon button while the floater owns the fuller preset or custom-theme menu
 - the landing route now keeps operator and deep-link shortcuts behind a floating helper button so the user-facing page can stay calmer than the previous toolbox-style entry
 - the public chrome now uses a compact globe-menu language selector instead of always-visible inline language pills
 - the home route may opt out of the shared public footer when a page-owned closing CTA gives a cleaner public narrative than the heavier shell footer
@@ -66,7 +66,7 @@ Rules:
 - the shell is role-aware, but not role-bloated: role-specific content lives in dashboard modules, not inside the chrome component
 - non-admin accounts already queued for deletion are redirected back toward `/app/settings`, and the shell repeats that frozen-state warning in the shared header
 - shared shell chrome and the account-settings block on `/app` now localize from `lib/i18n/ui-copy.ts`; deeper role dashboards still own their own remaining translation debt
-- the authenticated shell now also shares the same light or dark theme toggle and bootstrap path as the public shell, so the app chrome does not diverge into a second theme system
+- the authenticated shell now also shares the same multi-theme bootstrap and quick-toggle path as the public shell, so the app chrome does not diverge into a second theme system
 
 ## Role Dashboard Variants
 

@@ -737,3 +737,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Keep the shared public shell for header, language, and auth entry, but let `/` own its full narrative structure and hide the heavier shared footer there. The public header now reduces to logo plus utility controls, the language switcher is a globe-menu dropdown, the floating helper also carries the pilot context, and the landing body now uses preview placeholders that can be replaced later by real product GIFs without another structural rewrite.
 - Why: This makes the home route feel intentionally product-facing instead of shell-driven, keeps the CTA hierarchy obvious, and future-proofs the page for real media assets and later copy iteration.
 - Follow-up: Replace the preview placeholders with real product captures or GIFs, refine the English source copy after review, keep `fr` and `zh` aligned as the text evolves, and verify the new utility cluster against the real deployed helper stack and tablet interactions.
+
+### D-20260312-73 - Shared Themes Expand Into Previewable Presets And Saved Custom Tokens
+
+- Date: 2026-03-12
+- Status: accepted
+- Related tasks: `A7.4.7`, `P1.1`, `P1.2`, `P1.3`
+- Context: The shared shell already had a binary light-or-dark model, but the landing iteration now needs faster visual exploration without repeated code edits. A simple toggle was no longer enough for comparing calmer, warmer, or more neutral directions, and the founder explicitly wants a path to save a custom variant from the UI itself.
+- Decision: Expand the shared theme system from two modes into five: `light`, an inferred ChatGPT-like `dark`, the previous dark palette renamed to `smooth`, a warmer `warm` preset, and `custom`, which starts from `smooth` and overlays saved global CSS variables. Keep the quick icon toggle in the shared shells, but expose the full preview-on-hover theme menu plus custom-token editor in the landing floater. Persist the selected theme and custom token record in local storage, and let the bootstrap script restore them before hydration.
+- Why: This keeps theme experimentation inside the shared token architecture, enables rapid visual iteration without reopening core CSS each time, and preserves one durable theme path for both public and authenticated surfaces instead of spawning ad hoc page-specific variants.
+- Follow-up: Run tablet smoke again against the new presets, decide whether custom themes should later become account-level settings instead of device-local preferences, and tighten the custom-token set if some variables prove unnecessary in real iteration.

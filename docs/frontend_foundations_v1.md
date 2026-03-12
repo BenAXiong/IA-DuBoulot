@@ -53,7 +53,7 @@ Shared shell-brand iteration now lives in:
 Rules:
 
 - push color, typography, shell chrome, and motion changes into shared tokens or shared shell classes first
-- keep light and dark theme behavior in the shared theme layer instead of duplicating page-local dark variants
+- keep preset and custom theme behavior in the shared theme layer instead of duplicating page-local color variants
 - use `SurfaceCard` and the shared shell classes before adding page-local decorative wrappers
 - keep the tone calm, reassuring, and low-noise on both student and adult surfaces
 - reserve route-by-route redesign work for [Pilot_todo](pilot_todo.md) once a concrete UX problem is identified
@@ -61,7 +61,7 @@ Rules:
 Current MVP boundary:
 
 - the repo now has one branded baseline for shared shells and cards
-- the repo now also has a system-aware light or dark theme bootstrap plus a shared theme toggle in the public and authenticated shells, with the current palette blending ChatGPT-like calm neutrals and Brainly-like educational blue or warm accents
+- the repo now also has a shared multi-theme bootstrap plus public or authenticated shell controls, including `light`, a ChatGPT-like inferred `dark`, the current `smooth` dark preset, a warmer `warm` preset, and a saved `custom` variant that overrides the shared global tokens
 - deeper route redesign, flow experimentation, and broader UX polishing belong to the pilot lane
 
 ## Form Conventions

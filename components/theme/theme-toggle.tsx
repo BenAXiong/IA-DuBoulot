@@ -1,10 +1,14 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 import { getThemeToggleCopy } from "@/lib/i18n/ui-copy";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import {
-  isThemeMode,
+  isDarkLikeThemeMode,
+  persistThemeMode,
+  resolveClientThemeMode,
+  restoreStoredThemeMode,
+  THEME_CHANGE_EVENT,
   THEME_STORAGE_KEY,
   type ThemeMode,
 } from "@/lib/theme/config";
@@ -50,47 +54,39 @@ function MoonIcon({ className }: { className?: string }) {
   );
 }
 
-function resolveClientTheme(): ThemeMode {
-  const documentTheme = document.documentElement.dataset.theme;
-
-  if (isThemeMode(documentTheme)) {
-    return documentTheme;
-  }
-
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
-}
-
-function applyTheme(theme: ThemeMode) {
-  document.documentElement.dataset.theme = theme;
-  document.documentElement.style.colorScheme = theme;
-  localStorage.setItem(THEME_STORAGE_KEY, theme);
-}
-
 function subscribeToThemeChange(callback: () => void) {
   const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-  const handleChange = () => callback();
+  const handleMediaChange = () => {
+    const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
 
-  mediaQuery.addEventListener("change", handleChange);
-  window.addEventListener("storage", handleChange);
+    if (!storedTheme) {
+      restoreStoredThemeMode();
+    }
+
+    callback();
+  };
+  const handleStorage = () => callback();
+  const handleThemeChange = () => callback();
+
+  mediaQuery.addEventListener("change", handleMediaChange);
+  window.addEventListener("storage", handleStorage);
+  window.addEventListener(THEME_CHANGE_EVENT, handleThemeChange);
 
   return () => {
-    mediaQuery.removeEventListener("change", handleChange);
-    window.removeEventListener("storage", handleChange);
+    mediaQuery.removeEventListener("change", handleMediaChange);
+    window.removeEventListener("storage", handleStorage);
+    window.removeEventListener(THEME_CHANGE_EVENT, handleThemeChange);
   };
 }
 
 export function ThemeToggle({ languageCode }: ThemeToggleProps) {
   const copy = getThemeToggleCopy(languageCode);
-  const systemTheme = useSyncExternalStore(
+  const theme: ThemeMode = useSyncExternalStore(
     subscribeToThemeChange,
-    resolveClientTheme,
+    resolveClientThemeMode,
     () => "light",
   );
-  const [manualTheme, setManualTheme] = useState<ThemeMode | null>(null);
-  const theme = manualTheme ?? systemTheme;
-  const nextTheme = theme === "light" ? "dark" : "light";
+  const nextTheme: ThemeMode = isDarkLikeThemeMode(theme) ? "light" : "dark";
   const ariaLabel = `${copy.label}: ${
     nextTheme === "dark" ? copy.dark : copy.light
   }`;
@@ -98,17 +94,14 @@ export function ThemeToggle({ languageCode }: ThemeToggleProps) {
   return (
     <button
       aria-label={ariaLabel}
-      aria-pressed={theme === "dark"}
+      aria-pressed={isDarkLikeThemeMode(theme)}
       className="theme-toggle"
-      onClick={() => {
-        applyTheme(nextTheme);
-        setManualTheme(nextTheme);
-      }}
+      onClick={() => persistThemeMode(nextTheme)}
       title={ariaLabel}
       type="button"
     >
       <span className="sr-only">{ariaLabel}</span>
-      {theme === "dark" ? (
+      {isDarkLikeThemeMode(theme) ? (
         <SunIcon className="h-5 w-5" />
       ) : (
         <MoonIcon className="h-5 w-5" />
