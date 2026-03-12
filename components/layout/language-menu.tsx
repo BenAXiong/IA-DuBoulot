@@ -19,12 +19,12 @@ function GlobeIcon({ className }: { className?: string }) {
       fill="none"
       viewBox="0 0 24 24"
     >
-      <circle cx="12" cy="12" r="8.25" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="12" cy="12" r="7.25" stroke="currentColor" strokeWidth="1.7" />
       <path
-        d="M3.75 12h16.5M12 3.75c2.25 2.2 3.5 5.15 3.5 8.25S14.25 18.05 12 20.25M12 3.75c-2.25 2.2-3.5 5.15-3.5 8.25s1.25 6.05 3.5 8.25"
+        d="M4.75 12h14.5M12 4.75c2 2.05 3.1 4.78 3.1 7.25s-1.1 5.2-3.1 7.25M12 4.75c-2 2.05-3.1 4.78-3.1 7.25s1.1 5.2 3.1 7.25"
         stroke="currentColor"
         strokeLinecap="round"
-        strokeWidth="1.8"
+        strokeWidth="1.7"
       />
     </svg>
   );
@@ -78,7 +78,7 @@ export function LanguageMenu({
         type="button"
       >
         <span className="sr-only">{copy.buttonLabel}</span>
-        <GlobeIcon className="h-5 w-5" />
+        <GlobeIcon className="h-[1.1rem] w-[1.1rem] shrink-0 overflow-visible" />
       </button>
 
       {open ? (

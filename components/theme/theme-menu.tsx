@@ -121,7 +121,7 @@ export function ThemeMenu({ languageCode }: ThemeMenuProps) {
       </button>
 
       {open ? (
-        <div className="absolute bottom-full right-0 z-50 mb-3 w-[min(30rem,calc(100vw-2rem))] rounded-[1.6rem] border border-[color:var(--line)] bg-[color:var(--surface-raised)] p-4 shadow-[var(--shadow)] sm:bottom-auto sm:right-full sm:mb-0 sm:mr-3 sm:top-0">
+        <div className="absolute right-full top-0 z-50 mr-3 w-[min(30rem,calc(100vw-6.5rem))] max-h-[min(80vh,42rem)] overflow-y-auto rounded-[1.6rem] border border-[color:var(--line)] bg-[color:var(--surface-raised)] p-4 shadow-[var(--shadow)]">
           <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
             {copy.title}
           </p>

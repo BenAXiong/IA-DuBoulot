@@ -747,3 +747,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Expand the shared theme system from two modes into five: `light`, an inferred ChatGPT-like `dark`, the previous dark palette renamed to `smooth`, a warmer `warm` preset, and `custom`, which starts from `smooth` and overlays saved global CSS variables. Keep the quick icon toggle in the shared shells, but expose the full preview-on-hover theme menu plus custom-token editor in the landing floater. Persist the selected theme and custom token record in local storage, and let the bootstrap script restore them before hydration.
 - Why: This keeps theme experimentation inside the shared token architecture, enables rapid visual iteration without reopening core CSS each time, and preserves one durable theme path for both public and authenticated surfaces instead of spawning ad hoc page-specific variants.
 - Follow-up: Run tablet smoke again against the new presets, decide whether custom themes should later become account-level settings instead of device-local preferences, and tighten the custom-token set if some variables prove unnecessary in real iteration.
+
+### D-20260312-74 - The Landing Canvas Widens While Narrative Rows Standardize
+
+- Date: 2026-03-12
+- Status: accepted
+- Related tasks: `A7.4.7`, `P1.1`, `P1.2`, `P1.3`
+- Context: The calmer landing rewrite was structurally better, but the first row still felt boxed in, the lower sections mixed prose and previews inconsistently, and the utility controls still had small polish defects such as a clipped globe icon and a theme submenu that opened below the floater instead of beside it.
+- Decision: Keep the story-first landing, but widen the page canvas, center the hero and closing CTA, remove the outer wrapper panels around the preview rows, and standardize the body into three alternating `1 preview + 3 glass cards` sections that can later swap their placeholder previews for real product GIFs. Also tighten the utility interactions by forcing the theme submenu to open to the left of the floater and correcting the language-button icon geometry.
+- Why: This preserves readability for the text while giving future product media more horizontal room, makes the repeated sections feel intentional instead of ad hoc, and removes two visible UI rough edges from the highest-traffic public controls.
+- Follow-up: Replace placeholder previews with real captured media, validate the widened layout against the deployed site on large monitors, and keep checking the compact utility controls against tablet and touch-device behavior.

@@ -307,6 +307,34 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
           body: "banban aide aussi sur la meta-learning: analyser ton raisonnement, affiner tes méthodes, et développer des réflexes solides pour apprendre à apprendre.",
         },
       ],
+      contentCards: [
+        {
+          title: "Upload du vrai contenu.",
+          body: "Pars d'un devoir, d'une photo ou d'un PDF réel pour travailler sur une matière concrète, pas sur un exemple abstrait.",
+        },
+        {
+          title: "Dive et drill ciblés.",
+          body: "banban creuse le point qui bloque, reformule, puis transforme l'écart repéré en drill plus ciblé.",
+        },
+        {
+          title: "Résumé qui reste utile.",
+          body: "Chaque session peut se terminer par un résumé clair. Les aperçus média peuvent encore progresser plus tard, sans refaire la structure.",
+        },
+      ],
+      sharingCards: [
+        {
+          title: "Partager avec les parents.",
+          body: "Le parent reçoit une vue utile et limitée, centrée sur le suivi plutôt que sur une surveillance invasive.",
+        },
+        {
+          title: "Partager avec les tuteurs.",
+          body: "Le tuteur récupère l'historique, le contexte de la séance et ses propres notes pour reprendre le travail sans friction.",
+        },
+        {
+          title: "Suivi de progression.",
+          body: "Les résumés, l'historique et les futures vues de progression construisent un fil plus durable qu'un simple chat isolé.",
+        },
+      ],
       previews: {
         primary: {
           label: "Aperçu produit",
@@ -337,18 +365,8 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
             "Historique et retour sur sessions",
             "Progression dans le temps",
           ],
+          },
         },
-      },
-      sections: [
-        {
-          title: "Upload content, dive & drill, create summaries.",
-          body: "Importe un devoir réel, plonge dans les points difficiles, lance des drills ciblés et termine avec un résumé. Les aperçus média pourront encore gagner en finesse dans une itération suivante.",
-        },
-        {
-          title: "Share with your parents and tutors, keep track of your progress.",
-          body: "Les parents et les tuteurs récupèrent la bonne vue au bon moment, pendant que l'élève garde un fil de progression plus durable qu'une simple conversation isolée.",
-        },
-      ],
       closingTitle: "Start with banban.",
       closingBody:
         "Crée un compte gratuit et teste le parcours élève pendant que le pilot continue à se structurer.",
@@ -392,6 +410,34 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
           body: "banban also supports meta-learning: analyze your thought process, refine your methods, and build learning-how-to-learn habits that last.",
         },
       ],
+      contentCards: [
+        {
+          title: "Bring in real homework.",
+          body: "Start from an actual assignment, photo, or PDF so the work stays grounded in a real task instead of a generic example.",
+        },
+        {
+          title: "Dive and drill weak spots.",
+          body: "banban digs into the part that feels unclear, reframes it, and turns the gap into more targeted practice.",
+        },
+        {
+          title: "Summaries that stay useful.",
+          body: "Each session can end with a clear recap. The media layer can still get richer later without redoing the landing structure.",
+        },
+      ],
+      sharingCards: [
+        {
+          title: "Share with parents.",
+          body: "Parents get the right amount of visibility, focused on follow-through rather than intrusive monitoring.",
+        },
+        {
+          title: "Share with tutors.",
+          body: "Tutors pick up the session history, context, and private note layer so they can continue the work without friction.",
+        },
+        {
+          title: "Track progress over time.",
+          body: "Summaries, history, and future progress views create a longer arc than a single isolated AI chat ever could.",
+        },
+      ],
       previews: {
         primary: {
           label: "Product preview",
@@ -422,18 +468,8 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
             "Review past sessions",
             "Track progress over time",
           ],
+          },
         },
-      },
-      sections: [
-        {
-          title: "Upload content, dive & drill, create summaries.",
-          body: "Bring in real homework, dive into the tricky parts, run targeted drills, and finish with a summary. The media layer can still get richer in a later iteration.",
-        },
-        {
-          title: "Share with your parents and tutors, keep track of your progress.",
-          body: "Parents and tutors get the right visibility while the student keeps a longer-term sense of progress instead of losing everything inside a single AI chat.",
-        },
-      ],
       closingTitle: "Start with banban.",
       closingBody:
         "Create a free account and try the student flow while the private pilot keeps getting sharper.",
@@ -477,6 +513,34 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
           body: "banban 也支援 meta-learning：分析你的思考流程、修正方法，並建立能長久保留的學習如何學習能力。",
         },
       ],
+      contentCards: [
+        {
+          title: "帶入真實作業。",
+          body: "從真實的作業、照片或 PDF 開始，讓整個流程圍繞具體任務，而不是抽象示例。",
+        },
+        {
+          title: "深入並 drill 弱點。",
+          body: "banban 會先挖出真正卡住的地方，再重新說明，最後把落差轉成更聚焦的練習。",
+        },
+        {
+          title: "保留下來的摘要。",
+          body: "每次 session 都能收斂成清楚摘要。之後即使媒體層再升級，也不需要重做整個 landing 結構。",
+        },
+      ],
+      sharingCards: [
+        {
+          title: "分享給家長。",
+          body: "家長拿到的是剛剛好的可見性，重點是後續跟進，而不是過度監看。",
+        },
+        {
+          title: "分享給家教。",
+          body: "家教可以接手 session 歷史、上下文與私人筆記層，繼續往下教而不需要重新拼湊背景。",
+        },
+        {
+          title: "長期追蹤進步。",
+          body: "摘要、歷史紀錄與未來的進度視圖，會把學習軌跡拉成比單次 AI 聊天更長的弧線。",
+        },
+      ],
       previews: {
         primary: {
           label: "產品預覽",
@@ -507,18 +571,8 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
             "回看過去的 session",
             "長期追蹤進步",
           ],
+          },
         },
-      },
-      sections: [
-        {
-          title: "Upload content, dive & drill, create summaries.",
-          body: "把真實作業帶進來、深入卡住的地方、做更聚焦的 drill，最後收斂成摘要。媒體層之後還可以再做得更豐富。",
-        },
-        {
-          title: "Share with your parents and tutors, keep track of your progress.",
-          body: "家長與家教拿到正確層級的可見性，而學生也能保留比單次 AI 聊天更長期的進步脈絡。",
-        },
-      ],
       closingTitle: "從 banban 開始。",
       closingBody:
         "先建立免費帳號，試試學生流程，同時讓這個封閉 Pilot 繼續變得更穩、更清楚。",
