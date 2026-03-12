@@ -10,6 +10,9 @@ import {
   FIXTURE,
   createAdminClient,
   env as fixtureEnv,
+  restoreFixtureUsageState,
+  resolveFixtureUserIds,
+  snapshotFixtureUsageState,
 } from "./rls-fixture-shared.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -382,6 +385,12 @@ async function cleanupConversation(adminClient, state) {
 
 async function main() {
   const adminClient = createAdminClient();
+  const fixtureUserIds = await resolveFixtureUserIds(adminClient);
+  assert(fixtureUserIds.student, "Missing fixture student user id.");
+  const usageSnapshot = await snapshotFixtureUsageState(
+    adminClient,
+    fixtureUserIds.student,
+  );
   const storageClient = createClient(
     fixtureEnv.supabaseUrl,
     fixtureEnv.supabaseAnonKey,
@@ -955,6 +964,11 @@ async function main() {
     );
   } finally {
     await cleanupConversation(adminClient, state);
+    await restoreFixtureUsageState(
+      adminClient,
+      fixtureUserIds.student,
+      usageSnapshot,
+    ).catch(() => {});
     await stopLocalServer(childProcess);
   }
 }

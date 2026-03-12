@@ -9,10 +9,11 @@ import { SelectInput } from "@/components/ui/select-input";
 import { TextInput } from "@/components/ui/text-input";
 import {
   AI_LANGUAGE_OPTIONS,
-  STUDENT_AGE_BAND_OPTIONS,
   UI_LANGUAGE_OPTIONS,
   UNDER_13_AGE_BAND_VALUES,
+  getStudentAgeBandOptions,
 } from "@/lib/i18n/config";
+import { getAccountSettingsFormCopy } from "@/lib/i18n/ui-copy";
 import type { AppUserRecord } from "@/lib/server/auth/types";
 
 type ProfileErrorPayload = {
@@ -36,6 +37,7 @@ function getFieldError(
 
 export function AccountSettingsForm({ appUser }: AccountSettingsFormProps) {
   const router = useRouter();
+  const copy = getAccountSettingsFormCopy(appUser.preferred_ui_language);
   const [displayName, setDisplayName] = useState(appUser.display_name);
   const [preferredUiLanguage, setPreferredUiLanguage] = useState(
     appUser.preferred_ui_language,
@@ -49,11 +51,11 @@ export function AccountSettingsForm({ appUser }: AccountSettingsFormProps) {
 
   const ageBandOptions =
     appUser.role === "student" && appUser.is_under_13
-      ? STUDENT_AGE_BAND_OPTIONS.filter(
+      ? getStudentAgeBandOptions(appUser.preferred_ui_language).filter(
           (option) =>
             option.value === "" || UNDER_13_AGE_BAND_VALUES.has(option.value),
         )
-      : STUDENT_AGE_BAND_OPTIONS;
+      : getStudentAgeBandOptions(appUser.preferred_ui_language);
 
   function resetMessages() {
     setFieldErrors({});
@@ -85,35 +87,27 @@ export function AccountSettingsForm({ appUser }: AccountSettingsFormProps) {
       const errorPayload = payload as ProfileErrorPayload | null;
 
       if (!response.ok || !payload?.ok) {
-        setErrorMessage(
-          errorPayload?.error?.message ?? "Impossible de mettre le profil a jour.",
-        );
+        setErrorMessage(errorPayload?.error?.message ?? copy.errorFallback);
         setFieldErrors(errorPayload?.error?.fieldErrors ?? {});
         return;
       }
 
-      setSuccessMessage("Profil mis a jour.");
+      setSuccessMessage(copy.success);
       router.refresh();
     });
   }
 
   return (
     <form className="grid gap-4" onSubmit={handleSubmit}>
-      {errorMessage ? (
-        <FormCallout variant="error">
-          {errorMessage}
-        </FormCallout>
-      ) : null}
+      {errorMessage ? <FormCallout variant="error">{errorMessage}</FormCallout> : null}
 
       {successMessage ? (
-        <FormCallout variant="success">
-          {successMessage}
-        </FormCallout>
+        <FormCallout variant="success">{successMessage}</FormCallout>
       ) : null}
 
       <FormField
         error={getFieldError(fieldErrors, "displayName")}
-        label="Nom affiche"
+        label={copy.fields.displayName}
       >
         <TextInput
           onChange={(event) => setDisplayName(event.target.value)}
@@ -125,11 +119,13 @@ export function AccountSettingsForm({ appUser }: AccountSettingsFormProps) {
       <div className="grid gap-4 sm:grid-cols-2">
         <FormField
           error={getFieldError(fieldErrors, "preferredUiLanguage")}
-          label="Langue de l'interface"
+          label={copy.fields.uiLanguage}
         >
           <SelectInput
             onChange={(event) =>
-              setPreferredUiLanguage(event.target.value as typeof appUser.preferred_ui_language)
+              setPreferredUiLanguage(
+                event.target.value as typeof appUser.preferred_ui_language,
+              )
             }
             value={preferredUiLanguage}
           >
@@ -143,11 +139,13 @@ export function AccountSettingsForm({ appUser }: AccountSettingsFormProps) {
 
         <FormField
           error={getFieldError(fieldErrors, "aiHelpLanguage")}
-          label="Langue de l'aide IA"
+          label={copy.fields.aiLanguage}
         >
           <SelectInput
             onChange={(event) =>
-              setAiHelpLanguage(event.target.value as typeof appUser.ai_help_language)
+              setAiHelpLanguage(
+                event.target.value as typeof appUser.ai_help_language,
+              )
             }
             value={aiHelpLanguage}
           >
@@ -163,7 +161,7 @@ export function AccountSettingsForm({ appUser }: AccountSettingsFormProps) {
       {appUser.role === "student" ? (
         <FormField
           error={getFieldError(fieldErrors, "ageBand")}
-          label="Tranche d'age"
+          label={copy.fields.ageBand}
         >
           <SelectInput
             onChange={(event) => setAgeBand(event.target.value)}
@@ -179,7 +177,7 @@ export function AccountSettingsForm({ appUser }: AccountSettingsFormProps) {
       ) : null}
 
       <ActionButton disabled={isPending} type="submit">
-        {isPending ? "Mise a jour..." : "Enregistrer le profil"}
+        {isPending ? copy.buttons.pending : copy.buttons.submit}
       </ActionButton>
     </form>
   );

@@ -4,6 +4,10 @@ import {
   formatDateLabel,
   getConversationStatusLabel,
 } from "@/components/dashboard/student/student-dashboard-presenters";
+import {
+  getDashboardAccountStatusLabel,
+  getTutorDashboardCopy,
+} from "@/lib/i18n/dashboard-copy";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type { TutorDashboardSnapshot } from "@/lib/server/oversight/types";
 
@@ -16,43 +20,44 @@ export function TutorDashboard({
   snapshot,
   languageCode,
 }: TutorDashboardProps) {
+  const copy = getTutorDashboardCopy(languageCode);
+
   return (
     <div className="grid gap-6">
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" id="overview">
         <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-[var(--shadow)]">
           <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-            Liens
+            {copy.overview.links}
           </p>
           <h3 className="mt-3 font-[family-name:var(--font-heading)] text-2xl leading-tight">
-            {snapshot.linkedStudents.length} eleve(s) suivi(s)
+            {copy.overview.linkedStudents(snapshot.linkedStudents.length)}
           </h3>
           <p className="mt-3 text-sm leading-6 text-[color:var(--ink-soft)]">
-            Les invitations tuteur debouchent maintenant sur un vrai suivi eleve
-            et sur des notes privees persistantes.
+            {copy.overview.linksBody}
           </p>
         </article>
 
         <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-[var(--shadow)]">
           <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-            Sessions
+            {copy.overview.sessions}
           </p>
           <h3 className="mt-3 font-[family-name:var(--font-heading)] text-2xl leading-tight">
-            {snapshot.recentSessions.length} session(s) recente(s)
+            {copy.overview.recentSessions(snapshot.recentSessions.length)}
           </h3>
           <p className="mt-3 text-sm leading-6 text-[color:var(--ink-soft)]">
-            Les syntheses tuteur et leurs tags faibles deviennent la vue d&apos;entree pedagogique.
+            {copy.overview.sessionsBody}
           </p>
         </article>
 
         <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-[var(--shadow)]">
           <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-            Notes
+            {copy.overview.notes}
           </p>
           <h3 className="mt-3 font-[family-name:var(--font-heading)] text-2xl leading-tight">
-            Notes privees actives
+            {copy.overview.notesTitle}
           </h3>
           <p className="mt-3 text-sm leading-6 text-[color:var(--ink-soft)]">
-            Les notes restent invisibles pour l&apos;eleve et le parent, avec audit a chaque mutation.
+            {copy.overview.notesBody}
           </p>
         </article>
       </section>
@@ -64,16 +69,16 @@ export function TutorDashboard({
         <div className="grid gap-4">
           <div className="space-y-3">
             <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-              Eleves lies
+              {copy.linkedStudents.eyebrow}
             </p>
             <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-              Chaque fiche mene vers le detail eleve avec vues de sessions, tags faibles et notes privees.
+              {copy.linkedStudents.body}
             </p>
           </div>
 
           {snapshot.linkedStudents.length === 0 ? (
             <div className="rounded-[1.5rem] border border-dashed border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5 text-sm leading-6 text-[color:var(--ink-soft)]">
-              Aucun eleve lie pour l&apos;instant.
+              {copy.linkedStudents.empty}
             </div>
           ) : (
             <div className="grid gap-3 sm:grid-cols-2">
@@ -83,9 +88,22 @@ export function TutorDashboard({
                   key={student.id}
                 >
                   <div className="flex flex-wrap gap-2">
-                    <StudentStatusPill label={student.accountStatus} tone="accent" />
-                    <StudentStatusPill label={`${student.recentSessionCount} session(s)`} />
-                    <StudentStatusPill label={`${student.pinnedNoteCount} note(s)`} tone="warning" />
+                    <StudentStatusPill
+                      label={getDashboardAccountStatusLabel(
+                        student.accountStatus,
+                        languageCode,
+                      )}
+                      tone="accent"
+                    />
+                    <StudentStatusPill
+                      label={copy.linkedStudents.sessions(
+                        student.recentSessionCount,
+                      )}
+                    />
+                    <StudentStatusPill
+                      label={copy.linkedStudents.notes(student.pinnedNoteCount)}
+                      tone="warning"
+                    />
                   </div>
                   <div>
                     <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
@@ -98,7 +116,7 @@ export function TutorDashboard({
                         ))
                       ) : (
                         <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-                          Aucun tag faible consolide.
+                          {copy.linkedStudents.noWeakness}
                         </p>
                       )}
                     </div>
@@ -107,7 +125,7 @@ export function TutorDashboard({
                     className="inline-flex justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 font-medium transition hover:-translate-y-0.5"
                     href={`/app/students/${student.id}`}
                   >
-                    Ouvrir le suivi
+                    {copy.linkedStudents.open}
                   </Link>
                 </article>
               ))}
@@ -118,16 +136,16 @@ export function TutorDashboard({
         <div className="grid gap-4">
           <div className="space-y-3">
             <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-              Sessions a revoir
+              {copy.review.eyebrow}
             </p>
             <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-              Les sessions recentes remontent avec les insights tuteur deja disponibles.
+              {copy.review.body}
             </p>
           </div>
 
           {snapshot.recentSessions.length === 0 ? (
             <div className="rounded-[1.5rem] border border-dashed border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5 text-sm leading-6 text-[color:var(--ink-soft)]">
-              Aucune session recente visible.
+              {copy.review.empty}
             </div>
           ) : (
             snapshot.recentSessions.slice(0, 4).map((session) => (
@@ -141,14 +159,13 @@ export function TutorDashboard({
                 </div>
                 <p className="font-medium">{session.title}</p>
                 <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-                  {session.nextStepRecommendation ??
-                    "Aucune recommandation tuteur disponible."}
+                  {session.nextStepRecommendation ?? copy.review.noRecommendation}
                 </p>
                 <p className="text-sm text-[color:var(--ink-soft)]">
                   {formatDateLabel(
                     session.lastMessageAt ?? session.createdAt,
                     languageCode,
-                  ) ?? "Date indisponible"}
+                  ) ?? copy.review.noDate}
                 </p>
               </article>
             ))
@@ -159,16 +176,16 @@ export function TutorDashboard({
       <section className="grid gap-4 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]">
         <div className="space-y-3">
           <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-            Sessions recentes
+            {copy.recent.eyebrow}
           </p>
           <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-            Cette liste traverse tous les eleves lies et mene vers la relecture tuteur et les notes de seance.
+            {copy.recent.body}
           </p>
         </div>
 
         {snapshot.recentSessions.length === 0 ? (
           <div className="rounded-[1.5rem] border border-dashed border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5 text-sm leading-6 text-[color:var(--ink-soft)]">
-            Aucune session visible pour l&apos;instant.
+            {copy.recent.empty}
           </div>
         ) : (
           <div className="grid gap-3">
@@ -181,7 +198,12 @@ export function TutorDashboard({
                   <div className="flex flex-wrap gap-2">
                     <StudentStatusPill label={session.studentDisplayName} tone="accent" />
                     <StudentStatusPill label={session.subjectTag} />
-                    <StudentStatusPill label={getConversationStatusLabel(session.status)} />
+                    <StudentStatusPill
+                      label={getConversationStatusLabel(
+                        session.status,
+                        languageCode,
+                      )}
+                    />
                     {session.weaknessTags.map((tag) => (
                       <StudentStatusPill key={tag} label={tag} tone="warning" />
                     ))}
@@ -191,8 +213,7 @@ export function TutorDashboard({
                       {session.title}
                     </h2>
                     <p className="mt-2 text-sm leading-6 text-[color:var(--ink-soft)]">
-                      {session.summaryText ??
-                        "Aucune synthese tuteur n'est encore disponible pour cette session."}
+                      {session.summaryText ?? copy.recent.noSummary}
                     </p>
                   </div>
                 </div>
@@ -202,13 +223,13 @@ export function TutorDashboard({
                     {formatDateLabel(
                       session.lastMessageAt ?? session.createdAt,
                       languageCode,
-                    ) ?? "Date indisponible"}
+                    ) ?? copy.recent.noDate}
                   </p>
                   <Link
                     className="inline-flex rounded-full border border-[color:var(--line)] bg-white px-4 py-2 font-medium text-[color:var(--foreground)] transition hover:-translate-y-0.5"
                     href={`/app/review/${session.id}`}
                   >
-                    Ouvrir
+                    {copy.recent.open}
                   </Link>
                 </div>
               </article>

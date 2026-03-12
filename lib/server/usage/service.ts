@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { AiUsageSnapshot } from "@/lib/server/ai/types";
+import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type { BillingSubscriptionRecord } from "@/lib/server/billing/types";
 import { resolveEffectiveStudentSubscription } from "@/lib/server/billing/service";
 import { AppError } from "@/lib/server/errors/app-error";
@@ -209,29 +210,88 @@ function actionAllowsBlockReason(
 }
 
 function buildQuotaErrorMessage(
+  languageCode: UiLanguageCode,
   action: UsageQuotaAction,
   blockReason: UsageQuotaBlockReason,
 ) {
   if (blockReason === "trial_window_expired") {
-    return "La periode d'essai est terminee. Un parent doit activer l'abonnement Family pour continuer.";
+    if (languageCode === "en") {
+      return "The trial period has ended. A parent must activate the Family subscription to continue.";
+    }
+
+    if (languageCode === "zh") {
+      return "試用期已結束。需要由家長啟用 Family 訂閱後才能繼續。";
+    }
+
+    return "La période d'essai est terminée. Un parent doit activer l'abonnement Family pour continuer.";
   }
 
   if (blockReason === "sessions") {
-    return "La limite de sessions sur la periode courante est atteinte.";
+    if (languageCode === "en") {
+      return "The session limit for the current period has been reached.";
+    }
+
+    if (languageCode === "zh") {
+      return "目前期間的課程上限已達。";
+    }
+
+    return "La limite de sessions sur la période courante est atteinte.";
   }
 
   if (blockReason === "uploads") {
-    return "La limite d'uploads sur la periode courante est atteinte.";
+    if (languageCode === "en") {
+      return "The upload limit for the current period has been reached.";
+    }
+
+    if (languageCode === "zh") {
+      return "目前期間的上傳上限已達。";
+    }
+
+    return "La limite d'uploads sur la période courante est atteinte.";
   }
 
   if (blockReason === "assistant_messages") {
-    return "La limite de messages IA sur la periode courante est atteinte.";
+    if (languageCode === "en") {
+      return "The AI-message limit for the current period has been reached.";
+    }
+
+    if (languageCode === "zh") {
+      return "目前期間的 AI 訊息上限已達。";
+    }
+
+    return "La limite de messages IA sur la période courante est atteinte.";
   }
 
   if (blockReason === "input_tokens" || blockReason === "output_tokens") {
-    return action === "append_message"
-      ? "Le budget IA de la periode courante est atteint."
-      : "Le budget IA de la periode courante ne permet plus de lancer cette action.";
+    if (action === "append_message") {
+      if (languageCode === "en") {
+        return "The AI budget for the current period has been reached.";
+      }
+
+      if (languageCode === "zh") {
+        return "目前期間的 AI 預算已達上限。";
+      }
+
+      return "Le budget IA de la période courante est atteint.";
+    }
+
+    if (languageCode === "en") {
+      return "The AI budget for the current period no longer allows this action.";
+    }
+
+    if (languageCode === "zh") {
+      return "目前期間的 AI 預算已不足以執行這個動作。";
+    }
+
+    return "Le budget IA de la période courante ne permet plus de lancer cette action.";
+  }
+
+  if (languageCode === "en") {
+    return "The current quota no longer allows this action.";
+  }
+
+  if (languageCode === "zh") {
+    return "目前的額度已不允許這個動作。";
   }
 
   return "Le quota courant ne permet plus cette action.";
@@ -376,6 +436,7 @@ export async function resolveStudentUsageSnapshot(input: {
 export async function assertStudentUsageActionAllowed(input: {
   studentUserId: string;
   action: UsageQuotaAction;
+  languageCode?: UiLanguageCode;
 }) {
   const snapshot = await resolveStudentUsageSnapshot({
     studentUserId: input.studentUserId,
@@ -384,7 +445,11 @@ export async function assertStudentUsageActionAllowed(input: {
   if (actionAllowsBlockReason(input.action, snapshot.quota.blockReason)) {
     throw new AppError({
       code: "conflict",
-      message: buildQuotaErrorMessage(input.action, snapshot.quota.blockReason),
+      message: buildQuotaErrorMessage(
+        input.languageCode ?? "fr",
+        input.action,
+        snapshot.quota.blockReason,
+      ),
       status: 409,
     });
   }

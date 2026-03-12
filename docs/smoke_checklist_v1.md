@@ -24,6 +24,7 @@ This command currently runs:
 - `npm run typecheck`
 - `npm run lint`
 - `npm run build`
+- `npm run seed:rls-fixtures`
 - `npm run verify:rls-fixtures`
 - `npm run smoke:memory`
 - `npm run smoke:student-flow`
@@ -135,6 +136,9 @@ Use this when demonstrating the deployed app, even after the automated pass is g
 
 These remain required before an external demo even if the regression command passes.
 
+- run `npm run smoke:tablet-emulation` from a local production build as the repeatable tablet pre-pass for `/app`, `/app/new`, and `/app/conversations/[conversationId]`
+- rerun that same command with `SMOKE_UI_LANGUAGE=zh` when the tablet pre-pass needs to validate the translated student-route shell without manually editing the fixture profile first
+- rerun that same command with `SMOKE_THEME_MODE=dark` when a shared theme or shell change needs dark-mode verification on the tablet-critical student routes
 - confirm the deployed environment has the expected AI, Supabase, and Lemon env vars
 - confirm the Lemon webhook target matches the deployed domain
 - confirm the active Lemon mode matches the intended test or live walkthrough
@@ -147,5 +151,10 @@ These remain required before an external demo even if the regression command pas
 
 ## Latest Recorded Result
 
-- 2026-03-11 local `npm run regress:mvp`: success
+- 2026-03-11 local `npm run regress:mvp`: success, including deterministic fixture reseed before hosted RLS verification and the non-device smoke suite
+- 2026-03-11 local `npm run smoke:tablet-emulation`: success against a temporary local `next start` instance, with no horizontal overflow and no detected sub-`44x44` controls on the checked student tablet surfaces
+- 2026-03-12 local `npm run smoke:tablet-emulation`: success again after the trilingual copy refresh, with the selectors updated to the current accented French labels and no horizontal overflow or detected sub-`44x44` controls on the checked student tablet surfaces
+- 2026-03-12 local `SMOKE_UI_LANGUAGE=zh npm run smoke:tablet-emulation`: success on the same student tablet surfaces after a temporary fixture-language flip, with no horizontal overflow and no detected sub-`44x44` controls
+- 2026-03-12 local rerun of both tablet-emulation commands after the student-flow server-text and deterministic-fallback localization pass: success again on `/app`, `/app/new`, and `/app/conversations/[conversationId]`, with no horizontal overflow and no detected sub-`44x44` controls in either the default French or temporary `zh` fixture-language mode
+- 2026-03-12 local `SMOKE_THEME_MODE=dark npm run smoke:tablet-emulation`: success on `/app`, `/app/new`, and `/app/conversations/[conversationId]` after the shared light or dark theme redesign, with no horizontal overflow and no detected sub-`44x44` controls on the checked student tablet surfaces
 - latest observed non-blocking warnings: provider-backed extraction, coach reply, student summary, or memory refresh may fall back to the documented deterministic path; optional adult summary variants can also be missing in some student-flow runs without breaking the student contract

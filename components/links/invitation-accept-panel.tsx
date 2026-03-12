@@ -3,10 +3,16 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { getIntlLocale, type UiLanguageCode } from "@/lib/i18n/config";
+import {
+  getInvitationAcceptCopy,
+  getRoleLabel,
+} from "@/lib/i18n/ui-copy";
 import type { AppUserRole } from "@/lib/server/auth/types";
 import type {
   InvitationKind,
   InvitationLandingRecord,
+  InvitationStatus,
   InvitationViewerState,
 } from "@/lib/server/links/types";
 
@@ -26,22 +32,80 @@ type InvitationAcceptPanelProps = {
   authSignInHref: string;
   authSignUpHref: string;
   onboardingHref: string;
+  languageCode: UiLanguageCode;
 };
 
-function getTitle(kind: InvitationKind | null) {
-  if (kind === "tutor_link") {
-    return "Invitation tuteur";
-  }
-
-  return "Invitation parent";
+function getInvitationTitle(
+  copy: ReturnType<typeof getInvitationAcceptCopy>,
+  kind: InvitationKind | null,
+) {
+  return kind === "tutor_link" ? copy.titles.tutor : copy.titles.parent;
 }
 
-function getBody(kind: InvitationKind | null) {
-  if (kind === "tutor_link") {
-    return "Ce lien relie un tuteur au compte eleve cible.";
+function getInvitationBody(
+  copy: ReturnType<typeof getInvitationAcceptCopy>,
+  kind: InvitationKind | null,
+) {
+  return kind === "tutor_link" ? copy.bodies.tutor : copy.bodies.parent;
+}
+
+function getConnectedEmailLabel(
+  languageCode: UiLanguageCode,
+  email: string | null,
+) {
+  if (!email) {
+    return "";
   }
 
-  return "Ce lien sert a approuver ou relier un parent au compte eleve cible.";
+  switch (languageCode) {
+    case "en":
+      return ` for ${email}`;
+    case "zh":
+      return `（${email}）`;
+    default:
+      return ` pour ${email}`;
+  }
+}
+
+function getInvitationStatusLabel(
+  status: InvitationStatus,
+  languageCode: UiLanguageCode,
+) {
+  switch (languageCode) {
+    case "en":
+      switch (status) {
+        case "accepted":
+          return "Accepted";
+        case "revoked":
+          return "Revoked";
+        case "expired":
+          return "Expired";
+        default:
+          return "Pending";
+      }
+    case "zh":
+      switch (status) {
+        case "accepted":
+          return "已接受";
+        case "revoked":
+          return "已撤銷";
+        case "expired":
+          return "已過期";
+        default:
+          return "待處理";
+      }
+    default:
+      switch (status) {
+        case "accepted":
+          return "Acceptée";
+        case "revoked":
+          return "Révoquée";
+        case "expired":
+          return "Expirée";
+        default:
+          return "En attente";
+      }
+  }
 }
 
 export function InvitationAcceptPanel({
@@ -53,8 +117,10 @@ export function InvitationAcceptPanel({
   authSignInHref,
   authSignUpHref,
   onboardingHref,
+  languageCode,
 }: InvitationAcceptPanelProps) {
   const router = useRouter();
+  const copy = getInvitationAcceptCopy(languageCode);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -63,6 +129,12 @@ export function InvitationAcceptPanel({
     invitationKind === "tutor_link"
       ? "/api/auth/invitations/accept"
       : "/api/auth/parent-approval/confirm";
+  const currentRoleLabel = appUserRole
+    ? getRoleLabel(appUserRole, languageCode)
+    : "unknown";
+  const targetRoleLabel = landing
+    ? getRoleLabel(landing.invitation.target_role, languageCode)
+    : "matching";
 
   function handleAccept() {
     setErrorMessage(null);
@@ -83,9 +155,7 @@ export function InvitationAcceptPanel({
         | null;
 
       if (!response.ok || !payload?.ok) {
-        setErrorMessage(
-          payload?.error?.message ?? "Impossible d'accepter cette invitation.",
-        );
+        setErrorMessage(payload?.error?.message ?? copy.errorFallback);
         return;
       }
 
@@ -98,36 +168,39 @@ export function InvitationAcceptPanel({
     <section className="grid gap-6 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] md:grid-cols-[0.92fr_1.08fr] md:p-8">
       <article className="space-y-4">
         <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.24em] text-[color:var(--ink-soft)]">
-          {getTitle(invitationKind)}
+          {getInvitationTitle(copy, invitationKind)}
         </p>
         <h1 className="font-[family-name:var(--font-heading)] text-4xl leading-tight">
           {landing
-            ? `${landing.student.display_name} attend une action de votre part.`
-            : "Le lien d'invitation n'est plus disponible."}
+            ? copy.heading(landing.student.display_name)
+            : copy.unavailableHeading}
         </h1>
         <p className="text-base leading-7 text-[color:var(--ink-soft)]">
-          {landing ? getBody(invitationKind) : "Ce lien peut etre invalide, expire ou deja consomme."}
+          {landing
+            ? getInvitationBody(copy, invitationKind)
+            : copy.unavailableBody}
         </p>
 
         {landing ? (
           <div className="grid gap-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5 text-sm leading-6 text-[color:var(--foreground)]">
             <p>
-              <span className="font-medium">Eleve cible:</span>{" "}
+              <span className="font-medium">{copy.labels.student}:</span>{" "}
               {landing.student.display_name}
             </p>
             <p>
-              <span className="font-medium">Email invite:</span>{" "}
+              <span className="font-medium">{copy.labels.email}:</span>{" "}
               {landing.targetEmailMasked}
             </p>
             <p>
-              <span className="font-medium">Statut:</span>{" "}
-              {landing.resolvedStatus}
+              <span className="font-medium">{copy.labels.status}:</span>{" "}
+              {getInvitationStatusLabel(landing.resolvedStatus, languageCode)}
             </p>
             <p>
-              <span className="font-medium">Expire le:</span>{" "}
-              {new Date(landing.invitation.expires_at).toLocaleString("en-CA", {
-                hour12: false,
-              })}
+              <span className="font-medium">{copy.labels.expiry}:</span>{" "}
+              {new Intl.DateTimeFormat(getIntlLocale(languageCode), {
+                dateStyle: "medium",
+                timeStyle: "short",
+              }).format(new Date(landing.invitation.expires_at))}
             </p>
           </div>
         ) : null}
@@ -142,27 +215,27 @@ export function InvitationAcceptPanel({
 
         {viewerState === "unavailable" ? (
           <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-            L&apos;invitation ne peut pas etre utilisee dans son etat actuel.
+            {copy.states.unavailable}
           </p>
         ) : null}
 
         {viewerState === "unauthenticated" ? (
           <>
             <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-              Cree ou connecte le compte correspondant avant d&apos;accepter ce lien.
+              {copy.states.unauthenticated}
             </p>
             <div className="flex flex-wrap gap-3">
               <Link
                 className="inline-flex w-fit self-start items-center justify-center whitespace-nowrap rounded-full bg-[color:var(--foreground)] px-5 py-3 text-sm font-medium !text-white transition hover:-translate-y-0.5"
                 href={authSignInHref}
               >
-                Se connecter
+                {copy.buttons.signIn}
               </Link>
               <Link
                 className="inline-flex w-fit self-start items-center justify-center whitespace-nowrap rounded-full border border-[color:var(--line)] bg-white px-5 py-3 text-sm font-medium !text-[color:var(--foreground)] transition hover:-translate-y-0.5"
                 href={authSignUpHref}
               >
-                Creer le compte
+                {copy.buttons.signUp}
               </Link>
             </div>
           </>
@@ -171,30 +244,31 @@ export function InvitationAcceptPanel({
         {viewerState === "needs_onboarding" ? (
           <>
             <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-              La session est connectee{email ? ` pour ${email}` : ""}, mais le
-              profil applicatif n&apos;est pas encore cree.
+              {copy.states.needsOnboarding.replace(
+                "{emailLabel}",
+                getConnectedEmailLabel(languageCode, email),
+              )}
             </p>
             <Link
               className="inline-flex w-fit self-start items-center justify-center whitespace-nowrap rounded-full bg-[color:var(--foreground)] px-5 py-3 text-sm font-medium !text-white transition hover:-translate-y-0.5"
               href={onboardingHref}
             >
-              Terminer l&apos;onboarding
+              {copy.buttons.onboarding}
             </Link>
           </>
         ) : null}
 
         {viewerState === "role_mismatch" ? (
           <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-            La session actuelle utilise le role `{appUserRole ?? "unknown"}`.
-            Cette invitation attend un compte `{landing?.invitation.target_role ?? "matching"}`.
-            Deconnecte-toi puis reconnecte-toi avec le bon compte si necessaire.
+            {copy.states.roleMismatch
+              .replace("{currentRole}", currentRoleLabel)
+              .replace("{targetRole}", targetRoleLabel)}
           </p>
         ) : null}
 
         {viewerState === "already_accepted" ? (
           <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-            Cette invitation a deja ete acceptee par ce compte. Tu peux revenir
-            a l&apos;espace protege.
+            {copy.states.alreadyAccepted}
           </p>
         ) : null}
 
@@ -207,7 +281,7 @@ export function InvitationAcceptPanel({
                 onClick={handleAccept}
                 type="button"
               >
-                {isPending ? "Activation..." : "Accepter l'invitation"}
+                {isPending ? copy.buttons.pending : copy.buttons.accept}
               </button>
             ) : null}
 
@@ -215,7 +289,7 @@ export function InvitationAcceptPanel({
               className="inline-flex w-fit self-start items-center justify-center whitespace-nowrap rounded-full border border-[color:var(--line)] bg-white px-5 py-3 text-sm font-medium !text-[color:var(--foreground)] transition hover:-translate-y-0.5"
               href="/app"
             >
-              Aller a l&apos;app
+              {copy.buttons.app}
             </Link>
           </div>
         ) : null}

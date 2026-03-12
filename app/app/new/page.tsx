@@ -16,5 +16,10 @@ export default async function NewHomeworkPage() {
 
   const snapshot = await loadStudentDashboardSnapshot(appUser);
 
-  return <NewHomeworkEntry snapshot={snapshot} />;
+  return (
+    <NewHomeworkEntry
+      languageCode={appUser.preferred_ui_language}
+      snapshot={snapshot}
+    />
+  );
 }

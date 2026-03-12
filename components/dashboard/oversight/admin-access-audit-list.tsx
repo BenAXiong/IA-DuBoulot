@@ -1,5 +1,11 @@
 import { StudentStatusPill } from "@/components/dashboard/student/student-status-pill";
 import { formatDateLabel } from "@/components/dashboard/student/student-dashboard-presenters";
+import {
+  getAdminAccessAuditCopy,
+  getAdminAuditActionLabel,
+  getAdminAuditActorRoleLabel,
+  getAdminAuditTargetTableLabel,
+} from "@/lib/i18n/oversight-copy";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type { AdminSensitiveAccessEvent } from "@/lib/server/oversight/types";
 
@@ -12,13 +18,14 @@ export function AdminAccessAuditList({
   events,
   languageCode,
 }: AdminAccessAuditListProps) {
+  const copy = getAdminAccessAuditCopy(languageCode);
+
   if (events.length === 0) {
     return (
       <section className="rounded-[2rem] border border-dashed border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]">
-        <p className="font-medium">Aucun evenement sensible n&apos;a encore ete journalise.</p>
+        <p className="font-medium">{copy.emptyTitle}</p>
         <p className="mt-2 text-sm leading-6 text-[color:var(--ink-soft)]">
-          Les ouvertures de session parent/tuteur et les mutations de notes
-          privees apparaitront ici.
+          {copy.emptyBody}
         </p>
       </section>
     );
@@ -28,14 +35,13 @@ export function AdminAccessAuditList({
     <section className="grid gap-4 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]">
       <div className="space-y-3">
         <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-          Audit sensible
+          {copy.eyebrow}
         </p>
         <h1 className="font-[family-name:var(--font-heading)] text-4xl leading-tight sm:text-5xl">
-          Lectures adultes et notes privees, visibles depuis une seule file.
+          {copy.title}
         </h1>
         <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-          Cette vue donne au role admin une premiere surface de revue pour les
-          acces parent/tuteur et les changements de notes privees.
+          {copy.body}
         </p>
       </div>
 
@@ -47,19 +53,26 @@ export function AdminAccessAuditList({
           >
             <div className="space-y-3">
               <div className="flex flex-wrap gap-2">
-                <StudentStatusPill label={event.actorRole ?? "unknown"} tone="accent" />
-                <StudentStatusPill label={event.action} />
+                <StudentStatusPill
+                  label={getAdminAuditActorRoleLabel(event.actorRole, languageCode)}
+                  tone="accent"
+                />
+                <StudentStatusPill
+                  label={getAdminAuditActionLabel(event.action, languageCode)}
+                />
                 {event.studentDisplayName ? (
                   <StudentStatusPill label={event.studentDisplayName} tone="warning" />
                 ) : null}
               </div>
               <div>
                 <p className="text-sm font-medium text-[color:var(--foreground)]">
-                  {event.actorDisplayName ?? event.actorUserId ?? "acteur inconnu"}
+                  {event.actorDisplayName ?? event.actorUserId ?? copy.unknownActor}
                 </p>
                 <p className="mt-1 text-sm leading-6 text-[color:var(--ink-soft)]">
-                  Table cible: {event.targetTable}
-                  {event.conversationId ? ` | session ${event.conversationId}` : ""}
+                  {copy.targetDetails(
+                    getAdminAuditTargetTableLabel(event.targetTable, languageCode),
+                    event.conversationId,
+                  )}
                 </p>
               </div>
             </div>
@@ -69,7 +82,7 @@ export function AdminAccessAuditList({
               <p className="text-xs">
                 {typeof event.metadata.route === "string"
                   ? event.metadata.route
-                  : "route indisponible"}
+                  : copy.routeUnavailable}
               </p>
             </div>
           </article>

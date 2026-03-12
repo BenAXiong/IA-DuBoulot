@@ -10,7 +10,10 @@ const ROUTE = "/api/tutor/links";
 
 export const POST = withRouteErrorHandling(async (request, { requestId }) => {
   const context = await requireAuthenticatedUserContext();
-  const invitation = await parseCreateTutorInviteInput(request);
+  const invitation = await parseCreateTutorInviteInput(
+    request,
+    context.appUser?.preferred_ui_language ?? "fr",
+  );
   const result = await createTutorInvitation({
     context,
     requestId,

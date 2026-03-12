@@ -2,16 +2,19 @@ import type { Metadata } from "next";
 import { IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
 import { Suspense } from "react";
 import { RouteViewTracker } from "@/components/telemetry/route-view-tracker";
+import { ThemeScript } from "@/components/theme/theme-script";
 import "./globals.css";
 
 const bodyFont = IBM_Plex_Sans({
-  subsets: ["latin"],
+  fallback: ["PingFang TC", "Microsoft JhengHei", "sans-serif"],
+  subsets: ["latin", "latin-ext"],
   variable: "--font-body",
   weight: ["400", "500", "600"],
 });
 
 const headingFont = Space_Grotesk({
-  subsets: ["latin"],
+  fallback: ["PingFang TC", "Microsoft JhengHei", "sans-serif"],
+  subsets: ["latin", "latin-ext"],
   variable: "--font-heading",
   weight: ["500", "700"],
 });
@@ -19,7 +22,7 @@ const headingFont = Space_Grotesk({
 export const metadata: Metadata = {
   title: "IA DuBoulot",
   description:
-    "A supervised AI homework coach for students, parents, and tutors.",
+    "A calm, supervised AI homework coach for students, parents, and tutors.",
 };
 
 export default function RootLayout({
@@ -28,8 +31,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr">
-      <body className={`${bodyFont.variable} ${headingFont.variable}`}>
+    <html lang="fr" suppressHydrationWarning>
+      <body className={`${bodyFont.variable} ${headingFont.variable} antialiased`}>
+        <ThemeScript />
         <Suspense fallback={null}>
           <RouteViewTracker />
         </Suspense>

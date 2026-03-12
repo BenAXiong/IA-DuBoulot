@@ -1,12 +1,17 @@
 import "server-only";
 
 import {
+  getMemoryFallbackGeneratedCopy,
+  getMemoryServerCopy,
+} from "@/lib/i18n/dashboard-copy";
+import {
   requireActiveAppUser,
   requireAppUserContext,
 } from "@/lib/server/auth/authorization";
 import type {
   AppUserRecord,
   AuthenticatedUserContext,
+  UiLanguageCode,
 } from "@/lib/server/auth/types";
 import type {
   ConversationAttachmentRecord,
@@ -44,6 +49,8 @@ import { MEMORY_CATEGORIES } from "@/lib/server/memory/types";
 
 const MEMORY_RETENTION_DAYS = 180;
 const MAX_MEMORY_ITEMS_PER_STUDENT = 24;
+
+type MemoryServerCopy = ReturnType<typeof getMemoryServerCopy>;
 
 const SENSITIVE_MEMORY_PATTERNS = [
   /\badhd\b/i,
@@ -137,10 +144,11 @@ function toServiceError(message: string, cause: unknown) {
   });
 }
 
-function rawMemoryNotFound() {
+function rawMemoryNotFound(languageCode: UiLanguageCode = "fr") {
+  const copy = getMemoryServerCopy(languageCode);
   return new AppError({
     code: "not_found",
-    message: "Resource not found.",
+    message: copy.notFound,
     status: 404,
   });
 }
@@ -280,6 +288,7 @@ function buildFallbackGeneratedItems(input: {
   conversation: ConversationRecord;
   summaries: SessionSummaryRecord[];
 }): MemoryGenerationItem[] {
+  const copy = getMemoryFallbackGeneratedCopy(input.appUser.ai_help_language);
   const nextItems: MemoryGenerationItem[] = [];
   const subjectTitle = normalizeText(input.conversation.subject_tag);
 
@@ -287,7 +296,7 @@ function buildFallbackGeneratedItems(input: {
     nextItems.push({
       category: "topic",
       title: subjectTitle,
-      detail: "Sujet retrouve dans une session terminee recente.",
+      detail: copy.topicDetail,
       confidence: 0.62,
     });
   }
@@ -298,18 +307,15 @@ function buildFallbackGeneratedItems(input: {
     nextItems.push({
       category: "weakness",
       title: toTitleFromWeaknessTag(tag),
-      detail: "Point encore fragile dans la session recente.",
+      detail: copy.weaknessDetail,
       confidence: 0.58,
     });
   }
 
   nextItems.push({
     category: "preference",
-    title:
-      input.appUser.ai_help_language === "fr"
-        ? "Aide en francais"
-        : "Prefers help in English",
-    detail: "Preference explicite derivee du reglage d'aide IA du compte.",
+    title: copy.preferenceTitle,
+    detail: copy.preferenceDetail,
     confidence: 0.73,
   });
 
@@ -348,11 +354,11 @@ function sanitizeCandidateItem(
   };
 }
 
-function requireBodyObject(body: unknown) {
+function requireBodyObject(body: unknown, copy: MemoryServerCopy) {
   if (!body || typeof body !== "object" || Array.isArray(body)) {
     throw new AppError({
       code: "bad_request",
-      message: "Expected a JSON object body.",
+      message: copy.expectedObject,
       status: 400,
     });
   }
@@ -360,7 +366,10 @@ function requireBodyObject(body: unknown) {
   return body as Record<string, unknown>;
 }
 
-function parseMemoryCategory(value: unknown): ManualMemoryCategory {
+function parseMemoryCategory(
+  value: unknown,
+  copy: MemoryServerCopy,
+): ManualMemoryCategory {
   if (
     value === "strength" ||
     value === "weakness" ||
@@ -372,22 +381,22 @@ function parseMemoryCategory(value: unknown): ManualMemoryCategory {
 
   throw new AppError({
     code: "validation_error",
-    message: "One or more fields are invalid.",
+    message: copy.invalidFields,
     status: 400,
     fieldErrors: {
-      category: "Choose a valid memory category.",
+      category: copy.fieldErrors.category,
     },
   });
 }
 
-function parseMemoryTitle(value: unknown) {
+function parseMemoryTitle(value: unknown, copy: MemoryServerCopy) {
   if (typeof value !== "string") {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        title: "Title is required.",
+        title: copy.fieldErrors.titleRequired,
       },
     });
   }
@@ -397,10 +406,10 @@ function parseMemoryTitle(value: unknown) {
   if (!title || title.length > 120) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        title: "Title is required and must be 120 characters or fewer.",
+        title: copy.fieldErrors.titleRequired,
       },
     });
   }
@@ -408,10 +417,10 @@ function parseMemoryTitle(value: unknown) {
   if (containsSensitiveMemoryText(title)) {
     throw new AppError({
       code: "validation_error",
-      message: "Sensitive or speculative memory text is not allowed.",
+      message: copy.sensitiveText,
       status: 400,
       fieldErrors: {
-        title: "Keep memory items strictly educational and non-sensitive.",
+        title: copy.fieldErrors.titleSensitive,
       },
     });
   }
@@ -419,7 +428,7 @@ function parseMemoryTitle(value: unknown) {
   return title;
 }
 
-function parseMemoryDetail(value: unknown) {
+function parseMemoryDetail(value: unknown, copy: MemoryServerCopy) {
   if (value === null || typeof value === "undefined" || value === "") {
     return null;
   }
@@ -427,10 +436,10 @@ function parseMemoryDetail(value: unknown) {
   if (typeof value !== "string") {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        detail: "Detail must be text.",
+        detail: copy.fieldErrors.detailText,
       },
     });
   }
@@ -440,10 +449,10 @@ function parseMemoryDetail(value: unknown) {
   if (detail && detail.length > 320) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        detail: "Detail must be 320 characters or fewer.",
+        detail: copy.fieldErrors.detailLength,
       },
     });
   }
@@ -451,10 +460,10 @@ function parseMemoryDetail(value: unknown) {
   if (containsSensitiveMemoryText(detail)) {
     throw new AppError({
       code: "validation_error",
-      message: "Sensitive or speculative memory text is not allowed.",
+      message: copy.sensitiveText,
       status: 400,
       fieldErrors: {
-        detail: "Keep memory items strictly educational and non-sensitive.",
+        detail: copy.fieldErrors.detailSensitive,
       },
     });
   }
@@ -462,14 +471,18 @@ function parseMemoryDetail(value: unknown) {
   return detail;
 }
 
-function parseUuid(value: unknown, fieldName: "itemId") {
+function parseUuid(
+  value: unknown,
+  fieldName: "itemId",
+  copy: MemoryServerCopy,
+) {
   if (typeof value !== "string" || !/^[0-9a-fA-F-]{36}$/.test(value)) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        [fieldName]: "Expected a valid UUID.",
+        [fieldName]: copy.fieldErrors.itemId,
       },
     });
   }
@@ -517,6 +530,7 @@ async function upsertMemoryProfile(input: {
   studentUserId: string;
   items: StudentMemoryItemRecord[];
   reviewedAt: string;
+  copy?: MemoryServerCopy;
 }) {
   const grouped = buildItemsByCategory(input.items);
   const admin = createSupabaseAdminClient();
@@ -534,11 +548,17 @@ async function upsertMemoryProfile(input: {
   );
 
   if (error) {
-    throw toServiceError("Unable to update the student memory profile.", error);
+    throw toServiceError(
+      (input.copy ?? getMemoryServerCopy("fr")).service.updateProfile,
+      error,
+    );
   }
 }
 
-async function ensureMemoryItemBudget(studentUserId: string) {
+async function ensureMemoryItemBudget(
+  studentUserId: string,
+  copy: MemoryServerCopy,
+) {
   const admin = createSupabaseAdminClient();
   const { count, error } = await admin
     .from("student_memory_items")
@@ -547,19 +567,23 @@ async function ensureMemoryItemBudget(studentUserId: string) {
     .eq("is_active", true);
 
   if (error) {
-    throw toServiceError("Unable to verify the memory item limit.", error);
+    throw toServiceError(copy.service.verifyLimit, error);
   }
 
   if ((count ?? 0) >= MAX_MEMORY_ITEMS_PER_STUDENT) {
     throw new AppError({
       code: "conflict",
-      message: "The active memory limit is already reached for this student.",
+      message: copy.activeLimitReached,
       status: 409,
     });
   }
 }
 
-async function loadOwnedMemoryItem(studentUserId: string, itemId: string) {
+async function loadOwnedMemoryItem(
+  studentUserId: string,
+  itemId: string,
+  copy: MemoryServerCopy,
+) {
   const admin = createSupabaseAdminClient();
   const { data, error } = await admin
     .from("student_memory_items")
@@ -571,13 +595,13 @@ async function loadOwnedMemoryItem(studentUserId: string, itemId: string) {
     .maybeSingle<MemoryItemRow>();
 
   if (error) {
-    throw toServiceError("Unable to load the memory item.", error);
+    throw toServiceError(copy.service.loadItem, error);
   }
 
   if (!data) {
     throw new AppError({
       code: "not_found",
-      message: "Memory item not found.",
+      message: copy.itemNotFound,
       status: 404,
     });
   }
@@ -627,7 +651,7 @@ async function requireViewerCanAccessRawStudentMemory(
   studentUserId: string,
 ) {
   if (viewer.role === "tutor") {
-    throw rawMemoryNotFound();
+    throw rawMemoryNotFound(viewer.preferred_ui_language);
   }
 
   await requireViewerCanAccessStudent(viewer, studentUserId);
@@ -665,26 +689,28 @@ export async function loadVisibleStudentMemory(
 
 export async function parseStudentMemoryMutation(
   request: Request,
+  languageCode: UiLanguageCode = "fr",
 ): Promise<StudentMemoryMutation> {
   let body: unknown;
+  const copy = getMemoryServerCopy(languageCode);
 
   try {
     body = await request.json();
   } catch (error) {
     throw new AppError({
       code: "bad_request",
-      message: "Invalid JSON body.",
+      message: copy.invalidJson,
       status: 400,
       cause: error,
     });
   }
 
-  const payload = requireBodyObject(body);
+  const payload = requireBodyObject(body, copy);
 
   if (payload.action === "delete") {
     return {
       action: "delete",
-      itemId: parseUuid(payload.itemId, "itemId"),
+      itemId: parseUuid(payload.itemId, "itemId", copy),
     };
   }
 
@@ -693,20 +719,20 @@ export async function parseStudentMemoryMutation(
       action: "upsert",
       itemId:
         typeof payload.itemId === "string" && payload.itemId.length > 0
-          ? parseUuid(payload.itemId, "itemId")
+          ? parseUuid(payload.itemId, "itemId", copy)
           : undefined,
-      category: parseMemoryCategory(payload.category),
-      title: parseMemoryTitle(payload.title),
-      detail: parseMemoryDetail(payload.detail),
+      category: parseMemoryCategory(payload.category, copy),
+      title: parseMemoryTitle(payload.title, copy),
+      detail: parseMemoryDetail(payload.detail, copy),
     };
   }
 
   throw new AppError({
     code: "validation_error",
-    message: "One or more fields are invalid.",
+    message: copy.invalidFields,
     status: 400,
     fieldErrors: {
-      action: "Expected 'upsert' or 'delete'.",
+      action: copy.fieldErrors.action,
     },
   });
 }
@@ -717,7 +743,7 @@ async function upsertManualMemoryItem(input: {
   payload: UpsertStudentMemoryItemInput;
   requestId: string;
   route: string;
-}) {
+}, copy: MemoryServerCopy) {
   const admin = createSupabaseAdminClient();
   const expiresAt = addDaysIso(new Date().toISOString(), MEMORY_RETENTION_DAYS);
 
@@ -725,6 +751,7 @@ async function upsertManualMemoryItem(input: {
     const existing = await loadOwnedMemoryItem(
       input.studentUserId,
       input.payload.itemId,
+      copy,
     );
 
     const { data, error } = await admin
@@ -742,7 +769,7 @@ async function upsertManualMemoryItem(input: {
       .single<{ id: string }>();
 
     if (error) {
-      throw toServiceError("Unable to update the memory item.", error);
+      throw toServiceError(copy.service.updateItem, error);
     }
 
     logRuntimeInfo({
@@ -775,7 +802,7 @@ async function upsertManualMemoryItem(input: {
     return data.id;
   }
 
-  await ensureMemoryItemBudget(input.studentUserId);
+  await ensureMemoryItemBudget(input.studentUserId, copy);
 
   const { data, error } = await admin
     .from("student_memory_items")
@@ -793,7 +820,7 @@ async function upsertManualMemoryItem(input: {
     .single<{ id: string }>();
 
   if (error) {
-    throw toServiceError("Unable to create the memory item.", error);
+    throw toServiceError(copy.service.createItem, error);
   }
 
   logRuntimeInfo({
@@ -832,8 +859,12 @@ async function deleteMemoryItem(input: {
   itemId: string;
   requestId: string;
   route: string;
-}) {
-  const existing = await loadOwnedMemoryItem(input.studentUserId, input.itemId);
+}, copy: MemoryServerCopy) {
+  const existing = await loadOwnedMemoryItem(
+    input.studentUserId,
+    input.itemId,
+    copy,
+  );
   const admin = createSupabaseAdminClient();
   const { error } = await admin
     .from("student_memory_items")
@@ -844,7 +875,7 @@ async function deleteMemoryItem(input: {
     .eq("student_user_id", input.studentUserId);
 
   if (error) {
-    throw toServiceError("Unable to delete the memory item.", error);
+    throw toServiceError(copy.service.deleteItem, error);
   }
 
   logRuntimeInfo({
@@ -884,6 +915,7 @@ export async function mutateStudentMemory(input: {
   route: string;
 }): Promise<StudentMemoryMutationResult> {
   const appUser = requireAppUserContext(input.context);
+  const copy = getMemoryServerCopy(appUser.preferred_ui_language);
 
   if (appUser.role !== "admin") {
     requireActiveAppUser(appUser);
@@ -894,7 +926,7 @@ export async function mutateStudentMemory(input: {
   if (!canEditMemory(appUser, input.studentUserId)) {
     throw new AppError({
       code: "forbidden",
-      message: "You do not have access to this action.",
+      message: copy.noAccess,
       status: 403,
     });
   }
@@ -907,14 +939,14 @@ export async function mutateStudentMemory(input: {
           itemId: input.payload.itemId,
           requestId: input.requestId,
           route: input.route,
-        })
+        }, copy)
       : await upsertManualMemoryItem({
           actor: appUser,
           studentUserId: input.studentUserId,
           payload: input.payload,
           requestId: input.requestId,
           route: input.route,
-        });
+        }, copy);
 
   const activeRows = await loadActiveMemoryRows(input.studentUserId);
   const reviewedAt = new Date().toISOString();
@@ -922,6 +954,7 @@ export async function mutateStudentMemory(input: {
     studentUserId: input.studentUserId,
     items: activeRows.items,
     reviewedAt,
+    copy,
   });
 
   return {

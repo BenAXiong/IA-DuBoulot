@@ -1,5 +1,6 @@
 import "server-only";
 
+import { getStudentUploadServerCopy } from "@/lib/i18n/student-flow-copy";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getAiProvider } from "@/lib/server/ai/provider";
@@ -9,6 +10,7 @@ import {
   requireAppUserContext,
   requireAppUserRole,
 } from "@/lib/server/auth/authorization";
+import type { UiLanguageCode } from "@/lib/server/auth/types";
 import { AppError } from "@/lib/server/errors/app-error";
 import {
   moderateExtraction,
@@ -55,11 +57,13 @@ function toServiceError(message: string, cause: unknown) {
   });
 }
 
-function requireBodyObject(body: unknown) {
+function requireBodyObject(body: unknown, languageCode: UiLanguageCode) {
+  const copy = getStudentUploadServerCopy(languageCode);
+
   if (!body || typeof body !== "object" || Array.isArray(body)) {
     throw new AppError({
       code: "bad_request",
-      message: "Expected a JSON object body.",
+      message: copy.requestErrors.expectedObject,
       status: 400,
     });
   }
@@ -103,29 +107,32 @@ function normalizeMetadata(
 function buildExtractedTextBlock(input: {
   filename: string;
   extractedText: string | null;
+  languageCode: UiLanguageCode;
 }) {
+  const copy = getStudentUploadServerCopy(input.languageCode);
   const extractedText = input.extractedText?.trim() ?? "";
 
   if (!extractedText) {
     return null;
   }
 
-  return [`[Source: ${input.filename}]`, extractedText].join("\n");
+  return [copy.warnings.sourceLabel(input.filename), extractedText].join("\n");
 }
 
-function buildExtractionWarningMessage() {
-  return "Le texte n'a pas pu etre extrait proprement. Garde la piece jointe et relis manuellement la zone utile.";
+function buildExtractionWarningMessage(languageCode: UiLanguageCode) {
+  return getStudentUploadServerCopy(languageCode).warnings.extractionFailed;
 }
 
-function buildPartialExtractionWarningMessage() {
-  return "Extraction partielle: relis le texte avant de t'appuyer dessus.";
+function buildPartialExtractionWarningMessage(languageCode: UiLanguageCode) {
+  return getStudentUploadServerCopy(languageCode).warnings.extractionPartial;
 }
 
 function buildStoredExtractionWarningMessage(
   attachment: ConversationAttachmentRecord,
+  languageCode: UiLanguageCode,
 ) {
   if (attachment.extraction_status === "failed") {
-    return buildExtractionWarningMessage();
+    return buildExtractionWarningMessage(languageCode);
   }
 
   const metadata = normalizeMetadata(attachment.metadata);
@@ -136,7 +143,7 @@ function buildStoredExtractionWarningMessage(
       : null;
 
   if (needsManualReview || (confidence !== null && confidence < 0.55)) {
-    return buildPartialExtractionWarningMessage();
+    return buildPartialExtractionWarningMessage(languageCode);
   }
 
   return null;
@@ -144,6 +151,7 @@ function buildStoredExtractionWarningMessage(
 
 function buildExistingExtractionResult(
   attachment: ConversationAttachmentRecord,
+  languageCode: UiLanguageCode,
 ): ConfirmUploadResult {
   return {
     attachment,
@@ -152,9 +160,13 @@ function buildExistingExtractionResult(
         ? buildExtractedTextBlock({
             filename: attachment.original_filename,
             extractedText: attachment.raw_extracted_text,
+            languageCode,
           })
         : null,
-    warningMessage: buildStoredExtractionWarningMessage(attachment),
+    warningMessage: buildStoredExtractionWarningMessage(
+      attachment,
+      languageCode,
+    ),
   };
 }
 
@@ -165,7 +177,9 @@ type ParsedCreateUploadTargetRequest = Pick<
 
 export async function parseCreateUploadTargetRequest(
   request: Request,
+  languageCode: UiLanguageCode = "fr",
 ): Promise<ParsedCreateUploadTargetRequest> {
+  const copy = getStudentUploadServerCopy(languageCode);
   let body: unknown;
 
   try {
@@ -173,13 +187,13 @@ export async function parseCreateUploadTargetRequest(
   } catch (error) {
     throw new AppError({
       code: "bad_request",
-      message: "Invalid JSON body.",
+      message: copy.requestErrors.invalidJson,
       status: 400,
       cause: error,
     });
   }
 
-  const payload = requireBodyObject(body);
+  const payload = requireBodyObject(body, languageCode);
   const conversationId =
     typeof payload.conversationId === "string" ? payload.conversationId : "";
   const originalFilename =
@@ -197,10 +211,10 @@ export async function parseCreateUploadTargetRequest(
   if (!conversationId.trim()) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.requestErrors.invalidFields,
       status: 400,
       fieldErrors: {
-        conversationId: "Conversation id is required.",
+        conversationId: copy.validation.conversationIdRequired,
       },
     });
   }
@@ -208,10 +222,10 @@ export async function parseCreateUploadTargetRequest(
   if (!originalFilename.trim()) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.requestErrors.invalidFields,
       status: 400,
       fieldErrors: {
-        originalFilename: "Original filename is required.",
+        originalFilename: copy.validation.originalFilenameRequired,
       },
     });
   }
@@ -225,7 +239,11 @@ export async function parseCreateUploadTargetRequest(
   };
 }
 
-export async function parseConfirmUploadRequest(request: Request) {
+export async function parseConfirmUploadRequest(
+  request: Request,
+  languageCode: UiLanguageCode = "fr",
+) {
+  const copy = getStudentUploadServerCopy(languageCode);
   let body: unknown;
 
   try {
@@ -233,13 +251,13 @@ export async function parseConfirmUploadRequest(request: Request) {
   } catch (error) {
     throw new AppError({
       code: "bad_request",
-      message: "Invalid JSON body.",
+      message: copy.requestErrors.invalidJson,
       status: 400,
       cause: error,
     });
   }
 
-  const payload = requireBodyObject(body);
+  const payload = requireBodyObject(body, languageCode);
   const conversationId =
     typeof payload.conversationId === "string" ? payload.conversationId : "";
   const attachmentId =
@@ -248,10 +266,10 @@ export async function parseConfirmUploadRequest(request: Request) {
   if (!conversationId.trim() || !attachmentId.trim()) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.requestErrors.invalidFields,
       status: 400,
       fieldErrors: {
-        attachmentId: "Conversation id and attachment id are required.",
+        attachmentId: copy.validation.attachmentIdsRequired,
       },
     });
   }
@@ -305,6 +323,7 @@ async function requireWritableConversation(input: {
   conversationId: string;
 }) {
   const appUser = requireAppUserContext(input.context);
+  const copy = getStudentUploadServerCopy(appUser.preferred_ui_language);
   requireAppUserRole(appUser, ["student"]);
   requireActiveAppUser(appUser);
 
@@ -322,7 +341,7 @@ async function requireWritableConversation(input: {
   if (!conversation) {
     throw new AppError({
       code: "not_found",
-      message: "Conversation not found.",
+      message: copy.access.conversationNotFound,
       status: 404,
     });
   }
@@ -330,7 +349,7 @@ async function requireWritableConversation(input: {
   if (conversation.student_user_id !== appUser.id) {
     throw new AppError({
       code: "forbidden",
-      message: "You do not have access to this conversation.",
+      message: copy.access.conversationForbidden,
       status: 403,
     });
   }
@@ -338,7 +357,7 @@ async function requireWritableConversation(input: {
   if (conversation.status !== "active") {
     throw new AppError({
       code: "conflict",
-      message: "Completed sessions do not accept new uploads.",
+      message: copy.access.uploadsClosed,
       status: 409,
     });
   }
@@ -359,6 +378,7 @@ async function loadAttachmentForOwner(input: {
     context: input.context,
     conversationId: input.conversationId,
   });
+  const copy = getStudentUploadServerCopy(appUser.preferred_ui_language);
   const admin = createSupabaseAdminClient();
   const { data: attachment, error } = await admin
     .from("attachments")
@@ -374,7 +394,7 @@ async function loadAttachmentForOwner(input: {
   if (!attachment) {
     throw new AppError({
       code: "not_found",
-      message: "Attachment not found.",
+      message: copy.access.attachmentNotFound,
       status: 404,
     });
   }
@@ -382,7 +402,7 @@ async function loadAttachmentForOwner(input: {
   if (attachment.uploaded_by_user_id !== appUser.id) {
     throw new AppError({
       code: "forbidden",
-      message: "You do not have access to this attachment.",
+      message: copy.access.attachmentForbidden,
       status: 403,
     });
   }
@@ -401,18 +421,20 @@ export async function createUploadTarget(
     context: input.context,
     conversationId: input.conversationId,
   });
+  const copy = getStudentUploadServerCopy(appUser.preferred_ui_language);
   await assertStudentUsageActionAllowed({
     studentUserId: appUser.id,
     action: "create_upload",
+    languageCode: appUser.preferred_ui_language,
   });
 
   if (!isAllowedMimeType(input.mimeType)) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.requestErrors.invalidFields,
       status: 400,
       fieldErrors: {
-        mimeType: "Unsupported file type.",
+        mimeType: copy.validation.unsupportedFileType,
       },
     });
   }
@@ -420,10 +442,10 @@ export async function createUploadTarget(
   if (!Number.isFinite(input.byteSize) || input.byteSize <= 0) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.requestErrors.invalidFields,
       status: 400,
       fieldErrors: {
-        byteSize: "File size must be greater than zero.",
+        byteSize: copy.validation.fileSizePositive,
       },
     });
   }
@@ -433,12 +455,12 @@ export async function createUploadTarget(
   if (input.byteSize > attachmentRule.maxBytes) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.requestErrors.invalidFields,
       status: 400,
       fieldErrors: {
-        byteSize: `This file exceeds the ${Math.round(
-          attachmentRule.maxBytes / (1024 * 1024),
-        )} MB limit for this file type.`,
+        byteSize: copy.validation.fileTooLarge(
+          Math.round(attachmentRule.maxBytes / (1024 * 1024)),
+        ),
       },
     });
   }
@@ -455,7 +477,7 @@ export async function createUploadTarget(
   if ((existingAttachments ?? []).length >= ATTACHMENT_MAX_PER_CONVERSATION) {
     throw new AppError({
       code: "conflict",
-      message: "This session already reached the attachment limit.",
+      message: copy.validation.attachmentLimit,
       status: 409,
     });
   }
@@ -468,10 +490,10 @@ export async function createUploadTarget(
   if (currentBytes + input.byteSize > ATTACHMENT_MAX_TOTAL_BYTES) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.requestErrors.invalidFields,
       status: 400,
       fieldErrors: {
-        byteSize: "This upload would exceed the session upload budget.",
+        byteSize: copy.validation.uploadBudgetExceeded,
       },
     });
   }
@@ -551,6 +573,7 @@ export async function createUploadTarget(
 async function runAttachmentExtraction(input: {
   appUserId: string;
   appUserRole: "student";
+  languageCode: UiLanguageCode;
   conversationId: string;
   attachment: ConversationAttachmentRecord;
   requestId: string;
@@ -612,7 +635,7 @@ async function runAttachmentExtraction(input: {
     return {
       attachment: failedAttachment as ConversationAttachmentRecord,
       extractedTextBlock: null,
-      warningMessage: buildExtractionWarningMessage(),
+      warningMessage: buildExtractionWarningMessage(input.languageCode),
     };
   }
 
@@ -644,9 +667,9 @@ async function runAttachmentExtraction(input: {
   const shouldFailExtraction =
     !extraction.extractedText || moderation.status === "blocked";
   const warningMessage = shouldFailExtraction
-    ? buildExtractionWarningMessage()
+    ? buildExtractionWarningMessage(input.languageCode)
     : extraction.needsManualReview || (extraction.confidenceScore ?? 0) < 0.55
-      ? buildPartialExtractionWarningMessage()
+      ? buildPartialExtractionWarningMessage(input.languageCode)
       : null;
 
   const { data: updatedAttachment, error: updateError } = await admin
@@ -679,6 +702,7 @@ async function runAttachmentExtraction(input: {
     extractedTextBlock: buildExtractedTextBlock({
       filename: input.attachment.original_filename,
       extractedText: shouldFailExtraction ? null : extraction.extractedText,
+      languageCode: input.languageCode,
     }),
     warningMessage,
   };
@@ -692,6 +716,7 @@ export async function confirmUpload(
     conversationId: input.conversationId,
     attachmentId: input.attachmentId,
   });
+  const copy = getStudentUploadServerCopy(appUser.preferred_ui_language);
 
   const admin = createSupabaseAdminClient();
   const { data: objectInfo, error: infoError } = await admin.storage
@@ -710,7 +735,7 @@ export async function confirmUpload(
   if (!objectSize || objectSize !== attachment.byte_size) {
     throw new AppError({
       code: "conflict",
-      message: "Uploaded file size does not match the reserved attachment.",
+      message: copy.access.attachmentSizeMismatch,
       status: 409,
     });
   }
@@ -747,12 +772,16 @@ export async function confirmUpload(
       },
     });
 
-    return buildExistingExtractionResult(currentAttachment);
+    return buildExistingExtractionResult(
+      currentAttachment,
+      appUser.preferred_ui_language,
+    );
   }
 
   return runAttachmentExtraction({
     appUserId: appUser.id,
     appUserRole: "student",
+    languageCode: appUser.preferred_ui_language,
     conversationId: conversation.id,
     attachment: currentAttachment,
     requestId: input.requestId,
@@ -772,6 +801,7 @@ export async function retryAttachmentExtraction(
   return runAttachmentExtraction({
     appUserId: appUser.id,
     appUserRole: "student",
+    languageCode: appUser.preferred_ui_language,
     conversationId: conversation.id,
     attachment,
     requestId: input.requestId,
@@ -783,6 +813,7 @@ export async function createAttachmentAccessUrl(
   input: AttachmentAccessInput,
 ): Promise<AttachmentAccessResult> {
   const appUser = requireAppUserContext(input.context);
+  const copy = getStudentUploadServerCopy(appUser.preferred_ui_language);
   requireActiveAppUser(appUser);
   const supabase = await createSupabaseServerClient();
   const { data: attachment, error } = await supabase
@@ -798,7 +829,7 @@ export async function createAttachmentAccessUrl(
   if (!attachment) {
     throw new AppError({
       code: "not_found",
-      message: "Attachment not found.",
+      message: copy.access.attachmentNotFound,
       status: 404,
     });
   }

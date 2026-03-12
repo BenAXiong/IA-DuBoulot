@@ -1,5 +1,9 @@
 import { StudentStatusPill } from "@/components/dashboard/student/student-status-pill";
 import { formatDateLabel } from "@/components/dashboard/student/student-dashboard-presenters";
+import {
+  getConversationRoleLabel,
+  getStudentChatThreadCopy,
+} from "@/lib/i18n/student-flow-copy";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type { ConversationMessageRecord } from "@/lib/server/conversations/types";
 
@@ -7,19 +11,6 @@ type StudentChatThreadProps = {
   languageCode: UiLanguageCode;
   messages: ConversationMessageRecord[];
 };
-
-function getRoleLabel(role: ConversationMessageRecord["role"]) {
-  switch (role) {
-    case "student":
-      return "Eleve";
-    case "assistant":
-      return "Coach";
-    case "system":
-      return "Systeme";
-    default:
-      return "Message";
-  }
-}
 
 function getCardTone(role: ConversationMessageRecord["role"]) {
   if (role === "assistant") {
@@ -37,6 +28,8 @@ export function StudentChatThread({
   languageCode,
   messages,
 }: StudentChatThreadProps) {
+  const copy = getStudentChatThreadCopy(languageCode);
+
   return (
     <div className="grid gap-4">
       {messages.map((message) => (
@@ -46,11 +39,13 @@ export function StudentChatThread({
         >
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap gap-2">
-              <StudentStatusPill label={getRoleLabel(message.role)} />
+              <StudentStatusPill
+                label={getConversationRoleLabel(message.role, languageCode)}
+              />
               <StudentStatusPill
                 label={
                   formatDateLabel(message.created_at, languageCode) ??
-                  "Date indisponible"
+                  copy.noDate
                 }
               />
             </div>

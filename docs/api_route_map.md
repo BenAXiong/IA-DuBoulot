@@ -146,7 +146,7 @@ These routes keep product telemetry explicit and keep analytics metadata out of 
 
 | Route | Method | Caller | Purpose | Notes |
 | --- | --- | --- | --- | --- |
-| `/api/telemetry/events` | `POST` | browser client | record a whitelisted product event | current MVP sink is structured runtime logging; no raw child content; actual PostHog forwarding remains deferred until `A0.2.2` |
+| `/api/telemetry/events` | `POST` | browser client | record a whitelisted product event | current MVP sink is structured runtime logging; no raw child content; actual PostHog forwarding remains deferred until a dedicated adapter is implemented |
 
 ### Admin And Operations
 

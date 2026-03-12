@@ -3,6 +3,10 @@ import {
   formatDateLabel,
   getConversationStatusLabel,
 } from "@/components/dashboard/student/student-dashboard-presenters";
+import {
+  getStudentSessionSummaryCopy,
+  getWeaknessTagLabel,
+} from "@/lib/i18n/student-flow-copy";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type {
   ConversationRecord,
@@ -27,41 +31,46 @@ export function StudentSessionSummaryPanel({
   isCompleting,
 }: StudentSessionSummaryPanelProps) {
   const isCompleted = conversation.status === "completed";
+  const copy = getStudentSessionSummaryCopy(languageCode);
 
   return (
     <aside className="grid gap-4 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]">
       <div className="space-y-3">
         <div className="flex flex-wrap gap-2">
           <StudentStatusPill
-            label={getConversationStatusLabel(conversation.status)}
+            label={getConversationStatusLabel(conversation.status, languageCode)}
             tone={isCompleted ? "accent" : "neutral"}
           />
           {summary ? (
-            <StudentStatusPill label={`Resume ${summary.language_code.toUpperCase()}`} />
+            <StudentStatusPill
+              label={copy.summaryBadge(summary.language_code)}
+            />
           ) : null}
         </div>
 
         <div>
           <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-            Cloture et resume
+            {copy.eyebrow}
           </p>
           <h2 className="mt-2 font-[family-name:var(--font-heading)] text-3xl leading-tight">
             {isCompleted
-              ? "La session est figee et son resume reste consultable."
-              : "Termine la session quand le plan et le brouillon sont assez stables."}
+              ? copy.titleCompleted
+              : copy.titleActive}
           </h2>
         </div>
       </div>
 
       <div className="grid gap-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5 text-sm">
-        <p className="font-medium">Etat courant</p>
+        <p className="font-medium">{copy.stateTitle}</p>
         <p className="text-[color:var(--ink-soft)]">
-          Cree le {formatDateLabel(conversation.created_at, languageCode)}
+          {copy.createdOn(formatDateLabel(conversation.created_at, languageCode))}
         </p>
         <p className="text-[color:var(--ink-soft)]">
           {isCompleted && conversation.completed_at
-            ? `Terminee le ${formatDateLabel(conversation.completed_at, languageCode)}`
-            : "Tant que la session est active, le chat et l'espace de travail restent modifiables."}
+            ? copy.completedOn(
+                formatDateLabel(conversation.completed_at, languageCode),
+              )
+            : copy.activeBody}
         </p>
 
         {!isCompleted ? (
@@ -71,7 +80,7 @@ export function StudentSessionSummaryPanel({
             onClick={onComplete}
             type="button"
           >
-            {isCompleting ? "Cloture..." : "Terminer la session"}
+            {isCompleting ? copy.completing : copy.completeSession}
           </button>
         ) : null}
 
@@ -91,7 +100,7 @@ export function StudentSessionSummaryPanel({
       {summary ? (
         <article className="grid gap-4 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5">
           <div className="space-y-2">
-            <p className="font-medium">Resume eleve</p>
+            <p className="font-medium">{copy.summaryTitle}</p>
             <p className="whitespace-pre-line text-sm leading-6 text-[color:var(--foreground)]">
               {summary.summary_text}
             </p>
@@ -100,22 +109,26 @@ export function StudentSessionSummaryPanel({
           {summary.weakness_tags.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {summary.weakness_tags.map((tag) => (
-                <StudentStatusPill key={tag} label={tag} tone="warning" />
+                <StudentStatusPill
+                  key={tag}
+                  label={getWeaknessTagLabel(tag, languageCode)}
+                  tone="warning"
+                />
               ))}
             </div>
           ) : null}
 
           {summary.next_step_recommendation ? (
             <div className="rounded-[1.25rem] border border-[color:var(--line)] bg-white px-4 py-3 text-sm leading-6 text-[color:var(--ink-soft)]">
-              Prochaine etape: {summary.next_step_recommendation}
+              {copy.nextStep(summary.next_step_recommendation)}
             </div>
           ) : null}
         </article>
       ) : (
         <article className="rounded-[1.5rem] border border-dashed border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5 text-sm leading-6 text-[color:var(--ink-soft)]">
           {isCompleted
-            ? "Le resume est en attente. Recharge la page si la cloture vient d'etre faite."
-            : "Le resume final apparaitra ici une fois la session terminee."}
+            ? copy.pendingAfterComplete
+            : copy.pendingBeforeComplete}
         </article>
       )}
     </aside>

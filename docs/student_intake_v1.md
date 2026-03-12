@@ -25,6 +25,7 @@ This document covers `A3.2.1` to `A3.2.4`:
 - File list: `components/dashboard/student/intake-file-list.tsx`
 - Readiness card: `components/dashboard/student/intake-readiness-card.tsx`
 - Client-side intake config: `lib/intake/intake-config.ts`
+- Student flow localization copy: `lib/i18n/student-flow-copy.ts`
 
 ## Current Behavior
 
@@ -40,6 +41,8 @@ What works now:
 - the student can review and edit the text that will later feed the chat
 - the validated intake now creates a conversation draft, uploads the selected files through the signed upload flow, confirms them, runs extraction, syncs extracted text back into the workspace, and then redirects into the persisted session page
 - if provider extraction fails during confirmation, the attachment is kept, marked `failed`, and returned with a manual-review warning instead of breaking the student flow
+- the intake route copy, subject labels, staged-file labels, readiness card, client upload fallbacks, and provisional extraction draft now localize through `lib/i18n/student-flow-copy.ts` plus the localized helpers inside `lib/intake/intake-config.ts`
+- the server-owned intake validations, upload validation errors, extraction warnings, and extracted-text source labels now also localize from the student's `preferred_ui_language`, so the route no longer drops back to mixed English or French when the server rejects or repairs part of the flow
 
 What does not happen yet:
 

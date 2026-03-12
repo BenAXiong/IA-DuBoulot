@@ -21,8 +21,8 @@ As of 2026-03-11:
 - `A7.2` is now complete through the written smoke checklist, the aggregated regression pass, and the existing automated smoke scripts
 - `A7.3` is now complete through AI request caps, artifact-reuse guardrails, and the upload-economics review
 - `A7.3.4` is now complete through the consolidated AI ops/economics note and the logged recommendation to reserve future parent-triggered AI for the paid Family plan
-- `A7.4` is now complete through the founder walkthrough, launch checklist, scope freeze, and explicit PWA deferral
-- the next active product work inside `A7` is now `A7.1` manual iPad Safari validation
+- `A7.4.1` to `A7.4.3` are now complete through the founder walkthrough, launch checklist, scope freeze, and explicit PWA deferral
+- the next active product work inside `A7` is now `A7.1` manual iPad Safari validation plus `A7.4.4` to `A7.4.6` interface-language completion for the Taiwan-first pilot
 - `A0` now only contains external-account or remote-settings follow-ups, and is no longer on the repo-owned critical path for the current MVP slice
 
 ## Week-By-Week Plan

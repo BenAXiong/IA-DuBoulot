@@ -7,7 +7,7 @@ type HighlightCardProps = {
 
 export function HighlightCard({ title, body }: HighlightCardProps) {
   return (
-    <SurfaceCard as="article">
+    <SurfaceCard as="article" className="surface-card--feature">
       <p className="font-[family-name:var(--font-heading)] text-xl">{title}</p>
       <p className="mt-3 text-sm leading-6 text-[color:var(--ink-soft)]">
         {body}

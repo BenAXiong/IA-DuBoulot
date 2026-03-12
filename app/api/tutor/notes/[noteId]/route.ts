@@ -14,7 +14,10 @@ const ROUTE = "/api/tutor/notes/[noteId]";
 export const PATCH = withRouteErrorHandling<{ params: Params }>(
   async (request, { params, requestId }) => {
     const context = await requireAuthenticatedUserContext();
-    const payload = await parseUpdateTutorNoteInput(request);
+    const payload = await parseUpdateTutorNoteInput(
+      request,
+      context.appUser?.preferred_ui_language ?? "fr",
+    );
     const resolvedParams = await params;
     const note = await updateTutorNote({
       context,

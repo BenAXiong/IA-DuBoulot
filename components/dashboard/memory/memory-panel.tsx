@@ -3,6 +3,10 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { formatDateLabel } from "@/components/dashboard/student/student-dashboard-presenters";
+import {
+  getMemoryCategoryLabel,
+  getMemoryPanelCopy,
+} from "@/lib/i18n/dashboard-copy";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type {
   ManualMemoryCategory,
@@ -41,14 +45,6 @@ const manualCategories: ManualMemoryCategory[] = [
   "topic",
 ];
 
-const categoryLabels: Record<MemoryCategory, string> = {
-  strength: "Forces",
-  weakness: "Fragilites",
-  preference: "Preferences",
-  topic: "Sujets recurrents",
-  learning_note: "Notes d'apprentissage",
-};
-
 function buildInitialFormState() {
   return {
     itemId: "",
@@ -74,6 +70,7 @@ export function MemoryPanel({
   snapshot,
 }: MemoryPanelProps) {
   const router = useRouter();
+  const copy = getMemoryPanelCopy(languageCode);
   const [isPending, startTransition] = useTransition();
   const [formState, setFormState] = useState(buildInitialFormState);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -123,8 +120,7 @@ export function MemoryPanel({
 
       if (!response.ok || !payload?.ok) {
         setErrorMessage(
-          payload?.error?.message ??
-            "Impossible de mettre a jour la memoire pedagogique.",
+          payload?.error?.message ?? copy.errorFallback,
         );
         return;
       }
@@ -145,7 +141,7 @@ export function MemoryPanel({
         title: formState.title,
         detail: formState.detail,
       },
-      isEditing ? "Memoire mise a jour." : "Memoire ajoutee.",
+      isEditing ? copy.success.updated : copy.success.created,
     );
   }
 
@@ -155,7 +151,7 @@ export function MemoryPanel({
         action: "delete",
         itemId,
       },
-      "Memoire retiree.",
+      copy.success.deleted,
     );
   }
 
@@ -163,7 +159,7 @@ export function MemoryPanel({
     <section className="grid gap-6 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]">
       <div className="space-y-3">
         <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-          Memoire pedagogique
+          {copy.eyebrow}
         </p>
         <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
           {title}
@@ -174,28 +170,26 @@ export function MemoryPanel({
       <div className="grid gap-4 lg:grid-cols-3">
         <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4">
           <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-            Forces
+            {copy.summaries.strength}
           </p>
           <p className="mt-3 text-sm leading-6 text-[color:var(--ink-soft)]">
-            {snapshot.profile.strengthsSummary ?? "Aucune force durable enregistree."}
+            {snapshot.profile.strengthsSummary ?? copy.emptySummaries.strength}
           </p>
         </article>
         <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4">
           <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-            Fragilites
+            {copy.summaries.weakness}
           </p>
           <p className="mt-3 text-sm leading-6 text-[color:var(--ink-soft)]">
-            {snapshot.profile.weaknessesSummary ??
-              "Aucune fragilite durable enregistree."}
+            {snapshot.profile.weaknessesSummary ?? copy.emptySummaries.weakness}
           </p>
         </article>
         <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4">
           <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-            Preferences
+            {copy.summaries.preference}
           </p>
           <p className="mt-3 text-sm leading-6 text-[color:var(--ink-soft)]">
-            {snapshot.profile.preferencesSummary ??
-              "Aucune preference durable enregistree."}
+            {snapshot.profile.preferencesSummary ?? copy.emptySummaries.preference}
           </p>
         </article>
       </div>
@@ -219,24 +213,24 @@ export function MemoryPanel({
         >
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="font-medium">
-              {isEditing ? "Modifier une memoire" : "Ajouter une memoire"}
+              {isEditing ? copy.form.edit : copy.form.add}
             </p>
             {isEditing ? (
               <button
-                className="rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5"
+                className="inline-flex min-h-11 items-center justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5"
                 onClick={resetForm}
                 type="button"
               >
-                Annuler
+                {copy.form.cancel}
               </button>
             ) : null}
           </div>
 
           <div className="grid gap-4 md:grid-cols-[13rem_1fr]">
             <label className="grid gap-2 text-sm">
-              <span className="font-medium">Categorie</span>
+              <span className="font-medium">{copy.form.category}</span>
               <select
-                className="rounded-[1rem] border border-[color:var(--line)] bg-white px-3 py-2"
+                className="min-h-11 rounded-[1rem] border border-[color:var(--line)] bg-white px-3 py-2"
                 disabled={isPending}
                 onChange={(event) =>
                   setFormState((current) => ({
@@ -248,16 +242,16 @@ export function MemoryPanel({
               >
                 {manualCategories.map((category) => (
                   <option key={category} value={category}>
-                    {categoryLabels[category]}
+                    {getMemoryCategoryLabel(category, languageCode)}
                   </option>
                 ))}
               </select>
             </label>
 
             <label className="grid gap-2 text-sm">
-              <span className="font-medium">Titre</span>
+              <span className="font-medium">{copy.form.title}</span>
               <input
-                className="rounded-[1rem] border border-[color:var(--line)] bg-white px-3 py-2"
+                className="min-h-11 rounded-[1rem] border border-[color:var(--line)] bg-white px-3 py-2"
                 disabled={isPending}
                 maxLength={120}
                 onChange={(event) =>
@@ -266,14 +260,14 @@ export function MemoryPanel({
                     title: event.target.value,
                   }))
                 }
-                placeholder="ex. Fractions avec schema"
+                placeholder={copy.form.titlePlaceholder}
                 value={formState.title}
               />
             </label>
           </div>
 
           <label className="grid gap-2 text-sm">
-            <span className="font-medium">Detail</span>
+            <span className="font-medium">{copy.form.detail}</span>
             <textarea
               className="min-h-[6rem] rounded-[1rem] border border-[color:var(--line)] bg-white px-3 py-2"
               disabled={isPending}
@@ -282,27 +276,23 @@ export function MemoryPanel({
                 setFormState((current) => ({
                   ...current,
                   detail: event.target.value,
-                }))
-              }
-              placeholder="Garde une formulation strictement pedagogique et concrete."
+                  }))
+                }
+              placeholder={copy.form.detailPlaceholder}
               value={formState.detail}
             />
           </label>
 
           <div className="flex flex-wrap gap-3">
             <button
-              className="rounded-full border border-[#b34f32] bg-[#cb5d3c] px-4 py-2 text-sm font-medium text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-65"
+              className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#b34f32] bg-[#cb5d3c] px-4 py-2 text-sm font-medium text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-65"
               disabled={isPending}
               type="submit"
             >
-              {isPending
-                ? "Enregistrement..."
-                : isEditing
-                  ? "Mettre a jour"
-                  : "Ajouter"}
+              {isPending ? copy.form.pending : isEditing ? copy.form.update : copy.form.create}
             </button>
             <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-              Les souvenirs doivent rester utiles a l&apos;apprentissage. Les donnees sensibles ou speculatives sont refusees.
+              {copy.form.note}
             </p>
           </div>
         </form>
@@ -322,9 +312,11 @@ export function MemoryPanel({
               key={category}
             >
               <div className="space-y-1">
-                <p className="font-medium">{categoryLabels[category]}</p>
+                <p className="font-medium">
+                  {getMemoryCategoryLabel(category, languageCode)}
+                </p>
                 <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-                  {items.length} element(s) actif(s)
+                  {copy.activeItems(items.length)}
                 </p>
               </div>
 
@@ -346,12 +338,13 @@ export function MemoryPanel({
 
                       <div className="grid gap-2 text-sm text-[color:var(--ink-soft)] md:justify-items-end">
                         {formatConfidence(item.confidence) ? (
-                          <p>Confiance {formatConfidence(item.confidence)}</p>
+                          <p>{copy.confidence(formatConfidence(item.confidence) ?? "")}</p>
                         ) : null}
                         {item.expiresAt ? (
                           <p>
-                            Echeance{" "}
-                            {formatDateLabel(item.expiresAt, languageCode) ?? item.expiresAt}
+                            {copy.expiry(
+                              formatDateLabel(item.expiresAt, languageCode) ?? item.expiresAt,
+                            )}
                           </p>
                         ) : null}
                       </div>
@@ -360,20 +353,20 @@ export function MemoryPanel({
                     {snapshot.canEdit && category !== "learning_note" ? (
                       <div className="flex flex-wrap gap-3">
                         <button
-                          className="rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5"
+                          className="inline-flex min-h-11 items-center justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5"
                           disabled={isPending}
                           onClick={() => beginEdit(item)}
                           type="button"
                         >
-                          Modifier
+                          {copy.edit}
                         </button>
                         <button
-                          className="rounded-full border border-[#d07c5b] bg-[#fff0ea] px-4 py-2 text-sm font-medium text-[#8d3b1f] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-65"
+                          className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#d07c5b] bg-[#fff0ea] px-4 py-2 text-sm font-medium text-[#8d3b1f] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-65"
                           disabled={isPending}
                           onClick={() => handleDelete(item.id)}
                           type="button"
                         >
-                          Supprimer
+                          {copy.delete}
                         </button>
                       </div>
                     ) : null}
@@ -386,7 +379,7 @@ export function MemoryPanel({
 
         {snapshot.items.length === 0 ? (
           <div className="rounded-[1.5rem] border border-dashed border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5 text-sm leading-6 text-[color:var(--ink-soft)]">
-            Aucune memoire pedagogique active pour le moment.
+            {copy.empty}
           </div>
         ) : null}
       </div>

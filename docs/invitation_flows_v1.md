@@ -112,6 +112,7 @@ Current behavior:
 - the route returns `inviteUrl`
 - the current UI exposes that URL for copy/share
 - acceptance and auditing work immediately once the recipient opens the link
+- invitation creation and acceptance routes now resolve user-facing validation, conflict, expired-link, role-mismatch, and service-failure messages from the active `preferred_ui_language`
 
 Why:
 
@@ -144,6 +145,7 @@ Remaining caveat:
 Validation note:
 
 - same-browser recovery was verified on 2026-03-11 in a local browser pass against the live auth flow using a real tutor invitation and confirmation-token handoff
+- the public `/invite/[token]` page state now also receives the route language so inactive, expired, or already-accepted invitation states can render in the selected public language instead of defaulting to French
 
 ## Audit Expectations
 

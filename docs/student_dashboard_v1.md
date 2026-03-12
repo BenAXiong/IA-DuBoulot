@@ -30,6 +30,7 @@ This document started with `A3.1.1` to `A3.1.3` and now also records the `A6.1` 
 - Server snapshot service: `lib/server/student-dashboard/student-dashboard-service.ts`
 - Memory service: `lib/server/memory/service.ts`
 - Dashboard types: `lib/server/student-dashboard/types.ts`
+- Dashboard localization copy: `lib/i18n/dashboard-copy.ts`
 
 ## Data Contract
 
@@ -104,6 +105,7 @@ Current boundary:
 
 - raw session content still lives in the session detail and workbench surfaces
 - the dashboard memory panel is only for durable learning context that can help the next homework
+- the shared student-dashboard copy now respects `preferred_ui_language` through localized presenters and `lib/i18n/dashboard-copy.ts`, and the adjacent `/app/new`, `/app/history`, and `/app/conversations/[conversationId]` surfaces now localize through `lib/i18n/student-flow-copy.ts`
 
 ## Known Boundaries
 

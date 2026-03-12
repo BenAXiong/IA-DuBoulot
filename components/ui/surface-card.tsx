@@ -14,10 +14,7 @@ export function SurfaceCard({
 }: SurfaceCardProps) {
   return (
     <Component
-      className={[
-        "rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-[var(--shadow)]",
-        className,
-      ]
+      className={["shell-card rounded-[1.5rem] p-5", className]
         .filter(Boolean)
         .join(" ")}
       {...props}

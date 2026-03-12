@@ -8,7 +8,10 @@ import {
 
 export const POST = withRouteErrorHandling(async (request, { requestId }) => {
   const context = await requireAuthenticatedUserContext();
-  const payload = await parseCreateUploadTargetRequest(request);
+  const payload = await parseCreateUploadTargetRequest(
+    request,
+    context.appUser?.preferred_ui_language ?? "fr",
+  );
   const result = await createUploadTarget({
     context,
     requestId,

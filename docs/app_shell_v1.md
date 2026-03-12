@@ -35,6 +35,8 @@ Rules:
 - public routes share one branded header and footer
 - auth and invite flows should feel like the same product as the landing page
 - pricing remains intentionally provisional while the MVP still exposes only one wired Family monthly plan
+- the shell now carries the active UI language through shared dictionaries and a small client-side `document.documentElement.lang` sync instead of hardcoded French-only chrome
+- the shell now also exposes the shared light or dark theme toggle instead of leaving theme preference implicit in CSS alone
 
 ## Authenticated App Shell
 
@@ -60,6 +62,8 @@ Rules:
 - page content under `/app` should focus on role-specific panels, not duplicate nav/header code
 - the shell is role-aware, but not role-bloated: role-specific content lives in dashboard modules, not inside the chrome component
 - non-admin accounts already queued for deletion are redirected back toward `/app/settings`, and the shell repeats that frozen-state warning in the shared header
+- shared shell chrome and the account-settings block on `/app` now localize from `lib/i18n/ui-copy.ts`; deeper role dashboards still own their own remaining translation debt
+- the authenticated shell now also shares the same light or dark theme toggle and bootstrap path as the public shell, so the app chrome does not diverge into a second theme system
 
 ## Role Dashboard Variants
 
@@ -124,6 +128,6 @@ Scope boundary:
 ## Known Follow-Ups
 
 - convert anchor sections into real route destinations as dashboards grow
-- add localized copy structure instead of hardcoded strings
+- continue the trilingual pass inside the deeper student, parent, tutor, and admin dashboard content
 - validate the shell on actual iPad Safari during `A7.1`
 - add role-specific empty states that consume real data rather than static MVP guidance copy

@@ -1,4 +1,9 @@
 import { getIntlLocale, type UiLanguageCode } from "@/lib/i18n/config";
+import {
+  getLocalizedConversationStatusLabel,
+  getLocalizedStartStateBody,
+  getLocalizedStartStateLabel,
+} from "@/lib/i18n/dashboard-copy";
 import type {
   ConversationStatus,
   StudentDashboardStartState,
@@ -23,7 +28,15 @@ export function formatUsagePeriod(
   languageCode: UiLanguageCode,
 ) {
   if (!usage.periodStart || !usage.periodEnd) {
-    return "Aucune periode mesuree pour l'instant";
+    if (languageCode === "en") {
+      return "No measured usage window yet";
+    }
+
+    if (languageCode === "zh") {
+      return "目前還沒有已量測的使用期間";
+    }
+
+    return "Aucune période mesurée pour l'instant";
   }
 
   return `${formatDateLabel(usage.periodStart, languageCode)} -> ${formatDateLabel(
@@ -42,49 +55,23 @@ export function formatCompactNumber(
   }).format(value);
 }
 
-export function getStartStateLabel(startState: StudentDashboardStartState) {
-  switch (startState) {
-    case "ready":
-      return "Pret";
-    case "pending_parent_approval":
-      return "En attente parent";
-    case "quota_blocked":
-      return "Quota bloque";
-    case "suspended":
-      return "Suspendu";
-    case "deletion_requested":
-      return "Suppression demandee";
-    default:
-      return "Statut inconnu";
-  }
+export function getStartStateLabel(
+  startState: StudentDashboardStartState,
+  languageCode: UiLanguageCode = "fr",
+) {
+  return getLocalizedStartStateLabel(startState, languageCode);
 }
 
-export function getStartStateBody(startState: StudentDashboardStartState) {
-  switch (startState) {
-    case "ready":
-      return "Le compte peut lancer un nouveau devoir et reprendre les sessions recentes.";
-    case "pending_parent_approval":
-      return "Le prochain devoir reste bloque tant qu'un parent n'a pas active le lien de supervision.";
-    case "quota_blocked":
-      return "Le compte a atteint sa limite d'essai ou de quota. La reprise passe maintenant par le statut de facturation et le renouvellement de la periode.";
-    case "suspended":
-      return "Le compte ne peut pas demarrer de nouveau devoir tant que la suspension n'est pas levee.";
-    case "deletion_requested":
-      return "Le compte reste gele pendant la file de suppression et n'accepte plus de nouvelle activite.";
-    default:
-      return "Le statut de depart ne peut pas etre resolu.";
-  }
+export function getStartStateBody(
+  startState: StudentDashboardStartState,
+  languageCode: UiLanguageCode = "fr",
+) {
+  return getLocalizedStartStateBody(startState, languageCode);
 }
 
-export function getConversationStatusLabel(status: ConversationStatus) {
-  switch (status) {
-    case "active":
-      return "En cours";
-    case "completed":
-      return "Terminee";
-    case "archived":
-      return "Archivee";
-    default:
-      return "Statut inconnu";
-  }
+export function getConversationStatusLabel(
+  status: ConversationStatus,
+  languageCode: UiLanguageCode = "fr",
+) {
+  return getLocalizedConversationStatusLabel(status, languageCode);
 }

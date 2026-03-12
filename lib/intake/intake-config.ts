@@ -5,17 +5,8 @@ import {
   resolveAttachmentPolicy,
   type SharedAttachmentCategory,
 } from "@/lib/uploads/attachment-policy";
-
-export const INTAKE_SUBJECT_OPTIONS = [
-  { value: "mathematiques", label: "Mathematiques" },
-  { value: "francais", label: "Francais" },
-  { value: "anglais", label: "Anglais" },
-  { value: "histoire-geographie", label: "Histoire-geographie" },
-  { value: "sciences", label: "Sciences" },
-  { value: "physique-chimie", label: "Physique-chimie" },
-  { value: "svt", label: "SVT" },
-  { value: "autre", label: "Autre matiere" },
-] as const;
+import { getIntakeConfigCopy } from "@/lib/i18n/student-flow-copy";
+import type { UiLanguageCode } from "@/lib/server/auth/types";
 
 export const INTAKE_MAX_ATTACHMENTS = 5;
 export const INTAKE_MAX_TOTAL_UPLOAD_BYTES = 50 * 1024 * 1024;
@@ -54,16 +45,18 @@ export function resolveIntakeCategory(
 export function stageIntakeFiles(input: {
   existingFiles: StagedIntakeFile[];
   incomingFiles: File[];
+  languageCode?: UiLanguageCode;
 }) {
   const acceptedFiles = [...input.existingFiles];
   const errors: string[] = [];
   let totalBytes = acceptedFiles.reduce((sum, staged) => sum + staged.file.size, 0);
+  const copy = getIntakeConfigCopy(input.languageCode ?? "fr");
 
   for (const file of input.incomingFiles) {
     const category = resolveIntakeCategory(file);
 
     if (!category) {
-      errors.push(`${file.name}: format non accepte.`);
+      errors.push(copy.stageErrors.unsupportedFormat(file.name));
       continue;
     }
 
@@ -71,22 +64,20 @@ export function stageIntakeFiles(input: {
       category === "pdf" ? ATTACHMENT_MAX_PDF_BYTES : ATTACHMENT_MAX_IMAGE_BYTES;
 
     if (file.size > maxBytes) {
-      errors.push(
-        `${file.name}: ${formatBytes(maxBytes)} maximum pour ce type de fichier.`,
-      );
+      errors.push(copy.stageErrors.maxBytes(file.name, formatBytes(maxBytes)));
       continue;
     }
 
     if (acceptedFiles.length >= INTAKE_MAX_ATTACHMENTS) {
-      errors.push(
-        `Limite atteinte: ${INTAKE_MAX_ATTACHMENTS} fichiers maximum par devoir.`,
-      );
+      errors.push(copy.stageErrors.tooManyFiles(INTAKE_MAX_ATTACHMENTS));
       break;
     }
 
     if (totalBytes + file.size > INTAKE_MAX_TOTAL_UPLOAD_BYTES) {
       errors.push(
-        `Budget depasse: ${formatBytes(INTAKE_MAX_TOTAL_UPLOAD_BYTES)} maximum pour l'ensemble des fichiers.`,
+        copy.stageErrors.totalBudgetExceeded(
+          formatBytes(INTAKE_MAX_TOTAL_UPLOAD_BYTES),
+        ),
       );
       continue;
     }
@@ -109,6 +100,7 @@ export function stageIntakeFiles(input: {
 export function buildExtractionDraftSeed(input: {
   pastedText: string;
   files: StagedIntakeFile[];
+  languageCode?: UiLanguageCode;
 }) {
   const pastedText = input.pastedText.trim();
 
@@ -120,21 +112,29 @@ export function buildExtractionDraftSeed(input: {
     return "";
   }
 
+  const copy = getIntakeConfigCopy(input.languageCode ?? "fr");
   const fileLines = input.files.map((file) => {
-    const kindLabel = file.category === "pdf" ? "PDF" : "image/capture";
+    const kindLabel =
+      file.category === "pdf" ? copy.category.pdf : copy.category.image;
     return `- ${file.file.name} (${kindLabel}, ${formatBytes(file.file.size)})`;
   });
 
   return [
-    "[Brouillon d'extraction provisoire]",
+    copy.provisionalDraft.marker,
     "",
-    "Fichiers ajoutes:",
+    copy.provisionalDraft.filesAdded,
     ...fileLines,
     "",
-    "Ajoute ici une transcription manuelle, les consignes importantes, ou les zones a faire relire avant l'ouverture de la conversation.",
+    copy.provisionalDraft.helper,
   ].join("\n");
 }
 
 export function isProvisionalExtractionDraft(value: string) {
-  return value.trim().startsWith("[Brouillon d'extraction provisoire]");
+  return ["fr", "en", "zh"].some((languageCode) =>
+    value
+      .trim()
+      .startsWith(
+        getIntakeConfigCopy(languageCode as UiLanguageCode).provisionalDraft.marker,
+      ),
+  );
 }

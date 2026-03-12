@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { StudentStatusPill } from "@/components/dashboard/student/student-status-pill";
+import { getTutorNotesPanelCopy } from "@/lib/i18n/oversight-copy";
+import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type { TutorNoteRecord } from "@/lib/server/oversight/types";
 
 type TutorNoteResponse =
@@ -21,6 +23,7 @@ type TutorNoteResponse =
 
 type TutorNotesPanelProps = {
   initialNotes: TutorNoteRecord[];
+  languageCode: UiLanguageCode;
   studentUserId: string;
   conversationId?: string | null;
   title: string;
@@ -39,11 +42,13 @@ function sortNotes(notes: TutorNoteRecord[]) {
 
 export function TutorNotesPanel({
   initialNotes,
+  languageCode,
   studentUserId,
   conversationId = null,
   title,
   body,
 }: TutorNotesPanelProps) {
+  const copy = getTutorNotesPanelCopy(languageCode);
   const [notes, setNotes] = useState(sortNotes(initialNotes));
   const [newNoteText, setNewNoteText] = useState("");
   const [newNotePinned, setNewNotePinned] = useState(false);
@@ -90,9 +95,7 @@ export function TutorNotesPanel({
         payload && "error" in payload ? payload.error?.message : null;
 
       if (!response.ok || !payload?.ok || !payload.data?.note) {
-        setErrorMessage(
-          routeErrorMessage ?? "Impossible de creer cette note privee.",
-        );
+        setErrorMessage(routeErrorMessage ?? copy.createError);
         return;
       }
 
@@ -124,9 +127,7 @@ export function TutorNotesPanel({
         payload && "error" in payload ? payload.error?.message : null;
 
       if (!response.ok || !payload?.ok || !payload.data?.note) {
-        setErrorMessage(
-          routeErrorMessage ?? "Impossible de mettre a jour cette note.",
-        );
+        setErrorMessage(routeErrorMessage ?? copy.updateError);
         return;
       }
 
@@ -154,9 +155,7 @@ export function TutorNotesPanel({
         | null;
 
       if (!response.ok || !payload?.ok) {
-        setErrorMessage(
-          payload?.error?.message ?? "Impossible de supprimer cette note.",
-        );
+        setErrorMessage(payload?.error?.message ?? copy.deleteError);
         return;
       }
 
@@ -171,7 +170,7 @@ export function TutorNotesPanel({
     <section className="grid gap-4 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]">
       <div className="space-y-2">
         <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-          Notes privees
+          {copy.eyebrow}
         </p>
         <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
           {title}
@@ -191,8 +190,8 @@ export function TutorNotesPanel({
           onChange={(event) => setNewNoteText(event.target.value)}
           placeholder={
             conversationId
-              ? "Note privee sur cette session: point de vigilance, idee pour la prochaine seance, rappel pedagogique..."
-              : "Note privee generale sur l'eleve: habitudes, priorites, points a suivre..."
+              ? copy.placeholders.session
+              : copy.placeholders.general
           }
           value={newNoteText}
         />
@@ -202,7 +201,7 @@ export function TutorNotesPanel({
             onChange={(event) => setNewNotePinned(event.target.checked)}
             type="checkbox"
           />
-          Epingler cette note
+          {copy.pinLabel}
         </label>
         <button
           className="justify-self-start rounded-full bg-[color:var(--foreground)] px-5 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
@@ -210,13 +209,13 @@ export function TutorNotesPanel({
           onClick={createNote}
           type="button"
         >
-          {isPending ? "Enregistrement..." : "Ajouter la note"}
+          {isPending ? copy.saving : copy.addNote}
         </button>
       </div>
 
       {notes.length === 0 ? (
         <div className="rounded-[1.5rem] border border-dashed border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5 text-sm leading-6 text-[color:var(--ink-soft)]">
-          Aucune note privee n&apos;est encore enregistree pour ce suivi.
+          {copy.empty}
         </div>
       ) : (
         <div className="grid gap-3">
@@ -230,12 +229,12 @@ export function TutorNotesPanel({
               >
                 <div className="flex flex-wrap gap-2">
                   {note.isPinned ? (
-                    <StudentStatusPill label="Epinglee" tone="accent" />
+                    <StudentStatusPill label={copy.pinned} tone="accent" />
                   ) : null}
                   {note.conversationId ? (
-                    <StudentStatusPill label="Liee a une session" />
+                    <StudentStatusPill label={copy.linkedToSession} />
                   ) : (
-                    <StudentStatusPill label="Note generale" />
+                    <StudentStatusPill label={copy.generalNote} />
                   )}
                 </div>
 
@@ -252,7 +251,7 @@ export function TutorNotesPanel({
                         onChange={(event) => setEditingPinned(event.target.checked)}
                         type="checkbox"
                       />
-                      Epingler cette note
+                      {copy.pinLabel}
                     </label>
                     <div className="flex flex-wrap gap-3">
                       <button
@@ -260,14 +259,14 @@ export function TutorNotesPanel({
                         onClick={() => saveEdit(note.id)}
                         type="button"
                       >
-                        Sauver
+                        {copy.save}
                       </button>
                       <button
                         className="rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium text-[color:var(--foreground)] transition hover:-translate-y-0.5"
                         onClick={resetEditor}
                         type="button"
                       >
-                        Annuler
+                        {copy.cancel}
                       </button>
                     </div>
                   </div>
@@ -284,14 +283,14 @@ export function TutorNotesPanel({
                       onClick={() => beginEdit(note)}
                       type="button"
                     >
-                      Modifier
+                      {copy.edit}
                     </button>
                     <button
                       className="rounded-full border border-[#d07c5b] bg-[#fff0ea] px-4 py-2 text-sm font-medium text-[#8d3b1f] transition hover:-translate-y-0.5"
                       onClick={() => deleteNote(note.id)}
                       type="button"
                     >
-                      Supprimer
+                      {copy.delete}
                     </button>
                   </div>
                 ) : null}

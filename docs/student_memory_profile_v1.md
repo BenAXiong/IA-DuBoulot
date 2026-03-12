@@ -86,6 +86,7 @@ Current storage limits:
 - the provider path uses the `memory-profile-v1` prompt contract
 - provider usage is recorded through the shared usage service
 - if Gemini fails, a deterministic fallback still derives pedagogical items from the subject, weakness tags, and explicit language preference
+- the deterministic fallback copy now preserves accented French while still deriving the learner-facing help-language preference from `ai_help_language`
 - generated items are deduped by normalized `category + title`
 - memory refresh never blocks conversation completion
 
@@ -104,6 +105,7 @@ Current storage limits:
 - manual mutations and provider-generated items both pass server-side sanitization before persistence
 - global labels such as `lazy`, `genius`, or `anxious` are explicitly rejected
 - the UI copy keeps the memory panel framed as educational context only
+- memory mutation validation, not-found, no-access, active-limit, and service-failure messages now resolve from the viewer language instead of hardcoded French strings
 
 ## Verification
 
@@ -113,7 +115,7 @@ Current regression coverage:
 - `npm run smoke:student-flow`
 - `npm run smoke:adult-oversight`
 
-Latest local result on 2026-03-11:
+Latest local result on 2026-03-12:
 
 - the memory smoke passed across student dashboard rendering, completion-triggered refresh, manual create/update/delete, parent linked-student rendering, and tutor raw-memory denial
-- the latest pass also exercised the deterministic memory fallback after a provider failure, while still persisting a safe refreshed snapshot
+- the latest pass also exercised the deterministic memory fallback after a provider failure, while still persisting a safe refreshed snapshot and the localized memory-mutation path

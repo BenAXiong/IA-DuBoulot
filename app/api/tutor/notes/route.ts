@@ -10,7 +10,10 @@ const ROUTE = "/api/tutor/notes";
 
 export const POST = withRouteErrorHandling(async (request, { requestId }) => {
   const context = await requireAuthenticatedUserContext();
-  const payload = await parseCreateTutorNoteInput(request);
+  const payload = await parseCreateTutorNoteInput(
+    request,
+    context.appUser?.preferred_ui_language ?? "fr",
+  );
   const note = await createTutorNote({
     context,
     payload,

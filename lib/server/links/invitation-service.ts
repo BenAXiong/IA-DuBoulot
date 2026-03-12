@@ -2,6 +2,7 @@ import "server-only";
 
 import { createHash, randomBytes } from "node:crypto";
 import { env } from "@/lib/env";
+import { getInvitationServerCopy } from "@/lib/i18n/ui-copy";
 import { recordAuditEvent } from "@/lib/server/audit/audit-service";
 import { logRuntimeInfo } from "@/lib/server/audit/runtime-logger";
 import {
@@ -30,15 +31,18 @@ import type {
   InvitationTargetRole,
   LinkInvitationRecord,
 } from "@/lib/server/links/types";
+import type { UiLanguageCode } from "@/lib/server/auth/types";
 
 const INVITATION_SELECT =
   "id, invitation_kind, invitation_status, student_user_id, inviter_user_id, target_role, target_email, relationship_label, token_hash, accepted_by_user_id, expires_at, accepted_at, revoked_at, metadata, created_at, updated_at";
 
-function requireBodyObject<T>(body: unknown): T {
+type InvitationServerCopy = ReturnType<typeof getInvitationServerCopy>;
+
+function requireBodyObject<T>(body: unknown, copy: InvitationServerCopy): T {
   if (!body || typeof body !== "object" || Array.isArray(body)) {
     throw new AppError({
       code: "bad_request",
-      message: "Expected a JSON object body.",
+      message: copy.expectedObject,
       status: 400,
     });
   }
@@ -50,16 +54,20 @@ function normalizeEmail(email: string | undefined) {
   return email?.trim().toLowerCase() ?? "";
 }
 
-function parseEmail(value: string | undefined, fieldName: "parentEmail" | "tutorEmail") {
+function parseEmail(
+  value: string | undefined,
+  fieldName: "parentEmail" | "tutorEmail",
+  copy: InvitationServerCopy,
+) {
   const normalized = normalizeEmail(value);
 
   if (!normalized || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        [fieldName]: "A valid email address is required.",
+        [fieldName]: copy.fieldErrors.validEmail,
       },
     });
   }
@@ -67,7 +75,10 @@ function parseEmail(value: string | undefined, fieldName: "parentEmail" | "tutor
   return normalized;
 }
 
-function parseRelationshipLabel(value: string | null | undefined) {
+function parseRelationshipLabel(
+  value: string | null | undefined,
+  copy: InvitationServerCopy,
+) {
   if (value == null || value.trim() === "") {
     return null;
   }
@@ -77,10 +88,10 @@ function parseRelationshipLabel(value: string | null | undefined) {
   if (normalized.length > 80) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        relationshipLabel: "Relationship label must be 80 characters or fewer.",
+        relationshipLabel: copy.fieldErrors.relationshipLabel,
       },
     });
   }
@@ -88,7 +99,10 @@ function parseRelationshipLabel(value: string | null | undefined) {
   return normalized;
 }
 
-function parseStudentUserId(value: string | null | undefined) {
+function parseStudentUserId(
+  value: string | null | undefined,
+  copy: InvitationServerCopy,
+) {
   if (value == null || value === "") {
     return null;
   }
@@ -96,10 +110,10 @@ function parseStudentUserId(value: string | null | undefined) {
   if (!/^[0-9a-fA-F-]{36}$/.test(value)) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        studentUserId: "Student user ID must be a UUID.",
+        studentUserId: copy.fieldErrors.studentUserId,
       },
     });
   }
@@ -107,16 +121,19 @@ function parseStudentUserId(value: string | null | undefined) {
   return value;
 }
 
-function parseInvitationToken(token: string) {
+function parseInvitationToken(
+  token: string,
+  copy: InvitationServerCopy = getInvitationServerCopy("fr"),
+) {
   const normalized = token.trim();
 
   if (!normalized || normalized.length < 16 || normalized.length > 256) {
     throw new AppError({
       code: "validation_error",
-      message: "Invitation token is invalid.",
+      message: copy.fieldErrors.token,
       status: 400,
       fieldErrors: {
-        token: "Invitation token is invalid.",
+        token: copy.fieldErrors.token,
       },
     });
   }
@@ -166,7 +183,10 @@ function buildInvitationUrl(token: string) {
   return new URL(`/invite/${token}`, env.NEXT_PUBLIC_APP_URL).toString();
 }
 
-async function loadInvitationByToken(token: string) {
+async function loadInvitationByToken(
+  token: string,
+  copy: InvitationServerCopy = getInvitationServerCopy("fr"),
+) {
   const supabase = createSupabaseAdminClient();
   const { data, error } = await supabase
     .from("account_link_invitations")
@@ -177,7 +197,7 @@ async function loadInvitationByToken(token: string) {
   if (error) {
     throw new AppError({
       code: "service_unavailable",
-      message: "Unable to load the invitation.",
+      message: copy.service.loadInvitation,
       status: 503,
       retryable: true,
       cause: error,
@@ -187,13 +207,16 @@ async function loadInvitationByToken(token: string) {
   return data;
 }
 
-async function loadStudentRecord(studentUserId: string): Promise<InvitationStudentRecord> {
+async function loadStudentRecord(
+  studentUserId: string,
+  copy: InvitationServerCopy = getInvitationServerCopy("fr"),
+): Promise<InvitationStudentRecord> {
   const student = await loadAppUserById(studentUserId);
 
   if (student.role !== "student") {
     throw new AppError({
       code: "conflict",
-      message: "The invitation does not reference a student account.",
+      message: copy.errors.invitationStudentAccount,
       status: 409,
     });
   }
@@ -224,7 +247,7 @@ async function markInvitationStatus(input: {
   invitationId: string;
   status: Exclude<InvitationStatus, "pending">;
   acceptedByUserId?: string | null;
-}) {
+}, copy: InvitationServerCopy = getInvitationServerCopy("fr")) {
   const supabase = createSupabaseAdminClient();
   const patch =
     input.status === "accepted"
@@ -246,7 +269,7 @@ async function markInvitationStatus(input: {
   if (error) {
     throw new AppError({
       code: "service_unavailable",
-      message: "Unable to update the invitation status.",
+      message: copy.service.updateInvitationStatus,
       status: 503,
       retryable: true,
       cause: error,
@@ -258,7 +281,7 @@ async function revokeExistingPendingInvitations(input: {
   studentUserId: string;
   targetEmail: string;
   invitationKind: InvitationKind;
-}) {
+}, copy: InvitationServerCopy = getInvitationServerCopy("fr")) {
   const supabase = createSupabaseAdminClient();
   const { error } = await supabase
     .from("account_link_invitations")
@@ -274,7 +297,7 @@ async function revokeExistingPendingInvitations(input: {
   if (error) {
     throw new AppError({
       code: "service_unavailable",
-      message: "Unable to rotate the existing invitation.",
+      message: copy.service.rotateInvitation,
       status: 503,
       retryable: true,
       cause: error,
@@ -290,7 +313,7 @@ async function createInvitation(input: {
   targetEmail: string;
   relationshipLabel: string | null;
   metadata: Record<string, unknown>;
-}) {
+}, copy: InvitationServerCopy = getInvitationServerCopy("fr")) {
   const supabase = createSupabaseAdminClient();
   const token = createInvitationToken();
   const invitationPayload = {
@@ -315,7 +338,7 @@ async function createInvitation(input: {
   if (error) {
     throw new AppError({
       code: "service_unavailable",
-      message: "Unable to create the invitation.",
+      message: copy.service.createInvitation,
       status: 503,
       retryable: true,
       cause: error,
@@ -328,7 +351,10 @@ async function createInvitation(input: {
   };
 }
 
-async function countActiveParentLinks(studentUserId: string) {
+async function countActiveParentLinks(
+  studentUserId: string,
+  copy: InvitationServerCopy = getInvitationServerCopy("fr"),
+) {
   const supabase = createSupabaseAdminClient();
   const { count, error } = await supabase
     .from("parent_student_links")
@@ -342,7 +368,7 @@ async function countActiveParentLinks(studentUserId: string) {
   if (error) {
     throw new AppError({
       code: "service_unavailable",
-      message: "Unable to inspect parent link state.",
+      message: copy.service.inspectParentLinks,
       status: 503,
       retryable: true,
       cause: error,
@@ -352,7 +378,11 @@ async function countActiveParentLinks(studentUserId: string) {
   return count ?? 0;
 }
 
-async function requireActiveParentLink(parentUserId: string, studentUserId: string) {
+async function requireActiveParentLink(
+  parentUserId: string,
+  studentUserId: string,
+  copy: InvitationServerCopy = getInvitationServerCopy("fr"),
+) {
   const supabase = createSupabaseAdminClient();
   const { data, error } = await supabase
     .from("parent_student_links")
@@ -365,7 +395,7 @@ async function requireActiveParentLink(parentUserId: string, studentUserId: stri
   if (error) {
     throw new AppError({
       code: "service_unavailable",
-      message: "Unable to validate the parent link.",
+      message: copy.service.validateParentLink,
       status: 503,
       retryable: true,
       cause: error,
@@ -375,7 +405,7 @@ async function requireActiveParentLink(parentUserId: string, studentUserId: stri
   if (!data) {
     throw new AppError({
       code: "forbidden",
-      message: "An active parent link is required for this student.",
+      message: copy.errors.activeParentLinkRequired,
       status: 403,
     });
   }
@@ -385,7 +415,7 @@ async function upsertParentStudentLink(input: {
   parentUserId: string;
   studentUserId: string;
   relationshipLabel: string | null;
-}) {
+}, copy: InvitationServerCopy = getInvitationServerCopy("fr")) {
   const supabase = createSupabaseAdminClient();
   const approvedAt = new Date().toISOString();
   const { error } = await supabase.from("parent_student_links").upsert(
@@ -405,7 +435,7 @@ async function upsertParentStudentLink(input: {
   if (error) {
     throw new AppError({
       code: "service_unavailable",
-      message: "Unable to activate the parent link.",
+      message: copy.service.activateParentLink,
       status: 503,
       retryable: true,
       cause: error,
@@ -415,7 +445,12 @@ async function upsertParentStudentLink(input: {
   return approvedAt;
 }
 
-async function activateStudentAfterParentApproval(studentUserId: string, requestId: string, route: string) {
+async function activateStudentAfterParentApproval(
+  studentUserId: string,
+  requestId: string,
+  route: string,
+  copy: InvitationServerCopy = getInvitationServerCopy("fr"),
+) {
   const supabase = createSupabaseAdminClient();
   const approvedAt = new Date().toISOString();
 
@@ -430,7 +465,7 @@ async function activateStudentAfterParentApproval(studentUserId: string, request
   if (profileError) {
     throw new AppError({
       code: "service_unavailable",
-      message: "Unable to update the student approval state.",
+      message: copy.service.updateStudentApproval,
       status: 503,
       retryable: true,
       cause: profileError,
@@ -447,7 +482,7 @@ async function activateStudentAfterParentApproval(studentUserId: string, request
   if (userError) {
     throw new AppError({
       code: "service_unavailable",
-      message: "Unable to activate the student account.",
+      message: copy.service.activateStudentAccount,
       status: 503,
       retryable: true,
       cause: userError,
@@ -473,7 +508,7 @@ async function upsertTutorStudentLink(input: {
   tutorUserId: string;
   studentUserId: string;
   approvedByParentUserId: string | null;
-}) {
+}, copy: InvitationServerCopy = getInvitationServerCopy("fr")) {
   const supabase = createSupabaseAdminClient();
   const approvedAt = new Date().toISOString();
   const { error } = await supabase.from("tutor_student_links").upsert(
@@ -493,7 +528,7 @@ async function upsertTutorStudentLink(input: {
   if (error) {
     throw new AppError({
       code: "service_unavailable",
-      message: "Unable to activate the tutor link.",
+      message: copy.service.activateTutorLink,
       status: 503,
       retryable: true,
       cause: error,
@@ -506,11 +541,11 @@ async function upsertTutorStudentLink(input: {
 async function resolveTutorApprovalContext(input: {
   student: InvitationStudentRecord;
   inviter: InvitationInviterRecord | null;
-}) {
+}, copy: InvitationServerCopy = getInvitationServerCopy("fr")) {
   if (!input.inviter) {
     throw new AppError({
       code: "conflict",
-      message: "The invitation is missing inviter context.",
+      message: copy.errors.missingInviterContext,
       status: 409,
     });
   }
@@ -519,12 +554,12 @@ async function resolveTutorApprovalContext(input: {
     if (input.inviter.role !== "parent") {
       throw new AppError({
         code: "forbidden",
-        message: "Under-13 tutor access requires a parent-originated invitation.",
+        message: copy.errors.under13TutorNeedsParentOrigin,
         status: 403,
       });
     }
 
-    await requireActiveParentLink(input.inviter.id, input.student.id);
+    await requireActiveParentLink(input.inviter.id, input.student.id, copy);
 
     return {
       linkStatus: "active" as const,
@@ -540,7 +575,7 @@ async function resolveTutorApprovalContext(input: {
   }
 
   if (input.inviter.role === "parent") {
-    await requireActiveParentLink(input.inviter.id, input.student.id);
+    await requireActiveParentLink(input.inviter.id, input.student.id, copy);
 
     return {
       linkStatus: "active" as const,
@@ -550,7 +585,7 @@ async function resolveTutorApprovalContext(input: {
 
   throw new AppError({
     code: "forbidden",
-    message: "The invitation origin is not allowed to activate a tutor link.",
+    message: copy.errors.invitationOriginNotAllowed,
     status: 403,
   });
 }
@@ -570,8 +605,11 @@ function invitationKindMatchesRole(input: {
   return input.invitationKind === "tutor_link" && input.targetRole === "tutor";
 }
 
-async function loadInvitationLandingCore(token: string): Promise<InvitationLandingRecord | null> {
-  const invitation = await loadInvitationByToken(token);
+async function loadInvitationLandingCore(
+  token: string,
+  copy: InvitationServerCopy = getInvitationServerCopy("fr"),
+): Promise<InvitationLandingRecord | null> {
+  const invitation = await loadInvitationByToken(token, copy);
 
   if (!invitation) {
     return null;
@@ -579,7 +617,7 @@ async function loadInvitationLandingCore(token: string): Promise<InvitationLandi
 
   const resolvedStatus = resolveInvitationStatus(invitation);
   const [student, inviter] = await Promise.all([
-    loadStudentRecord(invitation.student_user_id),
+    loadStudentRecord(invitation.student_user_id, copy),
     loadInviterRecord(invitation.inviter_user_id),
   ]);
 
@@ -594,15 +632,17 @@ async function loadInvitationLandingCore(token: string): Promise<InvitationLandi
 
 export async function parseCreateParentApprovalRequestInput(
   request: Request,
+  languageCode: UiLanguageCode = "fr",
 ): Promise<CreateParentApprovalRequestInput> {
   let body: unknown;
+  const copy = getInvitationServerCopy(languageCode);
 
   try {
     body = await request.json();
   } catch (error) {
     throw new AppError({
       code: "bad_request",
-      message: "Invalid JSON body.",
+      message: copy.invalidJson,
       status: 400,
       cause: error,
     });
@@ -611,25 +651,27 @@ export async function parseCreateParentApprovalRequestInput(
   const payload = requireBodyObject<{
     parentEmail?: string;
     relationshipLabel?: string | null;
-  }>(body);
+  }>(body, copy);
 
   return {
-    parentEmail: parseEmail(payload.parentEmail, "parentEmail"),
-    relationshipLabel: parseRelationshipLabel(payload.relationshipLabel),
+    parentEmail: parseEmail(payload.parentEmail, "parentEmail", copy),
+    relationshipLabel: parseRelationshipLabel(payload.relationshipLabel, copy),
   };
 }
 
 export async function parseCreateTutorInviteInput(
   request: Request,
+  languageCode: UiLanguageCode = "fr",
 ): Promise<CreateTutorInviteInput> {
   let body: unknown;
+  const copy = getInvitationServerCopy(languageCode);
 
   try {
     body = await request.json();
   } catch (error) {
     throw new AppError({
       code: "bad_request",
-      message: "Invalid JSON body.",
+      message: copy.invalidJson,
       status: 400,
       cause: error,
     });
@@ -638,32 +680,36 @@ export async function parseCreateTutorInviteInput(
   const payload = requireBodyObject<{
     studentUserId?: string | null;
     tutorEmail?: string;
-  }>(body);
+  }>(body, copy);
 
   return {
-    studentUserId: parseStudentUserId(payload.studentUserId),
-    tutorEmail: parseEmail(payload.tutorEmail, "tutorEmail"),
+    studentUserId: parseStudentUserId(payload.studentUserId, copy),
+    tutorEmail: parseEmail(payload.tutorEmail, "tutorEmail", copy),
   };
 }
 
-export async function parseInvitationTokenInput(request: Request) {
+export async function parseInvitationTokenInput(
+  request: Request,
+  languageCode: UiLanguageCode = "fr",
+) {
   let body: unknown;
+  const copy = getInvitationServerCopy(languageCode);
 
   try {
     body = await request.json();
   } catch (error) {
     throw new AppError({
       code: "bad_request",
-      message: "Invalid JSON body.",
+      message: copy.invalidJson,
       status: 400,
       cause: error,
     });
   }
 
-  const payload = requireBodyObject<{ token?: string }>(body);
+  const payload = requireBodyObject<{ token?: string }>(body, copy);
 
   return {
-    token: parseInvitationToken(payload.token ?? ""),
+    token: parseInvitationToken(payload.token ?? "", copy),
   };
 }
 
@@ -674,12 +720,13 @@ export async function createParentApprovalRequest(input: {
   invitation: CreateParentApprovalRequestInput;
 }): Promise<CreatedInvitationResult> {
   const appUser = requireAppUserContext(input.context);
+  const copy = getInvitationServerCopy(appUser.preferred_ui_language);
   requireAppUserRole(appUser, ["student"]);
 
   if (!appUser.is_under_13) {
     throw new AppError({
       code: "forbidden",
-      message: "Parent approval requests are only available for under-13 student accounts.",
+      message: copy.errors.parentApprovalOnlyUnder13,
       status: 403,
     });
   }
@@ -687,20 +734,20 @@ export async function createParentApprovalRequest(input: {
   if (normalizeEmail(input.context.email ?? "") === input.invitation.parentEmail) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        parentEmail: "The parent email must be different from the student email.",
+        parentEmail: copy.fieldErrors.parentEmailDifferent,
       },
     });
   }
 
-  const activeParentLinkCount = await countActiveParentLinks(appUser.id);
+  const activeParentLinkCount = await countActiveParentLinks(appUser.id, copy);
 
   if (activeParentLinkCount > 0 && appUser.account_status === "active") {
     throw new AppError({
       code: "conflict",
-      message: "This student already has an active parent link.",
+      message: copy.errors.activeParentLinkExists,
       status: 409,
     });
   }
@@ -709,7 +756,7 @@ export async function createParentApprovalRequest(input: {
     studentUserId: appUser.id,
     targetEmail: input.invitation.parentEmail,
     invitationKind: "parent_approval",
-  });
+  }, copy);
 
   const result = await createInvitation({
     invitationKind: "parent_approval",
@@ -722,7 +769,7 @@ export async function createParentApprovalRequest(input: {
       student_account_status: appUser.account_status,
       student_is_under_13: appUser.is_under_13,
     },
-  });
+  }, copy);
 
   logRuntimeInfo({
     message: "Created parent approval invitation",
@@ -768,6 +815,7 @@ export async function createTutorInvitation(input: {
   invitation: CreateTutorInviteInput;
 }): Promise<CreatedInvitationResult> {
   const actor = requireAppUserContext(input.context);
+  const copy = getInvitationServerCopy(actor.preferred_ui_language);
 
   let studentUserId = input.invitation.studentUserId;
 
@@ -777,7 +825,7 @@ export async function createTutorInvitation(input: {
     if (actor.is_under_13) {
       throw new AppError({
         code: "forbidden",
-        message: "Under-13 students cannot directly invite tutors. A linked parent must initiate that flow.",
+        message: copy.errors.under13StudentCannotInviteTutor,
         status: 403,
       });
     }
@@ -785,19 +833,19 @@ export async function createTutorInvitation(input: {
     if (!studentUserId) {
       throw new AppError({
         code: "validation_error",
-        message: "One or more fields are invalid.",
+        message: copy.invalidFields,
         status: 400,
         fieldErrors: {
-          studentUserId: "Parent tutor invites must specify a student user ID.",
+          studentUserId: copy.fieldErrors.parentStudentRequired,
         },
       });
     }
 
-    await requireActiveParentLink(actor.id, studentUserId);
+    await requireActiveParentLink(actor.id, studentUserId, copy);
   } else {
     throw new AppError({
       code: "forbidden",
-      message: "Only students and linked parents can issue tutor invitations.",
+      message: copy.errors.onlyStudentsAndLinkedParents,
       status: 403,
     });
   }
@@ -805,20 +853,20 @@ export async function createTutorInvitation(input: {
   if (!studentUserId) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        studentUserId: "A student user ID is required.",
+        studentUserId: copy.fieldErrors.studentRequired,
       },
     });
   }
 
-  const student = await loadStudentRecord(studentUserId);
+  const student = await loadStudentRecord(studentUserId, copy);
 
   if (student.account_status !== "active") {
     throw new AppError({
       code: "conflict",
-      message: "Tutor invitations require an active student account.",
+      message: copy.errors.tutorInviteRequiresActiveStudent,
       status: 409,
     });
   }
@@ -826,7 +874,7 @@ export async function createTutorInvitation(input: {
   if (student.is_under_13 && actor.role !== "parent") {
     throw new AppError({
       code: "forbidden",
-      message: "Under-13 tutor access must be initiated by a linked parent.",
+      message: copy.errors.under13TutorParentOnly,
       status: 403,
     });
   }
@@ -834,10 +882,10 @@ export async function createTutorInvitation(input: {
   if (normalizeEmail(input.context.email ?? "") === input.invitation.tutorEmail) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        tutorEmail: "The tutor email must be different from the actor email.",
+        tutorEmail: copy.fieldErrors.tutorEmailDifferent,
       },
     });
   }
@@ -846,7 +894,7 @@ export async function createTutorInvitation(input: {
     studentUserId: student.id,
     targetEmail: input.invitation.tutorEmail,
     invitationKind: "tutor_link",
-  });
+  }, copy);
 
   const result = await createInvitation({
     invitationKind: "tutor_link",
@@ -859,7 +907,7 @@ export async function createTutorInvitation(input: {
       student_is_under_13: student.is_under_13,
       inviter_role: actor.role,
     },
-  });
+  }, copy);
 
   logRuntimeInfo({
     message: "Created tutor invitation",
@@ -902,23 +950,24 @@ export async function createTutorInvitation(input: {
 export async function acceptInvitation(
   input: InvitationAcceptanceInput,
 ): Promise<AcceptInvitationResult> {
-  const token = parseInvitationToken(input.token);
   const appUser = requireAppUserContext(input.context);
+  const copy = getInvitationServerCopy(appUser.preferred_ui_language);
+  const token = parseInvitationToken(input.token, copy);
 
   if (appUser.account_status !== "active") {
     throw new AppError({
       code: "forbidden",
-      message: "Only active accounts can accept invitations.",
+      message: copy.errors.onlyActiveAccountsCanAccept,
       status: 403,
     });
   }
 
-  const invitation = await loadInvitationByToken(token);
+  const invitation = await loadInvitationByToken(token, copy);
 
   if (!invitation) {
     throw new AppError({
       code: "not_found",
-      message: "Invitation not found.",
+      message: copy.errors.invitationNotFound,
       status: 404,
     });
   }
@@ -929,7 +978,7 @@ export async function acceptInvitation(
   })) {
     throw new AppError({
       code: "conflict",
-      message: "Invitation role configuration is invalid.",
+      message: copy.errors.invitationRoleInvalid,
       status: 409,
     });
   }
@@ -940,7 +989,7 @@ export async function acceptInvitation(
   ) {
     throw new AppError({
       code: "conflict",
-      message: "Invitation kind does not match this route.",
+      message: copy.errors.invitationKindRouteMismatch,
       status: 409,
     });
   }
@@ -951,11 +1000,11 @@ export async function acceptInvitation(
     await markInvitationStatus({
       invitationId: invitation.id,
       status: "expired",
-    });
+    }, copy);
 
     throw new AppError({
       code: "conflict",
-      message: "Invitation has expired.",
+      message: copy.errors.invitationExpired,
       status: 409,
     });
   }
@@ -963,7 +1012,7 @@ export async function acceptInvitation(
   if (resolvedStatus === "revoked") {
     throw new AppError({
       code: "conflict",
-      message: "Invitation is no longer active.",
+      message: copy.errors.invitationInactive,
       status: 409,
     });
   }
@@ -971,7 +1020,7 @@ export async function acceptInvitation(
   if (resolvedStatus === "accepted") {
     throw new AppError({
       code: "conflict",
-      message: "Invitation has already been accepted.",
+      message: copy.errors.invitationAccepted,
       status: 409,
     });
   }
@@ -979,7 +1028,7 @@ export async function acceptInvitation(
   if (appUser.role !== invitation.target_role) {
     throw new AppError({
       code: "forbidden",
-      message: "This invitation is for a different account role.",
+      message: copy.errors.invitationDifferentRole,
       status: 403,
     });
   }
@@ -987,15 +1036,15 @@ export async function acceptInvitation(
   if (normalizeEmail(input.context.email ?? "") !== invitation.target_email) {
     throw new AppError({
       code: "conflict",
-      message: "The signed-in email does not match the invitation target.",
+      message: copy.errors.invitationEmailMismatch,
       status: 409,
       fieldErrors: {
-        email: "Sign in with the invited email address to accept this invitation.",
+        email: copy.fieldErrors.invitedEmailRequired,
       },
     });
   }
 
-  const student = await loadStudentRecord(invitation.student_user_id);
+  const student = await loadStudentRecord(invitation.student_user_id, copy);
   const inviter = await loadInviterRecord(invitation.inviter_user_id);
   let linkStatus: "active" | "pending" = "active";
 
@@ -1007,14 +1056,19 @@ export async function acceptInvitation(
       parentUserId: appUser.id,
       studentUserId: student.id,
       relationshipLabel: invitation.relationship_label,
-    });
+    }, copy);
 
-    await activateStudentAfterParentApproval(student.id, input.requestId, input.route);
+    await activateStudentAfterParentApproval(
+      student.id,
+      input.requestId,
+      input.route,
+      copy,
+    );
   } else if (invitation.invitation_kind === "tutor_link") {
     const approvalContext = await resolveTutorApprovalContext({
       student,
       inviter,
-    });
+    }, copy);
 
     linkStatus = approvalContext.linkStatus;
 
@@ -1022,11 +1076,11 @@ export async function acceptInvitation(
       tutorUserId: appUser.id,
       studentUserId: student.id,
       approvedByParentUserId: approvalContext.approvedByParentUserId,
-    });
+    }, copy);
   } else {
     throw new AppError({
       code: "conflict",
-      message: "Unsupported invitation kind.",
+      message: copy.errors.unsupportedInvitationKind,
       status: 409,
     });
   }
@@ -1035,14 +1089,14 @@ export async function acceptInvitation(
     invitationId: invitation.id,
     status: "accepted",
     acceptedByUserId: appUser.id,
-  });
+  }, copy);
 
-  const acceptedInvitation = await loadInvitationByToken(token);
+  const acceptedInvitation = await loadInvitationByToken(token, copy);
 
   if (!acceptedInvitation) {
     throw new AppError({
       code: "service_unavailable",
-      message: "Unable to reload the accepted invitation.",
+      message: copy.service.reloadAcceptedInvitation,
       status: 503,
       retryable: true,
     });
@@ -1084,18 +1138,25 @@ export async function acceptInvitation(
 
   return {
     invitation: stripInvitationTokenHash(acceptedInvitation),
-    student: await loadStudentRecord(student.id),
+    student: await loadStudentRecord(student.id, copy),
     linkStatus,
   };
 }
 
-export async function loadInvitationLanding(token: string) {
-  const parsedToken = parseInvitationToken(token);
-  return loadInvitationLandingCore(parsedToken);
+export async function loadInvitationLanding(
+  token: string,
+  languageCode: UiLanguageCode = "fr",
+) {
+  const copy = getInvitationServerCopy(languageCode);
+  const parsedToken = parseInvitationToken(token, copy);
+  return loadInvitationLandingCore(parsedToken, copy);
 }
 
-export async function getInvitationPageState(token: string): Promise<InvitationPageState> {
-  const landing = await loadInvitationLanding(token);
+export async function getInvitationPageState(
+  token: string,
+  languageCode: UiLanguageCode = "fr",
+): Promise<InvitationPageState> {
+  const landing = await loadInvitationLanding(token, languageCode);
   const context = await getAuthenticatedUserContext();
   const appUser = context?.appUser ?? null;
 

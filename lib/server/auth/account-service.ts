@@ -1,5 +1,6 @@
 import "server-only";
 
+import { getAuthProfileServerCopy } from "@/lib/i18n/ui-copy";
 import { AppError } from "@/lib/server/errors/app-error";
 import {
   AI_LANGUAGE_CODES,
@@ -41,6 +42,8 @@ type UpdateProfilePayload = Partial<{
   ageBand: string | null;
 }>;
 
+type AuthProfileServerCopy = ReturnType<typeof getAuthProfileServerCopy>;
+
 export const APP_USER_SELECT =
   "id, role, account_status, display_name, preferred_ui_language, ai_help_language, age_band, is_under_13, deletion_requested_at, created_at, updated_at";
 
@@ -57,11 +60,20 @@ function isUnder13AgeBand(value: AgeBand): value is (typeof UNDER_13_AGE_BANDS)[
   );
 }
 
-function requireBodyObject(body: unknown): BootstrapProfilePayload {
+function resolveServerCopyLanguage(
+  value: string | null | undefined,
+): UiLanguageCode {
+  return value === "en" || value === "zh" ? value : "fr";
+}
+
+function requireBodyObject(
+  body: unknown,
+  copy: AuthProfileServerCopy,
+): BootstrapProfilePayload {
   if (!body || typeof body !== "object" || Array.isArray(body)) {
     throw new AppError({
       code: "bad_request",
-      message: "Expected a JSON object body.",
+      message: copy.expectedObject,
       status: 400,
     });
   }
@@ -69,14 +81,17 @@ function requireBodyObject(body: unknown): BootstrapProfilePayload {
   return body as BootstrapProfilePayload;
 }
 
-function parseRole(role: string | undefined): SelfBootstrapRole {
+function parseRole(
+  role: string | undefined,
+  copy: AuthProfileServerCopy,
+): SelfBootstrapRole {
   if (!role || !isStringInArray(role, SELF_BOOTSTRAP_ROLES)) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        role: "Role must be one of student, parent, or tutor.",
+        role: copy.fieldErrors.role,
       },
     });
   }
@@ -84,16 +99,19 @@ function parseRole(role: string | undefined): SelfBootstrapRole {
   return role;
 }
 
-function parseDisplayName(displayName: string | undefined) {
+function parseDisplayName(
+  displayName: string | undefined,
+  copy: AuthProfileServerCopy,
+) {
   const normalized = displayName?.trim() ?? "";
 
   if (!normalized || normalized.length > 80) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        displayName: "Display name is required and must be 80 characters or fewer.",
+        displayName: copy.fieldErrors.displayName,
       },
     });
   }
@@ -101,16 +119,19 @@ function parseDisplayName(displayName: string | undefined) {
   return normalized;
 }
 
-function parseUiLanguage(value: string | undefined): UiLanguageCode {
+function parseUiLanguage(
+  value: string | undefined,
+  copy: AuthProfileServerCopy,
+): UiLanguageCode {
   const normalized = value ?? "fr";
 
   if (!isStringInArray(normalized, UI_LANGUAGE_CODES)) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        preferredUiLanguage: "Preferred UI language must be fr, en, or zh.",
+        preferredUiLanguage: copy.fieldErrors.preferredUiLanguage,
       },
     });
   }
@@ -118,16 +139,19 @@ function parseUiLanguage(value: string | undefined): UiLanguageCode {
   return normalized;
 }
 
-function parseAiLanguage(value: string | undefined): AiLanguageCode {
+function parseAiLanguage(
+  value: string | undefined,
+  copy: AuthProfileServerCopy,
+): AiLanguageCode {
   const normalized = value ?? "fr";
 
   if (!isStringInArray(normalized, AI_LANGUAGE_CODES)) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        aiHelpLanguage: "AI help language must be fr or en.",
+        aiHelpLanguage: copy.fieldErrors.aiHelpLanguage,
       },
     });
   }
@@ -135,7 +159,10 @@ function parseAiLanguage(value: string | undefined): AiLanguageCode {
   return normalized;
 }
 
-function parseAgeBand(value: string | null | undefined): AgeBand | null {
+function parseAgeBand(
+  value: string | null | undefined,
+  copy: AuthProfileServerCopy,
+): AgeBand | null {
   if (value == null) {
     return null;
   }
@@ -149,10 +176,10 @@ function parseAgeBand(value: string | null | undefined): AgeBand | null {
   ) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        ageBand: "Age band must be one of the supported values.",
+        ageBand: copy.fieldErrors.ageBandSupported,
       },
     });
   }
@@ -160,11 +187,14 @@ function parseAgeBand(value: string | null | undefined): AgeBand | null {
   return value;
 }
 
-function requireUpdateBodyObject(body: unknown): UpdateProfilePayload {
+function requireUpdateBodyObject(
+  body: unknown,
+  copy: AuthProfileServerCopy,
+): UpdateProfilePayload {
   if (!body || typeof body !== "object" || Array.isArray(body)) {
     throw new AppError({
       code: "bad_request",
-      message: "Expected a JSON object body.",
+      message: copy.expectedObject,
       status: 400,
     });
   }
@@ -189,9 +219,11 @@ function buildAuthMetadata(appUser: AppUserRecord) {
 async function syncAuthUserMetadata(input: {
   authUserId: string;
   appUser: AppUserRecord;
+  languageCode: UiLanguageCode;
   requestId: string;
   route: string;
 }) {
+  const copy = getAuthProfileServerCopy(input.languageCode);
   const supabase = createSupabaseAdminClient();
   const { error } = await supabase.auth.admin.updateUserById(input.authUserId, {
     user_metadata: buildAuthMetadata(input.appUser),
@@ -200,7 +232,7 @@ async function syncAuthUserMetadata(input: {
   if (error) {
     throw new AppError({
       code: "service_unavailable",
-      message: "Unable to sync auth profile metadata.",
+      message: copy.service.syncAuthMetadata,
       status: 503,
       retryable: true,
       cause: error,
@@ -232,43 +264,51 @@ export async function loadAppUserById(userId: string): Promise<AppUserRecord> {
 export async function syncAuthUserMetadataFromAppUser(input: {
   authUserId: string;
   appUser: AppUserRecord;
+  languageCode?: UiLanguageCode;
   requestId: string;
   route: string;
 }) {
-  await syncAuthUserMetadata(input);
+  await syncAuthUserMetadata({
+    ...input,
+    languageCode: input.languageCode ?? input.appUser.preferred_ui_language,
+  });
 }
 
 export async function parseBootstrapProfileInput(
   request: Request,
 ): Promise<BootstrapProfileInput> {
   let body: unknown;
+  const fallbackCopy = getAuthProfileServerCopy("fr");
 
   try {
     body = await request.json();
   } catch (error) {
     throw new AppError({
       code: "bad_request",
-      message: "Invalid JSON body.",
+      message: fallbackCopy.invalidJson,
       status: 400,
       cause: error,
     });
   }
 
-  const payload = requireBodyObject(body);
-  const role = parseRole(payload.role);
-  const displayName = parseDisplayName(payload.displayName);
-  const preferredUiLanguage = parseUiLanguage(payload.preferredUiLanguage);
-  const aiHelpLanguage = parseAiLanguage(payload.aiHelpLanguage);
-  const ageBand = parseAgeBand(payload.ageBand);
+  const payload = requireBodyObject(body, fallbackCopy);
+  const copy = getAuthProfileServerCopy(
+    resolveServerCopyLanguage(payload.preferredUiLanguage),
+  );
+  const role = parseRole(payload.role, copy);
+  const displayName = parseDisplayName(payload.displayName, copy);
+  const preferredUiLanguage = parseUiLanguage(payload.preferredUiLanguage, copy);
+  const aiHelpLanguage = parseAiLanguage(payload.aiHelpLanguage, copy);
+  const ageBand = parseAgeBand(payload.ageBand, copy);
   const isUnder13 = payload.isUnder13 ?? false;
 
   if (isUnder13 && role !== "student") {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        isUnder13: "Only student accounts can be marked as under 13.",
+        isUnder13: copy.fieldErrors.onlyStudentUnder13,
       },
     });
   }
@@ -276,11 +316,10 @@ export async function parseBootstrapProfileInput(
   if (isUnder13 && (!ageBand || !isUnder13AgeBand(ageBand))) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        ageBand:
-          "Under-13 student accounts must use six_eight, nine_ten, or eleven_twelve.",
+        ageBand: copy.fieldErrors.under13AgeBand,
       },
     });
   }
@@ -288,10 +327,10 @@ export async function parseBootstrapProfileInput(
   if (!isUnder13 && role !== "student" && ageBand) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        ageBand: "Only student bootstrap requests should include an age band.",
+        ageBand: copy.fieldErrors.bootstrapAgeBandStudentOnly,
       },
     });
   }
@@ -311,31 +350,32 @@ export async function parseUpdateProfileInput(
   appUser: AppUserRecord,
 ): Promise<UpdateProfileInput> {
   let body: unknown;
+  const copy = getAuthProfileServerCopy(appUser.preferred_ui_language);
 
   try {
     body = await request.json();
   } catch (error) {
     throw new AppError({
       code: "bad_request",
-      message: "Invalid JSON body.",
+      message: copy.invalidJson,
       status: 400,
       cause: error,
     });
   }
 
-  const payload = requireUpdateBodyObject(body);
-  const displayName = parseDisplayName(payload.displayName);
-  const preferredUiLanguage = parseUiLanguage(payload.preferredUiLanguage);
-  const aiHelpLanguage = parseAiLanguage(payload.aiHelpLanguage);
-  const ageBand = parseAgeBand(payload.ageBand);
+  const payload = requireUpdateBodyObject(body, copy);
+  const displayName = parseDisplayName(payload.displayName, copy);
+  const preferredUiLanguage = parseUiLanguage(payload.preferredUiLanguage, copy);
+  const aiHelpLanguage = parseAiLanguage(payload.aiHelpLanguage, copy);
+  const ageBand = parseAgeBand(payload.ageBand, copy);
 
   if (appUser.role !== "student" && ageBand) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        ageBand: "Only student accounts can store an age band.",
+        ageBand: copy.fieldErrors.storedAgeBandStudentOnly,
       },
     });
   }
@@ -344,11 +384,10 @@ export async function parseUpdateProfileInput(
     if (!ageBand || !isUnder13AgeBand(ageBand)) {
       throw new AppError({
         code: "validation_error",
-        message: "One or more fields are invalid.",
+        message: copy.invalidFields,
         status: 400,
         fieldErrors: {
-          ageBand:
-            "Under-13 student accounts must use six_eight, nine_ten, or eleven_twelve.",
+          ageBand: copy.fieldErrors.under13AgeBand,
         },
       });
     }
@@ -365,7 +404,9 @@ export async function parseUpdateProfileInput(
 async function upsertStudentProfile(input: {
   authUserId: string;
   isUnder13: boolean;
+  languageCode: UiLanguageCode;
 }) {
+  const copy = getAuthProfileServerCopy(input.languageCode);
   const supabase = createSupabaseAdminClient();
   const { error } = await supabase.from("student_profiles").upsert(
     {
@@ -381,7 +422,7 @@ async function upsertStudentProfile(input: {
   if (error) {
     throw new AppError({
       code: "service_unavailable",
-      message: "Unable to bootstrap the student profile.",
+      message: copy.service.bootstrapStudentProfile,
       status: 503,
       retryable: true,
       cause: error,
@@ -394,6 +435,7 @@ export async function bootstrapProfile(
   input: BootstrapProfileInput,
   requestId: string,
 ): Promise<BootstrapProfileResult> {
+  const copy = getAuthProfileServerCopy(input.preferredUiLanguage);
   const supabase = createSupabaseAdminClient();
   const { data: existingUser, error: existingUserError } = await supabase
     .from("users")
@@ -404,7 +446,7 @@ export async function bootstrapProfile(
   if (existingUserError) {
     throw new AppError({
       code: "service_unavailable",
-      message: "Unable to load the current app profile.",
+      message: copy.service.loadCurrentProfile,
       status: 503,
       retryable: true,
       cause: existingUserError,
@@ -414,7 +456,7 @@ export async function bootstrapProfile(
   if (existingUser && existingUser.role !== input.role) {
     throw new AppError({
       code: "conflict",
-      message: "An app profile already exists with a different role.",
+      message: copy.service.roleConflict,
       status: 409,
     });
   }
@@ -447,7 +489,7 @@ export async function bootstrapProfile(
   if (upsertError) {
     throw new AppError({
       code: "service_unavailable",
-      message: "Unable to bootstrap the app profile.",
+      message: copy.service.bootstrapAppProfile,
       status: 503,
       retryable: true,
       cause: upsertError,
@@ -458,12 +500,14 @@ export async function bootstrapProfile(
     await upsertStudentProfile({
       authUserId: context.authUserId,
       isUnder13: input.isUnder13,
+      languageCode: input.preferredUiLanguage,
     });
   }
 
   await syncAuthUserMetadata({
     authUserId: context.authUserId,
     appUser: upsertedUser,
+    languageCode: input.preferredUiLanguage,
     requestId,
     route: "/api/auth/profile/bootstrap",
   });
@@ -516,6 +560,7 @@ export async function updateProfile(
   requestId: string,
 ) {
   requireActiveAppUser(appUser);
+  const copy = getAuthProfileServerCopy(input.preferredUiLanguage);
   const supabase = createSupabaseAdminClient();
   const { data: updatedUser, error } = await supabase
     .from("users")
@@ -532,7 +577,7 @@ export async function updateProfile(
   if (error) {
     throw new AppError({
       code: "service_unavailable",
-      message: "Unable to update the app profile.",
+      message: copy.service.updateAppProfile,
       status: 503,
       retryable: true,
       cause: error,
@@ -542,6 +587,7 @@ export async function updateProfile(
   await syncAuthUserMetadata({
     authUserId: context.authUserId,
     appUser: updatedUser,
+    languageCode: input.preferredUiLanguage,
     requestId,
     route: "/api/auth/profile",
   });

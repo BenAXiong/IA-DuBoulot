@@ -384,7 +384,7 @@ async function main() {
     );
     assert(
       parentReviewPage.response.ok &&
-        parentReviewPage.text.includes("Resume parent"),
+        parentReviewPage.text.includes("Résumé parent"),
       "Parent review page did not render the parent summary surface.",
     );
 
@@ -430,7 +430,7 @@ async function main() {
     );
     assert(
       tutorReviewPage.response.ok &&
-        tutorReviewPage.text.includes("Synthese tuteur"),
+        tutorReviewPage.text.includes("Synthèse tuteur"),
       "Tutor review page did not render the tutor summary surface.",
     );
 
@@ -518,7 +518,7 @@ async function main() {
     const adminAuditPage = await admin.requestText("/app/audit");
     assert(
       adminAuditPage.response.ok &&
-        adminAuditPage.text.includes("Lectures adultes"),
+        adminAuditPage.text.includes(FIXTURE.displayNames.student),
       "Admin audit page did not render the access-audit surface.",
     );
 

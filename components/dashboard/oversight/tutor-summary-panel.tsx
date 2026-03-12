@@ -1,19 +1,27 @@
 import { StudentStatusPill } from "@/components/dashboard/student/student-status-pill";
+import { getWeaknessTagLabel } from "@/lib/i18n/student-flow-copy";
+import { getTutorSummaryPanelCopy } from "@/lib/i18n/oversight-copy";
+import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type { SessionSummaryRecord } from "@/lib/server/conversations/types";
 
 type TutorSummaryPanelProps = {
+  languageCode: UiLanguageCode;
   summaries: SessionSummaryRecord[];
 };
 
-export function TutorSummaryPanel({ summaries }: TutorSummaryPanelProps) {
+export function TutorSummaryPanel({
+  languageCode,
+  summaries,
+}: TutorSummaryPanelProps) {
+  const copy = getTutorSummaryPanelCopy(languageCode);
   const summary = summaries[0] ?? null;
 
   if (!summary) {
     return (
       <article className="rounded-[1.5rem] border border-dashed border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-[var(--shadow)]">
-        <p className="font-medium">Synthese tuteur indisponible.</p>
+        <p className="font-medium">{copy.unavailableTitle}</p>
         <p className="mt-2 text-sm leading-6 text-[color:var(--ink-soft)]">
-          La session n&apos;a pas encore produit d&apos;insight tuteur exploitable.
+          {copy.unavailableBody}
         </p>
       </article>
     );
@@ -23,12 +31,16 @@ export function TutorSummaryPanel({ summaries }: TutorSummaryPanelProps) {
     <article className="grid gap-4 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-[var(--shadow)]">
       <div className="space-y-2">
         <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-          Synthese tuteur
+          {copy.eyebrow}
         </p>
         <div className="flex flex-wrap gap-2">
           <StudentStatusPill label={summary.language_code.toUpperCase()} tone="accent" />
           {summary.weakness_tags.map((tag) => (
-            <StudentStatusPill key={tag} label={tag} tone="warning" />
+            <StudentStatusPill
+              key={tag}
+              label={getWeaknessTagLabel(tag, languageCode)}
+              tone="warning"
+            />
           ))}
         </div>
       </div>
@@ -41,7 +53,7 @@ export function TutorSummaryPanel({ summaries }: TutorSummaryPanelProps) {
 
       {summary.next_step_recommendation ? (
         <div className="rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-3 text-sm leading-6 text-[color:var(--ink-soft)]">
-          Prochaine intervention conseillee: {summary.next_step_recommendation}
+          {copy.nextIntervention(summary.next_step_recommendation)}
         </div>
       ) : null}
     </article>

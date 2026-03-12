@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { formatDateLabel } from "@/components/dashboard/student/student-dashboard-presenters";
+import { getDeletionRequestFormCopy } from "@/lib/i18n/ui-copy";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 
 type DeletionRequestFormProps = {
@@ -39,6 +40,7 @@ export function DeletionRequestForm({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const copy = getDeletionRequestFormCopy(languageCode);
   const [successState, setSuccessState] = useState<{
     requestedAt: string;
     purgeTargetDate: string;
@@ -76,8 +78,7 @@ export function DeletionRequestForm({
 
       if (!response.ok || !payload?.ok || !payload.data?.requestedAt || !payload.data?.purgeTargetDate) {
         setErrorMessage(
-          payload?.error?.message ??
-            "Impossible d'enregistrer cette demande de suppression.",
+          payload?.error?.message ?? copy.genericError,
         );
         return;
       }
@@ -95,9 +96,11 @@ export function DeletionRequestForm({
     <div className="grid gap-3">
       {successState ? (
         <p className="rounded-[1.25rem] border border-[#d6c48d] bg-[#fff8e5] px-4 py-3 text-sm leading-6 text-[#6b5320]">
-          Suppression demandee pour {successState.targetDisplayName} le{" "}
-          {formatDateLabel(successState.requestedAt, languageCode)}. Purge cible
-          d&apos;ici le {formatDateLabel(successState.purgeTargetDate, languageCode)}.
+          {copy.success(
+            successState.targetDisplayName,
+            formatDateLabel(successState.requestedAt, languageCode),
+            formatDateLabel(successState.purgeTargetDate, languageCode),
+          )}
         </p>
       ) : null}
 
@@ -119,7 +122,7 @@ export function DeletionRequestForm({
           disabled={isDisabled}
           type="submit"
         >
-          {isPending ? "Demande en cours..." : buttonLabel}
+          {isPending ? copy.pending : buttonLabel}
         </button>
       </form>
     </div>

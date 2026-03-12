@@ -1,6 +1,6 @@
 # Frontend Foundations V1
 
-Related: [README](../README.md) | [App shell V1](app_shell_v1.md) | [Student dashboard V1](student_dashboard_v1.md) | [Telemetry and feature controls V1](telemetry_feature_controls_v1.md) | [Service interfaces](service_interfaces.md) | [MVP to-do list](mvp_todo.md)
+Related: [README](../README.md) | [App shell V1](app_shell_v1.md) | [Student dashboard V1](student_dashboard_v1.md) | [Telemetry and feature controls V1](telemetry_feature_controls_v1.md) | [Service interfaces](service_interfaces.md) | [MVP to-do list](mvp_todo.md) | [Pilot_todo](pilot_todo.md)
 
 ## Purpose
 
@@ -9,6 +9,7 @@ This document defines the shared frontend foundation that was postponed while th
 It closes the MVP-level expectations for:
 
 - a small component primitive layer
+- a reviewable shared brand layer for cards and shared shells
 - repeatable form conventions
 - explicit localization structure for `fr`, `en`, and `zh`
 - lightweight formatting and modularity rules
@@ -37,6 +38,32 @@ Current adoption baseline:
 - parent approval and tutor invite forms use the same primitives
 - dashboard and landing informational cards now reuse `SurfaceCard`
 
+## Brand And Shell Foundation
+
+Shared shell-brand iteration now lives in:
+
+- `app/layout.tsx`
+- `app/globals.css`
+- `components/theme/theme-script.tsx`
+- `components/theme/theme-toggle.tsx`
+- `lib/theme/config.ts`
+- `components/layout/public-shell.tsx`
+- `components/layout/app-shell.tsx`
+
+Rules:
+
+- push color, typography, shell chrome, and motion changes into shared tokens or shared shell classes first
+- keep light and dark theme behavior in the shared theme layer instead of duplicating page-local dark variants
+- use `SurfaceCard` and the shared shell classes before adding page-local decorative wrappers
+- keep the tone calm, reassuring, and low-noise on both student and adult surfaces
+- reserve route-by-route redesign work for [Pilot_todo](pilot_todo.md) once a concrete UX problem is identified
+
+Current MVP boundary:
+
+- the repo now has one branded baseline for shared shells and cards
+- the repo now also has a system-aware light or dark theme bootstrap plus a shared theme toggle in the public and authenticated shells, with the current palette blending ChatGPT-like calm neutrals and Brainly-like educational blue or warm accents
+- deeper route redesign, flow experimentation, and broader UX polishing belong to the pilot lane
+
 ## Form Conventions
 
 Preferred structure:
@@ -56,7 +83,15 @@ Rules:
 
 ## Localization Structure
 
-Shared localization configuration now lives in `lib/i18n/config.ts`.
+Shared localization code now lives in:
+
+- `lib/i18n/config.ts`
+- `lib/i18n/ui-copy.ts`
+- `lib/i18n/dashboard-copy.ts`
+- `lib/i18n/student-flow-copy.ts`
+- `lib/i18n/oversight-copy.ts`
+- `lib/i18n/ui-language.ts`
+- `components/i18n/document-language-sync.tsx`
 
 It currently owns:
 
@@ -65,6 +100,11 @@ It currently owns:
 - UI language labels
 - locale mapping for `Intl` formatting
 - shared student age-band option lists
+- shared route or surface dictionaries for public, auth, invite, shell, and settings copy
+- student intake, history, workbench, and summary route dictionaries
+- parent or tutor detail, review, notes, and billing dictionaries
+- public-route helpers that preserve `lang` across links and redirects
+- a small client-side document-language sync for the shared shells
 
 Rules:
 
@@ -75,8 +115,12 @@ Rules:
 
 Current MVP boundary:
 
-- the product still ships mostly French copy
-- this slice establishes the shared locale structure without attempting a full translation pass
+- landing, pricing, auth, onboarding, invite acceptance, shared shell chrome, app-home account card, and settings/privacy now consume the shared dictionaries
+- the role dashboards on `/app` now also consume the shared dashboard dictionaries and localized presenters
+- the student intake, history, workbench, linked-student detail, adult review, admin audit list, and deletion-request feedback now also consume dedicated copy modules or localized shared helpers, with the core student APIs also resolving their user-facing validation, upload, fallback, and summary text through `lib/i18n/student-flow-copy.ts`
+- auth/profile, invitation create/accept, tutor-note mutations, memory mutations, and the current parent billing-management conflict path now also resolve user-facing server messages through focused copy modules instead of hardcoded French strings
+- the shared Next font setup now carries explicit CJK fallback so `zh` headings do not depend on accidental glyph support from the Latin-first font choice
+- the remaining launch-blocking trilingual gap is now mostly the broader accented-French or Unicode audit, parent-summary default and language-switch verification, and residual generic provider or service strings that still live outside the focused copy modules
 
 ## Formatting And Modularity Rules
 

@@ -1,11 +1,18 @@
 import "server-only";
 
+import {
+  getStudentConversationServerCopy,
+  getStudentDraftCoachCopy,
+} from "@/lib/i18n/student-flow-copy";
 import { AppError } from "@/lib/server/errors/app-error";
 import { logRuntimeError, logRuntimeInfo } from "@/lib/server/audit/runtime-logger";
 import { recordAuditEvent } from "@/lib/server/audit/audit-service";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import type { AuthenticatedUserContext } from "@/lib/server/auth/types";
+import type {
+  AuthenticatedUserContext,
+  UiLanguageCode,
+} from "@/lib/server/auth/types";
 import {
   requireActiveAppUser,
   requireAppUserContext,
@@ -80,19 +87,24 @@ function normalizeText(value: string) {
   return normalized.length > 0 ? normalized : null;
 }
 
-function buildModerationSafeReply() {
-  return "Je ne peux pas continuer sur cette demande telle quelle. Reformule ton besoin sur le devoir, montre ce que tu as deja essaye, et je t'aiderai pas a pas.";
+function buildModerationSafeReply(languageCode: UiLanguageCode) {
+  return getStudentDraftCoachCopy(languageCode).moderationSafeReply;
 }
 
-function buildMaskedStudentMessage() {
-  return "[message masque par la moderation]";
+function buildMaskedStudentMessage(languageCode: UiLanguageCode) {
+  return getStudentConversationServerCopy(languageCode).appendMessage.maskedStudentMessage;
 }
 
-function requireBodyObject(body: unknown) {
+function requireBodyObject(
+  body: unknown,
+  languageCode: UiLanguageCode,
+) {
+  const copy = getStudentConversationServerCopy(languageCode);
+
   if (!body || typeof body !== "object" || Array.isArray(body)) {
     throw new AppError({
       code: "bad_request",
-      message: "Expected a JSON object body.",
+      message: copy.requestErrors.expectedObject,
       status: 400,
     });
   }
@@ -112,7 +124,9 @@ function validateAttachmentReferences(references: DraftAttachmentReferenceInput[
 
 export async function parseCreateConversationDraftInput(
   request: Request,
+  languageCode: UiLanguageCode = "fr",
 ): Promise<CreateConversationDraftInput> {
+  const copy = getStudentConversationServerCopy(languageCode);
   let body: unknown;
 
   try {
@@ -120,21 +134,13 @@ export async function parseCreateConversationDraftInput(
   } catch (error) {
     throw new AppError({
       code: "bad_request",
-      message: "Invalid JSON body.",
+      message: copy.requestErrors.invalidJson,
       status: 400,
       cause: error,
     });
   }
 
-  if (!body || typeof body !== "object" || Array.isArray(body)) {
-    throw new AppError({
-      code: "bad_request",
-      message: "Expected a JSON object body.",
-      status: 400,
-    });
-  }
-
-  const payload = body as Partial<{
+  const payload = requireBodyObject(body, languageCode) as Partial<{
     title: string;
     subjectTag: string;
     gradedHomework: boolean;
@@ -156,10 +162,10 @@ export async function parseCreateConversationDraftInput(
   if (!title || title.length > 120) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.requestErrors.invalidFields,
       status: 400,
       fieldErrors: {
-        title: "Title is required and must be 120 characters or fewer.",
+        title: copy.createDraft.titleInvalid,
       },
     });
   }
@@ -167,10 +173,10 @@ export async function parseCreateConversationDraftInput(
   if (!subjectTag || subjectTag.length > 60) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.requestErrors.invalidFields,
       status: 400,
       fieldErrors: {
-        subjectTag: "Subject is required and must be 60 characters or fewer.",
+        subjectTag: copy.createDraft.subjectInvalid,
       },
     });
   }
@@ -181,11 +187,10 @@ export async function parseCreateConversationDraftInput(
   ) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.requestErrors.invalidFields,
       status: 400,
       fieldErrors: {
-        pastedText:
-          "Pasted and extracted text fields must stay under 12000 characters.",
+        pastedText: copy.createDraft.sourceTextTooLong,
       },
     });
   }
@@ -197,11 +202,10 @@ export async function parseCreateConversationDraftInput(
   ) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.requestErrors.invalidFields,
       status: 400,
       fieldErrors: {
-        editedExtractedText:
-          "Provide pasted text, attachment references, or edited extracted text before creating a session.",
+        editedExtractedText: copy.createDraft.missingSource,
       },
     });
   }
@@ -218,7 +222,9 @@ export async function parseCreateConversationDraftInput(
 
 export async function parseAppendConversationMessageInput(
   request: Request,
+  languageCode: UiLanguageCode = "fr",
 ): Promise<AppendConversationMessageInput> {
+  const copy = getStudentConversationServerCopy(languageCode);
   let body: unknown;
 
   try {
@@ -226,13 +232,13 @@ export async function parseAppendConversationMessageInput(
   } catch (error) {
     throw new AppError({
       code: "bad_request",
-      message: "Invalid JSON body.",
+      message: copy.requestErrors.invalidJson,
       status: 400,
       cause: error,
     });
   }
 
-  const payload = requireBodyObject(body);
+  const payload = requireBodyObject(body, languageCode);
   const intent =
     payload.intent === "hint" || payload.intent === "summarize"
       ? payload.intent
@@ -243,10 +249,10 @@ export async function parseAppendConversationMessageInput(
   if (intent === "student_message" && contentText.trim().length === 0) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.requestErrors.invalidFields,
       status: 400,
       fieldErrors: {
-        contentText: "Message text is required.",
+        contentText: copy.appendMessage.messageRequired,
       },
     });
   }
@@ -254,10 +260,10 @@ export async function parseAppendConversationMessageInput(
   if (contentText.trim().length > MAX_STUDENT_MESSAGE_CHARS) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.requestErrors.invalidFields,
       status: 400,
       fieldErrors: {
-        contentText: "Message text must be 4000 characters or fewer.",
+        contentText: copy.appendMessage.messageTooLong,
       },
     });
   }
@@ -270,7 +276,9 @@ export async function parseAppendConversationMessageInput(
 
 export async function parseUpdateWorkspaceInput(
   request: Request,
+  languageCode: UiLanguageCode = "fr",
 ): Promise<UpdateWorkspaceInput> {
+  const copy = getStudentConversationServerCopy(languageCode);
   let body: unknown;
 
   try {
@@ -278,13 +286,13 @@ export async function parseUpdateWorkspaceInput(
   } catch (error) {
     throw new AppError({
       code: "bad_request",
-      message: "Invalid JSON body.",
+      message: copy.requestErrors.invalidJson,
       status: 400,
       cause: error,
     });
   }
 
-  const payload = requireBodyObject(body);
+  const payload = requireBodyObject(body, languageCode);
 
   const assignmentText =
     typeof payload.assignmentText === "string" ? payload.assignmentText : "";
@@ -304,10 +312,10 @@ export async function parseUpdateWorkspaceInput(
   ) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.requestErrors.invalidFields,
       status: 400,
       fieldErrors: {
-        assignmentText: "Assignment and extracted text fields must stay under 12000 characters.",
+        assignmentText: copy.workspace.sourceTextTooLong,
       },
     });
   }
@@ -319,10 +327,10 @@ export async function parseUpdateWorkspaceInput(
   ) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.requestErrors.invalidFields,
       status: 400,
       fieldErrors: {
-        planText: "Workspace fields must stay under 8000 characters.",
+        planText: copy.workspace.supportTextTooLong,
       },
     });
   }
@@ -336,51 +344,80 @@ export async function parseUpdateWorkspaceInput(
   };
 }
 
-function buildAttachmentReferenceLines(references: DraftAttachmentReferenceInput[]) {
+function buildAttachmentReferenceLines(
+  references: DraftAttachmentReferenceInput[],
+  languageCode: UiLanguageCode,
+) {
+  const copy = getStudentConversationServerCopy(languageCode);
+
   if (references.length === 0) {
     return null;
   }
 
   return references.map((reference) => {
-    const kindLabel = reference.category === "pdf" ? "PDF" : "image/capture";
+    const kindLabel =
+      reference.category === "pdf"
+        ? copy.createDraft.pdfLabel
+        : copy.createDraft.imageLabel;
     const sizeInKb = Math.max(1, Math.round(reference.byteSize / 1024));
     return `- ${reference.name} (${kindLabel}, ${sizeInKb} KB)`;
   });
 }
 
-function buildInitialStudentMessageContent(input: CreateConversationDraftInput) {
+function buildInitialStudentMessageContent(
+  input: CreateConversationDraftInput,
+  languageCode: UiLanguageCode,
+) {
+  const copy = getStudentConversationServerCopy(languageCode);
   const lines = [
-    `Titre: ${input.title}`,
-    `Matiere: ${input.subjectTag}`,
-    `Devoir note: ${input.gradedHomework ? "oui" : "non"}`,
+    `${copy.createDraft.titleLabel}: ${input.title}`,
+    `${copy.createDraft.subjectLabel}: ${input.subjectTag}`,
+    `${copy.createDraft.gradedLabel}: ${
+      input.gradedHomework
+        ? copy.createDraft.gradedYes
+        : copy.createDraft.gradedNo
+    }`,
   ];
-  const attachmentLines = buildAttachmentReferenceLines(input.attachmentReferences);
+  const attachmentLines = buildAttachmentReferenceLines(
+    input.attachmentReferences,
+    languageCode,
+  );
   const pastedText = normalizeText(input.pastedText);
   const editedExtractedText = normalizeText(input.editedExtractedText);
 
   if (attachmentLines) {
-    lines.push("", "Pieces referencees:", ...attachmentLines);
+    lines.push("", `${copy.createDraft.attachmentsLabel}:`, ...attachmentLines);
   }
 
   if (pastedText) {
-    lines.push("", "Texte fourni:", pastedText);
+    lines.push("", `${copy.createDraft.pastedTextLabel}:`, pastedText);
   }
 
   if (editedExtractedText && editedExtractedText !== pastedText) {
-    lines.push("", "Texte relu:", editedExtractedText);
+    lines.push("", `${copy.createDraft.reviewedTextLabel}:`, editedExtractedText);
   }
 
   return lines.join("\n");
 }
 
-function buildWorkspaceNotes(input: CreateConversationDraftInput) {
-  const attachmentLines = buildAttachmentReferenceLines(input.attachmentReferences);
+function buildWorkspaceNotes(
+  input: CreateConversationDraftInput,
+  languageCode: UiLanguageCode,
+) {
+  const copy = getStudentConversationServerCopy(languageCode);
+  const attachmentLines = buildAttachmentReferenceLines(
+    input.attachmentReferences,
+    languageCode,
+  );
 
   if (!attachmentLines) {
     return null;
   }
 
-  return ["Pieces referencees pour cette session:", ...attachmentLines].join("\n");
+  return [
+    `${copy.createDraft.workspaceAttachmentsLabel}:`,
+    ...attachmentLines,
+  ].join("\n");
 }
 
 async function deleteConversationBestEffort(conversationId: string) {
@@ -404,6 +441,7 @@ export async function createConversationDraft(input: {
   await assertStudentUsageActionAllowed({
     studentUserId: appUser.id,
     action: "create_conversation",
+    languageCode: appUser.preferred_ui_language,
   });
 
   const supabase = await createSupabaseServerClient();
@@ -438,7 +476,10 @@ export async function createConversationDraft(input: {
       conversation_id: conversation.id,
       assignment_text: assignmentText,
       edited_extracted_text: editedExtractedText,
-      student_notes: buildWorkspaceNotes(input.payload),
+      student_notes: buildWorkspaceNotes(
+        input.payload,
+        appUser.preferred_ui_language,
+      ),
       last_saved_by_user_id: appUser.id,
     })
     .select(WORKSPACE_SELECT)
@@ -455,7 +496,10 @@ export async function createConversationDraft(input: {
       conversation_id: conversation.id,
       author_user_id: appUser.id,
       role: "student",
-      content_text: buildInitialStudentMessageContent(input.payload),
+      content_text: buildInitialStudentMessageContent(
+        input.payload,
+        appUser.preferred_ui_language,
+      ),
       content_language: appUser.preferred_ui_language,
     })
     .select(MESSAGE_SELECT)
@@ -519,6 +563,7 @@ async function requireWritableStudentConversation(input: {
   conversationId: string;
 }) {
   const appUser = requireAppUserContext(input.context);
+  const copy = getStudentConversationServerCopy(appUser.preferred_ui_language);
   requireAppUserRole(appUser, ["student"]);
   requireActiveAppUser(appUser);
 
@@ -536,7 +581,7 @@ async function requireWritableStudentConversation(input: {
   if (!conversation) {
     throw new AppError({
       code: "not_found",
-      message: "Conversation not found.",
+      message: copy.access.conversationNotFound,
       status: 404,
     });
   }
@@ -544,7 +589,7 @@ async function requireWritableStudentConversation(input: {
   if (conversation.student_user_id !== appUser.id) {
     throw new AppError({
       code: "forbidden",
-      message: "You do not have access to this conversation.",
+      message: copy.access.conversationForbidden,
       status: 403,
     });
   }
@@ -684,9 +729,10 @@ export async function appendConversationTurn(input: {
     });
 
   if (conversation.status !== "active") {
+    const copy = getStudentConversationServerCopy(appUser.preferred_ui_language);
     throw new AppError({
       code: "conflict",
-      message: "Completed sessions are read-only.",
+      message: copy.access.sessionReadOnly,
       status: 409,
     });
   }
@@ -694,6 +740,7 @@ export async function appendConversationTurn(input: {
   await assertStudentUsageActionAllowed({
     studentUserId: appUser.id,
     action: "append_message",
+    languageCode: appUser.preferred_ui_language,
   });
 
   const [
@@ -742,6 +789,7 @@ export async function appendConversationTurn(input: {
   const studentMessageText = buildStudentIntentMessage({
     intent: input.payload.intent,
     contentText: input.payload.contentText,
+    languageCode: appUser.ai_help_language,
   });
   const inputModeration = moderateUserInput(studentMessageText);
 
@@ -765,9 +813,9 @@ export async function appendConversationTurn(input: {
   const aiProvider = getAiProvider();
   const persistedStudentMessageText =
     inputModeration.status === "blocked"
-      ? buildMaskedStudentMessage()
+      ? buildMaskedStudentMessage(appUser.ai_help_language)
       : studentMessageText;
-  let assistantMessageText = buildModerationSafeReply();
+  let assistantMessageText = buildModerationSafeReply(appUser.ai_help_language);
   let providerUsage: AiUsageSnapshot | null = null;
 
   if (inputModeration.status !== "blocked") {
@@ -811,7 +859,7 @@ export async function appendConversationTurn(input: {
 
       assistantMessageText =
         outputModeration.status === "blocked"
-          ? buildModerationSafeReply()
+          ? buildModerationSafeReply(appUser.ai_help_language)
           : aiReply.replyText;
     } catch (error) {
       assistantMessageText = buildDraftAssistantReply({
@@ -819,6 +867,7 @@ export async function appendConversationTurn(input: {
         workspace: workspace ?? null,
         intent: input.payload.intent,
         studentMessageText,
+        languageCode: appUser.ai_help_language,
       });
 
       logRuntimeInfo({
@@ -944,9 +993,10 @@ export async function updateWorkspaceState(input: {
     });
 
   if (conversation.status !== "active") {
+    const copy = getStudentConversationServerCopy(appUser.preferred_ui_language);
     throw new AppError({
       code: "conflict",
-      message: "Completed sessions are read-only.",
+      message: copy.access.sessionReadOnly,
       status: 409,
     });
   }
@@ -1016,9 +1066,10 @@ export async function completeConversation(input: {
     });
 
   if (conversation.status === "archived") {
+    const copy = getStudentConversationServerCopy(appUser.preferred_ui_language);
     throw new AppError({
       code: "conflict",
-      message: "Archived sessions cannot be completed again.",
+      message: copy.access.archivedCannotComplete,
       status: 409,
     });
   }

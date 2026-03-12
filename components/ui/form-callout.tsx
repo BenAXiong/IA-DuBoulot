@@ -8,9 +8,9 @@ type FormCalloutProps = {
 };
 
 const variantClassName: Record<FormCalloutVariant, string> = {
-  error: "border-[#d07c5b] bg-[#fff0ea] text-[#8d3b1f]",
-  success: "border-[#8cb88b] bg-[#eef8ee] text-[#295a2a]",
-  info: "border-[color:var(--line)] bg-[color:var(--surface-strong)] text-[color:var(--ink-soft)]",
+  error: "callout-error",
+  success: "callout-success",
+  info: "callout-info",
 };
 
 export function FormCallout({

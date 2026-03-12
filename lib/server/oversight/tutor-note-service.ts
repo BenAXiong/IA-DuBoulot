@@ -1,11 +1,15 @@
 import "server-only";
 
+import { getTutorNotesServerCopy } from "@/lib/i18n/oversight-copy";
 import {
   requireActiveAppUser,
   requireAppUserContext,
   requireAppUserRole,
 } from "@/lib/server/auth/authorization";
-import type { AuthenticatedUserContext } from "@/lib/server/auth/types";
+import type {
+  AuthenticatedUserContext,
+  UiLanguageCode,
+} from "@/lib/server/auth/types";
 import { recordAuditEvent } from "@/lib/server/audit/audit-service";
 import { logRuntimeInfo } from "@/lib/server/audit/runtime-logger";
 import { AppError } from "@/lib/server/errors/app-error";
@@ -36,6 +40,8 @@ export type UpdateTutorNoteInput = {
   isPinned: boolean;
 };
 
+type TutorNotesServerCopy = ReturnType<typeof getTutorNotesServerCopy>;
+
 function toServiceError(message: string, cause: unknown) {
   return new AppError({
     code: "service_unavailable",
@@ -46,11 +52,11 @@ function toServiceError(message: string, cause: unknown) {
   });
 }
 
-function requireBodyObject(body: unknown) {
+function requireBodyObject(body: unknown, copy: TutorNotesServerCopy) {
   if (!body || typeof body !== "object" || Array.isArray(body)) {
     throw new AppError({
       code: "bad_request",
-      message: "Expected a JSON object body.",
+      message: copy.expectedObject,
       status: 400,
     });
   }
@@ -61,6 +67,7 @@ function requireBodyObject(body: unknown) {
 function parseUuid(
   value: unknown,
   fieldName: "studentUserId" | "conversationId",
+  copy: TutorNotesServerCopy,
   allowNull = false,
 ) {
   if ((value === null || value === "" || typeof value === "undefined") && allowNull) {
@@ -70,10 +77,10 @@ function parseUuid(
   if (typeof value !== "string" || !/^[0-9a-fA-F-]{36}$/.test(value)) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        [fieldName]: "Expected a valid UUID.",
+        [fieldName]: copy.fieldErrors.uuid,
       },
     });
   }
@@ -81,14 +88,14 @@ function parseUuid(
   return value;
 }
 
-function parseNoteText(value: unknown) {
+function parseNoteText(value: unknown, copy: TutorNotesServerCopy) {
   if (typeof value !== "string") {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        noteText: "Note text is required.",
+        noteText: copy.fieldErrors.noteTextRequired,
       },
     });
   }
@@ -98,10 +105,10 @@ function parseNoteText(value: unknown) {
   if (!normalized || normalized.length > 4000) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        noteText: "Note text is required and must be 4000 characters or fewer.",
+        noteText: copy.fieldErrors.noteTextRequired,
       },
     });
   }
@@ -126,7 +133,7 @@ async function requireConversationOwnership(input: {
   tutorUserId: string;
   studentUserId: string;
   conversationId: string | null;
-}) {
+}, copy: TutorNotesServerCopy) {
   if (!input.conversationId) {
     return;
   }
@@ -139,22 +146,26 @@ async function requireConversationOwnership(input: {
     .maybeSingle<{ id: string; student_user_id: string }>();
 
   if (error) {
-    throw toServiceError("Unable to validate the linked conversation.", error);
+    throw toServiceError(copy.service.validateConversation, error);
   }
 
   if (!data || data.student_user_id !== input.studentUserId) {
     throw new AppError({
       code: "validation_error",
-      message: "One or more fields are invalid.",
+      message: copy.invalidFields,
       status: 400,
       fieldErrors: {
-        conversationId: "Conversation must belong to the linked student.",
+        conversationId: copy.fieldErrors.conversationStudent,
       },
     });
   }
 }
 
-async function loadOwnedTutorNote(tutorUserId: string, noteId: string) {
+async function loadOwnedTutorNote(
+  tutorUserId: string,
+  noteId: string,
+  copy: TutorNotesServerCopy,
+) {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from("tutor_notes")
@@ -166,13 +177,13 @@ async function loadOwnedTutorNote(tutorUserId: string, noteId: string) {
     .maybeSingle<TutorNoteRow>();
 
   if (error) {
-    throw toServiceError("Unable to load the tutor note.", error);
+    throw toServiceError(copy.service.loadNote, error);
   }
 
   if (!data) {
     throw new AppError({
       code: "not_found",
-      message: "Tutor note not found.",
+      message: copy.notFound,
       status: 404,
     });
   }
@@ -182,50 +193,63 @@ async function loadOwnedTutorNote(tutorUserId: string, noteId: string) {
 
 export async function parseCreateTutorNoteInput(
   request: Request,
+  languageCode: UiLanguageCode = "fr",
 ): Promise<CreateTutorNoteInput> {
   let body: unknown;
+  const copy = getTutorNotesServerCopy(languageCode);
 
   try {
     body = await request.json();
   } catch (error) {
     throw new AppError({
       code: "bad_request",
-      message: "Invalid JSON body.",
+      message: copy.invalidJson,
       status: 400,
       cause: error,
     });
   }
 
-  const payload = requireBodyObject(body);
+  const payload = requireBodyObject(body, copy);
 
   return {
-    studentUserId: parseUuid(payload.studentUserId, "studentUserId") as string,
-    conversationId: parseUuid(payload.conversationId, "conversationId", true),
-    noteText: parseNoteText(payload.noteText),
+    studentUserId: parseUuid(
+      payload.studentUserId,
+      "studentUserId",
+      copy,
+    ) as string,
+    conversationId: parseUuid(
+      payload.conversationId,
+      "conversationId",
+      copy,
+      true,
+    ),
+    noteText: parseNoteText(payload.noteText, copy),
     isPinned: payload.isPinned === true,
   };
 }
 
 export async function parseUpdateTutorNoteInput(
   request: Request,
+  languageCode: UiLanguageCode = "fr",
 ): Promise<UpdateTutorNoteInput> {
   let body: unknown;
+  const copy = getTutorNotesServerCopy(languageCode);
 
   try {
     body = await request.json();
   } catch (error) {
     throw new AppError({
       code: "bad_request",
-      message: "Invalid JSON body.",
+      message: copy.invalidJson,
       status: 400,
       cause: error,
     });
   }
 
-  const payload = requireBodyObject(body);
+  const payload = requireBodyObject(body, copy);
 
   return {
-    noteText: parseNoteText(payload.noteText),
+    noteText: parseNoteText(payload.noteText, copy),
     isPinned: payload.isPinned === true,
   };
 }
@@ -237,6 +261,7 @@ export async function createTutorNote(input: {
   route: string;
 }): Promise<TutorNoteRecord> {
   const appUser = requireAppUserContext(input.context);
+  const copy = getTutorNotesServerCopy(appUser.preferred_ui_language);
   requireAppUserRole(appUser, ["tutor"]);
   requireActiveAppUser(appUser);
   await requireViewerCanAccessStudent(appUser, input.payload.studentUserId);
@@ -244,7 +269,7 @@ export async function createTutorNote(input: {
     tutorUserId: appUser.id,
     studentUserId: input.payload.studentUserId,
     conversationId: input.payload.conversationId,
-  });
+  }, copy);
 
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
@@ -262,7 +287,7 @@ export async function createTutorNote(input: {
     .single<TutorNoteRow>();
 
   if (error) {
-    throw toServiceError("Unable to create the tutor note.", error);
+    throw toServiceError(copy.service.createNote, error);
   }
 
   logRuntimeInfo({
@@ -311,9 +336,10 @@ export async function updateTutorNote(input: {
   route: string;
 }): Promise<TutorNoteRecord> {
   const appUser = requireAppUserContext(input.context);
+  const copy = getTutorNotesServerCopy(appUser.preferred_ui_language);
   requireAppUserRole(appUser, ["tutor"]);
   requireActiveAppUser(appUser);
-  const note = await loadOwnedTutorNote(appUser.id, input.noteId);
+  const note = await loadOwnedTutorNote(appUser.id, input.noteId, copy);
   await requireViewerCanAccessStudent(appUser, note.student_user_id);
 
   const supabase = await createSupabaseServerClient();
@@ -331,7 +357,7 @@ export async function updateTutorNote(input: {
     .single<TutorNoteRow>();
 
   if (error) {
-    throw toServiceError("Unable to update the tutor note.", error);
+    throw toServiceError(copy.service.updateNote, error);
   }
 
   logRuntimeInfo({
@@ -379,9 +405,10 @@ export async function deleteTutorNote(input: {
   route: string;
 }): Promise<void> {
   const appUser = requireAppUserContext(input.context);
+  const copy = getTutorNotesServerCopy(appUser.preferred_ui_language);
   requireAppUserRole(appUser, ["tutor"]);
   requireActiveAppUser(appUser);
-  const note = await loadOwnedTutorNote(appUser.id, input.noteId);
+  const note = await loadOwnedTutorNote(appUser.id, input.noteId, copy);
   await requireViewerCanAccessStudent(appUser, note.student_user_id);
 
   const supabase = await createSupabaseServerClient();
@@ -392,7 +419,7 @@ export async function deleteTutorNote(input: {
     .eq("tutor_user_id", appUser.id);
 
   if (error) {
-    throw toServiceError("Unable to delete the tutor note.", error);
+    throw toServiceError(copy.service.deleteNote, error);
   }
 
   logRuntimeInfo({

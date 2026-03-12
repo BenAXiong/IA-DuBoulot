@@ -1,34 +1,31 @@
 import type { ConversationAttachmentRecord } from "@/lib/server/ai/types";
 import { StudentStatusPill } from "@/components/dashboard/student/student-status-pill";
+import {
+  getAttachmentKindLabel,
+  getAttachmentStatusLabel,
+  getStudentAttachmentListCopy,
+} from "@/lib/i18n/student-flow-copy";
+import type { UiLanguageCode } from "@/lib/server/auth/types";
 
 type StudentAttachmentListProps = {
   attachments: ConversationAttachmentRecord[];
+  languageCode: UiLanguageCode;
   disabled?: boolean;
   onRetryExtraction: (attachmentId: string) => void;
 };
 
-function getAttachmentStatusLabel(attachment: ConversationAttachmentRecord) {
-  if (attachment.extraction_status === "ready") {
-    return "Extrait";
-  }
-
-  if (attachment.extraction_status === "failed") {
-    return "A relire";
-  }
-
-  return "Analyse";
-}
-
 export function StudentAttachmentList({
   attachments,
+  languageCode,
   disabled = false,
   onRetryExtraction,
 }: StudentAttachmentListProps) {
+  const copy = getStudentAttachmentListCopy(languageCode);
+
   if (attachments.length === 0) {
     return (
       <div className="rounded-[1.5rem] border border-dashed border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4 text-sm leading-6 text-[color:var(--ink-soft)]">
-        Les pieces jointes confirmees apparaitront ici avec leur statut
-        d&apos;extraction.
+        {copy.empty}
       </div>
     );
   }
@@ -41,8 +38,19 @@ export function StudentAttachmentList({
           key={attachment.id}
         >
           <div className="flex flex-wrap gap-2">
-            <StudentStatusPill label={attachment.attachment_kind} tone="accent" />
-            <StudentStatusPill label={getAttachmentStatusLabel(attachment)} />
+            <StudentStatusPill
+              label={getAttachmentKindLabel(
+                attachment.attachment_kind,
+                languageCode,
+              )}
+              tone="accent"
+            />
+            <StudentStatusPill
+              label={getAttachmentStatusLabel(
+                attachment.extraction_status,
+                languageCode,
+              )}
+            />
           </div>
 
           <div className="space-y-2">
@@ -53,28 +61,28 @@ export function StudentAttachmentList({
               </p>
             ) : (
               <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-                Aucun texte exploitable n&apos;a encore ete sauve pour cette piece.
+                {copy.noExtractedText}
               </p>
             )}
           </div>
 
           <div className="flex flex-wrap gap-3">
             <a
-              className="inline-flex justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5"
+              className="inline-flex min-h-11 items-center justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5"
               href={`/api/attachments/${attachment.id}/access`}
               rel="noreferrer"
               target="_blank"
             >
-              Ouvrir
+              {copy.open}
             </a>
             {attachment.extraction_status === "failed" ? (
               <button
-                className="rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
+                className="inline-flex min-h-11 items-center justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
                 disabled={disabled}
                 onClick={() => onRetryExtraction(attachment.id)}
                 type="button"
               >
-                Relancer l&apos;extraction
+                {copy.retryExtraction}
               </button>
             ) : null}
           </div>

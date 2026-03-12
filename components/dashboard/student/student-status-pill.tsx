@@ -4,11 +4,12 @@ type StudentStatusPillProps = {
 };
 
 const toneClassName: Record<NonNullable<StudentStatusPillProps["tone"]>, string> = {
-  neutral: "border border-[color:var(--line)] bg-white/70 text-[color:var(--foreground)]",
+  neutral:
+    "border border-[color:var(--line)] bg-[color:var(--surface-raised)] text-[color:var(--foreground)]",
   accent:
-    "border border-[rgba(203,95,44,0.24)] bg-[rgba(203,95,44,0.12)] text-[color:var(--foreground)]",
+    "border border-[color:var(--accent-soft)] bg-[color:var(--accent-quiet)] text-[color:var(--foreground)]",
   warning:
-    "border border-[rgba(208,124,91,0.4)] bg-[#fff0ea] text-[#8d3b1f]",
+    "callout-warning border",
 };
 
 export function StudentStatusPill({

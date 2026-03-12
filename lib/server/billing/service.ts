@@ -1,6 +1,7 @@
 import "server-only";
 
 import { env } from "@/lib/env";
+import { getBillingServerCopy } from "@/lib/i18n/oversight-copy";
 import { recordAuditEvent } from "@/lib/server/audit/audit-service";
 import { logRuntimeInfo } from "@/lib/server/audit/runtime-logger";
 import {
@@ -401,6 +402,7 @@ export async function createBillingPortalSession(
   input: CreateBillingPortalSessionInput,
 ): Promise<CreateBillingPortalSessionResult> {
   const appUser = requireAppUserContext(input.context);
+  const copy = getBillingServerCopy(appUser.preferred_ui_language);
   requireAppUserRole(appUser, ["parent"]);
   requireActiveAppUser(appUser);
 
@@ -409,7 +411,7 @@ export async function createBillingPortalSession(
   if (!subscription?.providerSubscriptionId) {
     throw new AppError({
       code: "conflict",
-      message: "No payer subscription is available for management yet.",
+      message: copy.noManageableSubscription,
       status: 409,
     });
   }

@@ -1,17 +1,15 @@
 import { OnboardingForm } from "@/components/auth/onboarding-form";
 import { PublicShell } from "@/components/layout/public-shell";
+import { getOnboardingPageCopy } from "@/lib/i18n/ui-copy";
+import {
+  buildHrefWithSearchParams,
+  readFirstSearchParam,
+  resolveUiLanguageFromSearchParam,
+} from "@/lib/i18n/ui-language";
 import { requireOnboardingPageContext } from "@/lib/server/auth/page-guards";
 
 type SearchParamsValue = string | string[] | undefined;
 type SearchParamsRecord = Record<string, SearchParamsValue>;
-
-function readFirstValue(value: SearchParamsValue) {
-  if (Array.isArray(value)) {
-    return value[0] ?? null;
-  }
-
-  return value ?? null;
-}
 
 function parseDefaultRole(value: string | null) {
   if (value === "parent" || value === "tutor") {
@@ -28,25 +26,30 @@ export default async function OnboardingPage({
 }) {
   const context = await requireOnboardingPageContext();
   const resolvedSearchParams = searchParams ? await searchParams : {};
-  const defaultRole = parseDefaultRole(
-    readFirstValue(resolvedSearchParams.role),
+  const languageCode = resolveUiLanguageFromSearchParam(
+    readFirstSearchParam(resolvedSearchParams.lang),
+    context.appUser?.preferred_ui_language ?? "fr",
   );
+  const defaultRole = parseDefaultRole(
+    readFirstSearchParam(resolvedSearchParams.role),
+  );
+  const copy = getOnboardingPageCopy(languageCode);
+  const currentHref = buildHrefWithSearchParams("/onboarding", resolvedSearchParams);
 
   return (
-    <PublicShell>
+    <PublicShell currentHref={currentHref} languageCode={languageCode}>
       <main className="px-5 py-6 sm:px-8 lg:px-12">
         <div className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-5xl flex-col justify-center gap-6">
           <section className="grid gap-6 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] md:grid-cols-[0.8fr_1.2fr] md:p-8">
             <article className="space-y-4">
               <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.24em] text-[color:var(--ink-soft)]">
-                Onboarding
+                {copy.eyebrow}
               </p>
               <h1 className="font-[family-name:var(--font-heading)] text-4xl leading-tight">
-                Finaliser le profil applicatif avant d&apos;entrer dans l&apos;espace protege.
+                {copy.title}
               </h1>
               <p className="text-base leading-7 text-[color:var(--ink-soft)]">
-                Cette etape cree ou repare la ligne `public.users` et branche le
-                compte sur les contraintes de role deja definies dans le schema.
+                {copy.body}
               </p>
             </article>
 
@@ -54,7 +57,9 @@ export default async function OnboardingPage({
               <OnboardingForm
                 defaultRole={defaultRole}
                 email={context.email}
-                inviteToken={readFirstValue(resolvedSearchParams.invite)}
+                initialPreferredUiLanguage={languageCode}
+                inviteToken={readFirstSearchParam(resolvedSearchParams.invite)}
+                languageCode={languageCode}
               />
             </article>
           </section>

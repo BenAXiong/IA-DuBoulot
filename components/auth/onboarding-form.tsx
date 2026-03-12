@@ -8,11 +8,18 @@ import { FormField } from "@/components/ui/form-field";
 import { SelectInput } from "@/components/ui/select-input";
 import { TextInput } from "@/components/ui/text-input";
 import {
+  AI_LANGUAGE_CODES,
   AI_LANGUAGE_OPTIONS,
-  STUDENT_AGE_BAND_OPTIONS,
   UI_LANGUAGE_OPTIONS,
   UNDER_13_AGE_BAND_VALUES,
+  getStudentAgeBandOptions,
 } from "@/lib/i18n/config";
+import { getOnboardingFormCopy } from "@/lib/i18n/ui-copy";
+import { withUiLanguage } from "@/lib/i18n/ui-language";
+import type {
+  AiLanguageCode,
+  UiLanguageCode,
+} from "@/lib/server/auth/types";
 
 type BootstrapErrorPayload = {
   ok?: false;
@@ -26,6 +33,8 @@ type OnboardingFormProps = {
   email: string | null;
   defaultRole?: "student" | "parent" | "tutor";
   inviteToken?: string | null;
+  initialPreferredUiLanguage: UiLanguageCode;
+  languageCode: UiLanguageCode;
 };
 
 function getFieldError(
@@ -35,25 +44,43 @@ function getFieldError(
   return fieldErrors[fieldName] ?? null;
 }
 
+function resolveInitialAiHelpLanguage(
+  initialPreferredUiLanguage: UiLanguageCode,
+): AiLanguageCode {
+  if (AI_LANGUAGE_CODES.includes(initialPreferredUiLanguage as AiLanguageCode)) {
+    return initialPreferredUiLanguage as AiLanguageCode;
+  }
+
+  return "fr";
+}
+
 export function OnboardingForm({
   email,
   defaultRole = "student",
   inviteToken = null,
+  initialPreferredUiLanguage,
+  languageCode,
 }: OnboardingFormProps) {
   const router = useRouter();
+  const copy = getOnboardingFormCopy(languageCode);
   const [role, setRole] = useState<"student" | "parent" | "tutor">(defaultRole);
   const [displayName, setDisplayName] = useState("");
-  const [preferredUiLanguage, setPreferredUiLanguage] = useState("fr");
-  const [aiHelpLanguage, setAiHelpLanguage] = useState("fr");
+  const [preferredUiLanguage, setPreferredUiLanguage] = useState<UiLanguageCode>(
+    initialPreferredUiLanguage,
+  );
+  const [aiHelpLanguage, setAiHelpLanguage] = useState<AiLanguageCode>(
+    resolveInitialAiHelpLanguage(initialPreferredUiLanguage),
+  );
   const [isUnder13, setIsUnder13] = useState(false);
   const [ageBand, setAgeBand] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
 
+  const ageBandOptions = getStudentAgeBandOptions(languageCode);
   const visibleAgeBandOptions = !isUnder13
-    ? STUDENT_AGE_BAND_OPTIONS
-    : STUDENT_AGE_BAND_OPTIONS.filter(
+    ? ageBandOptions
+    : ageBandOptions.filter(
         (option) =>
           option.value === "" || UNDER_13_AGE_BAND_VALUES.has(option.value),
       );
@@ -98,14 +125,14 @@ export function OnboardingForm({
       const errorPayload = payload as BootstrapErrorPayload | null;
 
       if (!response.ok || !payload?.ok) {
-        setErrorMessage(
-          errorPayload?.error?.message ?? "Impossible de finaliser le profil.",
-        );
+        setErrorMessage(errorPayload?.error?.message ?? copy.errorFallback);
         setFieldErrors(errorPayload?.error?.fieldErrors ?? {});
         return;
       }
 
-      router.push(inviteToken ? `/invite/${inviteToken}` : "/app");
+      router.push(
+        withUiLanguage(inviteToken ? `/invite/${inviteToken}` : "/app", languageCode),
+      );
       router.refresh();
     });
   }
@@ -114,45 +141,27 @@ export function OnboardingForm({
     <form className="grid gap-5" onSubmit={handleSubmit}>
       <div className="grid gap-2 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4 text-sm text-[color:var(--ink-soft)]">
         <span className="font-medium text-[color:var(--foreground)]">
-          Session connectee
+          {copy.connectedSession}
         </span>
-        <span>{email ?? "email indisponible"}</span>
+        <span>{email ?? copy.emailUnavailable}</span>
       </div>
 
-      {errorMessage ? (
-        <FormCallout variant="error">
-          {errorMessage}
-        </FormCallout>
-      ) : null}
+      {errorMessage ? <FormCallout variant="error">{errorMessage}</FormCallout> : null}
 
       <fieldset className="grid gap-3">
-        <legend className="text-sm font-medium">Role</legend>
+        <legend className="text-sm font-medium">{copy.roleLegend}</legend>
         <div className="grid gap-3 sm:grid-cols-3">
-          {[
-            {
-              value: "student" as const,
-              title: "Eleve",
-              body: "Flux principal d'aide aux devoirs et espace de travail.",
-            },
-            {
-              value: "parent" as const,
-              title: "Parent",
-              body: "Vision sur les sessions et supervision de l'enfant.",
-            },
-            {
-              value: "tutor" as const,
-              title: "Tuteur",
-              body: "Acces supervise pour suivi pedagogique cible.",
-            },
-          ].map((option) => (
+          {copy.roles.map((option) => (
             <button
               className={`rounded-[1.5rem] border p-4 text-left transition ${
                 role === option.value
-                  ? "border-[color:var(--accent)] bg-[#fff1e8]"
-                  : "border-[color:var(--line)] bg-white/70"
+                  ? "border-[color:var(--brand)] bg-[color:var(--brand-soft)]"
+                  : "border-[color:var(--line)] bg-[color:var(--surface-raised)]"
               }`}
               key={option.value}
-              onClick={() => handleRoleChange(option.value)}
+              onClick={() =>
+                handleRoleChange(option.value as "student" | "parent" | "tutor")
+              }
               type="button"
             >
               <p className="font-[family-name:var(--font-heading)] text-lg">
@@ -165,7 +174,7 @@ export function OnboardingForm({
           ))}
         </div>
         {getFieldError(fieldErrors, "role") ? (
-          <p className="text-sm text-[#8d3b1f]">
+          <p className="text-sm text-[color:var(--error-ink)]">
             {getFieldError(fieldErrors, "role")}
           </p>
         ) : null}
@@ -173,11 +182,11 @@ export function OnboardingForm({
 
       <FormField
         error={getFieldError(fieldErrors, "displayName")}
-        label="Nom affiche"
+        label={copy.fields.displayName}
       >
         <TextInput
           onChange={(event) => setDisplayName(event.target.value)}
-          placeholder="Ex: Lea Martin"
+          placeholder={copy.displayNamePlaceholder}
           required
           type="text"
           value={displayName}
@@ -187,10 +196,12 @@ export function OnboardingForm({
       <div className="grid gap-4 sm:grid-cols-2">
         <FormField
           error={getFieldError(fieldErrors, "preferredUiLanguage")}
-          label="Langue de l'interface"
+          label={copy.fields.uiLanguage}
         >
           <SelectInput
-            onChange={(event) => setPreferredUiLanguage(event.target.value)}
+            onChange={(event) =>
+              setPreferredUiLanguage(event.target.value as UiLanguageCode)
+            }
             value={preferredUiLanguage}
           >
             {UI_LANGUAGE_OPTIONS.map((option) => (
@@ -203,10 +214,12 @@ export function OnboardingForm({
 
         <FormField
           error={getFieldError(fieldErrors, "aiHelpLanguage")}
-          label="Langue de l'aide IA"
+          label={copy.fields.aiLanguage}
         >
           <SelectInput
-            onChange={(event) => setAiHelpLanguage(event.target.value)}
+            onChange={(event) =>
+              setAiHelpLanguage(event.target.value as AiLanguageCode)
+            }
             value={aiHelpLanguage}
           >
             {AI_LANGUAGE_OPTIONS.map((option) => (
@@ -241,12 +254,12 @@ export function OnboardingForm({
               }}
               type="checkbox"
             />
-            <span>Compte eleve de moins de 13 ans</span>
+            <span>{copy.under13Label}</span>
           </label>
 
           <FormField
             error={getFieldError(fieldErrors, "ageBand")}
-            label="Tranche d'age"
+            label={copy.fields.ageBand}
           >
             <SelectInput
               onChange={(event) => setAgeBand(event.target.value)}
@@ -262,14 +275,14 @@ export function OnboardingForm({
 
           <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
             {isUnder13
-              ? "Le compte restera en attente d'approbation parentale apres bootstrap."
-              : "Les comptes eleve de 13 ans et plus restent actifs immediatement dans la baseline MVP."}
+              ? copy.studentStatus.under13
+              : copy.studentStatus.default}
           </p>
         </section>
       ) : null}
 
       <ActionButton disabled={isPending} type="submit">
-        {isPending ? "Creation du profil..." : "Finaliser le profil"}
+        {isPending ? copy.buttons.pending : copy.buttons.submit}
       </ActionButton>
     </form>
   );

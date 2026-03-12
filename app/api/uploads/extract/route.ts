@@ -8,7 +8,10 @@ import {
 
 export const POST = withRouteErrorHandling(async (request, { requestId }) => {
   const context = await requireAuthenticatedUserContext();
-  const payload = await parseConfirmUploadRequest(request);
+  const payload = await parseConfirmUploadRequest(
+    request,
+    context.appUser?.preferred_ui_language ?? "fr",
+  );
   const result = await retryAttachmentExtraction({
     context,
     requestId,

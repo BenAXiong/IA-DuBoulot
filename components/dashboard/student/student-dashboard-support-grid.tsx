@@ -4,6 +4,7 @@ import {
   formatDateLabel,
   formatUsagePeriod,
 } from "@/components/dashboard/student/student-dashboard-presenters";
+import { getStudentDashboardSupportCopy } from "@/lib/i18n/dashboard-copy";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type {
   StudentDashboardSupportSnapshot,
@@ -16,85 +17,16 @@ type StudentDashboardSupportGridProps = {
   usage: StudentDashboardUsageSnapshot;
 };
 
-function getSupportHeadline(support: StudentDashboardSupportSnapshot) {
-  if (support.isUnder13) {
-    if (support.parentApprovedAt || support.parentLinks.active > 0) {
-      return "Supervision parent active";
-    }
-
-    return "Validation parent attendue";
-  }
-
-  if (support.tutorLinks.active > 0) {
-    return "Cadre adulte branche";
-  }
-
-  return "Aucun adulte lie pour l'instant";
-}
-
-function getUsageHeadline(usage: StudentDashboardUsageSnapshot) {
-  if (usage.quota.accessState === "blocked") {
-    return "Essai ou quota atteint";
-  }
-
-  if (usage.quota.accessState === "warning") {
-    return usage.quota.planKind === "paid"
-      ? "Acces actif, marge a surveiller"
-      : "Essai en cours, marge bientot reduite";
-  }
-
-  if (usage.hasUsage) {
-    return "Activite suivie sur la periode courante";
-  }
-
-  return "Le suivi d'usage demarre avec le premier devoir";
-}
-
 function getUsageBody(
   usage: StudentDashboardUsageSnapshot,
   languageCode: UiLanguageCode,
 ) {
-  if (!usage.quota.trialStartedAt && usage.quota.planKind === "trial") {
-    return "L'essai gratuit commencera avec le premier devoir enregistre.";
-  }
+  const copy = getStudentDashboardSupportCopy(languageCode);
 
-  if (usage.quota.blockReason === "trial_window_expired") {
-    return "La periode d'essai est terminee. Le prochain devoir depend maintenant d'un abonnement payeur actif.";
-  }
-
-  if (usage.quota.blockReason === "sessions") {
-    return "La limite de sessions de cette periode est atteinte.";
-  }
-
-  if (usage.quota.blockReason === "uploads") {
-    return "La limite d'uploads de cette periode est atteinte.";
-  }
-
-  if (usage.quota.blockReason === "assistant_messages") {
-    return "La limite de messages IA de cette periode est atteinte.";
-  }
-
-  if (
-    usage.quota.blockReason === "input_tokens" ||
-    usage.quota.blockReason === "output_tokens"
-  ) {
-    return "Le budget IA de cette periode est atteint.";
-  }
-
-  if (usage.quota.planKind === "paid") {
-    return usage.quota.subscriptionStatus === "past_due"
-      ? "Le plan Family reste actif pour l'instant, mais la facturation parent demande une verification."
-      : "Le compte travaille sur un acces Family actif pilote par un adulte payeur.";
-  }
-
-  if (usage.quota.trialEndsAt) {
-    return `Essai actif jusqu'au ${formatDateLabel(
-      usage.quota.trialEndsAt,
-      languageCode,
-    )}.`;
-  }
-
-  return "Le premier devoir fixera la date d'essai et la premiere periode d'usage.";
+  return copy.usageBody(
+    usage,
+    formatDateLabel(usage.quota.trialEndsAt, languageCode),
+  );
 }
 
 function formatBudgetLine(
@@ -102,10 +34,11 @@ function formatBudgetLine(
   limit: number | null,
   languageCode: UiLanguageCode,
 ) {
+  const copy = getStudentDashboardSupportCopy(languageCode);
   const formattedUsed = formatCompactNumber(used, languageCode);
 
   if (limit == null) {
-    return `${formattedUsed} utilises`;
+    return copy.usedNoLimit(formattedUsed);
   }
 
   return `${formattedUsed} / ${formatCompactNumber(limit, languageCode)}`;
@@ -116,6 +49,8 @@ export function StudentDashboardSupportGrid({
   support,
   usage,
 }: StudentDashboardSupportGridProps) {
+  const copy = getStudentDashboardSupportCopy(languageCode);
+
   return (
     <div className="grid gap-6">
       <section
@@ -124,28 +59,28 @@ export function StudentDashboardSupportGrid({
       >
         <div className="space-y-3">
           <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-            Cadre adulte
+            {copy.adultFrameEyebrow}
           </p>
           <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
-            {getSupportHeadline(support)}
+            {copy.supportHeadline(support)}
           </h2>
           <div className="flex flex-wrap gap-2">
             {support.parentalApprovalRequired ? (
-              <StudentStatusPill label="Parent requis" tone="accent" />
+              <StudentStatusPill label={copy.approvalRequired} tone="accent" />
             ) : (
-              <StudentStatusPill label="Parent optionnel" />
+              <StudentStatusPill label={copy.approvalOptional} />
             )}
-            <StudentStatusPill label={`${support.parentLinks.active} parent actif`} />
-            <StudentStatusPill label={`${support.tutorLinks.active} tuteur actif`} />
+            <StudentStatusPill label={copy.activeParents(support.parentLinks.active)} />
+            <StudentStatusPill label={copy.activeTutors(support.tutorLinks.active)} />
             {support.parentLinks.pending > 0 ? (
               <StudentStatusPill
-                label={`${support.parentLinks.pending} parent en attente`}
+                label={copy.pendingParents(support.parentLinks.pending)}
                 tone="warning"
               />
             ) : null}
             {support.tutorLinks.pending > 0 ? (
               <StudentStatusPill
-                label={`${support.tutorLinks.pending} tuteur en attente`}
+                label={copy.pendingTutors(support.tutorLinks.pending)}
                 tone="warning"
               />
             ) : null}
@@ -153,16 +88,15 @@ export function StudentDashboardSupportGrid({
         </div>
 
         <div className="grid gap-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5 text-sm">
-          <p className="font-medium">Etat de supervision</p>
+          <p className="font-medium">{copy.supervisionState}</p>
           <p className="leading-6 text-[color:var(--ink-soft)]">
             {support.parentApprovedAt
-              ? `Derniere approbation parent enregistree le ${formatDateLabel(
-                  support.parentApprovedAt,
-                  languageCode,
-                )}.`
+              ? copy.supervisionApproved(
+                  formatDateLabel(support.parentApprovedAt, languageCode) ?? "",
+                )
               : support.parentalApprovalRequired
-                ? "Aucune approbation parent active n'est encore enregistree."
-                : "Le compte peut avancer sans approbation parent obligatoire."}
+                ? copy.supervisionMissing
+                : copy.supervisionOptionalBody}
           </p>
         </div>
       </section>
@@ -173,10 +107,10 @@ export function StudentDashboardSupportGrid({
       >
         <div className="space-y-3">
           <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-            Usage
+            {copy.usageEyebrow}
           </p>
           <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
-            {getUsageHeadline(usage)}
+            {copy.usageHeadline(usage)}
           </h2>
           <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
             {formatUsagePeriod(usage, languageCode)}
@@ -185,16 +119,16 @@ export function StudentDashboardSupportGrid({
 
         <div className="flex flex-wrap gap-2">
           <StudentStatusPill
-            label={usage.quota.planKind === "paid" ? "Plan Family" : "Essai gratuit"}
+            label={usage.quota.planKind === "paid" ? copy.paidPlan : copy.trialPlan}
             tone={usage.quota.planKind === "paid" ? "accent" : undefined}
           />
           <StudentStatusPill
             label={
               usage.quota.accessState === "blocked"
-                ? "Bloque"
+                ? copy.blocked
                 : usage.quota.accessState === "warning"
-                  ? "A surveiller"
-                  : "Disponible"
+                  ? copy.warning
+                  : copy.available
             }
             tone={
               usage.quota.accessState === "blocked"
@@ -206,10 +140,9 @@ export function StudentDashboardSupportGrid({
           />
           {usage.quota.trialEndsAt ? (
             <StudentStatusPill
-              label={`Essai jusqu'au ${formatDateLabel(
-                usage.quota.trialEndsAt,
-                languageCode,
-              )}`}
+              label={copy.trialUntil(
+                formatDateLabel(usage.quota.trialEndsAt, languageCode) ?? "",
+              )}
             />
           ) : null}
         </div>
@@ -217,7 +150,7 @@ export function StudentDashboardSupportGrid({
         <div className="grid gap-3 sm:grid-cols-3">
           <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4">
             <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-              Sessions
+              {copy.cards.sessions}
             </p>
             <p className="mt-3 font-[family-name:var(--font-heading)] text-3xl">
               {formatBudgetLine(
@@ -227,12 +160,13 @@ export function StudentDashboardSupportGrid({
               )}
             </p>
             <p className="mt-2 text-sm text-[color:var(--ink-soft)]">
-              Restant: {formatCompactNumber(usage.quota.sessions.remaining ?? 0, languageCode)}
+              {copy.remaining}:{" "}
+              {formatCompactNumber(usage.quota.sessions.remaining ?? 0, languageCode)}
             </p>
           </article>
           <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4">
             <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-              Uploads
+              {copy.cards.uploads}
             </p>
             <p className="mt-3 font-[family-name:var(--font-heading)] text-3xl">
               {formatBudgetLine(
@@ -242,12 +176,13 @@ export function StudentDashboardSupportGrid({
               )}
             </p>
             <p className="mt-2 text-sm text-[color:var(--ink-soft)]">
-              Restant: {formatCompactNumber(usage.quota.uploads.remaining ?? 0, languageCode)}
+              {copy.remaining}:{" "}
+              {formatCompactNumber(usage.quota.uploads.remaining ?? 0, languageCode)}
             </p>
           </article>
           <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4">
             <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-              Messages IA
+              {copy.cards.assistantMessages}
             </p>
             <p className="mt-3 font-[family-name:var(--font-heading)] text-3xl">
               {formatBudgetLine(
@@ -257,7 +192,7 @@ export function StudentDashboardSupportGrid({
               )}
             </p>
             <p className="mt-2 text-sm text-[color:var(--ink-soft)]">
-              Restant:{" "}
+              {copy.remaining}:{" "}
               {formatCompactNumber(
                 usage.quota.assistantMessages.remaining ?? 0,
                 languageCode,
@@ -269,7 +204,7 @@ export function StudentDashboardSupportGrid({
         <div className="grid gap-2 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4 text-sm leading-6 text-[color:var(--ink-soft)]">
           <p>{getUsageBody(usage, languageCode)}</p>
           <p>
-            Tokens entree:{" "}
+            {copy.inputTokens}:{" "}
             {formatBudgetLine(
               usage.inputTokens,
               usage.quota.inputTokens.limit,
@@ -277,7 +212,7 @@ export function StudentDashboardSupportGrid({
             )}
           </p>
           <p>
-            Tokens sortie:{" "}
+            {copy.outputTokens}:{" "}
             {formatBudgetLine(
               usage.outputTokens,
               usage.quota.outputTokens.limit,

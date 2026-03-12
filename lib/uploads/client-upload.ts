@@ -1,6 +1,8 @@
 "use client";
 
+import { getClientUploadCopy } from "@/lib/i18n/student-flow-copy";
 import type { ConversationAttachmentRecord } from "@/lib/server/ai/types";
+import type { UiLanguageCode } from "@/lib/server/auth/types";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { UploadSource } from "@/lib/server/uploads/constants";
 
@@ -55,9 +57,11 @@ export async function uploadConversationFiles(input: {
   conversationId: string;
   files: File[];
   uploadSource?: UploadSource;
+  languageCode?: UiLanguageCode;
 }) {
   const supabase = createSupabaseBrowserClient();
   const results: UploadStepResult[] = [];
+  const copy = getClientUploadCopy(input.languageCode ?? "fr");
 
   for (const file of input.files) {
     const createResponse = await fetch("/api/uploads/create", {
@@ -84,7 +88,7 @@ export async function uploadConversationFiles(input: {
     ) {
       throw new Error(
         getResponseErrorMessage(createPayload) ??
-          `Impossible de preparer l'upload pour ${file.name}.`,
+          copy.prepareUpload(file.name),
       );
     }
 
@@ -97,9 +101,7 @@ export async function uploadConversationFiles(input: {
       );
 
     if (uploadResult.error) {
-      throw new Error(
-        `Impossible de transferer ${file.name}: ${uploadResult.error.message}`,
-      );
+      throw new Error(copy.transferUpload(file.name, uploadResult.error.message));
     }
 
     const confirmResponse = await fetch("/api/uploads/confirm", {
@@ -119,7 +121,7 @@ export async function uploadConversationFiles(input: {
     if (!confirmResponse.ok || !confirmPayload?.ok || !confirmPayload.data) {
       throw new Error(
         getResponseErrorMessage(confirmPayload) ??
-          `Impossible de confirmer l'upload pour ${file.name}.`,
+          copy.confirmUpload(file.name),
       );
     }
 

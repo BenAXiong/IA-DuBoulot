@@ -1,0 +1,1408 @@
+import { getStudentAgeBandOptions } from "@/lib/i18n/config";
+import type {
+  AccountStatus,
+  AgeBand,
+  UiLanguageCode,
+} from "@/lib/server/auth/types";
+import type { MemoryCategory } from "@/lib/server/memory/types";
+import type {
+  ConversationStatus,
+  StudentDashboardStartState,
+  StudentDashboardSupportSnapshot,
+  StudentDashboardUsageSnapshot,
+} from "@/lib/server/student-dashboard/types";
+
+type LocalizedValue<T> = Record<UiLanguageCode, T>;
+
+function pickLocalizedValue<T>(
+  languageCode: UiLanguageCode,
+  variants: LocalizedValue<T>,
+) {
+  return variants[languageCode];
+}
+
+export function getDashboardAccountStatusLabel(
+  status: AccountStatus,
+  languageCode: UiLanguageCode,
+) {
+  const labels = pickLocalizedValue(languageCode, {
+    fr: {
+      active: "Actif",
+      pending_parent_approval: "En attente parent",
+      suspended: "Suspendu",
+      deletion_requested: "Suppression demandée",
+    },
+    en: {
+      active: "Active",
+      pending_parent_approval: "Pending parent approval",
+      suspended: "Suspended",
+      deletion_requested: "Deletion requested",
+    },
+    zh: {
+      active: "啟用中",
+      pending_parent_approval: "待家長核准",
+      suspended: "已停用",
+      deletion_requested: "已要求刪除",
+    },
+  });
+
+  return labels[status];
+}
+
+export function getDashboardAgeBandLabel(
+  ageBand: AgeBand | null,
+  languageCode: UiLanguageCode,
+) {
+  if (!ageBand) {
+    return null;
+  }
+
+  return (
+    getStudentAgeBandOptions(languageCode).find((option) => option.value === ageBand)
+      ?.label ?? ageBand
+  );
+}
+
+export function getLocalizedStartStateLabel(
+  startState: StudentDashboardStartState,
+  languageCode: UiLanguageCode,
+) {
+  const labels = pickLocalizedValue(languageCode, {
+    fr: {
+      ready: "Prêt",
+      pending_parent_approval: "En attente parent",
+      quota_blocked: "Quota bloqué",
+      suspended: "Suspendu",
+      deletion_requested: "Suppression demandée",
+    },
+    en: {
+      ready: "Ready",
+      pending_parent_approval: "Pending parent approval",
+      quota_blocked: "Quota blocked",
+      suspended: "Suspended",
+      deletion_requested: "Deletion requested",
+    },
+    zh: {
+      ready: "可開始",
+      pending_parent_approval: "待家長核准",
+      quota_blocked: "額度受阻",
+      suspended: "已停用",
+      deletion_requested: "已要求刪除",
+    },
+  });
+
+  return labels[startState];
+}
+
+export function getLocalizedStartStateBody(
+  startState: StudentDashboardStartState,
+  languageCode: UiLanguageCode,
+) {
+  const labels = pickLocalizedValue(languageCode, {
+    fr: {
+      ready:
+        "Le compte peut lancer un nouveau devoir et reprendre les sessions récentes.",
+      pending_parent_approval:
+        "Le prochain devoir reste bloqué tant qu'un parent n'a pas activé le lien de supervision.",
+      quota_blocked:
+        "Le compte a atteint sa limite d'essai ou de quota. La reprise passe maintenant par le statut de facturation et le renouvellement de la période.",
+      suspended:
+        "Le compte ne peut pas démarrer de nouveau devoir tant que la suspension n'est pas levée.",
+      deletion_requested:
+        "Le compte reste gelé pendant la file de suppression et n'accepte plus de nouvelle activité.",
+    },
+    en: {
+      ready:
+        "The account can start a new homework flow and resume recent sessions.",
+      pending_parent_approval:
+        "The next homework stays blocked until a parent activates the supervision link.",
+      quota_blocked:
+        "The account has reached its trial or quota limit. Resuming now depends on billing status and the next usage window.",
+      suspended:
+        "The account cannot start new homework until the suspension is lifted.",
+      deletion_requested:
+        "The account stays frozen during the deletion queue and no longer accepts new activity.",
+    },
+    zh: {
+      ready: "此帳號可以開始新作業，也可以回到最近的課程。",
+      pending_parent_approval:
+        "在家長啟用監督連結前，下一份作業仍會被阻擋。",
+      quota_blocked:
+        "此帳號已達試用或額度上限。要繼續使用，現在取決於付費狀態與下一個使用期間。",
+      suspended: "在停用解除前，帳號不能開始新的作業。",
+      deletion_requested:
+        "帳號在刪除排隊期間會維持凍結，不再接受新的活動。",
+    },
+  });
+
+  return labels[startState];
+}
+
+export function getLocalizedConversationStatusLabel(
+  status: ConversationStatus,
+  languageCode: UiLanguageCode,
+) {
+  const labels = pickLocalizedValue(languageCode, {
+    fr: {
+      active: "En cours",
+      completed: "Terminée",
+      archived: "Archivée",
+    },
+    en: {
+      active: "Active",
+      completed: "Completed",
+      archived: "Archived",
+    },
+    zh: {
+      active: "進行中",
+      completed: "已完成",
+      archived: "已封存",
+    },
+  });
+
+  return labels[status];
+}
+
+export function getStudentDashboardStartPanelCopy(languageCode: UiLanguageCode) {
+  return pickLocalizedValue(languageCode, {
+    fr: {
+      paidPlan: "Accès Family",
+      trialPlan: "Essai gratuit",
+      supervisionRequired: "Supervision requise",
+      autonomousStart: "Départ autonome",
+      recentSessions: (count: number) =>
+        `${count} session${count > 1 ? "s" : ""} récente${count > 1 ? "s" : ""}`,
+      eyebrow: "Point de départ élève",
+      titleReady: "Le prochain devoir commence ici.",
+      titleBlocked: "Le prochain devoir attend encore un jalon de confiance.",
+      buttons: {
+        ready: "Nouveau devoir",
+        waitParent: "Attendre le parent",
+        viewQuota: "Voir le quota",
+        blocked: "Départ bloqué",
+      },
+      canonicalRoute: "Route canonique",
+      recentSubjectsEyebrow: "Matières récentes",
+      recentSubjectsTitle:
+        "Les prochains raccourcis d'intake partiront des sujets déjà vus.",
+      noRecentSubjects:
+        "Aucun sujet récent pour l'instant. Le premier devoir fixera les tags les plus utiles pour la reprise de session.",
+      intakeBody:
+        "Le formulaire d'intake détaillé est maintenant relié au quota et à la facturation sans changer la route canonique d'entrée élève.",
+    },
+    en: {
+      paidPlan: "Family access",
+      trialPlan: "Free trial",
+      supervisionRequired: "Supervision required",
+      autonomousStart: "Autonomous start",
+      recentSessions: (count: number) =>
+        `${count} recent session${count === 1 ? "" : "s"}`,
+      eyebrow: "Student starting point",
+      titleReady: "The next homework starts here.",
+      titleBlocked: "The next homework is still waiting on a trust milestone.",
+      buttons: {
+        ready: "New homework",
+        waitParent: "Wait for parent",
+        viewQuota: "View quota",
+        blocked: "Start blocked",
+      },
+      canonicalRoute: "Canonical route",
+      recentSubjectsEyebrow: "Recent subjects",
+      recentSubjectsTitle:
+        "The next intake shortcuts will start from subjects already seen.",
+      noRecentSubjects:
+        "No recent subjects yet. The first homework will establish the most useful tags for resuming work later.",
+      intakeBody:
+        "The detailed intake form is now connected to quota and billing without changing the canonical student entry route.",
+    },
+    zh: {
+      paidPlan: "Family 方案",
+      trialPlan: "免費試用",
+      supervisionRequired: "需要監督",
+      autonomousStart: "可自主開始",
+      recentSessions: (count: number) => `最近 ${count} 個課程`,
+      eyebrow: "學生起始點",
+      titleReady: "下一份作業從這裡開始。",
+      titleBlocked: "下一份作業仍在等待一個信任節點。",
+      buttons: {
+        ready: "新作業",
+        waitParent: "等待家長",
+        viewQuota: "查看額度",
+        blocked: "起始受阻",
+      },
+      canonicalRoute: "標準路由",
+      recentSubjectsEyebrow: "最近科目",
+      recentSubjectsTitle: "下一批 intake 快捷入口會從已出現過的科目出發。",
+      noRecentSubjects:
+        "目前還沒有最近科目。第一份作業會建立之後續接最有用的標籤。",
+      intakeBody:
+        "詳細 intake 表單現在已接上額度與付費邏輯，同時保留學生入口的標準路由。",
+    },
+  });
+}
+
+export function getStudentDashboardRecentSessionsCopy(
+  languageCode: UiLanguageCode,
+) {
+  return pickLocalizedValue(languageCode, {
+    fr: {
+      eyebrow: "Sessions récentes",
+      title: "Reprendre vite, puis basculer vers l'historique complet si besoin.",
+      noRecentTag: "Aucun tag récent",
+      viewAll: "Tout voir",
+      emptyTitle: "Aucune session enregistrée pour l'instant.",
+      emptyBody:
+        "Dès que le premier devoir passera par le produit, cette zone affichera l'historique récent, les tags de matière, puis la reprise détaillée depuis `/app/history`.",
+      graded: "Notée",
+      practice: "Exercice libre",
+      body:
+        "Cette session peut déjà être rouverte, puis l'historique complet reste centralisé sur `/app/history`.",
+      lastActivity: "Dernière activité",
+      noDate: "Date indisponible",
+      resume: "Reprendre",
+    },
+    en: {
+      eyebrow: "Recent sessions",
+      title: "Resume quickly, then switch to full history when needed.",
+      noRecentTag: "No recent tag",
+      viewAll: "View all",
+      emptyTitle: "No saved session yet.",
+      emptyBody:
+        "As soon as the first homework goes through the product, this area will show recent history, subject tags, and the detailed resume path from `/app/history`.",
+      graded: "Graded",
+      practice: "Open exercise",
+      body:
+        "This session can already be reopened, while the full history remains centralized on `/app/history`.",
+      lastActivity: "Last activity",
+      noDate: "Date unavailable",
+      resume: "Resume",
+    },
+    zh: {
+      eyebrow: "最近課程",
+      title: "先快速續接，需要時再切到完整歷程。",
+      noRecentTag: "沒有最近標籤",
+      viewAll: "查看全部",
+      emptyTitle: "目前還沒有已儲存的課程。",
+      emptyBody:
+        "第一份作業進入產品後，這裡就會顯示最近歷程、科目標籤，以及從 `/app/history` 進行詳細續接的入口。",
+      graded: "已評分",
+      practice: "自由練習",
+      body: "這個課程已可重新打開，而完整歷程仍集中在 `/app/history`。",
+      lastActivity: "最近活動",
+      noDate: "日期不可用",
+      resume: "續接",
+    },
+  });
+}
+
+export function getStudentDashboardSupportCopy(languageCode: UiLanguageCode) {
+  return pickLocalizedValue(languageCode, {
+    fr: {
+      adultFrameEyebrow: "Cadre adulte",
+      approvalRequired: "Parent requis",
+      approvalOptional: "Parent optionnel",
+      activeParents: (count: number) => `${count} parent actif`,
+      activeTutors: (count: number) => `${count} tuteur actif`,
+      pendingParents: (count: number) => `${count} parent en attente`,
+      pendingTutors: (count: number) => `${count} tuteur en attente`,
+      supervisionState: "État de supervision",
+      supervisionApproved: (dateLabel: string) =>
+        `Dernière approbation parent enregistrée le ${dateLabel}.`,
+      supervisionMissing:
+        "Aucune approbation parent active n'est encore enregistrée.",
+      supervisionOptionalBody:
+        "Le compte peut avancer sans approbation parent obligatoire.",
+      usageEyebrow: "Usage",
+      paidPlan: "Plan Family",
+      trialPlan: "Essai gratuit",
+      available: "Disponible",
+      warning: "À surveiller",
+      blocked: "Bloqué",
+      trialUntil: (dateLabel: string) => `Essai jusqu'au ${dateLabel}`,
+      cards: {
+        sessions: "Sessions",
+        uploads: "Uploads",
+        assistantMessages: "Messages IA",
+      },
+      remaining: "Restant",
+      inputTokens: "Tokens entrée",
+      outputTokens: "Tokens sortie",
+      supportHeadline: (support: StudentDashboardSupportSnapshot) => {
+        if (support.isUnder13) {
+          if (support.parentApprovedAt || support.parentLinks.active > 0) {
+            return "Supervision parent active";
+          }
+
+          return "Validation parent attendue";
+        }
+
+        if (support.tutorLinks.active > 0) {
+          return "Cadre adulte branché";
+        }
+
+        return "Aucun adulte lié pour l'instant";
+      },
+      usageHeadline: (usage: StudentDashboardUsageSnapshot) => {
+        if (usage.quota.accessState === "blocked") {
+          return "Essai ou quota atteint";
+        }
+
+        if (usage.quota.accessState === "warning") {
+          return usage.quota.planKind === "paid"
+            ? "Accès actif, marge à surveiller"
+            : "Essai en cours, marge bientôt réduite";
+        }
+
+        if (usage.hasUsage) {
+          return "Activité suivie sur la période courante";
+        }
+
+        return "Le suivi d'usage démarre avec le premier devoir";
+      },
+      usageBody: (
+        usage: StudentDashboardUsageSnapshot,
+        trialEndsAtLabel: string | null,
+      ) => {
+        if (!usage.quota.trialStartedAt && usage.quota.planKind === "trial") {
+          return "L'essai gratuit commencera avec le premier devoir enregistré.";
+        }
+
+        if (usage.quota.blockReason === "trial_window_expired") {
+          return "La période d'essai est terminée. Le prochain devoir dépend maintenant d'un abonnement payeur actif.";
+        }
+
+        if (usage.quota.blockReason === "sessions") {
+          return "La limite de sessions de cette période est atteinte.";
+        }
+
+        if (usage.quota.blockReason === "uploads") {
+          return "La limite d'uploads de cette période est atteinte.";
+        }
+
+        if (usage.quota.blockReason === "assistant_messages") {
+          return "La limite de messages IA de cette période est atteinte.";
+        }
+
+        if (
+          usage.quota.blockReason === "input_tokens" ||
+          usage.quota.blockReason === "output_tokens"
+        ) {
+          return "Le budget IA de cette période est atteint.";
+        }
+
+        if (usage.quota.planKind === "paid") {
+          return usage.quota.subscriptionStatus === "past_due"
+            ? "Le plan Family reste actif pour l'instant, mais la facturation parent demande une vérification."
+            : "Le compte travaille sur un accès Family actif piloté par un adulte payeur.";
+        }
+
+        if (trialEndsAtLabel) {
+          return `Essai actif jusqu'au ${trialEndsAtLabel}.`;
+        }
+
+        return "Le premier devoir fixera la date d'essai et la première période d'usage.";
+      },
+      usedNoLimit: (usedLabel: string) => `${usedLabel} utilisés`,
+    },
+    en: {
+      adultFrameEyebrow: "Adult frame",
+      approvalRequired: "Parent required",
+      approvalOptional: "Parent optional",
+      activeParents: (count: number) => `${count} active parent`,
+      activeTutors: (count: number) => `${count} active tutor`,
+      pendingParents: (count: number) => `${count} pending parent`,
+      pendingTutors: (count: number) => `${count} pending tutor`,
+      supervisionState: "Supervision state",
+      supervisionApproved: (dateLabel: string) =>
+        `Latest parent approval recorded on ${dateLabel}.`,
+      supervisionMissing: "No active parent approval is recorded yet.",
+      supervisionOptionalBody:
+        "The account can move forward without mandatory parent approval.",
+      usageEyebrow: "Usage",
+      paidPlan: "Family plan",
+      trialPlan: "Free trial",
+      available: "Available",
+      warning: "Watch closely",
+      blocked: "Blocked",
+      trialUntil: (dateLabel: string) => `Trial until ${dateLabel}`,
+      cards: {
+        sessions: "Sessions",
+        uploads: "Uploads",
+        assistantMessages: "AI messages",
+      },
+      remaining: "Remaining",
+      inputTokens: "Input tokens",
+      outputTokens: "Output tokens",
+      supportHeadline: (support: StudentDashboardSupportSnapshot) => {
+        if (support.isUnder13) {
+          if (support.parentApprovedAt || support.parentLinks.active > 0) {
+            return "Parent supervision active";
+          }
+
+          return "Parent approval pending";
+        }
+
+        if (support.tutorLinks.active > 0) {
+          return "Adult support connected";
+        }
+
+        return "No linked adult yet";
+      },
+      usageHeadline: (usage: StudentDashboardUsageSnapshot) => {
+        if (usage.quota.accessState === "blocked") {
+          return "Trial or quota reached";
+        }
+
+        if (usage.quota.accessState === "warning") {
+          return usage.quota.planKind === "paid"
+            ? "Access active, margin to watch"
+            : "Trial active, margin shrinking soon";
+        }
+
+        if (usage.hasUsage) {
+          return "Usage tracked in the current window";
+        }
+
+        return "Usage tracking starts with the first homework";
+      },
+      usageBody: (
+        usage: StudentDashboardUsageSnapshot,
+        trialEndsAtLabel: string | null,
+      ) => {
+        if (!usage.quota.trialStartedAt && usage.quota.planKind === "trial") {
+          return "The free trial will start with the first recorded homework.";
+        }
+
+        if (usage.quota.blockReason === "trial_window_expired") {
+          return "The trial window is over. The next homework now depends on an active payer subscription.";
+        }
+
+        if (usage.quota.blockReason === "sessions") {
+          return "The session limit for this period has been reached.";
+        }
+
+        if (usage.quota.blockReason === "uploads") {
+          return "The upload limit for this period has been reached.";
+        }
+
+        if (usage.quota.blockReason === "assistant_messages") {
+          return "The AI-message limit for this period has been reached.";
+        }
+
+        if (
+          usage.quota.blockReason === "input_tokens" ||
+          usage.quota.blockReason === "output_tokens"
+        ) {
+          return "The AI budget for this period has been reached.";
+        }
+
+        if (usage.quota.planKind === "paid") {
+          return usage.quota.subscriptionStatus === "past_due"
+            ? "The Family plan is still active for now, but the parent billing state needs review."
+            : "The account is working under an active Family access controlled by a paying adult.";
+        }
+
+        if (trialEndsAtLabel) {
+          return `Trial active until ${trialEndsAtLabel}.`;
+        }
+
+        return "The first homework will set both the trial date and the first usage window.";
+      },
+      usedNoLimit: (usedLabel: string) => `${usedLabel} used`,
+    },
+    zh: {
+      adultFrameEyebrow: "成人框架",
+      approvalRequired: "需要家長",
+      approvalOptional: "家長可選",
+      activeParents: (count: number) => `${count} 位啟用中的家長`,
+      activeTutors: (count: number) => `${count} 位啟用中的家教`,
+      pendingParents: (count: number) => `${count} 位待處理家長`,
+      pendingTutors: (count: number) => `${count} 位待處理家教`,
+      supervisionState: "監督狀態",
+      supervisionApproved: (dateLabel: string) =>
+        `最近一次家長核准記錄於 ${dateLabel}。`,
+      supervisionMissing: "目前還沒有已啟用的家長核准記錄。",
+      supervisionOptionalBody: "此帳號可以在沒有強制家長核准的情況下繼續。",
+      usageEyebrow: "使用量",
+      paidPlan: "Family 方案",
+      trialPlan: "免費試用",
+      available: "可用",
+      warning: "需留意",
+      blocked: "受阻",
+      trialUntil: (dateLabel: string) => `試用至 ${dateLabel}`,
+      cards: {
+        sessions: "課程",
+        uploads: "上傳",
+        assistantMessages: "AI 訊息",
+      },
+      remaining: "剩餘",
+      inputTokens: "輸入 tokens",
+      outputTokens: "輸出 tokens",
+      supportHeadline: (support: StudentDashboardSupportSnapshot) => {
+        if (support.isUnder13) {
+          if (support.parentApprovedAt || support.parentLinks.active > 0) {
+            return "家長監督已啟用";
+          }
+
+          return "等待家長核准";
+        }
+
+        if (support.tutorLinks.active > 0) {
+          return "成人支持已連接";
+        }
+
+        return "目前沒有已連結的成人";
+      },
+      usageHeadline: (usage: StudentDashboardUsageSnapshot) => {
+        if (usage.quota.accessState === "blocked") {
+          return "已達試用或額度上限";
+        }
+
+        if (usage.quota.accessState === "warning") {
+          return usage.quota.planKind === "paid"
+            ? "存取仍可用，但需留意餘量"
+            : "試用進行中，餘量即將變少";
+        }
+
+        if (usage.hasUsage) {
+          return "目前期間的使用量已在追蹤";
+        }
+
+        return "第一次作業開始後才會啟用使用量追蹤";
+      },
+      usageBody: (
+        usage: StudentDashboardUsageSnapshot,
+        trialEndsAtLabel: string | null,
+      ) => {
+        if (!usage.quota.trialStartedAt && usage.quota.planKind === "trial") {
+          return "免費試用會在第一份已記錄作業時開始。";
+        }
+
+        if (usage.quota.blockReason === "trial_window_expired") {
+          return "試用期間已結束。下一份作業現在取決於是否有啟用中的付費訂閱。";
+        }
+
+        if (usage.quota.blockReason === "sessions") {
+          return "本期間的課程上限已達成。";
+        }
+
+        if (usage.quota.blockReason === "uploads") {
+          return "本期間的上傳上限已達成。";
+        }
+
+        if (usage.quota.blockReason === "assistant_messages") {
+          return "本期間的 AI 訊息上限已達成。";
+        }
+
+        if (
+          usage.quota.blockReason === "input_tokens" ||
+          usage.quota.blockReason === "output_tokens"
+        ) {
+          return "本期間的 AI 預算已用完。";
+        }
+
+        if (usage.quota.planKind === "paid") {
+          return usage.quota.subscriptionStatus === "past_due"
+            ? "Family 方案目前仍可用，但家長端帳務狀態需要檢查。"
+            : "此帳號正在使用由付費成人管理的 Family 權限。";
+        }
+
+        if (trialEndsAtLabel) {
+          return `試用將持續到 ${trialEndsAtLabel}。`;
+        }
+
+        return "第一份作業會決定試用日期與第一個使用期間。";
+      },
+      usedNoLimit: (usedLabel: string) => `已使用 ${usedLabel}`,
+    },
+  });
+}
+
+export function getStudentDashboardActionsCopy(languageCode: UiLanguageCode) {
+  return pickLocalizedValue(languageCode, {
+    fr: {
+      eyebrow: "Actions adultes",
+      titleUnder13: "Activer puis maintenir la supervision parentale",
+      titleDefault: "Ajouter un adulte de confiance autour du compte",
+      bodyUnder13:
+        "Tant que l'approbation parentale n'est pas active, le prochain devoir reste bloqué. Cette zone garde le flux d'invitation traçable à portée de main.",
+      bodyDefault:
+        "Le compte peut déjà travailler seul, mais un parent ou un tuteur lié donnera plus de contexte et de suivi quand les surfaces A5 arriveront.",
+    },
+    en: {
+      eyebrow: "Adult actions",
+      titleUnder13: "Activate and maintain parent supervision",
+      titleDefault: "Add a trusted adult around the account",
+      bodyUnder13:
+        "As long as parent approval is not active, the next homework stays blocked. This area keeps the traceable invitation flow close at hand.",
+      bodyDefault:
+        "The account can already work alone, but a linked parent or tutor will add more context and follow-up as the adult surfaces mature.",
+    },
+    zh: {
+      eyebrow: "成人操作",
+      titleUnder13: "啟用並維持家長監督",
+      titleDefault: "為這個帳號加入可信任的大人",
+      bodyUnder13:
+        "在家長核准啟用前，下一份作業仍會被阻擋。這一區會把可追蹤的邀請流程放在手邊。",
+      bodyDefault:
+        "帳號已能獨立使用，但若連結家長或家教，後續就能得到更多上下文與追蹤。",
+    },
+  });
+}
+
+export function getMemoryPanelCopy(languageCode: UiLanguageCode) {
+  return pickLocalizedValue(languageCode, {
+    fr: {
+      eyebrow: "Mémoire pédagogique",
+      summaries: {
+        strength: "Forces",
+        weakness: "Fragilités",
+        preference: "Préférences",
+      },
+      emptySummaries: {
+        strength: "Aucune force durable enregistrée.",
+        weakness: "Aucune fragilité durable enregistrée.",
+        preference: "Aucune préférence durable enregistrée.",
+      },
+      errorFallback: "Impossible de mettre à jour la mémoire pédagogique.",
+      success: {
+        updated: "Mémoire mise à jour.",
+        created: "Mémoire ajoutée.",
+        deleted: "Mémoire retirée.",
+      },
+      form: {
+        edit: "Modifier une mémoire",
+        add: "Ajouter une mémoire",
+        cancel: "Annuler",
+        category: "Catégorie",
+        title: "Titre",
+        detail: "Détail",
+        titlePlaceholder: "ex. Fractions avec schéma",
+        detailPlaceholder:
+          "Garde une formulation strictement pédagogique et concrète.",
+        pending: "Enregistrement...",
+        update: "Mettre à jour",
+        create: "Ajouter",
+        note:
+          "Les souvenirs doivent rester utiles à l'apprentissage. Les données sensibles ou spéculatives sont refusées.",
+      },
+      categories: {
+        strength: "Forces",
+        weakness: "Fragilités",
+        preference: "Préférences",
+        topic: "Sujets récurrents",
+        learning_note: "Notes d'apprentissage",
+      },
+      activeItems: (count: number) => `${count} élément(s) actif(s)`,
+      confidence: (label: string) => `Confiance ${label}`,
+      expiry: (dateLabel: string) => `Échéance ${dateLabel}`,
+      edit: "Modifier",
+      delete: "Supprimer",
+      empty: "Aucune mémoire pédagogique active pour le moment.",
+    },
+    en: {
+      eyebrow: "Pedagogical memory",
+      summaries: {
+        strength: "Strengths",
+        weakness: "Weaknesses",
+        preference: "Preferences",
+      },
+      emptySummaries: {
+        strength: "No durable strength recorded yet.",
+        weakness: "No durable weakness recorded yet.",
+        preference: "No durable preference recorded yet.",
+      },
+      errorFallback: "Unable to update pedagogical memory.",
+      success: {
+        updated: "Memory updated.",
+        created: "Memory added.",
+        deleted: "Memory removed.",
+      },
+      form: {
+        edit: "Edit a memory",
+        add: "Add a memory",
+        cancel: "Cancel",
+        category: "Category",
+        title: "Title",
+        detail: "Detail",
+        titlePlaceholder: "e.g. Fractions with diagram",
+        detailPlaceholder:
+          "Keep the wording strictly pedagogical and concrete.",
+        pending: "Saving...",
+        update: "Update",
+        create: "Add",
+        note:
+          "Memories must stay useful for learning. Sensitive or speculative data is rejected.",
+      },
+      categories: {
+        strength: "Strengths",
+        weakness: "Weaknesses",
+        preference: "Preferences",
+        topic: "Recurring topics",
+        learning_note: "Learning notes",
+      },
+      activeItems: (count: number) => `${count} active item(s)`,
+      confidence: (label: string) => `Confidence ${label}`,
+      expiry: (dateLabel: string) => `Expires ${dateLabel}`,
+      edit: "Edit",
+      delete: "Delete",
+      empty: "No active pedagogical memory at the moment.",
+    },
+    zh: {
+      eyebrow: "教學記憶",
+      summaries: {
+        strength: "優勢",
+        weakness: "脆弱點",
+        preference: "偏好",
+      },
+      emptySummaries: {
+        strength: "目前沒有已記錄的長期優勢。",
+        weakness: "目前沒有已記錄的長期脆弱點。",
+        preference: "目前沒有已記錄的長期偏好。",
+      },
+      errorFallback: "無法更新教學記憶。",
+      success: {
+        updated: "教學記憶已更新。",
+        created: "教學記憶已新增。",
+        deleted: "教學記憶已移除。",
+      },
+      form: {
+        edit: "編輯記憶",
+        add: "新增記憶",
+        cancel: "取消",
+        category: "類別",
+        title: "標題",
+        detail: "細節",
+        titlePlaceholder: "例如：用圖示理解分數",
+        detailPlaceholder: "描述要維持教學性、具體且可操作。",
+        pending: "儲存中...",
+        update: "更新",
+        create: "新增",
+        note: "記憶內容必須對學習有用。敏感或推測性資料會被拒絕。",
+      },
+      categories: {
+        strength: "優勢",
+        weakness: "脆弱點",
+        preference: "偏好",
+        topic: "反覆出現主題",
+        learning_note: "學習筆記",
+      },
+      activeItems: (count: number) => `${count} 個啟用中的項目`,
+      confidence: (label: string) => `信心度 ${label}`,
+      expiry: (dateLabel: string) => `到期日 ${dateLabel}`,
+      edit: "編輯",
+      delete: "刪除",
+      empty: "目前沒有啟用中的教學記憶。",
+    },
+  });
+}
+
+export function getMemoryCategoryLabel(
+  category: MemoryCategory,
+  languageCode: UiLanguageCode,
+) {
+  return getMemoryPanelCopy(languageCode).categories[category];
+}
+
+export function getMemoryServerCopy(languageCode: UiLanguageCode) {
+  return pickLocalizedValue(languageCode, {
+    fr: {
+      expectedObject: "Le corps JSON doit être un objet.",
+      invalidJson: "Corps JSON invalide.",
+      invalidFields: "Un ou plusieurs champs sont invalides.",
+      sensitiveText:
+        "Les contenus mémoire sensibles ou spéculatifs ne sont pas autorisés.",
+      notFound: "Ressource introuvable.",
+      noAccess: "Tu n'as pas accès à cette action.",
+      activeLimitReached:
+        "La limite de mémoires actives est déjà atteinte pour cet élève.",
+      itemNotFound: "Mémoire introuvable.",
+      fieldErrors: {
+        category: "Choisis une catégorie de mémoire valide.",
+        titleRequired:
+          "Le titre est requis et doit contenir 120 caractères ou moins.",
+        titleSensitive:
+          "Garde les mémoires strictement pédagogiques et non sensibles.",
+        detailText: "Le détail doit être du texte.",
+        detailLength: "Le détail doit contenir 320 caractères ou moins.",
+        detailSensitive:
+          "Garde les mémoires strictement pédagogiques et non sensibles.",
+        itemId: "Un UUID valide est requis.",
+        action: "Action attendue : 'upsert' ou 'delete'.",
+      },
+      service: {
+        updateProfile:
+          "Impossible de mettre à jour le profil de mémoire élève.",
+        verifyLimit:
+          "Impossible de vérifier la limite d'éléments mémoire.",
+        loadItem: "Impossible de charger cette mémoire.",
+        updateItem: "Impossible de mettre à jour cette mémoire.",
+        createItem: "Impossible de créer cette mémoire.",
+        deleteItem: "Impossible de supprimer cette mémoire.",
+      },
+    },
+    en: {
+      expectedObject: "The JSON body must be an object.",
+      invalidJson: "Invalid JSON body.",
+      invalidFields: "One or more fields are invalid.",
+      sensitiveText:
+        "Sensitive or speculative memory text is not allowed.",
+      notFound: "Resource not found.",
+      noAccess: "You do not have access to this action.",
+      activeLimitReached:
+        "The active memory limit is already reached for this student.",
+      itemNotFound: "Memory item not found.",
+      fieldErrors: {
+        category: "Choose a valid memory category.",
+        titleRequired:
+          "Title is required and must be 120 characters or fewer.",
+        titleSensitive:
+          "Keep memory items strictly educational and non-sensitive.",
+        detailText: "Detail must be text.",
+        detailLength: "Detail must be 320 characters or fewer.",
+        detailSensitive:
+          "Keep memory items strictly educational and non-sensitive.",
+        itemId: "A valid UUID is required.",
+        action: "Expected 'upsert' or 'delete'.",
+      },
+      service: {
+        updateProfile: "Unable to update the student memory profile.",
+        verifyLimit: "Unable to verify the memory item limit.",
+        loadItem: "Unable to load the memory item.",
+        updateItem: "Unable to update the memory item.",
+        createItem: "Unable to create the memory item.",
+        deleteItem: "Unable to delete the memory item.",
+      },
+    },
+    zh: {
+      expectedObject: "JSON 內容必須是物件。",
+      invalidJson: "JSON 內容無效。",
+      invalidFields: "一個或多個欄位無效。",
+      sensitiveText: "不允許敏感或推測性的記憶內容。",
+      notFound: "找不到資源。",
+      noAccess: "你沒有權限執行這個操作。",
+      activeLimitReached: "這位學生的啟用記憶數量已達上限。",
+      itemNotFound: "找不到記憶項目。",
+      fieldErrors: {
+        category: "請選擇有效的記憶類別。",
+        titleRequired: "標題為必填，且不得超過 120 個字元。",
+        titleSensitive: "記憶內容必須保持教學用途且不可敏感。",
+        detailText: "細節必須是文字。",
+        detailLength: "細節不得超過 320 個字元。",
+        detailSensitive: "記憶內容必須保持教學用途且不可敏感。",
+        itemId: "必須提供有效的 UUID。",
+        action: "動作必須是 'upsert' 或 'delete'。",
+      },
+      service: {
+        updateProfile: "無法更新學生記憶摘要。",
+        verifyLimit: "無法檢查記憶項目上限。",
+        loadItem: "無法載入這個記憶項目。",
+        updateItem: "無法更新這個記憶項目。",
+        createItem: "無法建立這個記憶項目。",
+        deleteItem: "無法刪除這個記憶項目。",
+      },
+    },
+  });
+}
+
+export function getMemoryFallbackGeneratedCopy(languageCode: "fr" | "en") {
+  return languageCode === "en"
+    ? {
+        topicDetail: "Topic recovered from a recent completed session.",
+        weaknessDetail: "Still-fragile point seen in the recent session.",
+        preferenceTitle: "Prefers help in English",
+        preferenceDetail:
+          "Explicit preference inferred from the account AI-help setting.",
+      }
+    : {
+        topicDetail: "Sujet retrouvé dans une session terminée récente.",
+        weaknessDetail: "Point encore fragile dans la session récente.",
+        preferenceTitle: "Aide en français",
+        preferenceDetail:
+          "Préférence explicite dérivée du réglage d'aide IA du compte.",
+      };
+}
+
+export function getParentApprovalRequestFormCopy(languageCode: UiLanguageCode) {
+  return pickLocalizedValue(languageCode, {
+    fr: {
+      errorFallback: "Impossible de préparer le lien d'approbation parentale.",
+      title: "Demander l'approbation parentale",
+      body:
+        "Crée un lien d'invitation parent. En attendant un vrai service d'envoi, le lien peut être copié puis partagé manuellement.",
+      fields: {
+        parentEmail: "Email du parent ou tuteur légal",
+        relationshipLabel: "Étiquette de relation",
+      },
+      relationshipPlaceholder: "Parent",
+      buttons: {
+        pending: "Préparation...",
+        submit: "Générer le lien parent",
+        copy: "Copier le lien",
+      },
+      successBody:
+        "Lien prêt. Partage-le avec le parent pour qu'il crée ou connecte son compte, puis accepte l'invitation.",
+    },
+    en: {
+      errorFallback: "Unable to prepare the parent-approval link.",
+      title: "Request parent approval",
+      body:
+        "Create a parent invitation link. Until a real delivery service exists, the link can be copied and shared manually.",
+      fields: {
+        parentEmail: "Parent or legal guardian email",
+        relationshipLabel: "Relationship label",
+      },
+      relationshipPlaceholder: "Parent",
+      buttons: {
+        pending: "Preparing...",
+        submit: "Generate parent link",
+        copy: "Copy link",
+      },
+      successBody:
+        "Link ready. Share it with the parent so they can create or sign in to their account, then accept the invitation.",
+    },
+    zh: {
+      errorFallback: "無法準備家長核准連結。",
+      title: "要求家長核准",
+      body:
+        "建立家長邀請連結。在真正的寄送服務完成前，這個連結可先複製並手動分享。",
+      fields: {
+        parentEmail: "家長或法定監護人 email",
+        relationshipLabel: "關係標籤",
+      },
+      relationshipPlaceholder: "家長",
+      buttons: {
+        pending: "準備中...",
+        submit: "產生家長連結",
+        copy: "複製連結",
+      },
+      successBody:
+        "連結已準備好。請分享給家長，讓對方建立或登入帳號後接受邀請。",
+    },
+  });
+}
+
+export function getTutorInviteFormCopy(languageCode: UiLanguageCode) {
+  return pickLocalizedValue(languageCode, {
+    fr: {
+      errorFallback: "Impossible de préparer le lien tuteur.",
+      title: "Inviter un tuteur",
+      body:
+        "Ce flux crée un lien de tutorat traçable. Pour l'instant, le lien est partagé manuellement plutôt qu'envoyé par email depuis le produit.",
+      tutorEmail: "Email du tuteur",
+      buttons: {
+        pending: "Préparation...",
+        submit: "Générer le lien tuteur",
+        copy: "Copier le lien",
+      },
+      successBody:
+        "Lien prêt. Le tuteur devra créer ou connecter son compte, terminer son onboarding si besoin, puis accepter l'invitation.",
+    },
+    en: {
+      errorFallback: "Unable to prepare the tutor link.",
+      title: "Invite a tutor",
+      body:
+        "This flow creates a traceable tutoring link. For now, the link is shared manually instead of being emailed by the product.",
+      tutorEmail: "Tutor email",
+      buttons: {
+        pending: "Preparing...",
+        submit: "Generate tutor link",
+        copy: "Copy link",
+      },
+      successBody:
+        "Link ready. The tutor must create or sign in to an account, finish onboarding if needed, then accept the invitation.",
+    },
+    zh: {
+      errorFallback: "無法準備家教連結。",
+      title: "邀請家教",
+      body:
+        "這個流程會建立可追蹤的家教連結。目前仍以手動分享連結為主，而不是由產品直接寄信。",
+      tutorEmail: "家教 email",
+      buttons: {
+        pending: "準備中...",
+        submit: "產生家教連結",
+        copy: "複製連結",
+      },
+      successBody:
+        "連結已準備好。家教需要先建立或登入帳號，必要時完成 onboarding，之後再接受邀請。",
+    },
+  });
+}
+
+export function getParentDashboardCopy(languageCode: UiLanguageCode) {
+  return pickLocalizedValue(languageCode, {
+    fr: {
+      overview: {
+        supervision: "Supervision",
+        quotas: "Quotas",
+        billing: "Facturation",
+        linkedStudents: (count: number) => `${count} élève(s) lié(s)`,
+        blockedStudents: (count: number) => `${count} élève(s) bloqué(s)`,
+        blockedBody: (count: number) =>
+          `${count} élève(s) demandent un suivi rapide avant le prochain blocage d'essai ou de budget.`,
+        supervisionBody:
+          "Le dashboard parent sert maintenant de point d'entrée aux suivis élève et aux sessions consultées en lecture seule.",
+        billingVisible: "Statut visible",
+        billingMissing: "Pas encore liée",
+        manage: "Reprendre la gestion",
+        activate: "Activer Family",
+        portal: "Portail billing",
+      },
+      noSubscription: "Aucun abonnement payeur enregistré pour ce compte parent.",
+      unknown: "inconnu",
+      quota: {
+        blocked: "Quota bloqué",
+        warning: "Quota à surveiller",
+        paid: "Accès Family",
+        trial: "Essai actif",
+      },
+      linkedStudents: {
+        eyebrow: "Élèves liés",
+        body:
+          "Chaque fiche mène vers la vue parent détaillée, puis vers les sessions individuelles avec résumé traduit si disponible.",
+        empty: "Aucun élève lié pour l'instant.",
+        under13: "Moins de 13 ans",
+        followUp: "Ouvrir le suivi",
+        interfaceUsage: (lang: string, count: number, limit: number | null) =>
+          `Interface ${lang} | sessions ${count}/${limit ?? "?"}`,
+      },
+      weekly: {
+        eyebrow: "Résumé hebdomadaire",
+        window: (start: string | null, end: string | null) =>
+          `Fenêtre ${start ?? "?"} -> ${end ?? "?"}`,
+        empty: "Aucune activité terminée cette semaine.",
+        sessions: (count: number) => `${count} session(s)`,
+        noSummary: "Aucun résumé parent récent.",
+        nextStep: (value: string) => `Prochaine étape : ${value}`,
+      },
+      recent: {
+        eyebrow: "Sessions récentes",
+        body:
+          "Cette liste traverse tous les élèves liés et mène directement vers la relecture parent en lecture seule.",
+        empty: "Aucune session visible pour l'instant.",
+        noRecommendation:
+          "Aucune recommandation parent n'est encore disponible.",
+        noDate: "Date indisponible",
+        open: "Ouvrir",
+      },
+    },
+    en: {
+      overview: {
+        supervision: "Oversight",
+        quotas: "Quotas",
+        billing: "Billing",
+        linkedStudents: (count: number) => `${count} linked student(s)`,
+        blockedStudents: (count: number) => `${count} blocked student(s)`,
+        blockedBody: (count: number) =>
+          `${count} student(s) need close follow-up before the next trial or budget block.`,
+        supervisionBody:
+          "The parent dashboard is now the entry point for student follow-up and read-only session review.",
+        billingVisible: "Status visible",
+        billingMissing: "Not linked yet",
+        manage: "Resume management",
+        activate: "Activate Family",
+        portal: "Billing portal",
+      },
+      noSubscription: "No payer subscription recorded for this parent account.",
+      unknown: "unknown",
+      quota: {
+        blocked: "Quota blocked",
+        warning: "Quota to watch",
+        paid: "Family access",
+        trial: "Trial active",
+      },
+      linkedStudents: {
+        eyebrow: "Linked students",
+        body:
+          "Each card leads to the detailed parent view, then to individual sessions with translated summaries when available.",
+        empty: "No linked student yet.",
+        under13: "Under 13",
+        followUp: "Open follow-up",
+        interfaceUsage: (lang: string, count: number, limit: number | null) =>
+          `Interface ${lang} | sessions ${count}/${limit ?? "?"}`,
+      },
+      weekly: {
+        eyebrow: "Weekly summary",
+        window: (start: string | null, end: string | null) =>
+          `Window ${start ?? "?"} -> ${end ?? "?"}`,
+        empty: "No completed activity this week.",
+        sessions: (count: number) => `${count} session(s)`,
+        noSummary: "No recent parent summary.",
+        nextStep: (value: string) => `Next step: ${value}`,
+      },
+      recent: {
+        eyebrow: "Recent sessions",
+        body:
+          "This list spans all linked students and goes straight to the read-only parent review.",
+        empty: "No visible session yet.",
+        noRecommendation: "No parent recommendation is available yet.",
+        noDate: "Date unavailable",
+        open: "Open",
+      },
+    },
+    zh: {
+      overview: {
+        supervision: "監督",
+        quotas: "額度",
+        billing: "付費",
+        linkedStudents: (count: number) => `${count} 位已連結學生`,
+        blockedStudents: (count: number) => `${count} 位受阻學生`,
+        blockedBody: (count: number) =>
+          `${count} 位學生需要盡快跟進，避免下一次試用或預算阻擋。`,
+        supervisionBody:
+          "家長 dashboard 現在是學生追蹤與唯讀課程檢視的主要入口。",
+        billingVisible: "狀態可見",
+        billingMissing: "尚未連結",
+        manage: "繼續管理",
+        activate: "啟用 Family",
+        portal: "帳務入口",
+      },
+      noSubscription: "此家長帳號尚未記錄付費訂閱。",
+      unknown: "未知",
+      quota: {
+        blocked: "額度受阻",
+        warning: "額度需留意",
+        paid: "Family 權限",
+        trial: "試用中",
+      },
+      linkedStudents: {
+        eyebrow: "已連結學生",
+        body:
+          "每張卡片都會通往家長詳細檢視，再進入個別課程與可用的翻譯摘要。",
+        empty: "目前還沒有已連結學生。",
+        under13: "13 歲以下",
+        followUp: "打開追蹤",
+        interfaceUsage: (lang: string, count: number, limit: number | null) =>
+          `介面 ${lang} | 課程 ${count}/${limit ?? "?"}`,
+      },
+      weekly: {
+        eyebrow: "每週摘要",
+        window: (start: string | null, end: string | null) =>
+          `區間 ${start ?? "?"} -> ${end ?? "?"}`,
+        empty: "本週沒有已完成活動。",
+        sessions: (count: number) => `${count} 個課程`,
+        noSummary: "沒有最近的家長摘要。",
+        nextStep: (value: string) => `下一步：${value}`,
+      },
+      recent: {
+        eyebrow: "最近課程",
+        body: "這份列表橫跨所有已連結學生，並直接通往家長唯讀檢視。",
+        empty: "目前沒有可見課程。",
+        noRecommendation: "目前還沒有家長建議。",
+        noDate: "日期不可用",
+        open: "打開",
+      },
+    },
+  });
+}
+
+export function getTutorDashboardCopy(languageCode: UiLanguageCode) {
+  return pickLocalizedValue(languageCode, {
+    fr: {
+      overview: {
+        links: "Liens",
+        sessions: "Sessions",
+        notes: "Notes",
+        linkedStudents: (count: number) => `${count} élève(s) suivi(s)`,
+        recentSessions: (count: number) => `${count} session(s) récente(s)`,
+        notesTitle: "Notes privées actives",
+        linksBody:
+          "Les invitations tuteur débouchent maintenant sur un vrai suivi élève et sur des notes privées persistantes.",
+        sessionsBody:
+          "Les synthèses tuteur et leurs tags faibles deviennent la vue d'entrée pédagogique.",
+        notesBody:
+          "Les notes restent invisibles pour l'élève et le parent, avec audit à chaque mutation.",
+      },
+      linkedStudents: {
+        eyebrow: "Élèves liés",
+        body:
+          "Chaque fiche mène vers le détail élève avec vues de sessions, tags faibles et notes privées.",
+        empty: "Aucun élève lié pour l'instant.",
+        sessions: (count: number) => `${count} session(s)`,
+        notes: (count: number) => `${count} note(s)`,
+        noWeakness: "Aucun tag faible consolidé.",
+        open: "Ouvrir le suivi",
+      },
+      review: {
+        eyebrow: "Sessions à revoir",
+        body:
+          "Les sessions récentes remontent avec les insights tuteur déjà disponibles.",
+        empty: "Aucune session récente visible.",
+        noRecommendation: "Aucune recommandation tuteur disponible.",
+        noDate: "Date indisponible",
+      },
+      recent: {
+        eyebrow: "Sessions récentes",
+        body:
+          "Cette liste traverse tous les élèves liés et mène vers la relecture tuteur et les notes de séance.",
+        empty: "Aucune session visible pour l'instant.",
+        noSummary:
+          "Aucune synthèse tuteur n'est encore disponible pour cette session.",
+        noDate: "Date indisponible",
+        open: "Ouvrir",
+      },
+    },
+    en: {
+      overview: {
+        links: "Links",
+        sessions: "Sessions",
+        notes: "Notes",
+        linkedStudents: (count: number) => `${count} followed student(s)`,
+        recentSessions: (count: number) => `${count} recent session(s)`,
+        notesTitle: "Active private notes",
+        linksBody:
+          "Tutor invitations now lead to real student follow-up and persistent private notes.",
+        sessionsBody:
+          "Tutor summaries and weakness tags are becoming the pedagogical entry view.",
+        notesBody:
+          "Notes stay invisible to the student and parent, with audits on every mutation.",
+      },
+      linkedStudents: {
+        eyebrow: "Linked students",
+        body:
+          "Each card leads to the student detail with session views, weakness tags, and private notes.",
+        empty: "No linked student yet.",
+        sessions: (count: number) => `${count} session(s)`,
+        notes: (count: number) => `${count} note(s)`,
+        noWeakness: "No consolidated weakness tag.",
+        open: "Open follow-up",
+      },
+      review: {
+        eyebrow: "Sessions to review",
+        body:
+          "Recent sessions surface with the tutor insights already available.",
+        empty: "No recent session visible.",
+        noRecommendation: "No tutor recommendation available.",
+        noDate: "Date unavailable",
+      },
+      recent: {
+        eyebrow: "Recent sessions",
+        body:
+          "This list spans all linked students and leads to tutor review plus session notes.",
+        empty: "No visible session yet.",
+        noSummary: "No tutor summary is available for this session yet.",
+        noDate: "Date unavailable",
+        open: "Open",
+      },
+    },
+    zh: {
+      overview: {
+        links: "連結",
+        sessions: "課程",
+        notes: "筆記",
+        linkedStudents: (count: number) => `${count} 位追蹤中的學生`,
+        recentSessions: (count: number) => `${count} 個最近課程`,
+        notesTitle: "啟用中的私人筆記",
+        linksBody:
+          "家教邀請現在已接上真正的學生追蹤流程與持久化私人筆記。",
+        sessionsBody: "家教摘要與弱點標籤正逐步成為教學入口視圖。",
+        notesBody:
+          "筆記對學生與家長都不可見，而且每次變更都會留下稽核。",
+      },
+      linkedStudents: {
+        eyebrow: "已連結學生",
+        body:
+          "每張卡片都會通往學生詳情，包含課程檢視、弱點標籤與私人筆記。",
+        empty: "目前還沒有已連結學生。",
+        sessions: (count: number) => `${count} 個課程`,
+        notes: (count: number) => `${count} 則筆記`,
+        noWeakness: "還沒有彙整出的弱點標籤。",
+        open: "打開追蹤",
+      },
+      review: {
+        eyebrow: "待複查課程",
+        body: "最近課程會連同目前已有的家教洞察一起出現。",
+        empty: "目前沒有可見的最近課程。",
+        noRecommendation: "目前沒有家教建議。",
+        noDate: "日期不可用",
+      },
+      recent: {
+        eyebrow: "最近課程",
+        body:
+          "這份列表橫跨所有已連結學生，並通往家教檢視與課程筆記。",
+        empty: "目前沒有可見課程。",
+        noSummary: "這個課程目前還沒有家教摘要。",
+        noDate: "日期不可用",
+        open: "打開",
+      },
+    },
+  });
+}
+
+export function getAdminDashboardCopy(languageCode: UiLanguageCode) {
+  return pickLocalizedValue(languageCode, {
+    fr: {
+      overview: {
+        operations: "Opérations",
+        volume: "Volume",
+        route: "Route",
+        auditTitle: "Audit sensible",
+        volumeTitle: (count: number) => `${count} événement(s)`,
+        routeTitle: "/app/audit",
+        auditBody:
+          "Les lectures parent/tuteur et les mutations de notes privées sont maintenant regroupées dans une vue admin dédiée.",
+        volumeBody:
+          "Le flux actuel couvre les ouvertures de session adulte et les notes privées tuteur.",
+        routeBody:
+          "Surface admin initiale pour revue de confiance et support.",
+      },
+      ops: {
+        eyebrow: "Ops",
+        title:
+          "Le shell admin pointe maintenant vers une vraie revue des accès sensibles.",
+        body:
+          "Cette étape ne couvre pas encore toute l'ops du produit, mais elle ferme déjà la boucle sur les accès adultes et les notes privées.",
+        support:
+          "Les prochaines surfaces admin pourront se brancher ici sans mélanger moderation, support et audit dans un panneau unique.",
+        open: "Ouvrir l'audit",
+      },
+    },
+    en: {
+      overview: {
+        operations: "Operations",
+        volume: "Volume",
+        route: "Route",
+        auditTitle: "Sensitive audit",
+        volumeTitle: (count: number) => `${count} event(s)`,
+        routeTitle: "/app/audit",
+        auditBody:
+          "Parent/tutor reads and private-note mutations are now grouped into a dedicated admin view.",
+        volumeBody:
+          "The current flow covers adult session openings and tutor private notes.",
+        routeBody: "Initial admin surface for trust review and support.",
+      },
+      ops: {
+        eyebrow: "Ops",
+        title: "The admin shell now points to a real review of sensitive access.",
+        body:
+          "This step does not cover the full product ops surface yet, but it already closes the loop on adult access and private notes.",
+        support:
+          "Future admin surfaces can plug in here without mixing moderation, support, and audit into one panel.",
+        open: "Open audit",
+      },
+    },
+    zh: {
+      overview: {
+        operations: "營運",
+        volume: "量級",
+        route: "路由",
+        auditTitle: "敏感稽核",
+        volumeTitle: (count: number) => `${count} 筆事件`,
+        routeTitle: "/app/audit",
+        auditBody:
+          "家長 / 家教讀取，以及私人筆記異動，現在都集中在專用的管理檢視中。",
+        volumeBody: "目前的流程涵蓋成人課程開啟與家教私人筆記。",
+        routeBody: "這是第一個用於信任檢視與支援的管理入口。",
+      },
+      ops: {
+        eyebrow: "Ops",
+        title: "管理 shell 現在已連到真正的敏感存取檢視。",
+        body:
+          "這一步還沒有覆蓋整個產品營運面，但已經把成人存取與私人筆記的閉環補上。",
+        support:
+          "後續管理介面可以接在這裡，而不必把 moderation、support 與 audit 混成同一個面板。",
+        open: "打開稽核",
+      },
+    },
+  });
+}

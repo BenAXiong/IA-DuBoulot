@@ -567,3 +567,153 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Add source-controlled issue templates plus a canonical labels manifest under `.github/`, and document them in `docs/github_workflow_v1.md`. Keep the task itself open until the manifest is actually applied to the GitHub repository, because the in-repo artifacts alone do not create the labels remotely.
 - Why: This preserves traceability and reviewability inside git while staying honest about the remaining external blocker.
 - Follow-up: Apply `.github/labels.json` to the GitHub repository through the UI or an authenticated automation step, then close `A0.3.6`.
+
+### D-20260311-56 - Tablet QA Uses A Repeatable Playwright Pre-Pass Without Replacing Real iPad Validation
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A7.1.1`, `A7.1.2`, `A7.1.3`
+- Context: The remaining MVP blocker is real iPad Safari validation, but the first attempt to do ad hoc local tablet emulation during an active coding session caused instability and left no reviewable QA artifact behind. The project needed a lower-risk, repeatable pre-pass that could validate the current student surfaces on tablet-sized viewports before a manual device run.
+- Decision: Add `scripts/smoke-tablet-emulation.mjs` as the canonical tablet-emulation pre-pass. The script now authenticates with the deterministic fixture student through the same SSR-cookie shape used by the other smoke scripts, starts a temporary `next start` instance from the current production build when no URL override is provided, checks `/app`, `/app/new`, and `/app/conversations/[conversationId]` in portrait and landscape tablet viewports, records screenshots, and reports horizontal-overflow plus tap-target findings. Keep real iPad Safari validation as a separate required step; this script does not close `A7.1` by itself.
+- Why: This turns tablet QA into a reviewable repo artifact, reduces dependence on a running dev server or brittle UI-login timing, and lets future sessions catch layout and touch-target regressions before spending time on manual device testing.
+- Follow-up: Log the real iPad Safari pass separately once upload, keyboard, and chat ergonomics are checked on hardware, and keep the tablet-emulation smoke focused on pre-pass layout and reachability rather than pretending to emulate Safari exactly.
+
+### D-20260311-57 - The Canonical Regression Command Reseeds Fixtures Before Verification And Smokes
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A1.4.1`, `A1.4.3`, `A7.2.3`
+- Context: `npm run regress:mvp` is documented as the canonical pre-demo regression pass, but the fixture-backed smoke scripts increment usage counters and other mutable state. Without a reseed inside the command, the regression suite becomes order-dependent and can fail on quota gates after earlier smoke runs even when the application code is unchanged.
+- Decision: Update `npm run regress:mvp` so it runs `npm run seed:rls-fixtures` after the production build and before `verify:rls-fixtures` plus the smoke suite. Keep the individual smoke scripts restoring their own mutable fixture state where reasonable, but treat the seeded fixture reset as part of the canonical regression baseline.
+- Why: The regression command should be deterministic from a dirty local fixture state, not only from a freshly reseeded manual session. Folding the reseed into the command keeps the documented acceptance gate honest and reduces hidden operator state.
+- Follow-up: Keep the fixture seed destructive only for the known deterministic fixture rows and accounts, and revisit broader smoke isolation only if future scripts still leave non-fixture state behind.
+
+### D-20260311-58 - Taiwan-First MVP Requires A Real Trilingual UI Pass, Not Locale Metadata Alone
+
+- Date: 2026-03-11
+- Status: accepted
+- Related tasks: `A7.4.4`, `A7.4.5`, `A7.4.6`
+- Context: `A2.1.6` established shared locale metadata and formatting helpers, but the current app still ships mostly hardcoded French UI copy, often with stripped accents, while the root layout still renders `lang="fr"` and the loaded fonts use Latin-only subsets. The founder also confirmed that the first real users are expected to be Taiwanese.
+- Decision: Treat the existing locale foundation as necessary but not sufficient for launch. Add launch-blocking follow-up tasks for accented French cleanup, real interface-copy localization across `fr`, `en`, and `zh`, and zh-aware verification on the tablet-critical MVP routes. Keep this UI-language requirement separate from the AI-help language scope, which remains its own product and cost decision.
+- Why: Persisting with metadata-only locale support would falsely imply the product is multilingual when the actual interface remains effectively French-only. Logging the follow-up keeps the MVP scope honest for the Taiwan-first pilot and prevents later sessions from mistaking saved language preference for real localized UX.
+- Follow-up: Introduce route or surface-level UI dictionaries, wire the document language and font fallback intentionally, localize the highest-traffic shared surfaces first, and revisit Chinese AI-help support separately if pilot demand justifies it.
+
+### D-20260312-59 - GitHub Label Sync Makes The In-Repo Manifest The Live Remote Baseline
+
+- Date: 2026-03-12
+- Status: accepted
+- Related tasks: `A0.3.6`
+- Context: `.github/labels.json` and the issue templates already existed, but the public repository still exposed only the default GitHub labels. That left the documented workflow half-real and made issue triage harder to trust.
+- Decision: Use an authenticated GitHub CLI pass to sync the public repository labels from `.github/labels.json`, removing the default GitHub labels and leaving the manifest-defined set as the live remote baseline.
+- Why: This closes the last external gap in the repo-owned GitHub workflow slice and keeps the label taxonomy reviewable in git rather than in ad hoc repository settings.
+- Follow-up: Treat `.github/labels.json` as the source of truth and reapply it if labels drift or the repository is migrated.
+
+### D-20260312-60 - Pilot Hardening Gets Its Own Backlog While MVP Keeps The Launch Gate
+
+- Date: 2026-03-12
+- Status: accepted
+- Related tasks: `A7.4.8`
+- Context: The MVP is close enough to launch-candidate status that the remaining work now splits into two different kinds: true launch blockers and broader pilot hardening around UI polish, UX smoothness, operating cadence, and release learning. Keeping all of that in one backlog would either hide launch blockers inside polish work or pressure the project to move unfinished blockers out of MVP too early.
+- Decision: Add `docs/pilot_todo.md` as the dedicated hardening backlog for the first closed real-user rollout. Keep true launch blockers in `docs/mvp_todo.md` until they are closed, introduce `P*` task IDs for pilot hardening, and update `AGENTS.md` plus the session and prompt logs to accept either `A*` or `P*` task IDs depending on the work lane. Use `Pilot` as the recommended label for the next controlled release, and reserve `Beta` for a broader external rollout after pilot evidence justifies it.
+- Why: This preserves an honest launch gate, gives polish and UX work a real audited home, and prevents future sessions from conflating controlled pilot learning with beta-scale readiness.
+- Follow-up: Only graduate work from `docs/pilot_todo.md` into beta-readiness once the closed pilot produces concrete evidence on stability, user trust, and support load.
+
+### D-20260312-61 - Trilingual MVP Copy Uses Shared Surface Dictionaries Plus Client-Side Document-Language Sync
+
+- Date: 2026-03-12
+- Status: accepted
+- Related tasks: `A7.4.4`, `A7.4.5`, `A7.4.6`
+- Context: The route layer had already started carrying `lang`, but the actual client surfaces for auth, onboarding, invite acceptance, app shell, and settings still contained hardcoded French strings. At the same time, Taiwan-first pilot readiness required real interface copy in `fr`, `en`, and `zh` without forcing a heavy i18n framework rewrite late in MVP.
+- Decision: Keep the localization architecture intentionally narrow: shared locale metadata and age-band options stay in `lib/i18n/config.ts`, route or surface dictionaries live in `lib/i18n/ui-copy.ts`, public-route `lang` helpers live in `lib/i18n/ui-language.ts`, and the shared public/app shells render `components/i18n/document-language-sync.tsx` so the browser `lang` follows the active UI language after hydration. Apply this slice first to landing, pricing, auth, onboarding, invite acceptance, app shell, app-home account copy, and settings/privacy rather than attempting an all-dashboard translation in one pass.
+- Why: This centralizes shared copy in reviewable files, keeps business logic out of translation helpers, preserves simple URL-driven language switching on public routes, and closes a meaningful part of the Taiwan-first interface gap without destabilizing the already-working role flows.
+- Follow-up: Extend the same dictionaries or presenters into the deeper student, parent, tutor, and admin dashboard bodies, finish the broader accented-French and Unicode cleanup, and run a real tablet-focused `zh` fit check before closing `A7.4.6`.
+
+### D-20260312-62 - Dashboard Localization Gets Its Own Copy Module Instead Of Growing `ui-copy.ts` Into A Catch-All
+
+- Date: 2026-03-12
+- Status: accepted
+- Related tasks: `A7.4.4`, `A7.4.5`, `A7.4.6`
+- Context: After the shared public/auth/settings localization pass, the next untranslated slice lived mostly inside the role dashboards on `/app`: student start/support/recent panels, the student memory panel, the student-side adult-link forms, and the parent/tutor/admin dashboard summaries. Folding that entire layer back into `lib/i18n/ui-copy.ts` would have turned one shared copy file into a mixed public-plus-dashboard catch-all.
+- Decision: Add `lib/i18n/dashboard-copy.ts` as the dashboard-specific dictionary module. Keep the previous shared-shell/public/auth/settings content in `lib/i18n/ui-copy.ts`, move dashboard-only copy and localized dashboard labels into the new module, and let `components/dashboard/student/student-dashboard-presenters.ts` delegate its localized labels to that layer.
+- Why: This keeps the i18n structure reviewable, prevents the shared copy layer from becoming a god file, and gives the `/app` route family a focused place to keep evolving while the remaining intake, history, detail, review, and workbench surfaces are translated later.
+- Follow-up: Reuse the same dashboard-copy layer for linked-student detail, read-only review, and other dashboard-adjacent surfaces as the remaining MVP translation pass continues.
+
+### D-20260312-63 - Student Session Routes And Adult Oversight Detail Routes Get Their Own Copy Modules
+
+- Date: 2026-03-12
+- Status: accepted
+- Related tasks: `A7.4.4`, `A7.4.5`, `A7.4.6`
+- Context: After the shared-shell pass and the `/app` dashboard pass, the remaining untranslated MVP surfaces were no longer one coherent layer. `/app/new`, `/app/history`, `/app/conversations/[conversationId]`, `/app/students/[studentUserId]`, and `/app/review/[conversationId]` mixed intake wording, workbench controls, read-only oversight copy, and localized fallback messages. Extending `lib/i18n/dashboard-copy.ts` again would have blurred dashboard concerns with session and oversight route concerns.
+- Decision: Add `lib/i18n/student-flow-copy.ts` for intake, history, workbench, summary-panel, attachment, and client-upload copy, and add `lib/i18n/oversight-copy.ts` for linked-student detail, adult review, tutor notes, tutor summary, and billing-status copy. Keep the route components presentational by passing `languageCode` down and resolving strings in those focused copy modules instead of reintroducing inline French.
+- Why: This preserves a reviewable i18n structure, removes visible internal or dev phrasing from the deeper MVP routes, and localizes the remaining high-traffic student and adult surfaces without turning one copy file into a second hidden application.
+- Follow-up: Finish the remaining accented-French and Unicode audit, keep narrowing any residual generic provider or service fallback strings, and complete the parent-summary default plus broader real-device language-switch verification before calling the trilingual launch pass done.
+
+### D-20260312-64 - Gemini Free-Tier Project Limits Stay Development-Only While Pilot Uses A Dedicated Billed Project
+
+- Date: 2026-03-12
+- Status: accepted
+- Related tasks: `A0.2.4`, `A7.3.4`, `A7.4.3`
+- Context: The current founder setup hit Gemini free-tier RPM and RPD limits during local work. Google documents those limits as project-level rather than key-level, with the daily window resetting at midnight Pacific. That means the repo cannot treat "one more API key" inside the same project as a real mitigation path, and it should not assume that the local free-tier project is an acceptable live pilot backend.
+- Decision: Treat the current free-tier Gemini project as development-only. For the first real pilot, provision a separate billed Gemini project, mirror only that project's key into the pilot or production environment, and keep dev work on a separate project so UI iteration cannot starve real user traffic. Document this in the AI ops note, environment matrix, and launch checklist instead of leaving it as oral knowledge.
+- Why: This turns a fragile founder-memory detail into an explicit operating rule, makes launch-readiness criteria more honest, and avoids a false sense of resilience based on API-key rotation that would not actually bypass project-level rate windows.
+- Follow-up: Add a dev-only mock-AI mode plus any needed 429 backoff or telemetry refinements in the pilot lane so local UI work burns less real provider quota.
+
+### D-20260312-65 - The Trilingual MVP Pass Now Covers Admin Audit, Deletion Feedback, And Quota Errors
+
+- Date: 2026-03-12
+- Status: accepted
+- Related tasks: `A7.1.2`, `A7.4.4`, `A7.4.5`, `A7.4.6`
+- Context: After the deeper route localization pass, the user-facing language leaks that still mattered on shared MVP surfaces were no longer whole pages. They were concentrated in the admin audit list, the privacy deletion form and blocked reasons, the quota-block messages surfaced during conversation or upload actions, and the tablet-emulation smoke script still depended on pre-accent French selectors. The root font setup also still relied on Latin-first fonts without an explicit CJK fallback chain.
+- Decision: Extend the existing focused i18n architecture rather than introducing a new framework. Keep admin audit copy and label mappings in `lib/i18n/oversight-copy.ts`, keep deletion-request form feedback in `lib/i18n/ui-copy.ts`, localize the privacy blocked reasons and quota-block `AppError` messages from the viewer's `preferred_ui_language`, add explicit CJK fallback fonts in `app/layout.tsx`, and refresh `scripts/smoke-tablet-emulation.mjs` to the current accented French selectors before rerunning the local tablet smoke.
+- Why: This closes the remaining high-visibility language leaks on MVP-critical routes, keeps copy close to the surfaces that own it, and preserves the existing narrow localization structure instead of widening scope into a late global refactor.
+- Follow-up: The remaining launch-blocking language work is now mostly the broader accented-French and Unicode audit, the broader parent-summary and language-switch verification, and the still-pending real iPad verification.
+
+### D-20260312-66 - Tablet Emulation Smoke Can Temporarily Flip The Fixture UI Language
+
+- Date: 2026-03-12
+- Status: accepted
+- Related tasks: `A7.1.2`, `A7.4.6`
+- Context: The original tablet-emulation smoke only exercised the seeded French fixture account, so once the trilingual UI pass advanced, the repeatable pre-pass could not say anything about `zh` fit without a manual profile edit before every run.
+- Decision: Extend `scripts/smoke-tablet-emulation.mjs` with `SMOKE_UI_LANGUAGE=fr|en|zh`. The script now temporarily updates the fixture student's `preferred_ui_language`, runs the localized selector plan for that language, and restores the seeded fixture language afterward.
+- Why: This keeps the tablet pre-pass repeatable, reduces manual fixture drift, and gives the MVP a real local `zh` route-fit check on the critical student surfaces before the later hardware pass.
+- Follow-up: Keep treating the localized smoke as a pre-pass only. Real iPad Safari behavior, broader language-switch verification, and parent-summary default checks still remain outside what this script proves.
+
+### D-20260312-67 - Core Student Runtime Text Reuses The Student-Flow Copy Boundary
+
+- Date: 2026-03-12
+- Status: accepted
+- Related tasks: `A7.1.2`, `A7.4.4`, `A7.4.5`, `A7.4.6`
+- Context: After the interface-copy pass, the biggest remaining language leaks on MVP-critical student routes were no longer static labels. They were the server-owned validation errors coming back from `/api/conversations` and `/api/uploads`, the deterministic transcript scaffolding created at intake time, the moderation-safe and provider-fallback coach replies, the deterministic student-summary fallback, and the raw weakness-tag codes rendered in student and tutor summary chips.
+- Decision: Keep those runtime strings inside the existing student-flow localization boundary instead of introducing a new global server-i18n layer. `lib/i18n/student-flow-copy.ts` now owns the user-facing conversation and upload validation messages, initial draft transcript labels, localized extraction warnings, deterministic coach fallback copy, deterministic student-summary fallback copy, and weakness-tag labels. The route handlers pass `preferred_ui_language` into student-facing request parsers, while deterministic coaching and required student-summary fallback continue to follow `ai_help_language`.
+- Why: This closes the highest-traffic remaining language leaks without adding another abstraction layer, preserves the narrow surface-oriented i18n structure, and keeps the student runtime behavior aligned with the route and summary surfaces that already depend on the same copy module.
+- Follow-up: The remaining launch-blocking language work is now mostly the accented-French and Unicode audit, parent-summary default and language-switch verification, and residual generic provider or service fallback strings that still bypass the focused copy modules.
+
+### D-20260312-68 - Shared Light Or Dark Theme Lives In One Shell-Level System
+
+- Date: 2026-03-12
+- Status: accepted
+- Related tasks: `P1.1`, `P1.2`, `P1.3`
+- Context: The MVP already had a calmer light-shell baseline, but it still behaved like a single-theme app. There was no real dark theme model, no persisted user preference, and too many shared surfaces still depended on literal white backgrounds. The pilot lane also needed a faster way to iterate on trust and polish without redesigning each page in isolation.
+- Decision: Keep theme work at the shared-shell and primitive layer. `app/globals.css` now owns the dual light or dark token system, `components/theme/theme-script.tsx` bootstraps the theme before hydration, `components/theme/theme-toggle.tsx` exposes the toggle in both public and authenticated shells, `lib/theme/config.ts` holds the shared theme constants, and the shared buttons, inputs, cards, auth surfaces, and shell chrome now resolve through those tokens. The visual direction intentionally blends ChatGPT-like calm workspace restraint with Brainly-like blue or warm educational accents instead of copying either product literally.
+- Why: This creates one reviewable theme system for both shells, keeps route components from growing their own dark-mode forks, and raises perceived product polish on the highest-traffic surfaces with a bounded change set rather than a full route-by-route redesign.
+- Follow-up: Keep `P1` open for deeper route-level cleanup, empty/loading/error consistency, and future accessibility or contrast review on real pilot devices.
+
+### D-20260312-69 - Pilot Backlog And Git Publishing Become Mandatory Same-Session Close-Out
+
+- Date: 2026-03-12
+- Status: accepted
+- Related tasks: `A0.3.2`, `A0.3.6`, `A0.3.7`, `P4.1`, `P4.2`
+- Context: The repo now has a real `docs/pilot_todo.md` lane, but recent hardening work showed an avoidable failure mode: pilot-relevant status can change in code and docs without the pilot backlog being updated in the same session, and verified work can remain only in a local dirty worktree instead of becoming durable git history. Both gaps weaken handoff quality even when the underlying implementation is correct.
+- Decision: Treat `docs/pilot_todo.md` as mandatory maintenance whenever a session changes pilot-facing polish, UX findings, release-ops assumptions, or `P*` task status, even if the active implementation still lives under an `A*` launch task. Also treat a task-ID git commit plus push to `origin` as the default end-of-slice workflow after verification. If a push should be deferred, the reason must be stated explicitly in the session close-out instead of left implicit.
+- Why: This keeps pilot readiness reviewable from the repo itself rather than from chat memory, and it turns git history into part of the operating trace instead of an optional afterthought.
+- Follow-up: Apply the rule immediately on the next coherent slice, and keep commits bounded when the local worktree contains unrelated in-flight changes.
+
+### D-20260312-70 - The Final MVP Language-Leak Slice Reuses Focused Surface Copy Modules
+
+- Date: 2026-03-12
+- Status: accepted
+- Related tasks: `A7.4.4`, `A7.4.5`, `A7.4.6`
+- Context: After the shared dashboard, student-flow, deletion, quota, and admin-audit localization passes, the highest-visibility remaining self-serve language leaks were concentrated in auth/profile bootstrap and update, invitation create and accept, tutor-note mutations, memory mutations, a small parent billing-management conflict path, and the accentless deterministic memory fallback copy.
+- Decision: Close that slice by extending the existing focused copy modules instead of introducing a new global server-i18n layer. `lib/i18n/ui-copy.ts` now owns auth/profile and invitation server-copy helpers, `lib/i18n/dashboard-copy.ts` owns memory server-copy helpers plus deterministic memory fallback text, and `lib/i18n/oversight-copy.ts` owns tutor-note and billing-management server-copy helpers. The affected routes and services now thread `preferred_ui_language` into their parsers and user-facing error branches.
+- Why: This closes the visible launch-blocking leaks with a bounded change set, keeps the i18n architecture narrow and reviewable, and avoids turning generic server-error handling into a second translation framework before the MVP launch gate.
+- Follow-up: Finish the broader accented-French and Unicode audit, keep narrowing any residual generic provider or service fallback strings, and complete the remaining parent-summary default plus real-device language-switch verification.

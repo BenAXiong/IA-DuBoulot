@@ -4,6 +4,7 @@ import {
   formatDateLabel,
   getConversationStatusLabel,
 } from "@/components/dashboard/student/student-dashboard-presenters";
+import { getStudentDashboardRecentSessionsCopy } from "@/lib/i18n/dashboard-copy";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type {
   StudentDashboardConversation,
@@ -20,11 +21,13 @@ function getSessionDate(
   session: StudentDashboardConversation,
   languageCode: UiLanguageCode,
 ) {
+  const copy = getStudentDashboardRecentSessionsCopy(languageCode);
+
   return (
     formatDateLabel(session.lastMessageAt, languageCode) ??
     formatDateLabel(session.completedAt, languageCode) ??
     formatDateLabel(session.createdAt, languageCode) ??
-    "Date indisponible"
+    copy.noDate
   );
 }
 
@@ -33,6 +36,8 @@ export function StudentDashboardRecentSessions({
   recentSessions,
   subjectRollup,
 }: StudentDashboardRecentSessionsProps) {
+  const copy = getStudentDashboardRecentSessionsCopy(languageCode);
+
   return (
     <section
       className="grid gap-5 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]"
@@ -40,10 +45,10 @@ export function StudentDashboardRecentSessions({
     >
       <div className="space-y-3">
         <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-          Sessions recentes
+          {copy.eyebrow}
         </p>
         <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
-          Reprendre vite, puis basculer vers l&apos;historique complet si besoin.
+          {copy.title}
         </h2>
         <div className="flex flex-wrap items-center gap-2">
           {subjectRollup.length > 0 ? (
@@ -54,24 +59,22 @@ export function StudentDashboardRecentSessions({
               />
             ))
           ) : (
-            <StudentStatusPill label="Aucun tag recent" tone="warning" />
+            <StudentStatusPill label={copy.noRecentTag} tone="warning" />
           )}
           <Link
-            className="inline-flex rounded-full border border-[color:var(--line)] bg-white px-3 py-1 text-sm font-medium text-[color:var(--foreground)] transition hover:-translate-y-0.5"
+            className="inline-flex min-h-11 items-center justify-center rounded-full border border-[color:var(--line)] bg-white px-3 py-1 text-sm font-medium text-[color:var(--foreground)] transition hover:-translate-y-0.5"
             href="/app/history"
           >
-            Tout voir
+            {copy.viewAll}
           </Link>
         </div>
       </div>
 
       {recentSessions.length === 0 ? (
         <article className="rounded-[1.5rem] border border-dashed border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5">
-          <p className="font-medium">Aucune session enregistree pour l&apos;instant.</p>
+          <p className="font-medium">{copy.emptyTitle}</p>
           <p className="mt-2 text-sm leading-6 text-[color:var(--ink-soft)]">
-            Des que le premier devoir passera par le produit, cette zone affichera
-            l&apos;historique recent, les tags de matiere, puis la reprise detaillee
-            depuis `/app/history`.
+            {copy.emptyBody}
           </p>
         </article>
       ) : (
@@ -85,12 +88,15 @@ export function StudentDashboardRecentSessions({
                 <div className="flex flex-wrap gap-2">
                   <StudentStatusPill label={session.subjectTag} tone="accent" />
                   <StudentStatusPill
-                    label={getConversationStatusLabel(session.status)}
+                    label={getConversationStatusLabel(
+                      session.status,
+                      languageCode,
+                    )}
                   />
                   {session.gradedHomework ? (
-                    <StudentStatusPill label="Notee" />
+                    <StudentStatusPill label={copy.graded} />
                   ) : (
-                    <StudentStatusPill label="Exercice libre" />
+                    <StudentStatusPill label={copy.practice} />
                   )}
                 </div>
                 <div>
@@ -98,22 +104,21 @@ export function StudentDashboardRecentSessions({
                     {session.title}
                   </h3>
                   <p className="mt-2 text-sm leading-6 text-[color:var(--ink-soft)]">
-                    Cette session peut deja etre rouverte, puis l&apos;historique complet
-                    reste centralise sur `/app/history`.
+                    {copy.body}
                   </p>
                 </div>
               </div>
 
               <div className="grid gap-3 text-sm text-[color:var(--ink-soft)] md:justify-items-end">
-                <p>Derniere activite</p>
+                <p>{copy.lastActivity}</p>
                 <p className="mt-1 font-medium text-[color:var(--foreground)]">
                   {getSessionDate(session, languageCode)}
                 </p>
                 <Link
-                  className="inline-flex rounded-full border border-[color:var(--line)] bg-white px-4 py-2 font-medium text-[color:var(--foreground)] transition hover:-translate-y-0.5"
+                  className="inline-flex min-h-11 items-center justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 font-medium text-[color:var(--foreground)] transition hover:-translate-y-0.5"
                   href={`/app/conversations/${session.id}`}
                 >
-                  Reprendre
+                  {copy.resume}
                 </Link>
               </div>
             </article>

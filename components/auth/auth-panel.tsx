@@ -6,6 +6,9 @@ import {
   clearPendingInviteCookie,
   persistPendingInviteCookie,
 } from "@/lib/auth/pending-invite";
+import { getAuthPanelCopy } from "@/lib/i18n/ui-copy";
+import { withUiLanguage } from "@/lib/i18n/ui-language";
+import type { UiLanguageCode } from "@/lib/server/auth/types";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type AuthMode = "sign_in" | "sign_up";
@@ -18,14 +21,15 @@ type AuthPanelProps = {
   initialRole?: SignupRole;
   intentLabel?: string | null;
   inviteToken?: string | null;
+  languageCode: UiLanguageCode;
 };
 
-function getAuthErrorMessage(error: unknown) {
+function getAuthErrorMessage(error: unknown, fallback: string) {
   if (error instanceof Error) {
     return error.message;
   }
 
-  return "Une erreur inattendue est survenue.";
+  return fallback;
 }
 
 export function AuthPanel({
@@ -35,9 +39,11 @@ export function AuthPanel({
   initialRole = "student",
   intentLabel = null,
   inviteToken = null,
+  languageCode,
 }: AuthPanelProps) {
   const router = useRouter();
   const supabase = createSupabaseBrowserClient();
+  const copy = getAuthPanelCopy(languageCode);
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -66,11 +72,16 @@ export function AuthPanel({
       });
 
       if (error) {
-        setErrorMessage(getAuthErrorMessage(error));
+        setErrorMessage(getAuthErrorMessage(error, copy.errorFallback));
         return;
       }
 
-      router.push(inviteToken ? `/invite/${inviteToken}` : "/onboarding");
+      router.push(
+        withUiLanguage(
+          inviteToken ? `/invite/${inviteToken}` : "/onboarding",
+          languageCode,
+        ),
+      );
       router.refresh();
     });
   }
@@ -86,11 +97,12 @@ export function AuthPanel({
         clearPendingInviteCookie();
       }
 
-      const confirmUrl = new URL("/auth/confirm", window.location.origin);
-      confirmUrl.searchParams.set(
-        "next",
+      const nextPath = withUiLanguage(
         inviteToken ? `/invite/${inviteToken}` : `/onboarding?role=${signupRole}`,
+        languageCode,
       );
+      const confirmUrl = new URL("/auth/confirm", window.location.origin);
+      confirmUrl.searchParams.set("next", nextPath);
 
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -101,20 +113,18 @@ export function AuthPanel({
       });
 
       if (error) {
-        setErrorMessage(getAuthErrorMessage(error));
+        setErrorMessage(getAuthErrorMessage(error, copy.errorFallback));
         return;
       }
 
       if (data.session) {
-        router.push(inviteToken ? `/invite/${inviteToken}` : `/onboarding?role=${signupRole}`);
+        router.push(nextPath);
         router.refresh();
         return;
       }
 
       setInfoMessage(
-        inviteToken
-          ? "Compte cree. Confirme l'adresse email depuis le message Supabase. Le produit reprendra automatiquement l'invitation dans ce navigateur."
-          : "Compte cree. Confirme l'adresse email depuis le message Supabase avant de continuer.",
+        inviteToken ? copy.signUpInfo.invite : copy.signUpInfo.default,
       );
       setMode("sign_in");
     });
@@ -124,33 +134,31 @@ export function AuthPanel({
     <section className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
       <article className="rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] sm:p-8">
         <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.26em] text-[color:var(--ink-soft)]">
-          Auth branch
+          {copy.eyebrow}
         </p>
         <h1 className="mt-4 font-[family-name:var(--font-heading)] text-4xl leading-tight">
-          Connecter la vraie session Supabase au produit.
+          {copy.title}
         </h1>
         <p className="mt-4 max-w-xl text-base leading-7 text-[color:var(--ink-soft)]">
-          Cette etape ouvre le flux reel vers l&apos;onboarding, le bootstrap
-          de profil et les pages protegees deja branchees au backend.
+          {copy.body}
         </p>
 
         <div className="mt-8 grid gap-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5 text-sm leading-6 text-[color:var(--foreground)]">
-          <p className="font-medium">Ce qui est deja branche:</p>
+          <p className="font-medium">{copy.checklistTitle}</p>
           <ul className="grid gap-2 text-[color:var(--ink-soft)]">
-            <li>- email + mot de passe via Supabase SSR</li>
-            <li>- confirmation email route `auth/confirm`</li>
-            <li>- page d&apos;onboarding reliee au bootstrap API</li>
-            <li>- redirection vers `/app` si le profil existe deja</li>
+            {copy.checklist.map((item) => (
+              <li key={item}>- {item}</li>
+            ))}
           </ul>
         </div>
       </article>
 
       <article className="rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] sm:p-8">
-        <div className="inline-flex rounded-full border border-[color:var(--line)] bg-white/70 p-1 text-sm">
+        <div className="inline-flex rounded-full border border-[color:var(--line)] bg-[color:var(--surface-muted)] p-1 text-sm">
           <button
             className={`rounded-full px-4 py-2 transition ${
               mode === "sign_in"
-                ? "bg-[color:var(--foreground)] text-white"
+                ? "bg-[color:var(--foreground)] text-[color:var(--foreground-inverse)]"
                 : "text-[color:var(--ink-soft)]"
             }`}
             onClick={() => {
@@ -159,12 +167,12 @@ export function AuthPanel({
             }}
             type="button"
           >
-            Connexion
+            {copy.tabs.signIn}
           </button>
           <button
             className={`rounded-full px-4 py-2 transition ${
               mode === "sign_up"
-                ? "bg-[color:var(--foreground)] text-white"
+                ? "bg-[color:var(--foreground)] text-[color:var(--foreground-inverse)]"
                 : "text-[color:var(--ink-soft)]"
             }`}
             onClick={() => {
@@ -173,24 +181,24 @@ export function AuthPanel({
             }}
             type="button"
           >
-            Creation
+            {copy.tabs.signUp}
           </button>
         </div>
 
         {intentLabel ? (
-          <p className="mt-5 rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-3 text-sm text-[color:var(--ink-soft)]">
+          <p className="callout-info mt-5 rounded-2xl border px-4 py-3 text-sm">
             {intentLabel}
           </p>
         ) : null}
 
         {errorMessage ? (
-          <p className="mt-5 rounded-2xl border border-[#d07c5b] bg-[#fff0ea] px-4 py-3 text-sm text-[#8d3b1f]">
+          <p className="callout-error mt-5 rounded-2xl border px-4 py-3 text-sm">
             {errorMessage}
           </p>
         ) : null}
 
         {infoMessage ? (
-          <p className="mt-5 rounded-2xl border border-[#cbbf8d] bg-[#fff8df] px-4 py-3 text-sm text-[#69551b]">
+          <p className="callout-warning mt-5 rounded-2xl border px-4 py-3 text-sm">
             {infoMessage}
           </p>
         ) : null}
@@ -201,33 +209,19 @@ export function AuthPanel({
         >
           {mode === "sign_up" ? (
             <fieldset className="grid gap-3">
-              <legend className="text-sm font-medium">Type de compte</legend>
+              <legend className="text-sm font-medium">
+                {copy.accountType}
+              </legend>
               <div className="grid gap-3 sm:grid-cols-3">
-                {[
-                  {
-                    value: "student" as const,
-                    title: "Eleve",
-                    body: "Aide aux devoirs et espace de travail.",
-                  },
-                  {
-                    value: "parent" as const,
-                    title: "Parent",
-                    body: "Supervision et suivis des sessions.",
-                  },
-                  {
-                    value: "tutor" as const,
-                    title: "Tuteur",
-                    body: "Accompagnement pedagogique cible.",
-                  },
-                ].map((option) => (
+                {copy.roles.map((option) => (
                   <button
                     className={`rounded-[1.25rem] border p-4 text-left transition ${
                       signupRole === option.value
-                        ? "border-[color:var(--accent)] bg-[#fff1e8]"
-                        : "border-[color:var(--line)] bg-white/70"
+                        ? "border-[color:var(--brand)] bg-[color:var(--brand-soft)]"
+                        : "border-[color:var(--line)] bg-[color:var(--surface-raised)]"
                     }`}
                     key={option.value}
-                    onClick={() => setSignupRole(option.value)}
+                    onClick={() => setSignupRole(option.value as SignupRole)}
                     type="button"
                   >
                     <p className="font-[family-name:var(--font-heading)] text-base">
@@ -243,10 +237,10 @@ export function AuthPanel({
           ) : null}
 
           <label className="grid gap-2 text-sm">
-            <span className="font-medium">Email</span>
+            <span className="font-medium">{copy.fields.email}</span>
             <input
               autoComplete="email"
-              className="rounded-2xl border border-[color:var(--line)] bg-white px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
+              className="field-control rounded-2xl px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
               onChange={(event) => setEmail(event.target.value)}
               placeholder="parent@example.com"
               required
@@ -256,36 +250,30 @@ export function AuthPanel({
           </label>
 
           <label className="grid gap-2 text-sm">
-            <span className="font-medium">Mot de passe</span>
+            <span className="font-medium">{copy.fields.password}</span>
             <input
               autoComplete={mode === "sign_in" ? "current-password" : "new-password"}
-              className="rounded-2xl border border-[color:var(--line)] bg-white px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
+              className="field-control rounded-2xl px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
               minLength={8}
               onChange={(event) => setPassword(event.target.value)}
-              placeholder="8 caracteres minimum"
+              placeholder={copy.placeholders.password}
               required
               type="password"
               value={password}
             />
           </label>
 
-          <button
-            className="mt-2 rounded-full bg-[color:var(--accent)] px-5 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
-            disabled={isPending}
-            type="submit"
-          >
+          <button className="button-base button-primary mt-2" disabled={isPending} type="submit">
             {isPending
-              ? "Traitement..."
+              ? copy.buttons.pending
               : mode === "sign_in"
-                ? "Se connecter"
-                : "Creer le compte"}
+                ? copy.buttons.signIn
+                : copy.buttons.signUp}
           </button>
         </form>
 
         <p className="mt-4 text-xs leading-6 text-[color:var(--ink-soft)]">
-          {mode === "sign_in"
-            ? "Si la session est valide mais qu'aucun profil applicatif n'existe encore, la prochaine etape sera l'onboarding."
-            : "Si la confirmation email est active, l'utilisateur devra valider le lien avant d'arriver sur l'onboarding."}
+          {mode === "sign_in" ? copy.footer.signIn : copy.footer.signUp}
         </p>
       </article>
     </section>

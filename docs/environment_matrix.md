@@ -46,8 +46,10 @@ Keep environment configuration explicit so local development, Vercel, and provid
 
 - confirm Vercel environment sync after Supabase integration changes
 - planned storage buckets are now created automatically by the fixture seed script, and the upload route family now exists locally, but deployed route-level verification still needs a targeted smoke pass
-- `GEMINI_API_KEY` is present locally; confirm the same key is mirrored in Vercel before relying on deployed `A4` behavior
-- PostHog and Resend values still need to be provisioned before their corresponding flags should be enabled
+- `GEMINI_API_KEY` is present locally, but Gemini free-tier RPM and RPD limits apply per Google project rather than per API key; use a separate dev project for local work and provision a dedicated billed pilot project before real user traffic
+- local PostHog provisioning is now present through `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`, and `NEXT_PUBLIC_ENABLE_ANALYTICS`; confirm Vercel parity and keep the sink runtime-only until the real PostHog adapter exists
+- local `RESEND_API_KEY` is now present, but sender/domain setup and `ENABLE_RESEND_EMAILS` remain off, so Resend-backed delivery is still externally blocked
+- the current repo still has no Resend mailer path; invitation flows return copy/share URLs today, so enabling `ENABLE_RESEND_EMAILS` alone will not send transactional email
 - Lemon Squeezy is now verified in deployed production with `LEMON_SQUEEZY_TEST_MODE=true`; the remaining billing follow-up is a later live-mode cutover, not missing MVP wiring
 - OpenAI is now the chosen fallback provider, but the adapter remains intentionally disabled until implemented and provisioned
 

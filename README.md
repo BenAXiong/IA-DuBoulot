@@ -19,6 +19,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Smoke checklist V1](docs/smoke_checklist_v1.md)
 - [Founder walkthrough V1](docs/founder_walkthrough_v1.md)
 - [Launch checklist V1](docs/launch_checklist_v1.md)
+- [Pilot_todo](docs/pilot_todo.md)
 - [Sample attachment corpus](docs/sample_attachment_corpus.md)
 - [API route map](docs/api_route_map.md)
 - [App shell V1](docs/app_shell_v1.md)
@@ -85,19 +86,28 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - a fourth fixture-backed privacy smoke script now exists at `scripts/smoke-privacy-controls.mjs` and passed on 2026-03-11 against the real settings route, linked-child deletion queueing, immediate tutor-access revocation, redirect-to-settings behavior, and write blocking for deletion-requested accounts.
 - the student dashboard and linked-parent student detail now expose a pedagogical memory panel backed by `lib/server/memory/`, with completion-triggered refresh, manual edit/delete controls, and tutor raw-memory access explicitly blocked.
 - a fifth fixture-backed smoke script now exists at `scripts/smoke-memory-profile.mjs` and passed on 2026-03-11 against the real memory route, dashboard surfaces, manual mutation flow, and tutor-access boundary.
-- a written operator smoke checklist now exists at `docs/smoke_checklist_v1.md`, and `npm run regress:mvp` now gives the canonical pre-demo regression pass across typecheck, build, RLS verification, and all current smoke scripts.
+- a written operator smoke checklist now exists at `docs/smoke_checklist_v1.md`, and `npm run regress:mvp` now gives the canonical pre-demo regression pass across typecheck, build, deterministic fixture reseed, RLS verification, and the current non-device smoke suite.
+- a sixth fixture-backed tablet-emulation smoke script now exists at `scripts/smoke-tablet-emulation.mjs` and passed on 2026-03-11 against a local production-build `next start` instance for `/app`, `/app/new`, and `/app/conversations/[conversationId]`, with no horizontal overflow or detected sub-`44x44` controls on those checked student surfaces.
 - `A7.3` cost-control guardrails now bound the Gemini-backed path through request-size caps, prompt-context truncation, output-token caps, and idempotent reuse of existing upload-extraction and completion artifacts instead of repeating expensive provider calls.
 - launch-candidate operating docs now exist at `docs/founder_walkthrough_v1.md` and `docs/launch_checklist_v1.md`, and the current scope decision explicitly defers PWA installability until after real iPad Safari validation and early beta feedback.
 - an experimental prompt-level trace now also exists at `docs/work_prompt_log.md`, while `docs/work_sessions.md` remains the canonical session log.
 - a consolidated AI operations and economics note now exists at `docs/ai_ops_economics_v1.md`, including the current quota model, prompt pipeline, guardrails, token-cost ceilings, and the recommended parent-paid policy for future adult-triggered AI features.
-- frontend foundations now live in `components/ui/`, `lib/i18n/config.ts`, `.editorconfig`, and `docs/frontend_foundations_v1.md`, giving the repo a stable primitive layer, shared locale metadata, and explicit form/modularity rules.
-- telemetry and risky-integration controls now live in `lib/analytics/`, `lib/server/telemetry/`, `lib/feature-flags.ts`, and `docs/telemetry_feature_controls_v1.md`, with the MVP analytics path currently staying runtime-only until a real PostHog project exists.
-- the repo-owned GitHub workflow layer now includes issue templates plus a labels manifest in `.github/`, while actual remote label creation remains an external follow-up.
-- the latest `npm run regress:mvp` pass succeeded on 2026-03-11; the current non-blocking warning profile still consists of documented Gemini fallback usage and optional adult summary variants missing in some student-flow runs.
+- frontend foundations now live in `components/ui/`, `lib/i18n/config.ts`, `lib/i18n/ui-copy.ts`, `lib/i18n/dashboard-copy.ts`, `lib/i18n/ui-language.ts`, `.editorconfig`, and `docs/frontend_foundations_v1.md`, giving the repo a stable primitive layer, shared locale metadata, shared route/surface UI dictionaries, and explicit form/modularity rules.
+- telemetry and risky-integration controls now live in `lib/analytics/`, `lib/server/telemetry/`, `lib/feature-flags.ts`, and `docs/telemetry_feature_controls_v1.md`; the local PostHog project/env is now provisioned, but the MVP analytics path still stays runtime-only until a real PostHog forwarding adapter exists.
+- the repo-owned GitHub workflow layer now includes issue templates plus a labels manifest in `.github/`, and the public repository labels were synced from that manifest on 2026-03-12.
+- the latest `npm run regress:mvp` pass succeeded on 2026-03-11 after the deterministic fixture reseed, and the current non-blocking warning profile still consists of documented Gemini fallback usage and optional adult summary variants missing in some student-flow runs.
 - the latest student smoke completed successfully while also verifying repeated upload confirmation and repeated completion reuse the existing expensive artifacts; provider reliability remains a QA follow-up even though the student flow stays stable.
+- pilot hardening now has a dedicated backlog at `docs/pilot_todo.md`, so launch-blocking MVP work stays separate from post-MVP polish, UX, and release-ops work.
+- the shared shell and card layer now carries a calmer branded baseline through `app/layout.tsx`, `app/globals.css`, `components/layout/public-shell.tsx`, `components/layout/app-shell.tsx`, and `components/ui/surface-card.tsx`, reducing per-page styling drift while deeper redesign stays in the pilot lane.
+- the shared theme layer now supports both light and dark modes through `app/globals.css`, `components/theme/theme-script.tsx`, `components/theme/theme-toggle.tsx`, and `lib/theme/config.ts`, blending calmer ChatGPT-like workspace restraint with brighter Brainly-like learning-product accents without forking the route layouts.
+- the shared public, auth, onboarding, invite, app-shell, account-settings, and privacy surfaces now read route/surface copy from `lib/i18n/ui-copy.ts`, preserve `lang` on the public routes through `lib/i18n/ui-language.ts`, localize student age-band options, and sync `document.documentElement.lang` from the live UI language on the shared shells.
+- the role dashboards on `/app` now localize their shared copy through `lib/i18n/dashboard-copy.ts`, and the deeper intake, history, workbench, linked-student-detail, adult-review, auth/profile, invitation, tutor-note, memory, deletion, quota, and current billing-management paths now localize their user-facing UI or server messages through the focused copy modules; the remaining MVP language gap is now primarily the broader accent or Unicode audit, parent-summary default and language-switch verification, and the later real iPad confirmation.
+- `docs/ai_ops_economics_v1.md` now also records Gemini project-level rate-limit behavior, the required dev-versus-pilot project split, and why a dedicated billed pilot project is the trustworthy path before real user traffic.
 
 ## Working Conventions
 
 - Use task IDs from [the MVP to-do list](docs/mvp_todo.md) in session notes, decision log entries, commit messages, and review notes.
+- Use task IDs from [Pilot_todo](docs/pilot_todo.md) the same way for pilot-hardening work, and update that backlog whenever a session changes pilot-facing polish, UX findings, or release-ops assumptions.
 - Treat [the decision log](docs/decision_log.md) and [the work sessions log](docs/work_sessions.md) as mandatory maintenance files, not optional notes.
+- After a coherent verified slice, create a task-ID commit and push it to `origin` unless the user explicitly asks to defer git actions.
 - Update this file whenever a new top-level project doc becomes part of the operating workflow.

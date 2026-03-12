@@ -52,6 +52,55 @@ function toServiceError(message: string, cause: unknown) {
   });
 }
 
+function getPrivacyDeletionCopy(
+  languageCode: AppUserRecord["preferred_ui_language"],
+) {
+  return {
+    under13Blocked:
+      languageCode === "en"
+        ? "Only a linked parent can request deletion for a student account under 13."
+        : languageCode === "zh"
+          ? "只有已連結的家長可以要求刪除 13 歲以下學生帳號。"
+          : "Seul un parent lié peut demander la suppression d'un compte élève de moins de 13 ans.",
+    adminBlocked:
+      languageCode === "en"
+        ? "The admin account does not go through self-service deletion."
+        : languageCode === "zh"
+          ? "管理員帳號不走自助刪除流程。"
+          : "Le compte admin ne passe pas par la suppression libre-service.",
+    linkedStudentsBlocked:
+      languageCode === "en"
+        ? "Delete or unlink the linked student accounts before requesting deletion of the parent account."
+        : languageCode === "zh"
+          ? "請先刪除或解除已連結的學生帳號，再要求刪除家長帳號。"
+          : "Supprime ou délie d'abord les comptes élève liés avant de demander la suppression du compte parent.",
+    billingBlocked:
+      languageCode === "en"
+        ? "The parent account still has an active billing relationship. Handle the subscription before requesting deletion."
+        : languageCode === "zh"
+          ? "家長帳號仍有有效的付費關係。請先處理訂閱，再要求刪除帳號。"
+          : "Le compte parent a encore une relation de facturation. Gère d'abord l'abonnement avant de demander la suppression du compte.",
+    linkedChildAlreadyQueued:
+      languageCode === "en"
+        ? "A deletion request is already queued for this student."
+        : languageCode === "zh"
+          ? "這位學生已經有刪除要求在排隊中。"
+          : "Une demande est déjà en file pour cet élève.",
+    selfAlreadyQueued:
+      languageCode === "en"
+        ? "A deletion request is already queued for this account."
+        : languageCode === "zh"
+          ? "這個帳號已經有刪除要求在排隊中。"
+          : "Une demande de suppression est déjà en file pour ce compte.",
+    requestNotAllowed:
+      languageCode === "en"
+        ? "Deletion request is not allowed."
+        : languageCode === "zh"
+          ? "目前不允許提出刪除要求。"
+          : "Cette demande de suppression n'est pas autorisée.",
+  };
+}
+
 async function loadActiveLinkedStudents(parentUserId: string) {
   const admin = createSupabaseAdminClient();
   const { data: links, error: linkError } = await admin
@@ -87,15 +136,17 @@ async function loadActiveLinkedStudents(parentUserId: string) {
 }
 
 async function loadSelfDeletionBlockers(appUser: AppUserRecord) {
+  const copy = getPrivacyDeletionCopy(appUser.preferred_ui_language);
+
   if (appUser.role !== "parent") {
     return {
       linkedStudentCount: 0,
       hasSubscription: false,
       blockedReason:
         appUser.role === "student" && appUser.is_under_13
-          ? "Seul un parent lie peut demander la suppression d'un compte eleve de moins de 13 ans."
+          ? copy.under13Blocked
           : appUser.role === "admin"
-            ? "Le compte admin ne passe pas par la suppression libre-service."
+            ? copy.adminBlocked
             : null,
     };
   }
@@ -109,8 +160,7 @@ async function loadSelfDeletionBlockers(appUser: AppUserRecord) {
     return {
       linkedStudentCount: linkedStudents.length,
       hasSubscription: billing.hasSubscription,
-      blockedReason:
-        "Supprime ou delie d'abord les comptes eleves relies avant de demander la suppression du compte parent.",
+      blockedReason: copy.linkedStudentsBlocked,
     };
   }
 
@@ -118,8 +168,7 @@ async function loadSelfDeletionBlockers(appUser: AppUserRecord) {
     return {
       linkedStudentCount: 0,
       hasSubscription: true,
-      blockedReason:
-        "Le compte parent a encore une relation de facturation. Gere d'abord l'abonnement avant de demander la suppression du compte.",
+      blockedReason: copy.billingBlocked,
     };
   }
 
@@ -139,6 +188,7 @@ async function buildDeletionTargetSnapshot(input: {
   scope: PrivacyDeletionScope;
 }): Promise<PrivacyDeletionTargetSnapshot> {
   const isAlreadyRequested = input.target.account_status === "deletion_requested";
+  const copy = getPrivacyDeletionCopy(input.viewer.preferred_ui_language);
 
   if (input.scope === "linked_child") {
     return {
@@ -149,9 +199,7 @@ async function buildDeletionTargetSnapshot(input: {
       requestedAt: input.target.deletion_requested_at,
       purgeTargetDate: toPurgeTargetDate(input.target.deletion_requested_at),
       canRequest: !isAlreadyRequested,
-      blockedReason: isAlreadyRequested
-        ? "Une demande est deja en file pour cet eleve."
-        : null,
+      blockedReason: isAlreadyRequested ? copy.linkedChildAlreadyQueued : null,
       linkedStudentCount: 0,
       hasSubscription: false,
     };
@@ -160,7 +208,7 @@ async function buildDeletionTargetSnapshot(input: {
   const blockers = await loadSelfDeletionBlockers(input.viewer);
   const blockedReason =
     isAlreadyRequested
-      ? "Une demande de suppression est deja en file pour ce compte."
+      ? copy.selfAlreadyQueued
       : blockers.blockedReason;
 
   return {
@@ -330,9 +378,10 @@ export async function requestPrivacyDeletion(input: {
   });
 
   if (!snapshot.canRequest && !snapshot.requestedAt) {
+    const copy = getPrivacyDeletionCopy(appUser.preferred_ui_language);
     throw new AppError({
       code: "conflict",
-      message: snapshot.blockedReason ?? "Deletion request is not allowed.",
+      message: snapshot.blockedReason ?? copy.requestNotAllowed,
       status: 409,
     });
   }

@@ -7,16 +7,21 @@ import { IntakeReadinessCard } from "@/components/dashboard/student/intake-readi
 import {
   buildExtractionDraftSeed,
   INTAKE_ACCEPT_ATTR,
-  INTAKE_SUBJECT_OPTIONS,
   isProvisionalExtractionDraft,
   stageIntakeFiles,
   type StagedIntakeFile,
 } from "@/lib/intake/intake-config";
+import {
+  getIntakeSubjectOptions,
+  getNewHomeworkIntakeCopy,
+} from "@/lib/i18n/student-flow-copy";
+import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type { StudentDashboardSnapshot } from "@/lib/server/student-dashboard/types";
 import { uploadConversationFiles } from "@/lib/uploads/client-upload";
 
 type NewHomeworkIntakeFormProps = {
   snapshot: StudentDashboardSnapshot;
+  languageCode: UiLanguageCode;
 };
 
 type CreateConversationResponse =
@@ -81,8 +86,11 @@ function hasAnySource(input: {
 
 export function NewHomeworkIntakeForm({
   snapshot,
+  languageCode,
 }: NewHomeworkIntakeFormProps) {
   const router = useRouter();
+  const copy = getNewHomeworkIntakeCopy(languageCode);
+  const subjectOptions = getIntakeSubjectOptions(languageCode);
   const [assignmentTitle, setAssignmentTitle] = useState("");
   const [subjectChoice, setSubjectChoice] = useState("mathematiques");
   const [customSubject, setCustomSubject] = useState("");
@@ -110,6 +118,7 @@ export function NewHomeworkIntakeForm({
       buildExtractionDraftSeed({
         files: nextFiles,
         pastedText: nextPastedText,
+        languageCode,
       }),
     );
   }
@@ -124,6 +133,7 @@ export function NewHomeworkIntakeForm({
     const staged = stageIntakeFiles({
       existingFiles: files,
       incomingFiles,
+      languageCode,
     });
 
     setFiles(staged.acceptedFiles);
@@ -151,6 +161,7 @@ export function NewHomeworkIntakeForm({
       buildExtractionDraftSeed({
         files,
         pastedText,
+        languageCode,
       }),
     );
     setHasEditedExtractionDraft(false);
@@ -163,19 +174,17 @@ export function NewHomeworkIntakeForm({
     setReviewMessage(null);
 
     if (!snapshot.canStartHomework) {
-      setErrorMessage(
-        "Le compte ne peut pas encore lancer un nouveau devoir depuis cette route.",
-      );
+      setErrorMessage(copy.errors.cannotStart);
       return;
     }
 
     if (!assignmentTitle.trim()) {
-      setErrorMessage("Ajoute un titre de devoir avant de continuer.");
+      setErrorMessage(copy.errors.missingTitle);
       return;
     }
 
     if (!resolvedSubjectTag) {
-      setErrorMessage("Choisis ou saisis une matiere.");
+      setErrorMessage(copy.errors.missingSubject);
       return;
     }
 
@@ -186,9 +195,7 @@ export function NewHomeworkIntakeForm({
         extractionDraft,
       })
     ) {
-      setErrorMessage(
-        "Ajoute au moins un fichier, un texte colle, ou un brouillon d'extraction.",
-      );
+      setErrorMessage(copy.errors.missingSource);
       return;
     }
 
@@ -215,10 +222,7 @@ export function NewHomeworkIntakeForm({
         payload && "error" in payload ? payload.error?.message : null;
 
       if (!response.ok || !payload?.ok || !payload.data?.conversationId) {
-        setErrorMessage(
-          routeErrorMessage ??
-            "Impossible de creer la session brouillon pour ce devoir.",
-        );
+        setErrorMessage(routeErrorMessage ?? copy.errors.createSession);
         return;
       }
 
@@ -228,6 +232,7 @@ export function NewHomeworkIntakeForm({
             ? await uploadConversationFiles({
                 conversationId: payload.data.conversationId,
                 files: files.map((file) => file.file),
+                languageCode,
               })
             : [];
         const extractedBlocks = uploadResults
@@ -268,7 +273,7 @@ export function NewHomeworkIntakeForm({
           if (!workspaceResponse.ok || !workspacePayload?.ok) {
             throw new Error(
               getWorkspaceRouteErrorMessage(workspacePayload) ??
-                "La session a ete creee mais le texte extrait n'a pas pu etre synchronise.",
+                copy.errors.workspaceSync,
             );
           }
         }
@@ -276,17 +281,15 @@ export function NewHomeworkIntakeForm({
         const message =
           error instanceof Error
             ? error.message
-            : "La session a ete creee, mais les pieces jointes n'ont pas toutes ete confirmees.";
+            : copy.errors.uploadFallback;
         setErrorMessage(message);
-        setReviewMessage(
-          "Le brouillon existe deja. Tu peux reprendre la session et relancer les pieces dans le chat.",
-        );
+        setReviewMessage(copy.messages.fallbackResume);
         router.push(`/app/conversations/${payload.data.conversationId}`);
         router.refresh();
         return;
       }
 
-      setReviewMessage("Session creee et pieces analysees. Redirection...");
+      setReviewMessage(copy.messages.readyRedirect);
       router.push(`/app/conversations/${payload.data.conversationId}`);
       router.refresh();
     });
@@ -298,34 +301,34 @@ export function NewHomeworkIntakeForm({
         <article className="grid gap-5 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]">
           <div className="space-y-3">
             <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-              A3.2.1 Brief du devoir
+              {copy.sections.brief.eyebrow}
             </p>
             <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
-              Capture le titre et la matiere avant toute extraction.
+              {copy.sections.brief.title}
             </h2>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
             <label className="grid gap-2 text-sm">
-              <span className="font-medium">Titre du devoir</span>
+              <span className="font-medium">{copy.sections.brief.titleLabel}</span>
               <input
                 className="rounded-2xl border border-[color:var(--line)] bg-white px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
                 maxLength={120}
                 onChange={(event) => setAssignmentTitle(event.target.value)}
-                placeholder="Ex: Fractions - exercice 4"
+                placeholder={copy.sections.brief.titlePlaceholder}
                 type="text"
                 value={assignmentTitle}
               />
             </label>
 
             <label className="grid gap-2 text-sm">
-              <span className="font-medium">Matiere</span>
+              <span className="font-medium">{copy.sections.brief.subjectLabel}</span>
               <select
                 className="rounded-2xl border border-[color:var(--line)] bg-white px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
                 onChange={(event) => setSubjectChoice(event.target.value)}
                 value={subjectChoice}
               >
-                {INTAKE_SUBJECT_OPTIONS.map((option) => (
+                {subjectOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
@@ -336,12 +339,14 @@ export function NewHomeworkIntakeForm({
 
           {subjectChoice === "autre" ? (
             <label className="grid gap-2 text-sm">
-              <span className="font-medium">Nom de la matiere</span>
+              <span className="font-medium">
+                {copy.sections.brief.customSubjectLabel}
+              </span>
               <input
                 className="rounded-2xl border border-[color:var(--line)] bg-white px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
                 maxLength={60}
                 onChange={(event) => setCustomSubject(event.target.value)}
-                placeholder="Ex: Allemand"
+                placeholder={copy.sections.brief.customSubjectPlaceholder}
                 type="text"
                 value={customSubject}
               />
@@ -352,19 +357,20 @@ export function NewHomeworkIntakeForm({
         <article className="grid gap-5 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]">
           <div className="space-y-3">
             <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-              A3.2.2 A3.2.3 Sources du devoir
+              {copy.sections.sources.eyebrow}
             </p>
             <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
-              Ajoute les pieces du devoir puis le texte utile deja lisible.
+              {copy.sections.sources.title}
             </h2>
           </div>
 
           <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
             <div className="space-y-2">
-              <p className="text-sm font-medium">Fichiers autorises</p>
+              <p className="text-sm font-medium">
+                {copy.sections.sources.allowedFilesTitle}
+              </p>
               <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-                Images, captures d&apos;ecran et PDF sont verifies ici puis
-                transferes et analyses pendant la creation de session.
+                {copy.sections.sources.allowedFilesBody}
               </p>
             </div>
 
@@ -382,20 +388,26 @@ export function NewHomeworkIntakeForm({
                 onClick={() => fileInputRef.current?.click()}
                 type="button"
               >
-                Ajouter des fichiers
+                {copy.sections.sources.addFiles}
               </button>
             </div>
           </div>
 
-          <IntakeFileList files={files} onRemove={handleRemoveFile} />
+          <IntakeFileList
+            files={files}
+            languageCode={languageCode}
+            onRemove={handleRemoveFile}
+          />
 
           <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-start">
             <label className="grid gap-2 text-sm">
-              <span className="font-medium">Texte colle ou recopie utile</span>
+              <span className="font-medium">
+                {copy.sections.sources.pastedTextLabel}
+              </span>
               <textarea
                 className="min-h-40 rounded-[1.5rem] border border-[color:var(--line)] bg-white px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
                 onChange={(event) => handlePastedTextChange(event.target.value)}
-                placeholder="Colle ici l'enonce, la correction, ou les passages deja lisibles..."
+                placeholder={copy.sections.sources.pastedTextPlaceholder}
                 value={pastedText}
               />
             </label>
@@ -406,7 +418,7 @@ export function NewHomeworkIntakeForm({
                 onChange={(event) => setGradedHomework(event.target.checked)}
                 type="checkbox"
               />
-              Devoir note
+              {copy.sections.sources.gradedHomework}
             </label>
           </div>
         </article>
@@ -415,14 +427,13 @@ export function NewHomeworkIntakeForm({
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="space-y-3">
               <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-                A3.2.4 Texte extrait relu
+                {copy.sections.review.eyebrow}
               </p>
               <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
-                Relis, corrige, puis laisse un texte propre a transmettre au chat.
+                {copy.sections.review.title}
               </h2>
               <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-                Le brouillon peut venir du texte colle, d&apos;une correction
-                manuelle, ou des pieces qui seront analysees a la creation.
+                {copy.sections.review.body}
               </p>
             </div>
 
@@ -431,7 +442,7 @@ export function NewHomeworkIntakeForm({
               onClick={handleExtractionReset}
               type="button"
             >
-              Regenerer le brouillon
+              {copy.sections.review.resetDraft}
             </button>
           </div>
 
@@ -442,7 +453,7 @@ export function NewHomeworkIntakeForm({
               setHasEditedExtractionDraft(true);
               setReviewMessage(null);
             }}
-            placeholder="Le texte relu du devoir apparaitra ici."
+            placeholder={copy.sections.review.draftPlaceholder}
             value={extractionDraft}
           />
 
@@ -452,10 +463,12 @@ export function NewHomeworkIntakeForm({
               disabled={!snapshot.canStartHomework || isSubmitting}
               type="submit"
             >
-              {isSubmitting ? "Creation..." : "Creer la session"}
+              {isSubmitting
+                ? copy.sections.review.creating
+                : copy.sections.review.createSession}
             </button>
             <span className="inline-flex items-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-2 text-sm text-[color:var(--ink-soft)]">
-              La session sera persistee puis les pieces seront uploadees et extraites
+              {copy.sections.review.persistenceBadge}
             </span>
           </div>
 
@@ -471,6 +484,7 @@ export function NewHomeworkIntakeForm({
         canStartHomework={snapshot.canStartHomework}
         extractionDraftLength={extractionDraft.trim().length}
         filesCount={files.length}
+        languageCode={languageCode}
         pastedTextLength={pastedText.trim().length}
         reviewMessage={reviewMessage}
         subjectReady={subjectReady}

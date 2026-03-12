@@ -8,15 +8,15 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 
-- Overall: `[#############################.]` `124/130` complete (`95%`)
-- A0: `[xxxxxxxxxxxxxxxxxxx...]` `19/22`
+- Overall: `[############################..]` `128/135` complete (`95%`)
+- A0: `[xxxxxxxxxxxxxxxxxxxxx.]` `21/22`
 - A1: `[xxxxxxxxxxxxxxxx]` `16/16`
 - A2: `[xxxxxxxxxxxxxxxxx]` `17/17`
 - A3: `[xxxxxxxxxxxxxxxxx]` `17/17`
 - A4: `[xxxxxxxxxxxxxxxxxxx]` `19/19`
 - A5: `[xxxxxxxxxxxxx]` `13/13`
 - A6: `[xxxxxxxxxxxxx]` `13/13`
-- A7: `[xxxxxxxxxx...]` `10/13`
+- A7: `[xxxxxxxxxxxx......]` `12/18`
 
 ## Table Of Contents
 
@@ -46,7 +46,7 @@ Current direction: GitHub repo exists, Vercel is the chosen deployment platform,
 ### A0.2 Service Accounts And Environment Matrix
 
 - [x] A0.2.1 Create the Supabase project.
-- [ ] A0.2.2 Create the PostHog project.
+- [x] A0.2.2 Create the PostHog project.
 - [ ] A0.2.3 Create the Resend account and sender setup.
 - [x] A0.2.4 Choose the primary AI provider and a fallback provider.
 - [x] A0.2.5 Choose the billing provider compatible with the founder's geography/entity setup.
@@ -55,7 +55,11 @@ Current direction: GitHub repo exists, Vercel is the chosen deployment platform,
 Current direction: primary starter AI path is Gemini, with OpenAI API now selected as the explicit fallback provider for a later adapter. Billing provider is Lemon Squeezy.
 Constraint: verify the Gemini tier and data-handling settings are suitable for minors before any live child traffic uses the AI flow.
 Constraint: a founder personal AI subscription is not treated as a backend fallback provider for the app.
+Status note: local env now confirms `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`, and `NEXT_PUBLIC_ENABLE_ANALYTICS`, so the external PostHog project-creation step is treated as complete; the telemetry sink still stays runtime-only until a dedicated PostHog adapter exists.
+Status note: local env now includes `RESEND_API_KEY`, but `ENABLE_RESEND_EMAILS` remains off and sender/domain setup is still unverified, so `A0.2.3` remains an external blocker.
+Status note: the current repo still has no Resend mailer path; parent-approval and tutor-invite routes continue to return copy/share invite URLs until a separate delivery slice is implemented.
 Status note: the fallback choice is now documented in `docs/decision_log.md`, `docs/environment_matrix.md`, and `docs/telemetry_feature_controls_v1.md`; the actual fallback adapter remains intentionally disabled until implemented.
+Status note: the Gemini note now explicitly records that RPM and RPD limits apply per Google project, not per API key, so a dedicated billed pilot project plus separate dev and pilot keys is now the expected launch path before real user traffic.
 
 ### A0.3 Traceability Spine
 
@@ -64,11 +68,12 @@ Status note: the fallback choice is now documented in `docs/decision_log.md`, `d
 - [x] A0.3.3 Create the implementation plan and brief adjustments docs.
 - [x] A0.3.4 Create the decision log and work sessions log.
 - [x] A0.3.5 Create `Vibestructions`.
-- [ ] A0.3.6 Add issue labels and review templates after GitHub setup.
+- [x] A0.3.6 Add issue labels and review templates after GitHub setup.
 - [x] A0.3.7 Add an experimental prompt-level log that can run in parallel with session logging.
 
 Status note: `docs/work_sessions.md` remains the canonical session log, and `docs/work_prompt_log.md` now exists as an experimental one-row-per-prompt trace with a manual Codex-credit column.
-Status note: repo-owned issue and PR workflow artifacts now live under `.github/` plus `docs/github_workflow_v1.md`, but the actual GitHub label creation step remains an external follow-up.
+Status note: repo-owned issue and PR workflow artifacts now live under `.github/` plus `docs/github_workflow_v1.md`, and the public GitHub repository labels were synced from `.github/labels.json` on 2026-03-12 through an authenticated GitHub CLI pass.
+Status note: the canonical remote label set is now `type:bug`, `type:work`, `type:ops`, `needs:triage`, `blocked:external`, `risk:student-flow`, `risk:oversight`, and `risk:billing-ai`.
 
 ### A0.4 Product Constraints And Acceptance Rules
 
@@ -364,13 +369,17 @@ Outcome: the product is stable enough for serious parent and tutor trials.
 - [ ] A7.1.2 Fix keyboard, layout, and tap-target issues.
 - [ ] A7.1.3 Verify portrait and landscape tablet behavior.
 
+Status note: `scripts/smoke-tablet-emulation.mjs` now provides a repeatable tablet pre-pass against `/app`, `/app/new`, and `/app/conversations/[conversationId]` using the deterministic fixture student plus a local production-build `next start` instance when no URL override is provided.
+Status note: on 2026-03-11 that pre-pass reported no horizontal overflow and no detected tap targets below `44x44` on the checked student surfaces in both portrait and landscape tablet viewports.
+Status note: real iPad Safari upload, keyboard, and chat ergonomics are still required before `A7.1` can close.
+
 ### A7.2 Smoke Tests And Regression Coverage
 
 - [x] A7.2.1 Create a written smoke test checklist for student, parent, tutor, and admin roles.
 - [x] A7.2.2 Add automated coverage for the highest-risk backend and auth paths.
 - [x] A7.2.3 Add a pre-demo regression pass.
 
-Status note: fixture-backed automated smoke now exists for student, memory, adult-oversight, privacy, and billing flows; `docs/smoke_checklist_v1.md` now defines the written acceptance criteria for student, parent, tutor, and admin roles; and `npm run regress:mvp` now acts as the canonical pre-demo regression pass.
+Status note: fixture-backed automated smoke now exists for student, memory, adult-oversight, privacy, and billing flows; `docs/smoke_checklist_v1.md` now defines the written acceptance criteria for student, parent, tutor, and admin roles; and `npm run regress:mvp` now acts as the canonical pre-demo regression pass while reseeding deterministic fixtures before verification and the smoke suite.
 
 ### A7.3 Performance And Cost Controls
 
@@ -380,11 +389,28 @@ Status note: fixture-backed automated smoke now exists for student, memory, adul
 - [x] A7.3.4 Publish a consolidated AI ops and economics note covering quota windows, prompt pipeline, guardrails, per-activity usage estimates, and the paid-vs-trial policy for parent-facing AI value.
 
 Status note: the current Gemini-backed path now enforces bounded prompt context and output-token caps, reuses existing upload-extraction and completion artifacts instead of repeating provider calls, keeps the current upload byte limits after an explicit review against the 30-day trial quotas, and now has a consolidated operating note in `docs/ai_ops_economics_v1.md`.
+Status note: `docs/ai_ops_economics_v1.md` now also records Gemini project-level rate windows, free-tier development limits, the need for a dedicated billed pilot project, and the recommended dev-only mitigation path around project split, mock AI mode, batch work, and caching boundaries.
 
 ### A7.4 Launch Candidate
 
 - [x] A7.4.1 Decide whether PWA installability is worth doing before beta.
 - [x] A7.4.2 Prepare demo accounts and a founder walkthrough script.
 - [x] A7.4.3 Freeze the MVP scope and publish the launch checklist.
+- [ ] A7.4.4 Restore accented French copy and audit Unicode-safe rendering on shared MVP surfaces.
+- [ ] A7.4.5 Add actual interface-copy localization for `fr`, `en`, and `zh` across the shared MVP routes.
+- [ ] A7.4.6 Verify language switching, parent-summary language defaults, and `zh` copy fit on the tablet-critical routes.
+- [x] A7.4.7 Add a shared MVP brand layer and shell polish that improves trust without a full UI rewrite.
+- [x] A7.4.8 Create a separate `Pilot_todo` hardening plan and logging rules without moving true MVP blockers out of the launch gate.
 
 Status note: PWA installability is now explicitly deferred before beta, the canonical demo-account and founder walkthrough script now live in `docs/founder_walkthrough_v1.md`, and the frozen launch-candidate scope plus exit checklist now live in `docs/launch_checklist_v1.md`.
+Status note: `A2.1.6` still marks the foundation slice only, but the shared public, auth, onboarding, invite, app-shell, app-home, and settings/privacy surfaces now read from `lib/i18n/ui-copy.ts`, preserve public-route `lang` state through `lib/i18n/ui-language.ts`, and localize the shared student age-band options.
+Status note: a small `components/i18n/document-language-sync.tsx` layer now updates `document.documentElement.lang` from the live UI language on the shared shells, even though `app/layout.tsx` still renders `lang=\"fr\"` at the initial server HTML level.
+Status note: the `/app` role dashboards now also localize their main copy through `lib/i18n/dashboard-copy.ts`, including the student start/support/recent panels, the student memory panel, the student-side adult-link forms, and the parent/tutor/admin dashboard summaries.
+Status note: the deeper student and adult route family now localizes its main interface copy through `lib/i18n/student-flow-copy.ts` and `lib/i18n/oversight-copy.ts`, covering `/app/new`, `/app/history`, `/app/conversations/[conversationId]`, `/app/students/[studentUserId]`, and `/app/review/[conversationId]`.
+Status note: the admin audit list, deletion-request feedback, and the user-facing quota block messages for conversation creation, upload, and chat now also localize by UI language, while `app/layout.tsx` adds explicit CJK fallback for the shared font variables.
+Status note: the core student APIs now also localize their user-facing validation errors, upload warnings, deterministic coach fallback, initial transcript scaffolding, deterministic student-summary fallback, and visible weakness-tag labels through `lib/i18n/student-flow-copy.ts`.
+Status note: auth/profile bootstrap and update, invitation create and accept, tutor-note mutations, memory mutations, deterministic memory fallback copy, and the small parent billing-management conflict path now also localize their user-facing server messages through the focused copy modules.
+Status note: the remaining launch-blocking language gap is now primarily the full accented-French plus Unicode audit, broader parent-summary default and language-switch verification, and residual generic provider or service fallback strings that still bypass the focused copy modules.
+Status note: the public language switcher is now visible at tablet widths, and refreshed local `npm run smoke:tablet-emulation` passes succeeded again on 2026-03-12 against both the current localized French labels and a temporary `zh` fixture-language pre-pass for `/app`, `/app/new`, and `/app/conversations/[conversationId]`, but broader language-switch behavior, parent-summary default verification, and real iPad Safari validation still remain open inside `A7.4.6` and `A7.1`.
+Status note: the shared public and app shells, `SurfaceCard`, and global CSS now carry a calmer brand baseline and reusable shell classes, while deeper route-by-route redesign remains pilot work rather than a late MVP rewrite.
+Status note: [Pilot_todo](pilot_todo.md) now tracks post-MVP hardening with `P*` task IDs; true launch blockers remain in `docs/mvp_todo.md` until they are actually closed.

@@ -4,6 +4,7 @@ import { AccountSettingsForm } from "@/components/auth/account-settings-form";
 import { ParentDashboard } from "@/components/dashboard/parent-dashboard";
 import { StudentDashboard } from "@/components/dashboard/student-dashboard";
 import { TutorDashboard } from "@/components/dashboard/tutor-dashboard";
+import { getAppHomeCopy } from "@/lib/i18n/ui-copy";
 import {
   redirectDeletionRequestedAppUser,
   requireAppPageContext,
@@ -40,7 +41,12 @@ async function renderRoleDashboard(
     }
     case "admin": {
       const snapshot = await loadAdminAccessAuditSnapshot(appUser);
-      return <AdminDashboard auditEventCount={snapshot.events.length} />;
+      return (
+        <AdminDashboard
+          auditEventCount={snapshot.events.length}
+          languageCode={appUser.preferred_ui_language}
+        />
+      );
     }
     default:
       return null;
@@ -50,6 +56,7 @@ async function renderRoleDashboard(
 export default async function AppHomePage() {
   const { appUser } = await requireAppPageContext();
   redirectDeletionRequestedAppUser(appUser);
+  const copy = getAppHomeCopy(appUser.preferred_ui_language);
 
   return (
     <div className="grid gap-6">
@@ -61,20 +68,19 @@ export default async function AppHomePage() {
       >
         <article className="space-y-3">
           <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-            Account settings
+            {copy.eyebrow}
           </p>
           <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
-            Les champs editables passent maintenant par `PATCH /api/auth/profile`.
+            {copy.title}
           </h2>
           <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-            Cette surface reste simple, mais elle exerce deja la persistence
-            du profil applicatif et la synchronisation de metadata cote auth.
+            {copy.body}
           </p>
           <Link
-            className="inline-flex rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5"
+            className="button-base button-secondary"
             href="/app/settings"
           >
-            Ouvrir les reglages complets
+            {copy.cta}
           </Link>
         </article>
 

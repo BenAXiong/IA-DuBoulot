@@ -24,7 +24,10 @@ export const GET = withRouteErrorHandling(async (_request, { requestId }) => {
 
 export const POST = withRouteErrorHandling(async (request, { requestId }) => {
   const context = await requireAuthenticatedUserContext();
-  const payload = await parseCreateConversationDraftInput(request);
+  const payload = await parseCreateConversationDraftInput(
+    request,
+    context.appUser?.preferred_ui_language ?? "fr",
+  );
   const result = await createConversationDraft({
     context,
     payload,

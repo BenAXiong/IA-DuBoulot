@@ -19,7 +19,7 @@ export function FormField({
     >
       <span className="font-medium">{label}</span>
       {children}
-      {error ? <span className="text-[#8d3b1f]">{error}</span> : null}
+      {error ? <span className="text-[color:var(--error-ink)]">{error}</span> : null}
     </label>
   );
 }

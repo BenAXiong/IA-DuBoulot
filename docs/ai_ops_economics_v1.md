@@ -22,6 +22,41 @@ It is intentionally explicit about the difference between:
 
 These prices are implementation constants, not a legal or billing guarantee. Re-check the provider docs before relying on them for real margin planning.
 
+## Gemini Provider Limit Model
+
+Official references:
+
+- rate limits: <https://ai.google.dev/gemini-api/docs/rate-limits>
+- troubleshooting: <https://ai.google.dev/gemini-api/docs/troubleshooting>
+- context caching: <https://ai.google.dev/gemini-api/docs/caching>
+- batch API: <https://ai.google.dev/gemini-api/docs/batch-api>
+
+Key provider facts to plan around:
+
+- Gemini limits are enforced per Google project, not per API key. Rotating keys inside the same project will not bypass a saturated free-tier RPM or RPD window.
+- The free tier exposes both per-minute and per-day limits by model. In practice, the common `429 RESOURCE_EXHAUSTED` class can mean either the RPM window or the daily request window was reached.
+- Google documents the daily window as resetting at midnight Pacific time.
+- Linking billing raises available limits, but the exact ceilings remain model and tier specific, so re-check the official table before deciding pilot capacity.
+
+Current repo implication:
+
+- treat the current free-tier Gemini setup as a development-only path
+- do not reuse the same Google project for both local iteration and the first real pilot
+- before live pilot traffic, provision a dedicated billed Gemini project and mirror that project's key into Vercel plus the local production-like env
+
+Operational recommendation:
+
+1. keep one Gemini project for local or dev work
+2. keep a separate Gemini project for pilot or production traffic
+3. keep the free-tier project out of live walkthroughs once real reliability matters
+4. add explicit 429 handling and backoff if provider-limit errors become visible in pilot telemetry
+
+What not to over-claim:
+
+- context caching can reduce repeated large-prefix cost, but it does not remove the underlying standard `GenerateContent` rate limits
+- the Batch API is useful for asynchronous bulk work, not for live student chat or synchronous completion flows
+- a second provider path may help resilience later, but it does not remove the need to size the primary Gemini project correctly
+
 ## Quota Windows
 
 Current implemented windows:
@@ -239,6 +274,7 @@ Not yet implemented:
 Recommendation:
 
 - if usage pressure appears in production, add a deterministic benchmark harness before widening parent-side AI features
+- for local UI-heavy iteration, add a dev-only mock-AI mode before spending more effort on prompt-path polish against the live Gemini project
 
 ## Parent-Facing AI Policy
 

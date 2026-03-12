@@ -1,10 +1,10 @@
 # Launch Checklist V1
 
-Related: [README](../README.md) | [Implementation plan](implementation_plan.md) | [Smoke checklist V1](smoke_checklist_v1.md) | [Founder walkthrough V1](founder_walkthrough_v1.md) | [AI ops and economics V1](ai_ops_economics_v1.md) | [Environment matrix](environment_matrix.md) | [RLS fixture verification](rls_fixture_verification.md) | [MVP to-do list](mvp_todo.md) | [Decision log](decision_log.md)
+Related: [README](../README.md) | [Implementation plan](implementation_plan.md) | [Smoke checklist V1](smoke_checklist_v1.md) | [Founder walkthrough V1](founder_walkthrough_v1.md) | [AI ops and economics V1](ai_ops_economics_v1.md) | [Environment matrix](environment_matrix.md) | [RLS fixture verification](rls_fixture_verification.md) | [MVP to-do list](mvp_todo.md) | [Pilot_todo](pilot_todo.md) | [Decision log](decision_log.md)
 
 ## Purpose
 
-This document freezes the current MVP launch-candidate scope and defines the checklist for an internal beta-ready build.
+This document freezes the current MVP launch-candidate scope and defines the checklist for a closed pilot-ready build.
 
 ## PWA Decision
 
@@ -31,6 +31,7 @@ Keep in the launch candidate:
 - privacy/settings, deletion-request queueing, and audit visibility
 - deterministic fixture seeding plus the current regression and smoke suite
 - Gemini-backed coaching, extraction, summaries, translations, and memory with documented fallback behavior
+- shared interface copy that is genuinely shippable in `fr`, `en`, and `zh` for the first Taiwan pilot cohort
 
 Explicitly defer beyond this launch candidate:
 
@@ -38,6 +39,7 @@ Explicitly defer beyond this launch candidate:
 - a second AI provider or richer retry orchestration
 - adult-summary repair or manual summary-regeneration tooling
 - richer analytics, dashboards, or marketing-site polish
+- broader UX and visual refinement beyond the shared shell baseline now tracked in [Pilot_todo](pilot_todo.md)
 - broader admin tooling than the current audit-focused surface
 
 ## Launch Candidate Checklist
@@ -59,6 +61,7 @@ Explicitly defer beyond this launch candidate:
 - Vercel production deploy is healthy
 - production env vars match the documented matrix
 - Lemon webhook target and mode match the intended walkthrough or beta environment
+- Gemini production traffic uses a dedicated project or tier with enough rate headroom for the pilot; do not rely on the free-tier dev project for live user traffic
 - Gemini-backed paths are reachable in production even if fallback may still be exercised intermittently
 
 ### Access And Privacy
@@ -76,10 +79,13 @@ Explicitly defer beyond this launch candidate:
 
 ### Device Readiness
 
-- real iPad Safari validation is completed and logged
+- local `npm run smoke:tablet-emulation` pre-pass is green and logged
+- real iPad Safari validation is still pending and remains a launch blocker
 
-## Current Remaining Blocker
+## Current Remaining Blockers
 
-The only remaining open work inside `A7` is `A7.1` real iPad Safari validation.
+The remaining open work inside `A7` is `A7.1` real iPad Safari validation plus the last `A7.4.4` to `A7.4.6` interface-language gaps around the accented-French or Unicode audit, the broader parent-summary default and language-switch verification, and any residual generic provider or service strings that still bypass the focused copy modules after the local `zh` tablet-fit pre-pass for the Taiwan-first pilot.
 
-The AI ops/economics and parent-AI policy note is now published in [AI ops and economics V1](ai_ops_economics_v1.md), so the main product blocker returns to the real iPad Safari pass.
+The AI ops/economics and parent-AI policy note is now published in [AI ops and economics V1](ai_ops_economics_v1.md), including the Gemini project-limit model and pilot-project recommendation, so the main product blockers are now device validation and the explicit trilingual UI pass.
+
+Post-launch polish, UX hardening, and broader pilot operating work now live in [Pilot_todo](pilot_todo.md) instead of being mixed into the launch gate.

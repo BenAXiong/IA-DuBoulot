@@ -11,7 +11,10 @@ type Params = Promise<{ conversationId: string }> | { conversationId: string };
 export const PATCH = withRouteErrorHandling<{ params: Params }>(
   async (request, { params, requestId }) => {
     const context = await requireAuthenticatedUserContext();
-    const payload = await parseUpdateWorkspaceInput(request);
+    const payload = await parseUpdateWorkspaceInput(
+      request,
+      context.appUser?.preferred_ui_language ?? "fr",
+    );
     const resolvedParams = await params;
     const workspace = await updateWorkspaceState({
       context,

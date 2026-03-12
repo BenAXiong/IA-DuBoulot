@@ -65,6 +65,8 @@ Dashboard and review components:
 - `components/dashboard/oversight/admin-access-audit-list.tsx`
 - `components/dashboard/oversight/billing-status-card.tsx`
 - `components/dashboard/memory/memory-panel.tsx`
+- `lib/i18n/dashboard-copy.ts`
+- `lib/i18n/oversight-copy.ts`
 
 Server services:
 
@@ -91,6 +93,9 @@ Dashboard:
 - shows payer subscription status from `subscriptions`
 - shows each linked student's quota state from the shared usage service
 - leaves the richer billing/privacy controls to `/app/settings`, while still surfacing the parent billing status inside the dashboard
+- now localizes its own `/app` dashboard copy through `lib/i18n/dashboard-copy.ts`
+- the linked-student detail, parent review, and admin audit list now also localize their interface copy through `lib/i18n/oversight-copy.ts`
+- the current billing-management conflict path now also localizes its user-facing message through `lib/i18n/oversight-copy.ts`
 
 Student detail:
 
@@ -113,8 +118,10 @@ Session review:
 Dashboard:
 
 - shows linked students with recent-session counts
-- surfaces top tutor-summary weakness tags
+- surfaces top tutor-summary weakness tags with localized human labels instead of raw stored codes
 - links into the tutor student detail and session-review flow
+- now localizes its own `/app` dashboard copy through `lib/i18n/dashboard-copy.ts`
+- the linked-student detail, tutor summary, session-review note surface, and admin audit list now also localize their interface copy through `lib/i18n/oversight-copy.ts`, while the tutor-summary weakness-tag chips reuse the shared student-flow label mapping
 
 Student detail:
 
@@ -135,6 +142,7 @@ Session review:
 - notes stay invisible to student and parent
 - mutations go through canonical server routes even though RLS already restricts direct access
 - create, update, and delete actions emit audit rows
+- tutor-note create, update, and delete validation, not-found, and service-failure messages now localize from the tutor's UI language instead of defaulting to French
 
 ## Audit Rules
 
@@ -150,6 +158,8 @@ Current review surface:
 
 - `/app/audit` for admin
 - `GET /api/admin/audit/access-events` for machine-readable inspection and smoke coverage
+- the first `/app` admin dashboard summary cards are localized through `lib/i18n/dashboard-copy.ts`
+- the dedicated `/app/audit` list now also resolves localized actor-role, action, target-table, and empty-state copy through `lib/i18n/oversight-copy.ts`
 
 ## Verification
 
@@ -161,13 +171,13 @@ Current automated coverage now includes:
 - `npm run smoke:adult-oversight`
 - `npm run smoke:billing`
 
-Latest local result on 2026-03-11:
+Latest local result on 2026-03-12:
 
 - RLS fixture verification passed with `17` checks and `0` failures
 - memory smoke passed across student and parent memory surfaces while confirming tutor raw-memory denial
 - student-flow smoke passed with provider-fallback warnings
-- adult-oversight smoke passed across parent, tutor, and admin surfaces
-- billing smoke passed against the signed Lemon webhook route and the parent dashboard billing surface, while intentionally blanking local checkout env to keep the graceful `503` branch covered
+- adult-oversight smoke passed across parent, tutor, and admin surfaces after the localized tutor-note and admin-audit updates
+- billing smoke passed against the signed Lemon webhook route and the parent dashboard billing surface, while intentionally blanking local checkout env to keep the graceful `503` branch covered and rechecking the localized billing-management conflict path
 - deployed Vercel billing verification also passed in Lemon test mode, including checkout open, payment completion, redirect back to `/app`, dashboard subscription visibility, confirmation email, and Lemon order logging
 
 ## Known Boundaries

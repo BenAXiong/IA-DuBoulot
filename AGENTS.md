@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Primary references: [README.md](README.md) | [Implementation plan](docs/implementation_plan.md) | [MVP to-do list](docs/mvp_todo.md) | [Decision log](docs/decision_log.md) | [Work sessions log](docs/work_sessions.md) | [Prompt work log](docs/work_prompt_log.md)
+Primary references: [README.md](README.md) | [Implementation plan](docs/implementation_plan.md) | [MVP to-do list](docs/mvp_todo.md) | [Pilot_todo](docs/pilot_todo.md) | [Decision log](docs/decision_log.md) | [Work sessions log](docs/work_sessions.md) | [Prompt work log](docs/work_prompt_log.md)
 
 This repository is being built as a long-term AI-assisted software project. The main failure mode is not raw coding quality. It is traceability loss: code, docs, prompts, scripts, and operating rules drifting out of sync until future sessions build on incomplete context.
 
@@ -10,12 +10,13 @@ This file defines the mandatory operating system for all future agents and sessi
 
 1. Read the current project state before making plans or code changes.
 2. Never create an orphan artifact. Every new script, doc, SQL file, prompt file, or meta file must be linked from at least one existing source-of-truth document.
-3. Every meaningful change must map back to a task ID from [docs/mvp_todo.md](docs/mvp_todo.md).
+3. Every meaningful change must map back to a task ID from [docs/mvp_todo.md](docs/mvp_todo.md) or [docs/pilot_todo.md](docs/pilot_todo.md) when the work is in the post-MVP pilot lane.
 4. Any change that affects architecture, schema, auth, AI behavior, billing, moderation, or operating workflow must be logged in [docs/decision_log.md](docs/decision_log.md).
 5. Every work session must appear in [docs/work_sessions.md](docs/work_sessions.md).
 6. If code and docs drift, fix the drift in the same session or leave an explicit follow-up task in [docs/mvp_todo.md](docs/mvp_todo.md).
 7. Prefer explicit, boring, reviewable structure over clever abstractions.
 8. Do not create god components, god hooks, god services, or god utility files.
+9. After each coherent implementation slice that changes tracked files, create a task-ID git commit and push it unless the user explicitly asks to defer git actions or the work is still intentionally mid-slice.
 
 ## Mandatory Read Order At Session Start
 
@@ -52,14 +53,15 @@ Read these in order before any substantial implementation work:
 29. [docs/smoke_checklist_v1.md](docs/smoke_checklist_v1.md) when QA, demo readiness, or launch-readiness work is in scope
 30. [docs/founder_walkthrough_v1.md](docs/founder_walkthrough_v1.md) when demo prep or external walkthrough work is in scope
 31. [docs/launch_checklist_v1.md](docs/launch_checklist_v1.md) when launch-candidate or beta-readiness work is in scope
-32. [docs/sample_attachment_corpus.md](docs/sample_attachment_corpus.md) when upload, extraction, or demo fixture work is in scope
-33. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
-34. [docs/mvp_todo.md](docs/mvp_todo.md)
-35. [docs/mvp_timeline.md](docs/mvp_timeline.md)
-36. [docs/decision_log.md](docs/decision_log.md)
-37. [docs/work_sessions.md](docs/work_sessions.md)
-38. [docs/work_prompt_log.md](docs/work_prompt_log.md) when the experimental prompt-level trace is active
-39. The relevant code, SQL, prompt, or UI files for the task being worked on
+32. [docs/pilot_todo.md](docs/pilot_todo.md) when pilot hardening, UX polish, or post-MVP release planning is in scope
+33. [docs/sample_attachment_corpus.md](docs/sample_attachment_corpus.md) when upload, extraction, or demo fixture work is in scope
+34. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
+35. [docs/mvp_todo.md](docs/mvp_todo.md)
+36. [docs/mvp_timeline.md](docs/mvp_timeline.md)
+37. [docs/decision_log.md](docs/decision_log.md)
+38. [docs/work_sessions.md](docs/work_sessions.md)
+39. [docs/work_prompt_log.md](docs/work_prompt_log.md) when the experimental prompt-level trace is active
+40. The relevant code, SQL, prompt, or UI files for the task being worked on
 
 If a file above is outdated, update it before or alongside the code change that depends on it.
 
@@ -74,7 +76,7 @@ If a file above is outdated, update it before or alongside the code change that 
 
 ### 2. Rebuild Context
 
-- Confirm the current active phase and task IDs in [docs/mvp_todo.md](docs/mvp_todo.md).
+- Confirm the current active phase and task IDs in [docs/mvp_todo.md](docs/mvp_todo.md), and in [docs/pilot_todo.md](docs/pilot_todo.md) when pilot hardening work is in scope.
 - Review recent decisions in [docs/decision_log.md](docs/decision_log.md).
 - Check whether the intended work changes architecture, contracts, prompts, or workflow. If yes, prepare a decision log update.
 
@@ -88,10 +90,12 @@ If a file above is outdated, update it before or alongside the code change that 
 
 After any meaningful code or doc change:
 
-- Update the relevant task checkboxes in [docs/mvp_todo.md](docs/mvp_todo.md).
+- Update the relevant task checkboxes in [docs/mvp_todo.md](docs/mvp_todo.md) and/or [docs/pilot_todo.md](docs/pilot_todo.md).
+- If the work changes pilot-hardening status, UX findings, release-ops assumptions, or shared polish debt, update [docs/pilot_todo.md](docs/pilot_todo.md) in the same session even when the active code task still lives in MVP.
 - Add or update decision entries in [docs/decision_log.md](docs/decision_log.md) when the change affects structure or behavior.
 - Update [README.md](README.md) if a new top-level artifact becomes important to future work.
 - Update cross-links inside any new document or operating document.
+- After verification, stage only the relevant files, create a task-ID commit, and push to `origin`. If unrelated local work is present, do not mix it silently; either commit a bounded subset or leave an explicit note.
 
 ### 5. End The Session Only On Explicit User Instruction
 
@@ -167,8 +171,8 @@ If a new folder becomes a stable part of the project, add it to [README.md](READ
 
 ## Task ID Rules
 
-- Use IDs exactly as written in [docs/mvp_todo.md](docs/mvp_todo.md).
-- If new work does not fit an existing task, add the new task before implementing it.
+- Use IDs exactly as written in [docs/mvp_todo.md](docs/mvp_todo.md) for launch work and in [docs/pilot_todo.md](docs/pilot_todo.md) for pilot-hardening work.
+- If new work does not fit an existing task, add the new task in the right planning document before implementing it.
 - Reference task IDs in:
   - session log rows
   - decision entries
@@ -227,3 +231,4 @@ A task is only done when:
 4. Any structural decision is logged.
 5. New artifacts are linked from the right docs.
 6. The next agent can infer what happened without reconstructing it from git history alone.
+7. The coherent change set is committed and pushed, or the reason for deferring git actions is explicitly logged in the session close-out.

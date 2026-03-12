@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { StudentStatusPill } from "@/components/dashboard/student/student-status-pill";
+import { getSummaryLanguagePanelCopy } from "@/lib/i18n/oversight-copy";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type { ParentConversationSummaryVariant } from "@/lib/server/oversight/types";
 
@@ -27,6 +28,7 @@ export function SummaryLanguagePanel({
   variants,
   preferredLanguage,
 }: SummaryLanguagePanelProps) {
+  const copy = getSummaryLanguagePanelCopy(preferredLanguage);
   const [selectedLanguage, setSelectedLanguage] = useState<UiLanguageCode | null>(
     pickInitialLanguage(variants, preferredLanguage),
   );
@@ -36,7 +38,7 @@ export function SummaryLanguagePanel({
   if (variants.length === 0) {
     return (
       <article className="rounded-[1.5rem] border border-dashed border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5 text-sm leading-6 text-[color:var(--ink-soft)]">
-        Aucun resume parent n&apos;est encore disponible pour cette session.
+        {copy.empty}
       </article>
     );
   }
@@ -45,7 +47,7 @@ export function SummaryLanguagePanel({
     <article className="grid gap-4 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-[var(--shadow)]">
       <div className="space-y-2">
         <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-          Resume parent
+          {copy.eyebrow}
         </p>
         <div className="flex flex-wrap gap-2">
           {variants.map((variant) => (
@@ -81,7 +83,7 @@ export function SummaryLanguagePanel({
 
           {selectedVariant.nextStepRecommendation ? (
             <div className="rounded-[1.25rem] border border-[color:var(--line)] bg-white px-4 py-3 text-sm leading-6 text-[color:var(--ink-soft)]">
-              Prochaine etape: {selectedVariant.nextStepRecommendation}
+              {copy.nextStep(selectedVariant.nextStepRecommendation)}
             </div>
           ) : null}
         </div>

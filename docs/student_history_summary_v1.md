@@ -20,6 +20,7 @@ This document covers `A3.5.1` to `A3.5.3`:
 - History list UI: `components/dashboard/student/student-session-history-list.tsx`
 - Conversation page: `app/app/conversations/[conversationId]/page.tsx`
 - Summary panel UI: `components/dashboard/student/student-session-summary-panel.tsx`
+- Student flow localization copy: `lib/i18n/student-flow-copy.ts`
 - Complete route: `app/api/conversations/[conversationId]/complete/route.ts`
 - Conversation service: `lib/server/conversations/conversation-service.ts`
 - Summary service: `lib/server/summaries/service.ts`
@@ -35,6 +36,8 @@ The student flow now has three session surfaces:
 2. `/app/history` for the long-form history list
 3. `/app/conversations/[conversationId]` for the detailed transcript, workspace, and final summary
 
+The history list plus the student completion or summary panel now also localize their route copy through `lib/i18n/student-flow-copy.ts`, while the persisted summary artifacts continue to come from the provider-backed summary pipeline.
+
 When the student marks a session complete, the app now:
 
 1. updates `conversations.status` to `completed`
@@ -44,9 +47,11 @@ When the student marks a session complete, the app now:
 5. turns the session read-only for student message/workspace writes
 6. reuses the persisted student summary on repeated completion calls instead of regenerating summaries or refreshing memory again
 
+The deterministic student-summary fallback now localizes from the student's `ai_help_language`, and the student plus tutor summary surfaces map the stored weakness-tag codes back to human labels before rendering them.
+
 ## Important Boundaries
 
-- the summary path is now provider-backed in the current local workspace, but the required student artifact has a deterministic fallback and adult artifacts are best-effort
+- the summary path is now provider-backed in the current local workspace, but the required student artifact has a localized deterministic fallback and adult artifacts are best-effort
 - parent and tutor summary data now feeds the dedicated adult review surfaces documented in [Oversight surfaces V1](oversight_surfaces_v1.md)
 - completed sessions stay readable, but the student must start a new session to keep working
 - repeated completion of an already-completed session should be a cheap read of the stored student artifact, not a second expensive generation pass

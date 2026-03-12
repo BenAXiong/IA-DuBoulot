@@ -3,6 +3,8 @@ import {
   INTAKE_MAX_ATTACHMENTS,
   INTAKE_MAX_TOTAL_UPLOAD_BYTES,
 } from "@/lib/intake/intake-config";
+import { getIntakeReadinessCardCopy } from "@/lib/i18n/student-flow-copy";
+import type { UiLanguageCode } from "@/lib/server/auth/types";
 
 type IntakeReadinessCardProps = {
   canStartHomework: boolean;
@@ -13,11 +15,8 @@ type IntakeReadinessCardProps = {
   titleReady: boolean;
   subjectReady: boolean;
   reviewMessage: string | null;
+  languageCode: UiLanguageCode;
 };
-
-function getReadinessLabel(isReady: boolean) {
-  return isReady ? "pret" : "a faire";
-}
 
 export function IntakeReadinessCard({
   canStartHomework,
@@ -28,47 +27,63 @@ export function IntakeReadinessCard({
   titleReady,
   subjectReady,
   reviewMessage,
+  languageCode,
 }: IntakeReadinessCardProps) {
+  const copy = getIntakeReadinessCardCopy(languageCode);
+
   return (
     <aside className="grid gap-4 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5">
       <div className="space-y-2">
         <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-          Controle rapide
+          {copy.eyebrow}
         </p>
         <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
-          Cette carte verifie le brouillon juste avant sa persistence.
+          {copy.title}
         </h2>
       </div>
 
       <div className="grid gap-3 text-sm leading-6 text-[color:var(--ink-soft)]">
         <div className="rounded-[1.25rem] border border-[color:var(--line)] bg-white/70 px-4 py-3">
-          <p className="font-medium text-[color:var(--foreground)]">Etat</p>
-          <p>{canStartHomework ? "Depart autorise" : "Depart bloque par le statut du compte"}</p>
-        </div>
-        <div className="rounded-[1.25rem] border border-[color:var(--line)] bg-white/70 px-4 py-3">
-          <p className="font-medium text-[color:var(--foreground)]">Titre</p>
-          <p>{getReadinessLabel(titleReady)}</p>
-        </div>
-        <div className="rounded-[1.25rem] border border-[color:var(--line)] bg-white/70 px-4 py-3">
-          <p className="font-medium text-[color:var(--foreground)]">Matiere</p>
-          <p>{getReadinessLabel(subjectReady)}</p>
-        </div>
-        <div className="rounded-[1.25rem] border border-[color:var(--line)] bg-white/70 px-4 py-3">
-          <p className="font-medium text-[color:var(--foreground)]">Sources</p>
-          <p>
-            {filesCount} fichier{filesCount > 1 ? "s" : ""} | {pastedTextLength} caracteres colles
+          <p className="font-medium text-[color:var(--foreground)]">
+            {copy.cards.state}
           </p>
+          <p>{canStartHomework ? copy.stateReady : copy.stateBlocked}</p>
         </div>
         <div className="rounded-[1.25rem] border border-[color:var(--line)] bg-white/70 px-4 py-3">
-          <p className="font-medium text-[color:var(--foreground)]">Texte relu</p>
-          <p>{extractionDraftLength} caracteres dans le panneau d&apos;edition</p>
+          <p className="font-medium text-[color:var(--foreground)]">
+            {copy.cards.title}
+          </p>
+          <p>{copy.readinessLabel(titleReady)}</p>
         </div>
         <div className="rounded-[1.25rem] border border-[color:var(--line)] bg-white/70 px-4 py-3">
-          <p className="font-medium text-[color:var(--foreground)]">Limites</p>
+          <p className="font-medium text-[color:var(--foreground)]">
+            {copy.cards.subject}
+          </p>
+          <p>{copy.readinessLabel(subjectReady)}</p>
+        </div>
+        <div className="rounded-[1.25rem] border border-[color:var(--line)] bg-white/70 px-4 py-3">
+          <p className="font-medium text-[color:var(--foreground)]">
+            {copy.cards.sources}
+          </p>
+          <p>{copy.sourcesLine(filesCount, pastedTextLength)}</p>
+        </div>
+        <div className="rounded-[1.25rem] border border-[color:var(--line)] bg-white/70 px-4 py-3">
+          <p className="font-medium text-[color:var(--foreground)]">
+            {copy.cards.reviewedText}
+          </p>
+          <p>{copy.reviewedTextLine(extractionDraftLength)}</p>
+        </div>
+        <div className="rounded-[1.25rem] border border-[color:var(--line)] bg-white/70 px-4 py-3">
+          <p className="font-medium text-[color:var(--foreground)]">
+            {copy.cards.limits}
+          </p>
           <p>
-            {filesCount}/{INTAKE_MAX_ATTACHMENTS} fichiers | {formatBytes(totalBytes)} /
-            {" "}
-            {formatBytes(INTAKE_MAX_TOTAL_UPLOAD_BYTES)}
+            {copy.limitsLine(
+              filesCount,
+              INTAKE_MAX_ATTACHMENTS,
+              formatBytes(totalBytes),
+              formatBytes(INTAKE_MAX_TOTAL_UPLOAD_BYTES),
+            )}
           </p>
         </div>
       </div>

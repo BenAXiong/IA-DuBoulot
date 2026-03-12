@@ -1,5 +1,6 @@
 import "server-only";
 
+import { getDeterministicStudentSummaryCopy } from "@/lib/i18n/student-flow-copy";
 import type {
   ConversationMessageRecord,
   ConversationRecord,
@@ -60,6 +61,7 @@ function inferWeaknessTags(input: BuildStudentSessionSummaryInput) {
 }
 
 function buildProgressLine(input: BuildStudentSessionSummaryInput) {
+  const copy = getDeterministicStudentSummaryCopy(input.languageCode);
   const studentMessages = input.messages.filter(
     (message) => message.role === "student",
   ).length;
@@ -70,16 +72,17 @@ function buildProgressLine(input: BuildStudentSessionSummaryInput) {
   const draftAnswerText = compactText(input.workspace?.draft_answer_text);
 
   return [
-    `- Echanges eleve: ${studentMessages}`,
-    `- Reponses de coaching: ${assistantMessages}`,
-    `- Plan note: ${planText ? "oui" : "non"}`,
-    `- Brouillon present: ${draftAnswerText ? "oui" : "non"}`,
+    copy.progressLines.studentMessages(studentMessages),
+    copy.progressLines.assistantMessages(assistantMessages),
+    copy.progressLines.planSaved(Boolean(planText)),
+    copy.progressLines.draftSaved(Boolean(draftAnswerText)),
   ].join("\n");
 }
 
 export function buildDeterministicStudentSessionSummary(
   input: BuildStudentSessionSummaryInput,
 ): DeterministicSessionSummary {
+  const copy = getDeterministicStudentSummaryCopy(input.languageCode);
   const assignmentText =
     compactText(input.workspace?.assignment_text) ??
     compactText(input.conversation.assignment_text);
@@ -90,32 +93,32 @@ export function buildDeterministicStudentSessionSummary(
   const draftAnswerText = compactText(input.workspace?.draft_answer_text);
   const weaknessTags = inferWeaknessTags(input);
   const nextStepRecommendation = draftAnswerText
-    ? "Reprends ton brouillon, verifie chaque etape, puis ouvre une nouvelle session si tu veux un feedback plus cible."
+    ? copy.nextSteps.refineDraft
     : planText
-      ? "Transforme maintenant ton plan en premier brouillon complet avant de lancer une nouvelle session."
-      : "Reformule la consigne et ecris un plan court en 3 etapes avant la prochaine reprise.";
+      ? copy.nextSteps.writeDraft
+      : copy.nextSteps.clarifyPlan;
 
   const summaryText = [
-    `Session terminee: ${input.conversation.title}`,
+    copy.summary.title(input.conversation.title),
     "",
-    `Matiere: ${input.conversation.subject_tag}`,
+    copy.summary.subject(input.conversation.subject_tag),
     assignmentText
-      ? `Consigne retenue: ${assignmentText}`
-      : "Consigne retenue: la session doit encore conserver un enonce plus explicite.",
+      ? copy.summary.assignment(assignmentText)
+      : copy.summary.noAssignment,
     editedExtractedText
-      ? `Texte relu disponible: ${editedExtractedText}`
-      : "Texte relu disponible: aucun texte relu n'a ete sauve pour cette session.",
+      ? copy.summary.reviewedText(editedExtractedText)
+      : copy.summary.noReviewedText,
     planText
-      ? `Plan de travail: ${planText}`
-      : "Plan de travail: aucun plan n'a ete note pendant la session.",
+      ? copy.summary.plan(planText)
+      : copy.summary.noPlan,
     draftAnswerText
-      ? `Brouillon actuel: ${draftAnswerText}`
-      : "Brouillon actuel: aucune tentative redigee n'a ete gardee.",
+      ? copy.summary.draft(draftAnswerText)
+      : copy.summary.noDraft,
     "",
-    "Progression observee",
+    copy.progressTitle,
     buildProgressLine(input),
     "",
-    `Prochaine etape conseillee: ${nextStepRecommendation}`,
+    copy.summary.nextStep(nextStepRecommendation),
   ].join("\n");
 
   return {

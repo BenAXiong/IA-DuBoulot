@@ -28,8 +28,17 @@ Important:
 3. For larger or riskier work, create a task-scoped branch.
 4. Make the change.
 5. Update docs, logs, and task status in the same branch or commit set.
-6. Open a PR to `main` when branch review adds value.
-7. Squash merge when the branch is coherent.
+6. Verify the slice before handoff.
+7. Create a task-ID commit for the coherent slice.
+8. Push that commit to `origin`.
+9. Open a PR to `main` when branch review adds value.
+10. Squash merge when the branch is coherent.
+
+If the worktree already contains unrelated pending changes:
+
+- stage only the bounded slice you are finishing
+- do not mix unrelated work into the commit just because it is present locally
+- if a safe split is not practical, state that explicitly in the session close-out before pushing
 
 ## Branch Naming
 
@@ -97,6 +106,8 @@ Even in that case:
 - update [work_sessions.md](work_sessions.md)
 - update [decision_log.md](decision_log.md) if structure changed
 - update [mvp_todo.md](mvp_todo.md) task state
+- update [pilot_todo.md](pilot_todo.md) when the slice changes pilot-hardening status, UX findings, or release-ops assumptions
+- create a real commit and push it before handoff instead of leaving completed work only in the local workspace
 
 Later target:
 

@@ -36,7 +36,7 @@ Current MVP behavior:
 - events are whitelisted and validated server-side
 - properties stay small and metadata-only
 - raw child content, raw prompts, attachment text, and summaries stay out of analytics payloads
-- until a real PostHog project exists, events land in structured runtime logs rather than a third-party analytics warehouse
+- even with a real PostHog project now provisioned locally, events still land in structured runtime logs until a dedicated forwarding adapter is implemented
 
 ## Allowed Event Names
 
@@ -97,6 +97,7 @@ Rules:
 Current MVP interpretation:
 
 - analytics can be enabled without immediately wiring a third-party sink
+- the local PostHog key, host, and analytics flag are now provisioned, but the current sink still stays runtime-only until a real PostHog adapter is added behind the same event boundary
 - OpenAI is selected as the fallback AI provider, but the adapter stays disabled until implemented and provisioned
 - Resend remains disabled until the account and sender setup exist
 - parent-initiated AI remains disabled until that paid surface is intentionally built

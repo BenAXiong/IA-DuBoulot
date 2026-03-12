@@ -16,6 +16,7 @@ import {
   StudentWorkspacePanel,
   type WorkspaceDraftState,
 } from "@/components/dashboard/student/student-workspace-panel";
+import { getStudentWorkbenchCopy } from "@/lib/i18n/student-flow-copy";
 import type { ConversationAttachmentRecord } from "@/lib/server/ai/types";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type {
@@ -109,6 +110,7 @@ export function StudentConversationWorkbench({
   detail,
   languageCode,
 }: StudentConversationWorkbenchProps) {
+  const copy = getStudentWorkbenchCopy(languageCode);
   const [conversation, setConversation] = useState(detail.conversation);
   const [messages, setMessages] = useState(detail.messages);
   const [attachments, setAttachments] = useState(detail.attachments);
@@ -135,7 +137,7 @@ export function StudentConversationWorkbench({
     setChatError(null);
 
     if (intent === "student_message" && composerText.trim().length === 0) {
-      setChatError("Ajoute un message avant de l'envoyer.");
+      setChatError(copy.errors.emptyMessage);
       return;
     }
 
@@ -166,9 +168,7 @@ export function StudentConversationWorkbench({
         !payload.data?.studentMessage ||
         !payload.data?.assistantMessage
       ) {
-        setChatError(
-          routeErrorMessage ?? "Impossible d'ajouter ce tour de conversation.",
-        );
+        setChatError(routeErrorMessage ?? copy.errors.addConversationTurn);
         return;
       }
 
@@ -197,9 +197,7 @@ export function StudentConversationWorkbench({
       payload && "error" in payload ? payload.error?.message : null;
 
     if (!response.ok || !payload?.ok || !payload.data?.workspace) {
-      throw new Error(
-        routeErrorMessage ?? "Impossible de sauvegarder l'espace de travail.",
-      );
+      throw new Error(routeErrorMessage ?? copy.errors.saveWorkspace);
     }
 
     const persistedWorkspace = {
@@ -225,6 +223,7 @@ export function StudentConversationWorkbench({
     const staged = stageIntakeFiles({
       existingFiles: [],
       incomingFiles: files,
+      languageCode,
     });
 
     if (staged.errors.length > 0) {
@@ -240,6 +239,7 @@ export function StudentConversationWorkbench({
         const results = await uploadConversationFiles({
           conversationId: conversation.id,
           files: staged.acceptedFiles.map((file) => file.file),
+          languageCode,
         });
         const nextAttachments = [...attachments];
 
@@ -272,15 +272,13 @@ export function StudentConversationWorkbench({
         };
 
         await persistWorkspace(nextWorkspace);
-        setWorkspaceMessage(
-          "Piece jointe confirmee et texte extrait synchronise dans l'espace de travail.",
-        );
+        setWorkspaceMessage(copy.errors.uploadAdded);
         setWorkspaceError(null);
       } catch (error) {
         setWorkspaceError(
           error instanceof Error
             ? error.message
-            : "Impossible d'ajouter cette piece jointe.",
+            : copy.errors.addAttachment,
         );
       }
     });
@@ -293,12 +291,12 @@ export function StudentConversationWorkbench({
     startSaving(async () => {
       try {
         await persistWorkspace(workspace);
-        setWorkspaceMessage("Espace de travail sauvegarde.");
+        setWorkspaceMessage(copy.errors.workspaceSaved);
       } catch (error) {
         setWorkspaceError(
           error instanceof Error
             ? error.message
-            : "Impossible de sauvegarder l'espace de travail.",
+            : copy.errors.saveWorkspace,
         );
       }
     });
@@ -323,15 +321,13 @@ export function StudentConversationWorkbench({
         payload && "error" in payload ? payload.error?.message : null;
 
       if (!response.ok || !payload?.ok || !payload.data?.conversation) {
-        setCompletionError(
-          routeErrorMessage ?? "Impossible de terminer cette session.",
-        );
+        setCompletionError(routeErrorMessage ?? copy.errors.completeSession);
         return;
       }
 
       setConversation(payload.data.conversation);
       setSummaries(payload.data.summaries ?? []);
-      setCompletionMessage("Session terminee. Le resume eleve est maintenant fige.");
+      setCompletionMessage(copy.errors.sessionCompleted);
       setChatError(null);
       setWorkspaceError(null);
     });
@@ -359,9 +355,7 @@ export function StudentConversationWorkbench({
         payload && "error" in payload ? payload.error?.message : null;
 
       if (!response.ok || !payload?.ok || !payload.data?.attachment) {
-        setWorkspaceError(
-          routeErrorMessage ?? "Impossible de relancer l'extraction.",
-        );
+        setWorkspaceError(routeErrorMessage ?? copy.errors.retryExtraction);
         return;
       }
 
@@ -387,7 +381,7 @@ export function StudentConversationWorkbench({
       }));
       setWorkspaceMessage(
         payload.data.warningMessage ??
-          "Extraction relancee. Pense a sauvegarder si le texte a change.",
+          copy.errors.extractionRetried,
       );
     });
   }
@@ -408,54 +402,55 @@ export function StudentConversationWorkbench({
           <div className="flex flex-wrap gap-2">
             <StudentStatusPill label={conversation.subject_tag} tone="accent" />
             <StudentStatusPill
-              label={getConversationStatusLabel(conversation.status)}
+              label={getConversationStatusLabel(conversation.status, languageCode)}
             />
             <StudentStatusPill
-              label={conversation.graded_homework ? "Notee" : "Exercice libre"}
+              label={
+                conversation.graded_homework ? copy.graded : copy.practice
+              }
             />
           </div>
 
           <div className="space-y-3">
             <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-              Chat et espace de travail
+              {copy.eyebrow}
             </p>
             <h1 className="font-[family-name:var(--font-heading)] text-4xl leading-tight sm:text-5xl">
               {conversation.title}
             </h1>
             <p className="text-sm leading-7 text-[color:var(--ink-soft)]">
-              La session garde maintenant un transcript reel, des pieces jointes
-              durables, un texte extrait revu, et un coaching IA centre sur la
-              demarche.
+              {copy.body}
             </p>
           </div>
         </article>
 
         <article className="grid gap-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5 text-sm">
-          <p className="font-medium">Reprise</p>
+          <p className="font-medium">{copy.resumeTitle}</p>
           <p className="text-[color:var(--ink-soft)]">
-            Cree le {formatDateLabel(conversation.created_at, languageCode)}
+            {copy.createdOn(formatDateLabel(conversation.created_at, languageCode))}
           </p>
           <p className="text-[color:var(--ink-soft)]">
-            Derniere activite le{" "}
-            {formatDateLabel(
-              messages.at(-1)?.created_at ??
-                conversation.last_message_at ??
-                conversation.created_at,
-              languageCode,
+            {copy.lastActivity(
+              formatDateLabel(
+                messages.at(-1)?.created_at ??
+                  conversation.last_message_at ??
+                  conversation.created_at,
+                languageCode,
+              ),
             )}
           </p>
           <div className="flex flex-wrap gap-3">
             <Link
-              className="inline-flex justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 font-medium transition hover:-translate-y-0.5"
+              className="inline-flex min-h-11 items-center justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 font-medium transition hover:-translate-y-0.5"
               href="/app/history"
             >
-              Voir l&apos;historique
+              {copy.viewHistory}
             </Link>
             <Link
-              className="inline-flex justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 font-medium transition hover:-translate-y-0.5"
+              className="inline-flex min-h-11 items-center justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 font-medium transition hover:-translate-y-0.5"
               href="/app/new"
             >
-              Nouveau devoir
+              {copy.newHomework}
             </Link>
           </div>
         </article>
@@ -465,10 +460,10 @@ export function StudentConversationWorkbench({
         <article className="grid gap-4 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] lg:min-h-[calc(100vh-10rem)]">
           <div className="space-y-3">
             <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-              Conversation
+              {copy.conversationEyebrow}
             </p>
             <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
-              Transcript persiste et controls de coaching
+              {copy.conversationTitle}
             </h2>
           </div>
 
@@ -481,6 +476,7 @@ export function StudentConversationWorkbench({
               composerText={composerText}
               disabled={isReadOnly}
               isSending={isSending || isUploading}
+              languageCode={languageCode}
               onComposerTextChange={setComposerText}
               onRequestHint={() => sendMessage("hint")}
               onRequestSummary={() => sendMessage("summarize")}
@@ -496,14 +492,13 @@ export function StudentConversationWorkbench({
 
             {isUploading ? (
               <p className="rounded-[1.25rem] border border-[color:var(--line)] bg-white px-4 py-3 text-sm leading-6 text-[color:var(--ink-soft)]">
-                Upload et extraction en cours...
+                {copy.uploadInProgress}
               </p>
             ) : null}
 
             {isReadOnly ? (
               <p className="rounded-[1.25rem] border border-[#cbbf8d] bg-[#fff8df] px-4 py-3 text-sm leading-6 text-[#69551b]">
-                Cette session est terminee. Le transcript reste lisible, mais les
-                nouvelles ecritures passent maintenant par une nouvelle session.
+                {copy.readOnly}
               </p>
             ) : null}
           </div>
@@ -522,16 +517,17 @@ export function StudentConversationWorkbench({
           <aside className="grid gap-4 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]">
             <div className="space-y-3">
               <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-                Pieces jointes
+                {copy.attachmentsEyebrow}
               </p>
               <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
-                Fichiers prives et statut d&apos;extraction
+                {copy.attachmentsTitle}
               </h2>
             </div>
 
             <StudentAttachmentList
               attachments={attachments}
               disabled={isUploading || isReadOnly}
+              languageCode={languageCode}
               onRetryExtraction={retryAttachmentExtraction}
             />
           </aside>
@@ -539,6 +535,7 @@ export function StudentConversationWorkbench({
           <StudentWorkspacePanel
             disabled={isReadOnly}
             isSaving={isSaving || isUploading}
+            languageCode={languageCode}
             onSaveWorkspace={saveWorkspace}
             onWorkspaceChange={setWorkspace}
             saveMessage={workspaceError ?? workspaceMessage}

@@ -57,6 +57,7 @@ Server routes and services:
 - `app/api/privacy/deletion-requests/route.ts`
 - `lib/server/privacy/service.ts`
 - `lib/server/privacy/types.ts`
+- `lib/i18n/ui-copy.ts`
 
 Shared auth and mutation gates:
 
@@ -153,4 +154,5 @@ Latest local result on 2026-03-11:
 - the current MVP queues deletion and freezes access immediately, but the final purge execution still needs a real worker or operator workflow
 - parent self-deletion remains intentionally conservative while linked students or billing state still exist
 - admin deletion stays manual and audited
-- the privacy copy is currently hardcoded in the settings component and not yet localized through a dedicated content system
+- the settings shell and deletion-request form now localize their copy through `lib/i18n/ui-copy.ts`, and the main blocked reasons from `lib/server/privacy/service.ts` now follow the viewer language
+- some unrelated server-side validation strings elsewhere in the product still remain outside this privacy-specific localization slice

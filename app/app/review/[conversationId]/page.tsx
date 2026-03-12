@@ -5,6 +5,10 @@ import { SummaryLanguagePanel } from "@/components/dashboard/oversight/summary-l
 import { TutorNotesPanel } from "@/components/dashboard/oversight/tutor-notes-panel";
 import { TutorSummaryPanel } from "@/components/dashboard/oversight/tutor-summary-panel";
 import {
+  getAdultConversationAudienceLabel,
+  getTutorStudentDetailCopy,
+} from "@/lib/i18n/oversight-copy";
+import {
   redirectDeletionRequestedAppUser,
   requireAppPageContext,
 } from "@/lib/server/auth/page-guards";
@@ -30,7 +34,10 @@ export default async function OversightConversationReviewPage({
 
     return (
       <AdultConversationReview
-        audienceLabel="Vue parent"
+        audienceLabel={getAdultConversationAudienceLabel(
+          "parent",
+          appUser.preferred_ui_language,
+        )}
         detail={review.detail}
         languageCode={appUser.preferred_ui_language}
         secondaryPanel={
@@ -55,23 +62,33 @@ export default async function OversightConversationReviewPage({
       appUser,
       conversationId: resolvedParams.conversationId,
     });
+    const tutorCopy = getTutorStudentDetailCopy(appUser.preferred_ui_language);
 
     return (
       <AdultConversationReview
-        audienceLabel="Vue tuteur"
+        audienceLabel={getAdultConversationAudienceLabel(
+          "tutor",
+          appUser.preferred_ui_language,
+        )}
         detail={review.detail}
         languageCode={appUser.preferred_ui_language}
         secondaryPanel={
           <TutorNotesPanel
-            body="Ajoute ici les notes privees liees a cette seance. Elles restent invisibles a l'eleve et au parent."
+            body={tutorCopy.notesBody}
             conversationId={review.detail.conversation.id}
             initialNotes={review.notes}
+            languageCode={appUser.preferred_ui_language}
             studentUserId={review.student.id}
-            title="Notes privees de seance"
+            title={tutorCopy.notesTitle}
           />
         }
         studentName={review.student.displayName}
-        summaryPanel={<TutorSummaryPanel summaries={review.detail.summaries} />}
+        summaryPanel={
+          <TutorSummaryPanel
+            languageCode={appUser.preferred_ui_language}
+            summaries={review.detail.summaries}
+          />
+        }
       />
     );
   }

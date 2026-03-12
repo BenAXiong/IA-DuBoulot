@@ -9,7 +9,9 @@ import {
   FIXTURE,
   createAdminClient,
   env as fixtureEnv,
+  restoreFixtureUsageState,
   resolveFixtureUserIds,
+  snapshotFixtureUsageState,
 } from "./rls-fixture-shared.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -412,6 +414,10 @@ async function main() {
     adminClient,
     fixtureUserIds.student,
   );
+  const usageSnapshot = await snapshotFixtureUsageState(
+    adminClient,
+    fixtureUserIds.student,
+  );
 
   let childProcess = null;
   let conversationId = null;
@@ -615,6 +621,11 @@ async function main() {
       adminClient,
       fixtureUserIds.student,
       memorySnapshot,
+    ).catch(() => {});
+    await restoreFixtureUsageState(
+      adminClient,
+      fixtureUserIds.student,
+      usageSnapshot,
     ).catch(() => {});
     await stopLocalServer(childProcess);
   }

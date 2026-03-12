@@ -7,12 +7,9 @@ type ActionButtonProps = {
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
 const variantClassName: Record<ActionButtonVariant, string> = {
-  primary:
-    "bg-[color:var(--foreground)] text-white hover:-translate-y-0.5",
-  secondary:
-    "border border-[color:var(--line)] bg-white text-[color:var(--foreground)] hover:-translate-y-0.5",
-  danger:
-    "border border-[#b34f32] bg-[#cb5d3c] text-white hover:-translate-y-0.5",
+  primary: "button-primary",
+  secondary: "button-secondary",
+  danger: "button-danger",
 };
 
 export function ActionButton({
@@ -24,7 +21,7 @@ export function ActionButton({
   return (
     <button
       className={[
-        "rounded-full px-5 py-3 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-70",
+        "button-base",
         variantClassName[variant],
         className,
       ]

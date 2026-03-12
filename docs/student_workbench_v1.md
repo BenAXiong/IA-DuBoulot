@@ -28,6 +28,7 @@ This document covers `A3.4.1` to `A3.4.4`:
 - Conversation service: `lib/server/conversations/conversation-service.ts`
 - Upload client helper: `lib/uploads/client-upload.ts`
 - Upload service: `lib/server/uploads/service.ts`
+- Student flow localization copy: `lib/i18n/student-flow-copy.ts`
 - Gemini provider: `lib/server/ai/gemini-provider.ts`
 - Moderation service: `lib/server/moderation/service.ts`
 - Conversation types: `lib/server/conversations/types.ts`
@@ -44,6 +45,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 6. saves workspace edits through a dedicated server route
 7. uploads attachments through signed upload targets, confirms them, shows their extraction state, lets the student retry failed extraction, and keeps the file plus warning if extraction fails
 8. renders the summary/closure panel that now drives `A3.5`
+9. localizes the workbench shell, composer, attachment list, workspace panel, and completion panel through `lib/i18n/student-flow-copy.ts`
 
 ## Interaction Rules
 
@@ -59,14 +61,15 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 - moderation is currently local-rule based, not yet provider-assisted or admin-tunable
 - once the session is marked complete, the workbench becomes read-only for student writes
 - adult review surfaces now live separately under [Oversight surfaces V1](oversight_surfaces_v1.md); the student workbench remains a student-only mutation surface
+- the core student workbench path now localizes its server-side validation messages, upload warnings, moderation-safe fallback reply, and deterministic coach fallback through `lib/i18n/student-flow-copy.ts`; the remaining language risk near this surface is now mostly the broader accented-French or Unicode audit and any residual generic provider or service fallback strings
 
 ## Validation Record
 
 - Date: `2026-03-11`
-- Method: Playwright emulated tablet pass
+- Method: repeatable Playwright tablet-emulation smoke via `scripts/smoke-tablet-emulation.mjs`
 - Widths checked: `820x1180` portrait and `1180x820` landscape
-- Routes checked: `/app` and `/app/conversations/[conversationId]`
-- Result: no horizontal overflow detected; the transcript surface and workspace save control remained reachable at both widths
+- Routes checked: `/app`, `/app/new`, and `/app/conversations/[conversationId]`
+- Result: no horizontal overflow detected, no sub-`44x44` controls detected on the checked student surfaces, and the transcript surface plus workspace save control remained reachable at both widths
 
 ## Next Extension Points
 

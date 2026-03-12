@@ -5,6 +5,8 @@ import { ActionButton } from "@/components/ui/action-button";
 import { FormCallout } from "@/components/ui/form-callout";
 import { FormField } from "@/components/ui/form-field";
 import { TextInput } from "@/components/ui/text-input";
+import { getParentApprovalRequestFormCopy } from "@/lib/i18n/dashboard-copy";
+import type { UiLanguageCode } from "@/lib/server/auth/types";
 
 type InviteResponsePayload = {
   ok?: boolean;
@@ -24,9 +26,18 @@ function getFieldError(
   return fieldErrors[fieldName] ?? null;
 }
 
-export function ParentApprovalRequestForm() {
+type ParentApprovalRequestFormProps = {
+  languageCode?: UiLanguageCode;
+};
+
+export function ParentApprovalRequestForm({
+  languageCode = "fr",
+}: ParentApprovalRequestFormProps) {
+  const copy = getParentApprovalRequestFormCopy(languageCode);
   const [parentEmail, setParentEmail] = useState("");
-  const [relationshipLabel, setRelationshipLabel] = useState("Parent");
+  const [relationshipLabel, setRelationshipLabel] = useState(
+    copy.relationshipPlaceholder,
+  );
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -68,8 +79,7 @@ export function ParentApprovalRequestForm() {
 
       if (!response.ok || !payload?.ok || !payload.data?.inviteUrl) {
         setErrorMessage(
-          payload?.error?.message ??
-            "Impossible de preparer le lien d'approbation parentale.",
+          payload?.error?.message ?? copy.errorFallback,
         );
         setFieldErrors(payload?.error?.fieldErrors ?? {});
         return;
@@ -83,11 +93,10 @@ export function ParentApprovalRequestForm() {
     <form className="grid gap-4" onSubmit={handleSubmit}>
       <div className="space-y-1">
         <h3 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
-          Demander l&apos;approbation parentale
+          {copy.title}
         </h3>
         <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-          Cree un lien d&apos;invitation parent. En attendant un vrai service d&apos;envoi,
-          le lien peut etre copie puis partage manuellement.
+          {copy.body}
         </p>
       </div>
 
@@ -99,7 +108,7 @@ export function ParentApprovalRequestForm() {
 
       <FormField
         error={getFieldError(fieldErrors, "parentEmail")}
-        label="Email du parent ou tuteur legal"
+        label={copy.fields.parentEmail}
       >
         <TextInput
           onChange={(event) => setParentEmail(event.target.value)}
@@ -112,25 +121,24 @@ export function ParentApprovalRequestForm() {
 
       <FormField
         error={getFieldError(fieldErrors, "relationshipLabel")}
-        label="Etiquette de relation"
+        label={copy.fields.relationshipLabel}
       >
         <TextInput
           onChange={(event) => setRelationshipLabel(event.target.value)}
-          placeholder="Parent"
+          placeholder={copy.relationshipPlaceholder}
           type="text"
           value={relationshipLabel}
         />
       </FormField>
 
       <ActionButton disabled={isPending} type="submit">
-        {isPending ? "Preparation..." : "Generer le lien parent"}
+        {isPending ? copy.buttons.pending : copy.buttons.submit}
       </ActionButton>
 
       {inviteUrl ? (
         <div className="grid gap-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4">
           <p className="text-sm text-[color:var(--ink-soft)]">
-            Lien pret. Partage-le avec le parent pour qu&apos;il cree ou connecte
-            son compte, puis accepte l&apos;invitation.
+            {copy.successBody}
           </p>
           <code className="overflow-x-auto rounded-2xl bg-white px-4 py-3 text-xs leading-6 text-[color:var(--foreground)]">
             {inviteUrl}
@@ -141,7 +149,7 @@ export function ParentApprovalRequestForm() {
             type="button"
             variant="secondary"
           >
-            Copier le lien
+            {copy.buttons.copy}
           </ActionButton>
         </div>
       ) : null}

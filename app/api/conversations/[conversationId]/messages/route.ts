@@ -11,7 +11,10 @@ type Params = Promise<{ conversationId: string }> | { conversationId: string };
 export const POST = withRouteErrorHandling<{ params: Params }>(
   async (request, { params, requestId }) => {
     const context = await requireAuthenticatedUserContext();
-    const payload = await parseAppendConversationMessageInput(request);
+    const payload = await parseAppendConversationMessageInput(
+      request,
+      context.appUser?.preferred_ui_language ?? "fr",
+    );
     const resolvedParams = await params;
     const result = await appendConversationTurn({
       context,

@@ -1,5 +1,7 @@
 import "server-only";
 
+import { getStudentDraftCoachCopy } from "@/lib/i18n/student-flow-copy";
+import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type {
   ConversationActionIntent,
   ConversationRecord,
@@ -12,6 +14,7 @@ type BuildDraftAssistantReplyInput = {
   workspace: WorkspaceStateRecord | null;
   intent: ConversationActionIntent;
   studentMessageText: string;
+  languageCode: UiLanguageCode;
 };
 
 function compactText(value: string | null | undefined, fallback: string) {
@@ -20,62 +23,66 @@ function compactText(value: string | null | undefined, fallback: string) {
 }
 
 function buildHintReply(input: BuildDraftAssistantReplyInput) {
+  const copy = getStudentDraftCoachCopy(input.languageCode);
   const assignmentText = compactText(
     input.workspace?.assignment_text ?? input.conversation.assignment_text,
-    "Reprends l'enonce exact du devoir dans ton espace de travail.",
+    copy.hint.assignmentFallback,
   );
 
   return [
-    "Indice de depart",
+    copy.hint.title,
     "",
-    `1. Reformule l'objectif du devoir: ${input.conversation.title}.`,
-    `2. Repere la matiere et la consigne cle: ${input.conversation.subject_tag}.`,
-    `3. A partir du texte disponible, commence par la partie la plus concrete: ${assignmentText}`,
+    copy.hint.firstStep(input.conversation.title),
+    copy.hint.secondStep(input.conversation.subject_tag),
+    copy.hint.thirdStep(assignmentText),
     "",
-    "Avant de demander une solution complete, note ce que tu sais deja faire et ce qui te bloque precisement.",
+    copy.hint.closing,
   ].join("\n");
 }
 
 function buildSummaryReply(input: BuildDraftAssistantReplyInput) {
+  const copy = getStudentDraftCoachCopy(input.languageCode);
   const planText = compactText(
     input.workspace?.plan_text,
-    "Aucun plan n'est encore note dans l'espace de travail.",
+    copy.summary.noPlan,
   );
   const draftAnswerText = compactText(
     input.workspace?.draft_answer_text,
-    "Aucune reponse brouillon n'est encore ecrite.",
+    copy.summary.noDraft,
   );
 
   return [
-    "Resume de session",
+    copy.summary.title,
     "",
-    `- Devoir: ${input.conversation.title}`,
-    `- Matiere: ${input.conversation.subject_tag}`,
-    `- Plan actuel: ${planText}`,
-    `- Reponse brouillon: ${draftAnswerText}`,
+    copy.summary.assignment(input.conversation.title),
+    copy.summary.subject(input.conversation.subject_tag),
+    copy.summary.plan(planText),
+    copy.summary.draft(draftAnswerText),
     "",
-    "Prochaine etape conseillee: choisis un sous-probleme, ecris ton essai dans le panneau de droite, puis demande un indice cible si besoin.",
+    copy.summary.nextStep,
   ].join("\n");
 }
 
 function buildGenericReply(input: BuildDraftAssistantReplyInput) {
+  const copy = getStudentDraftCoachCopy(input.languageCode);
   const editedExtractedText = compactText(
     input.workspace?.edited_extracted_text ??
       input.conversation.edited_extracted_text,
-    "Aucun texte relu n'est encore disponible.",
+    copy.generic.noReviewedText,
   );
 
   return [
-    "Coach brouillon",
+    copy.generic.title,
     "",
-    `J'ai note ton message: "${input.studentMessageText}".`,
-    `Contexte actif: ${input.conversation.title} (${input.conversation.subject_tag}).`,
-    `Texte relu disponible: ${editedExtractedText}`,
+    copy.generic.notedMessage(input.studentMessageText),
+    copy.generic.activeContext(
+      input.conversation.title,
+      input.conversation.subject_tag,
+    ),
+    copy.generic.reviewedText(editedExtractedText),
     "",
-    "Etape suivante conseillee:",
-    "- decris ce que tu as deja essaye",
-    "- isole la question exacte a traiter",
-    "- remplis le plan ou la reponse brouillon dans l'espace de travail avant le futur moteur IA",
+    copy.generic.nextStepTitle,
+    ...copy.generic.bullets.map((line) => `- ${line}`),
   ].join("\n");
 }
 
@@ -96,13 +103,16 @@ export function buildDraftAssistantReply(
 export function buildStudentIntentMessage(input: {
   intent: ConversationActionIntent;
   contentText: string;
+  languageCode: UiLanguageCode;
 }) {
+  const copy = getStudentDraftCoachCopy(input.languageCode);
+
   if (input.intent === "hint") {
-    return "Je veux un indice pour avancer sur ce devoir.";
+    return copy.intents.hint;
   }
 
   if (input.intent === "summarize") {
-    return "Peux-tu resumer la session et la prochaine etape utile ?";
+    return copy.intents.summarize;
   }
 
   return input.contentText.trim();

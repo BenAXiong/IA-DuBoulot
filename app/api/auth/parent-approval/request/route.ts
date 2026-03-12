@@ -10,7 +10,10 @@ const ROUTE = "/api/auth/parent-approval/request";
 
 export const POST = withRouteErrorHandling(async (request, { requestId }) => {
   const context = await requireAuthenticatedUserContext();
-  const invitation = await parseCreateParentApprovalRequestInput(request);
+  const invitation = await parseCreateParentApprovalRequestInput(
+    request,
+    context.appUser?.preferred_ui_language ?? "fr",
+  );
   const result = await createParentApprovalRequest({
     context,
     requestId,

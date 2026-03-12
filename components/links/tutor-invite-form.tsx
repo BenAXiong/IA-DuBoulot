@@ -5,6 +5,8 @@ import { ActionButton } from "@/components/ui/action-button";
 import { FormCallout } from "@/components/ui/form-callout";
 import { FormField } from "@/components/ui/form-field";
 import { TextInput } from "@/components/ui/text-input";
+import { getTutorInviteFormCopy } from "@/lib/i18n/dashboard-copy";
+import type { UiLanguageCode } from "@/lib/server/auth/types";
 
 type InviteResponsePayload = {
   ok?: boolean;
@@ -26,11 +28,14 @@ function getFieldError(
 
 type TutorInviteFormProps = {
   studentUserId?: string | null;
+  languageCode?: UiLanguageCode;
 };
 
 export function TutorInviteForm({
   studentUserId = null,
+  languageCode = "fr",
 }: TutorInviteFormProps) {
+  const copy = getTutorInviteFormCopy(languageCode);
   const [tutorEmail, setTutorEmail] = useState("");
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -73,7 +78,7 @@ export function TutorInviteForm({
 
       if (!response.ok || !payload?.ok || !payload.data?.inviteUrl) {
         setErrorMessage(
-          payload?.error?.message ?? "Impossible de preparer le lien tuteur.",
+          payload?.error?.message ?? copy.errorFallback,
         );
         setFieldErrors(payload?.error?.fieldErrors ?? {});
         return;
@@ -87,11 +92,10 @@ export function TutorInviteForm({
     <form className="grid gap-4" onSubmit={handleSubmit}>
       <div className="space-y-1">
         <h3 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
-          Inviter un tuteur
+          {copy.title}
         </h3>
         <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-          Ce flux cree un lien de tutorat traçable. Pour l&apos;instant, le lien
-          est partage manuellement plutot qu&apos;envoye par email depuis le produit.
+          {copy.body}
         </p>
       </div>
 
@@ -103,7 +107,7 @@ export function TutorInviteForm({
 
       <FormField
         error={getFieldError(fieldErrors, "tutorEmail")}
-        label="Email du tuteur"
+        label={copy.tutorEmail}
       >
         <TextInput
           onChange={(event) => setTutorEmail(event.target.value)}
@@ -115,14 +119,13 @@ export function TutorInviteForm({
       </FormField>
 
       <ActionButton disabled={isPending} type="submit">
-        {isPending ? "Preparation..." : "Generer le lien tuteur"}
+        {isPending ? copy.buttons.pending : copy.buttons.submit}
       </ActionButton>
 
       {inviteUrl ? (
         <div className="grid gap-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4">
           <p className="text-sm text-[color:var(--ink-soft)]">
-            Lien pret. Le tuteur devra creer ou connecter son compte, terminer
-            son onboarding si besoin, puis accepter l&apos;invitation.
+            {copy.successBody}
           </p>
           <code className="overflow-x-auto rounded-2xl bg-white px-4 py-3 text-xs leading-6 text-[color:var(--foreground)]">
             {inviteUrl}
@@ -133,7 +136,7 @@ export function TutorInviteForm({
             type="button"
             variant="secondary"
           >
-            Copier le lien
+            {copy.buttons.copy}
           </ActionButton>
         </div>
       ) : null}

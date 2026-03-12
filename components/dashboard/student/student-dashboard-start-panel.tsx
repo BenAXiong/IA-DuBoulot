@@ -4,6 +4,8 @@ import {
   getStartStateBody,
   getStartStateLabel,
 } from "@/components/dashboard/student/student-dashboard-presenters";
+import { getIntlLocale } from "@/lib/i18n/config";
+import { getStudentDashboardStartPanelCopy } from "@/lib/i18n/dashboard-copy";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type {
   StudentDashboardSnapshot,
@@ -14,20 +16,25 @@ type StudentDashboardStartPanelProps = {
   snapshot: StudentDashboardSnapshot;
 };
 
-function getButtonLabel(snapshot: StudentDashboardSnapshot) {
+function getButtonLabel(
+  snapshot: StudentDashboardSnapshot,
+  languageCode: UiLanguageCode,
+) {
+  const copy = getStudentDashboardStartPanelCopy(languageCode);
+
   if (snapshot.canStartHomework) {
-    return "Nouveau devoir";
+    return copy.buttons.ready;
   }
 
   if (snapshot.startState === "pending_parent_approval") {
-    return "Attendre le parent";
+    return copy.buttons.waitParent;
   }
 
   if (snapshot.startState === "quota_blocked") {
-    return "Voir le quota";
+    return copy.buttons.viewQuota;
   }
 
-  return "Depart bloque";
+  return copy.buttons.blocked;
 }
 
 function getButtonHref(snapshot: StudentDashboardSnapshot) {
@@ -50,11 +57,12 @@ function renderSubjectHighlights(
   subjectRollup: StudentDashboardSubjectRollup[],
   languageCode: UiLanguageCode,
 ) {
+  const copy = getStudentDashboardStartPanelCopy(languageCode);
+
   if (subjectRollup.length === 0) {
     return (
       <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-        Aucun sujet recent pour l&apos;instant. Le premier devoir fixera les tags
-        les plus utiles pour la reprise de session.
+        {copy.noRecentSubjects}
       </p>
     );
   }
@@ -68,13 +76,9 @@ function renderSubjectHighlights(
         >
           {subject.subjectTag}
           <span className="ml-2 text-[color:var(--ink-soft)]">
-            {new Intl.NumberFormat(
-              languageCode === "fr"
-                ? "fr-FR"
-                : languageCode === "en"
-                  ? "en-US"
-                  : "zh-TW",
-            ).format(subject.count)}
+            {new Intl.NumberFormat(getIntlLocale(languageCode)).format(
+              subject.count,
+            )}
           </span>
         </span>
       ))}
@@ -85,6 +89,9 @@ function renderSubjectHighlights(
 export function StudentDashboardStartPanel({
   snapshot,
 }: StudentDashboardStartPanelProps) {
+  const languageCode = snapshot.appUser.preferred_ui_language;
+  const copy = getStudentDashboardStartPanelCopy(languageCode);
+
   return (
     <section
       className="grid gap-6 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] lg:grid-cols-[1.2fr_0.8fr]"
@@ -93,39 +100,39 @@ export function StudentDashboardStartPanel({
       <article className="space-y-4">
         <div className="flex flex-wrap gap-2">
           <StudentStatusPill
-            label={getStartStateLabel(snapshot.startState)}
+            label={getStartStateLabel(snapshot.startState, languageCode)}
             tone={getTone(snapshot)}
           />
           <StudentStatusPill
             label={
               snapshot.usage.quota.planKind === "paid"
-                ? "Acces Family"
-                : "Essai gratuit"
+                ? copy.paidPlan
+                : copy.trialPlan
             }
           />
           <StudentStatusPill
             label={
               snapshot.support.parentalApprovalRequired
-                ? "Supervision requise"
-                : "Depart autonome"
+                ? copy.supervisionRequired
+                : copy.autonomousStart
             }
           />
           <StudentStatusPill
-            label={`${snapshot.recentSessions.length} session${snapshot.recentSessions.length > 1 ? "s" : ""} recente${snapshot.recentSessions.length > 1 ? "s" : ""}`}
+            label={copy.recentSessions(snapshot.recentSessions.length)}
           />
         </div>
 
         <div className="space-y-3">
           <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-            Point de depart eleve
+            {copy.eyebrow}
           </p>
           <h2 className="font-[family-name:var(--font-heading)] text-4xl leading-tight sm:text-5xl">
             {snapshot.canStartHomework
-              ? "Le prochain devoir commence ici."
-              : "Le prochain devoir attend encore un jalon de confiance."}
+              ? copy.titleReady
+              : copy.titleBlocked}
           </h2>
           <p className="max-w-2xl text-sm leading-7 text-[color:var(--ink-soft)]">
-            {getStartStateBody(snapshot.startState)}
+            {getStartStateBody(snapshot.startState, languageCode)}
           </p>
         </div>
 
@@ -139,10 +146,10 @@ export function StudentDashboardStartPanel({
             }`}
             href={getButtonHref(snapshot)}
           >
-            {getButtonLabel(snapshot)}
+            {getButtonLabel(snapshot, languageCode)}
           </Link>
           <p className="text-sm text-[color:var(--ink-soft)]">
-            Route canonique: <code>/app/new</code>
+            {copy.canonicalRoute}: <code>/app/new</code>
           </p>
         </div>
       </article>
@@ -150,21 +157,17 @@ export function StudentDashboardStartPanel({
       <article className="grid gap-4 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5">
         <div className="space-y-2">
           <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-            Matieres recentes
+            {copy.recentSubjectsEyebrow}
           </p>
           <h3 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
-            Les prochains raccourcis d&apos;intake partiront des sujets deja vus.
+            {copy.recentSubjectsTitle}
           </h3>
         </div>
 
-        {renderSubjectHighlights(
-          snapshot.subjectRollup,
-          snapshot.appUser.preferred_ui_language,
-        )}
+        {renderSubjectHighlights(snapshot.subjectRollup, languageCode)}
 
         <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-          Le formulaire d&apos;intake detaille est maintenant relie au quota et a
-          la facturation sans changer la route canonique d&apos;entree eleve.
+          {copy.intakeBody}
         </p>
       </article>
     </section>

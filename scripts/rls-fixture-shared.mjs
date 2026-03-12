@@ -300,3 +300,44 @@ export async function resolveFixtureUserIds(adminClient) {
     admin: byEmail.get(FIXTURE.emails.admin),
   };
 }
+
+export async function snapshotFixtureUsageState(adminClient, studentUserId) {
+  const { data, error } = await adminClient
+    .from("usage_counters")
+    .select("*")
+    .eq("student_user_id", studentUserId)
+    .order("period_start", { ascending: true });
+
+  if (error) {
+    throw error;
+  }
+
+  return data ?? [];
+}
+
+export async function restoreFixtureUsageState(
+  adminClient,
+  studentUserId,
+  snapshot,
+) {
+  const { error: deleteError } = await adminClient
+    .from("usage_counters")
+    .delete()
+    .eq("student_user_id", studentUserId);
+
+  if (deleteError) {
+    throw deleteError;
+  }
+
+  if (snapshot.length === 0) {
+    return;
+  }
+
+  const { error: restoreError } = await adminClient
+    .from("usage_counters")
+    .insert(snapshot);
+
+  if (restoreError) {
+    throw restoreError;
+  }
+}
