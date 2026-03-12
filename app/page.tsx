@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { FloatingHelperMenu } from "@/components/layout/floating-helper-menu";
 import { PublicShell } from "@/components/layout/public-shell";
@@ -11,11 +12,9 @@ import {
 type SearchParamsValue = string | string[] | undefined;
 type SearchParamsRecord = Record<string, SearchParamsValue>;
 
-type PreviewCardProps = {
-  body: string;
-  label: string;
-  steps: string[];
-  title: string;
+type MediaPreviewProps = {
+  alt: string;
+  src: string;
 };
 
 type FeatureCardProps = {
@@ -23,37 +22,24 @@ type FeatureCardProps = {
   title: string;
 };
 
-function PreviewCard({ body, label, steps, title }: PreviewCardProps) {
+function MediaPreview({ alt, src }: MediaPreviewProps) {
   return (
-    <div className="shell-panel page-glow relative rounded-[2.35rem] p-6 sm:p-7">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(46,109,179,0.18),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(203,95,44,0.16),transparent_28%)]" />
-      <div className="relative">
-        <span className="soft-chip px-3 py-1">{label}</span>
-        <h3 className="mt-4 font-[family-name:var(--font-heading)] text-2xl leading-tight">
-          {title}
-        </h3>
-        <p className="mt-3 max-w-xl text-sm leading-6 text-[color:var(--ink-soft)]">
-          {body}
-        </p>
-
-        <div className="mt-6 grid gap-3">
-          {steps.map((step) => (
-            <div
-              className="rounded-[1.2rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-sm text-[color:var(--foreground)]"
-              key={step}
-            >
-              {step}
-            </div>
-          ))}
-        </div>
-      </div>
+    <div className="relative h-full min-h-[21rem] overflow-hidden rounded-[2rem] border border-[color:var(--line)] bg-[#0b1020] sm:min-h-[25rem] lg:min-h-[34rem]">
+      <Image
+        alt={alt}
+        className="h-full w-full object-cover"
+        fill
+        sizes="(min-width: 1024px) 60vw, 100vw"
+        src={src}
+        unoptimized
+      />
     </div>
   );
 }
 
 function FeatureCard({ body, title }: FeatureCardProps) {
   return (
-    <article className="shell-card page-glow rounded-[1.7rem] p-5 sm:p-6">
+    <article className="shell-card page-glow h-full rounded-[1.7rem] p-5 sm:p-6">
       <h2 className="font-[family-name:var(--font-heading)] text-xl leading-tight">
         {title}
       </h2>
@@ -81,16 +67,19 @@ export default async function Home({
   const featureRows = [
     {
       cards: copy.featureCards,
+      mediaSrc: "/landing/abstract-flow-1.gif",
       preview: copy.previews.primary,
       reverse: false,
     },
     {
       cards: copy.contentCards,
+      mediaSrc: "/landing/abstract-flow-2.gif",
       preview: copy.previews.content,
       reverse: true,
     },
     {
       cards: copy.sharingCards,
+      mediaSrc: "/landing/abstract-flow-3.gif",
       preview: copy.previews.sharing,
       reverse: false,
     },
@@ -129,19 +118,14 @@ export default async function Home({
 
             return (
               <section
-                className={`${index === 0 ? "" : "mt-10"} grid items-center gap-6 lg:grid-cols-[1.08fr_0.92fr] xl:gap-8`}
+                className={`${index === 0 ? "" : "mt-10"} grid items-stretch gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] xl:gap-8`}
                 key={row.preview.title}
               >
-                <div className={previewOrder}>
-                  <PreviewCard
-                    body={row.preview.body}
-                    label={row.preview.label}
-                    steps={row.preview.steps}
-                    title={row.preview.title}
-                  />
+                <div className={`${previewOrder} h-full`}>
+                  <MediaPreview alt={row.preview.title} src={row.mediaSrc} />
                 </div>
 
-                <div className={`grid gap-4 ${cardsOrder}`}>
+                <div className={`grid h-full gap-4 auto-rows-fr lg:grid-rows-3 ${cardsOrder}`}>
                   {row.cards.map((card) => (
                     <FeatureCard body={card.body} key={card.title} title={card.title} />
                   ))}
