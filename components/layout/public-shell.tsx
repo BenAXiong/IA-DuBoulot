@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { DocumentLanguageSync } from "@/components/i18n/document-language-sync";
+import { LanguageMenu } from "@/components/layout/language-menu";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import { getPublicShellCopy } from "@/lib/i18n/ui-copy";
@@ -9,12 +10,14 @@ type PublicShellProps = {
   children: React.ReactNode;
   currentHref: string;
   languageCode: UiLanguageCode;
+  showFooter?: boolean;
 };
 
 export function PublicShell({
   children,
   currentHref,
   languageCode,
+  showFooter = true,
 }: PublicShellProps) {
   const copy = getPublicShellCopy(languageCode);
 
@@ -44,39 +47,12 @@ export function PublicShell({
             </div>
           </Link>
 
-          <nav className="flex flex-wrap items-center gap-2 text-sm text-[color:var(--ink-soft)]">
-            <Link
-              className="shell-nav-link"
-              href={withUiLanguage("/", languageCode)}
-            >
-              {copy.nav.product}
-            </Link>
-            <Link
-              className="shell-nav-link"
-              href={withUiLanguage("/pricing", languageCode)}
-            >
-              {copy.nav.pricing}
-            </Link>
-          </nav>
-
           <div className="flex flex-wrap items-center gap-2">
             <ThemeToggle languageCode={languageCode} />
-            <div className="hidden flex-wrap gap-2 md:flex">
-              {(["fr", "en", "zh"] as const).map((code) => (
-                <Link
-                  className={`button-base min-h-[2.4rem] px-3 py-2 text-xs ${
-                    code === languageCode
-                      ? "border-[color:var(--line-strong)] bg-[color:var(--foreground)] text-[color:var(--foreground-inverse)]"
-                      : "button-secondary text-[color:var(--ink-soft)]"
-                  }`}
-                  href={withUiLanguage(currentHref, code)}
-                  key={code}
-                >
-                  {code === "fr" ? "FR" : code === "en" ? "EN" : "中文"}
-                </Link>
-              ))}
-            </div>
-            <span className="brand-pill hidden lg:inline-flex">{copy.pilotBadge}</span>
+            <LanguageMenu
+              currentHref={currentHref}
+              languageCode={languageCode}
+            />
             <Link
               className="button-base button-primary interactive-card"
               href={withUiLanguage("/auth", languageCode)}
@@ -89,37 +65,39 @@ export function PublicShell({
 
       {children}
 
-      <footer className="px-5 pb-8 pt-10 sm:px-8 lg:px-12">
-        <div className="shell-panel page-glow mx-auto grid max-w-6xl gap-6 rounded-[2rem] p-6 md:grid-cols-[0.9fr_1.1fr] md:p-8">
-          <div className="space-y-4">
-            <span className="brand-pill">{copy.footerBadge}</span>
-            <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
-              {copy.footerTitle}
-            </h2>
-            <p className="max-w-xl text-sm leading-6 text-[color:var(--ink-soft)]">
-              {copy.footerBody}
-            </p>
-          </div>
+      {showFooter ? (
+        <footer className="px-5 pb-8 pt-10 sm:px-8 lg:px-12">
+          <div className="shell-panel page-glow mx-auto grid max-w-6xl gap-6 rounded-[2rem] p-6 md:grid-cols-[0.9fr_1.1fr] md:p-8">
+            <div className="space-y-4">
+              <span className="brand-pill">{copy.footerBadge}</span>
+              <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
+                {copy.footerTitle}
+              </h2>
+              <p className="max-w-xl text-sm leading-6 text-[color:var(--ink-soft)]">
+                {copy.footerBody}
+              </p>
+            </div>
 
-          <div className="grid gap-4 sm:grid-cols-3">
-            {copy.footerColumns.map((column) => (
-              <article
-                className="shell-card rounded-[1.5rem] p-4"
-                key={column.title}
-              >
-                <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.16em] text-[color:var(--ink-soft)]">
-                  {column.title}
-                </p>
-                <ul className="mt-3 grid gap-2 text-sm leading-6 text-[color:var(--foreground)]">
-                  {column.items.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </article>
-            ))}
+            <div className="grid gap-4 sm:grid-cols-3">
+              {copy.footerColumns.map((column) => (
+                <article
+                  className="shell-card rounded-[1.5rem] p-4"
+                  key={column.title}
+                >
+                  <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.16em] text-[color:var(--ink-soft)]">
+                    {column.title}
+                  </p>
+                  <ul className="mt-3 grid gap-2 text-sm leading-6 text-[color:var(--foreground)]">
+                    {column.items.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </article>
+              ))}
+            </div>
           </div>
-        </div>
-      </footer>
+        </footer>
+      ) : null}
     </div>
   );
 }

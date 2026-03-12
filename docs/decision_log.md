@@ -727,3 +727,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Keep the shared public shell, but reshape `/` into a concise product landing with one clear hero, a short flow explanation, role framing, and a quieter closing CTA. Move the old quick-access shortcuts into a floating helper button positioned above the Vercel helper area, and simplify the shared public theme control to a single light-or-dark icon toggle instead of a labeled segmented control.
 - Why: This preserves fast operator access without making the public page feel like a dev console, keeps the most visible entry route aligned with the current trust-oriented visual direction, and reduces cognitive noise for first-time visitors.
 - Follow-up: Iterate on the landing copy after user review, audit the same calmness standard on the pricing and auth pages, and validate the helper-button placement against the real deployed Vercel helper plus real tablet hardware.
+
+### D-20260312-72 - The Home Route Now Owns A Story-First Product Narrative
+
+- Date: 2026-03-12
+- Status: accepted
+- Related tasks: `A7.4.7`, `P1.1`, `P1.2`, `P1.3`
+- Context: The first landing redesign was calmer, but it still relied too much on generic shell cards and inherited footer structure. The next requested iteration needed a clearer public story: a large English-first hero, a single free-signup CTA, one heavy feature section, two alternating preview sections, and less chrome competing with the message.
+- Decision: Keep the shared public shell for header, language, and auth entry, but let `/` own its full narrative structure and hide the heavier shared footer there. The public header now reduces to logo plus utility controls, the language switcher is a globe-menu dropdown, the floating helper also carries the pilot context, and the landing body now uses preview placeholders that can be replaced later by real product GIFs without another structural rewrite.
+- Why: This makes the home route feel intentionally product-facing instead of shell-driven, keeps the CTA hierarchy obvious, and future-proofs the page for real media assets and later copy iteration.
+- Follow-up: Replace the preview placeholders with real product captures or GIFs, refine the English source copy after review, keep `fr` and `zh` aligned as the text evolves, and verify the new utility cluster against the real deployed helper stack and tablet interactions.

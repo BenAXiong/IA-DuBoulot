@@ -37,7 +37,7 @@ Use `OPEN` for the unfinished side of an active session.
 | A.x.x.x | A.x.x.x | 77% | GPT-5.4 | Extra High | / | MVP last considerations and Pilot prep |
 | x | x | 100% | GPT-5.4 | Extra High | / | unexpected quota refresh again|
 | x | P1.3 | 84% | GPT-5.4 | Extra High | / | |
-| x | x | 82% | GPT-5.4 | Extra High | / | |
+| x | x | 79% | GPT-5.4 | Extra High | / | localization and UI revamp|
 | x | x | xx% | GPT-5.4 | Extra High | / | |
 | x | x | xx% | GPT-5.4 | Extra High | / | |
 | x | x | xx% | GPT-5.4 | Extra High | / | |
@@ -52,4 +52,4 @@ Use `OPEN` for the unfinished side of an active session.
 | 2026-03-11 | 13:48 -> 19:09 | 5h21 | A0.2.4 A0.3.6 A0.3.7 A0.4.2 A2.1.3 A2.1.5 A2.1.6 A2.4.1 A2.4.2 A2.4.3 A6.1.1 A6.1.2 A6.1.3 A6.1.4 A6.2.1 A6.2.2 A6.2.3 A6.3.1 A6.3.2 A6.3.3 A6.4.1 A6.4.2 A6.4.3 A7.2.1 A7.2.3 A7.3.1 A7.3.2 A7.3.3 A7.3.4 A7.4.1 A7.4.2 A7.4.3 | phase A6 context rebuild + usage counters, trial/quota enforcement, billing abstraction, deployed Lemon test-mode verification, privacy/settings deletion controls, student memory profile work, repo-owned A0/A2 foundation closure for fallback-provider choice + UI primitives + i18n + telemetry/feature flags + GitHub workflow artifacts, QA smoke/regression checklist closure, A7.3 cost-control guardrails with artifact reuse + upload-economics review, A7.4 launch-candidate docs with PWA deferral + founder walkthrough, and an experimental prompt-level log plus AI ops/policy gap audit |
 | 2026-03-11 | 21:35 -> 21:52 | 0h17 | A0.2.2 A0.2.3 A0.3.6 A7.1.1 A7.1.2 A7.1.3 | close remaining external setup gaps where possible, walk through GitHub labels, and run a Chrome or Playwright tablet-emulation pass ahead of real iPad Safari validation |
 | 2026-03-11 | 23:20 -> 04:12 | 4h52 | A0.2.2 A0.2.3 A0.3.6 A0.3.7 A2.1.3 A2.1.5 A7.1.1 A7.1.2 A7.1.3 A7.4.4 A7.4.5 A7.4.6 A7.4.7 A7.4.8 P1.1 P1.2 P1.3 | fresh context rebuild after crash, traceability reconciliation, Resend and GitHub-label follow-up, trilingual UI or accent audit, pilot-plan split, shared shell branding polish, and the first full light or dark theme redesign pass |
-| 2026-03-12 | 09:42 -> OPEN | OPEN | A0.3.2 A0.3.6 A0.3.7 A7.4.4 A7.4.5 A7.4.6 A7.4.7 P1.1 P1.2 P1.3 P4.1 P4.2 | tighten pilot or workflow traceability, make commit or push expectations repo rules, finish the remaining localization slice, redesign the public landing into a calmer product-facing entry, document the role-test workflow, refresh the affected smokes, and publish verified slices |
+| 2026-03-12 | 09:42 -> OPEN | OPEN | A0.3.2 A0.3.6 A0.3.7 A7.4.4 A7.4.5 A7.4.6 A7.4.7 P1.1 P1.2 P1.3 P4.1 P4.2 | tighten pilot or workflow traceability, finish the remaining localization slice, redesign the public landing through multiple calmer product-facing iterations, document the role-test workflow, refresh the affected checks, and publish verified slices |

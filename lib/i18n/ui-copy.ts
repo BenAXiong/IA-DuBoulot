@@ -29,6 +29,23 @@ export function getThemeToggleCopy(languageCode: UiLanguageCode) {
   });
 }
 
+export function getLanguageMenuCopy(languageCode: UiLanguageCode) {
+  return pickLocalizedValue(languageCode, {
+    fr: {
+      buttonLabel: "Langue",
+      menuTitle: "Langue",
+    },
+    en: {
+      buttonLabel: "Language",
+      menuTitle: "Language",
+    },
+    zh: {
+      buttonLabel: "語言",
+      menuTitle: "語言",
+    },
+  });
+}
+
 export function getPublicShellCopy(languageCode: UiLanguageCode) {
   return pickLocalizedValue(languageCode, {
     fr: {
@@ -162,84 +179,82 @@ export function getPublicShellCopy(languageCode: UiLanguageCode) {
 export function getHomePageCopy(languageCode: UiLanguageCode) {
   return pickLocalizedValue(languageCode, {
     fr: {
-      badges: ["Pilot privé", "FR / EN / ZH"],
-      eyebrow: "Aide aux devoirs supervisée",
-      title:
-        "Une aide IA qui guide l'élève sans sortir les adultes du cadre.",
-      body:
-        "L'élève avance étape par étape, le parent garde de la visibilité, et le tuteur retrouve le fil du travail. Le produit reste volontairement simple, calme et pensé pour de vrais devoirs.",
-      ctas: {
-        primary: "Entrer dans l'app",
-        secondary: "Voir les tarifs",
-        journey: "Comprendre le parcours",
-      },
-      supportCard: {
-        eyebrow: "Ce que le produit apporte",
-        title: "Un cadre clair pour chaque rôle.",
-        items: [
-          "L'élève travaille avec des indices, un espace de brouillon et un historique.",
-          "Le parent voit les résumés, le statut du compte et les contrôles de confidentialité.",
-          "Le tuteur retrouve un élève lié sans accéder à toute la mémoire brute.",
-        ],
-      },
-      proof: [
+      heroTitle: "Voici banban, ton coach IA pour les devoirs.",
+      heroBody:
+        "Une aide calme et guidée pour travailler un devoir, consolider ce que tu comprends déjà, et progresser sans recevoir les réponses toutes faites.",
+      heroCta: "S'inscrire gratuitement",
+      featureCards: [
         {
-          title: "Côté élève",
-          body: "Le produit aide à avancer sans transformer le devoir en simple machine à réponses.",
+          title: "Guidance personnalisée.",
+          body: "banban adapte ses réponses au niveau actuel de l'élève. Il guide, questionne et relance, sans donner directement la réponse.",
         },
         {
-          title: "Côté adulte",
-          body: "Les parents et les tuteurs gardent de la visibilité au lieu d'être exclus du travail fait avec l'IA.",
+          title: "Améliore tes notes.",
+          body: "Génère des fiches d'entraînement ciblées avant le prochain contrôle. Ajoute les résultats ensuite pour transformer la pratique en connaissance durable.",
         },
         {
-          title: "Côté produit",
-          body: "Le MVP reste resserré: parcours simple, ton calme, et pilot fermé avant toute ouverture plus large.",
+          title: "Pas seulement les notes.",
+          body: "banban aide aussi sur la meta-learning: analyser ton raisonnement, affiner tes méthodes, et développer des réflexes solides pour apprendre à apprendre.",
         },
       ],
-      journeyEyebrow: "Parcours",
-      journeyTitle: "Trois étapes simples pour garder le devoir lisible.",
-      journeySteps: [
-        {
-          title: "1. Importer le devoir",
-          body: "PDF, capture, photo ou texte libre: l'entrée suit la réalité du travail scolaire.",
+      previews: {
+        primary: {
+          label: "Aperçu produit",
+          title: "Conversation guidée, brouillon, et devoir réel.",
+          body: "Remplace ce cadre par un GIF ou une capture dès qu'un média propre est prêt.",
+          steps: [
+            "Capture ou PDF de devoir",
+            "Espace de travail guidé",
+            "Historique de session réutilisable",
+          ],
         },
-        {
-          title: "2. Travailler avec l'IA",
-          body: "L'élève avance avec des indices, un espace de brouillon et des réponses orientées apprentissage.",
+        content: {
+          label: "Flux contenu",
+          title: "Importer, approfondir, s'entraîner, résumer.",
+          body: "Le futur travail média pourra rendre ce flux plus démonstratif, mais la structure produit est déjà prête à l'accueillir.",
+          steps: [
+            "Upload de contenu réel",
+            "Dive et drill ciblés",
+            "Résumé de fin de session",
+          ],
         },
-        {
-          title: "3. Garder les adultes alignés",
-          body: "Résumés, revue et notes privées permettent un suivi sans ouvrir tout le contexte à tout le monde.",
+        sharing: {
+          label: "Flux suivi",
+          title: "Partager le bon niveau d'information.",
+          body: "Le suivi long terme s'appuie sur les résumés, l'historique, les liens parent ou tuteur, et les futures itérations de visualisation de progression.",
+          steps: [
+            "Résumé parent ou tuteur",
+            "Historique et retour sur sessions",
+            "Progression dans le temps",
+          ],
         },
-      ],
-      rolesEyebrow: "Rôles",
-      rolesTitle: "Trois rôles, une même base de confiance.",
-      roles: [
-        {
-          title: "Élève",
-          body: "Commencer un devoir, reprendre une session, et obtenir une aide qui reste pédagogique.",
-        },
-        {
-          title: "Parent",
-          body: "Voir la progression, comprendre les points fragiles et garder la main sur le compte.",
-        },
-        {
-          title: "Tuteur",
-          body: "Relire une session, suivre les besoins et conserver des notes privées de continuité.",
-        },
-      ],
-      closing: {
-        eyebrow: "Pilot",
-        title: "Le pilot reste volontairement fermé.",
-        body: "Le bon objectif pour maintenant n'est pas d'ajouter du bruit, mais de rendre l'expérience assez nette pour les premières familles réelles.",
-        cta: "Commencer",
       },
+      sections: [
+        {
+          title: "Upload content, dive & drill, create summaries.",
+          body: "Importe un devoir réel, plonge dans les points difficiles, lance des drills ciblés et termine avec un résumé. Les aperçus média pourront encore gagner en finesse dans une itération suivante.",
+        },
+        {
+          title: "Share with your parents and tutors, keep track of your progress.",
+          body: "Les parents et les tuteurs récupèrent la bonne vue au bon moment, pendant que l'élève garde un fil de progression plus durable qu'une simple conversation isolée.",
+        },
+      ],
+      closingTitle: "Start with banban.",
+      closingBody:
+        "Crée un compte gratuit et teste le parcours élève pendant que le pilot continue à se structurer.",
+      closingCta: "S'inscrire gratuitement",
       helper: {
         buttonLabel: "Accès rapide",
         title: "Accès rapide",
-        body: "Les raccourcis produit et opérateur sont regroupés ici pour garder la page d'accueil plus calme.",
+        body: "Les raccourcis produit et opérateur restent ici pour ne pas surcharger la landing.",
+        pilotBadge: "Pilot privé",
+        pilotTitle: "Pilot supervisé",
+        pilotBody:
+          "Le produit reste dans un pilot fermé pendant que le design, les devices et les parcours gagnent en maturité.",
+        linksTitle: "Liens",
         links: {
           auth: "Connexion",
+          pricing: "Tarifs",
           student: "Inscription élève",
           parent: "Inscription parent",
           tutor: "Inscription tuteur",
@@ -249,84 +264,82 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
       },
     },
     en: {
-      badges: ["Private pilot", "FR / EN / ZH"],
-      eyebrow: "Supervised homework help",
-      title:
-        "AI homework help that guides the student without cutting adults out.",
-      body:
-        "The student moves step by step, the parent keeps visibility, and the tutor can pick up the thread. The product stays intentionally simple, calm, and built for real homework.",
-      ctas: {
-        primary: "Open the app",
-        secondary: "See pricing",
-        journey: "See the flow",
-      },
-      supportCard: {
-        eyebrow: "What the product does",
-        title: "A clear frame for each role.",
-        items: [
-          "The student works with hints, a scratchpad, and session history.",
-          "The parent sees summaries, account state, and privacy controls.",
-          "The tutor can pick up a linked student without getting full raw memory access.",
-        ],
-      },
-      proof: [
+      heroTitle: "Meet banban, he's your AI homework coach.",
+      heroBody:
+        "A calmer way to work through homework, strengthen what you already know, and keep learning moving without getting direct answers handed to you.",
+      heroCta: "Sign up for free",
+      featureCards: [
         {
-          title: "Student side",
-          body: "The product helps the student move forward without becoming a pure answer machine.",
+          title: "Personalized guidance.",
+          body: "banban adapts every answer to the learner's current knowledge. He guides, prompts, and redirects, but never reveals direct answers.",
         },
         {
-          title: "Adult side",
-          body: "Parents and tutors keep visibility instead of being pushed out of the AI-assisted work.",
+          title: "Improve your grades.",
+          body: "Generate targeted practice sheets to ace the next exam. Upload results afterward so banban can help turn repetition into lasting knowledge.",
         },
         {
-          title: "Product side",
-          body: "The MVP stays tight: simple flow, calm tone, and a closed pilot before any wider rollout.",
+          title: "Not just the grades.",
+          body: "banban also supports meta-learning: analyze your thought process, refine your methods, and build learning-how-to-learn habits that last.",
         },
       ],
-      journeyEyebrow: "Flow",
-      journeyTitle: "Three simple steps that keep the homework readable.",
-      journeySteps: [
-        {
-          title: "1. Bring the homework in",
-          body: "PDF, screenshot, photo, or pasted text: intake follows how students actually work.",
+      previews: {
+        primary: {
+          label: "Product preview",
+          title: "Guided chat, workspace, and real homework intake.",
+          body: "Swap this frame for a clean GIF or screenshot as soon as one is ready.",
+          steps: [
+            "Real homework upload",
+            "Guided workspace",
+            "Reusable session history",
+          ],
         },
-        {
-          title: "2. Work with guided help",
-          body: "The student gets hints, a workspace, and learning-oriented replies instead of instant full solutions.",
+        content: {
+          label: "Content flow",
+          title: "Upload, dive, drill, and summarize.",
+          body: "Future media work can make this flow more vivid, but the layout is already ready for a stronger product preview.",
+          steps: [
+            "Upload real content",
+            "Dive and drill weak spots",
+            "Generate a session summary",
+          ],
         },
-        {
-          title: "3. Keep adults aligned",
-          body: "Summaries, review, and private notes support follow-up without exposing every surface to every role.",
+        sharing: {
+          label: "Progress flow",
+          title: "Share the right view with adults.",
+          body: "Long-term follow-through builds on summaries, history, parent or tutor links, and future progress views instead of isolated one-off chats.",
+          steps: [
+            "Parent or tutor summaries",
+            "Review past sessions",
+            "Track progress over time",
+          ],
         },
-      ],
-      rolesEyebrow: "Roles",
-      rolesTitle: "Three roles, one trust frame.",
-      roles: [
-        {
-          title: "Student",
-          body: "Start homework, return to a session later, and get help that stays pedagogical.",
-        },
-        {
-          title: "Parent",
-          body: "Review progress, understand fragile points, and keep control of the account.",
-        },
-        {
-          title: "Tutor",
-          body: "Review a session, follow recurring needs, and keep private continuity notes.",
-        },
-      ],
-      closing: {
-        eyebrow: "Pilot",
-        title: "The pilot stays intentionally closed.",
-        body: "The right goal for now is not more noise. It is a calmer experience that is strong enough for the first real families.",
-        cta: "Get started",
       },
+      sections: [
+        {
+          title: "Upload content, dive & drill, create summaries.",
+          body: "Bring in real homework, dive into the tricky parts, run targeted drills, and finish with a summary. The media layer can still get richer in a later iteration.",
+        },
+        {
+          title: "Share with your parents and tutors, keep track of your progress.",
+          body: "Parents and tutors get the right visibility while the student keeps a longer-term sense of progress instead of losing everything inside a single AI chat.",
+        },
+      ],
+      closingTitle: "Start with banban.",
+      closingBody:
+        "Create a free account and try the student flow while the private pilot keeps getting sharper.",
+      closingCta: "Sign up for free",
       helper: {
         buttonLabel: "Quick access",
         title: "Quick access",
-        body: "Product and operator shortcuts live here so the landing page can stay quieter.",
+        body: "Product and operator shortcuts live here so the landing page can stay focused.",
+        pilotBadge: "Private pilot",
+        pilotTitle: "Supervised pilot",
+        pilotBody:
+          "The product is still in a closed pilot while design, devices, and live user journeys are being tightened.",
+        linksTitle: "Links",
         links: {
           auth: "Sign in",
+          pricing: "Pricing",
           student: "Student sign-up",
           parent: "Parent sign-up",
           tutor: "Tutor sign-up",
@@ -336,83 +349,82 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
       },
     },
     zh: {
-      badges: ["封閉 Pilot", "FR / EN / ZH"],
-      eyebrow: "受監督的作業協助",
-      title: "用 AI 引導學生做作業，同時不把大人排除在外。",
-      body:
-        "學生可以一步一步前進，家長保有可見性，家教也能接上脈絡。產品刻意保持簡單、安定，而且是為真實作業情境而設計。",
-      ctas: {
-        primary: "進入 App",
-        secondary: "查看方案",
-        journey: "了解流程",
-      },
-      supportCard: {
-        eyebrow: "產品帶來什麼",
-        title: "為每個角色保留清楚的框架。",
-        items: [
-          "學生可用提示、草稿空間與歷史紀錄來完成作業。",
-          "家長可看到摘要、帳號狀態與隱私控制。",
-          "家教可以接手已連結學生的情境，但不會直接看到完整原始記憶。",
-        ],
-      },
-      proof: [
+      heroTitle: "認識 banban，他是你的 AI 作業教練。",
+      heroBody:
+        "用更安靜、更有引導感的方式完成作業、加深你已經理解的內容，並在沒有直接答案的前提下持續前進。",
+      heroCta: "免費註冊",
+      featureCards: [
         {
-          title: "學生端",
-          body: "產品幫助學生向前推進，但不會變成單純吐答案的機器。",
+          title: "個人化引導。",
+          body: "banban 會根據學習者當下的理解程度調整回答。他會引導、提問、修正方向，但不直接揭露答案。",
         },
         {
-          title: "大人端",
-          body: "家長與家教保有可見性，而不是被排除在 AI 協助之外。",
+          title: "提升成績。",
+          body: "產生更聚焦的練習題，幫你準備下一次考試。之後再上傳結果，讓 banban 幫你把練習變成更持久的知識。",
         },
         {
-          title: "產品端",
-          body: "MVP 刻意收斂：流程簡單、語氣安定，並先以封閉 Pilot 驗證。",
+          title: "不只是成績。",
+          body: "banban 也支援 meta-learning：分析你的思考流程、修正方法，並建立能長久保留的學習如何學習能力。",
         },
       ],
-      journeyEyebrow: "流程",
-      journeyTitle: "三個簡單步驟，讓作業過程保持清楚。",
-      journeySteps: [
-        {
-          title: "1. 帶入作業",
-          body: "PDF、截圖、照片或貼上文字都可以，符合學生真實的使用方式。",
+      previews: {
+        primary: {
+          label: "產品預覽",
+          title: "引導式對話、工作區與真實作業輸入。",
+          body: "一旦有更乾淨的 GIF 或截圖，就可以直接把這個區塊替換掉。",
+          steps: [
+            "上傳真實作業",
+            "引導式工作區",
+            "可重用的歷史紀錄",
+          ],
         },
-        {
-          title: "2. 在引導下完成",
-          body: "學生會得到提示、工作區與偏向學習的回應，而不是立即拿到完整答案。",
+        content: {
+          label: "內容流程",
+          title: "上傳、深挖、drill 與摘要。",
+          body: "之後的媒體素材可以讓這個流程更有臨場感，但版面已經先為更完整的產品預覽做好準備。",
+          steps: [
+            "上傳真實內容",
+            "針對弱點 dive 與 drill",
+            "產出本次摘要",
+          ],
         },
-        {
-          title: "3. 讓大人保持同步",
-          body: "摘要、回顧與私人筆記讓後續追蹤可行，同時不把每個面向都暴露給所有角色。",
+        sharing: {
+          label: "進度流程",
+          title: "把正確的視角分享給大人。",
+          body: "長期追蹤會建立在摘要、歷史紀錄、家長或家教連結，以及未來的進度視圖上，而不是單次聊天後就消失。",
+          steps: [
+            "家長或家教摘要",
+            "回看過去的 session",
+            "長期追蹤進步",
+          ],
         },
-      ],
-      rolesEyebrow: "角色",
-      rolesTitle: "三種角色，共用同一套信任框架。",
-      roles: [
-        {
-          title: "學生",
-          body: "開始一份作業、之後再回來續做，並得到仍然具有教學性的協助。",
-        },
-        {
-          title: "家長",
-          body: "查看進度、理解脆弱點，並保有對帳號與資料的控制。",
-        },
-        {
-          title: "家教",
-          body: "回顧作業過程、追蹤反覆需求，並留下私人連續性筆記。",
-        },
-      ],
-      closing: {
-        eyebrow: "Pilot",
-        title: "目前的 Pilot 會刻意維持封閉。",
-        body: "現在真正重要的不是更多噪音，而是把體驗整理得夠穩、夠清楚，讓第一批真實家庭敢用。",
-        cta: "開始使用",
       },
+      sections: [
+        {
+          title: "Upload content, dive & drill, create summaries.",
+          body: "把真實作業帶進來、深入卡住的地方、做更聚焦的 drill，最後收斂成摘要。媒體層之後還可以再做得更豐富。",
+        },
+        {
+          title: "Share with your parents and tutors, keep track of your progress.",
+          body: "家長與家教拿到正確層級的可見性，而學生也能保留比單次 AI 聊天更長期的進步脈絡。",
+        },
+      ],
+      closingTitle: "從 banban 開始。",
+      closingBody:
+        "先建立免費帳號，試試學生流程，同時讓這個封閉 Pilot 繼續變得更穩、更清楚。",
+      closingCta: "免費註冊",
       helper: {
         buttonLabel: "快速入口",
         title: "快速入口",
-        body: "產品與操作捷徑先收在這裡，讓首頁保持更安靜。",
+        body: "產品與操作捷徑放在這裡，讓 landing 保持更聚焦。",
+        pilotBadge: "封閉 Pilot",
+        pilotTitle: "受監督 Pilot",
+        pilotBody:
+          "產品仍在封閉 Pilot 中，會先把設計、裝置表現與真實使用旅程打磨到更可靠。",
+        linksTitle: "連結",
         links: {
           auth: "登入",
+          pricing: "方案",
           student: "學生註冊",
           parent: "家長註冊",
           tutor: "家教註冊",

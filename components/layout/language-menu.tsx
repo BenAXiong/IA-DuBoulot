@@ -1,0 +1,109 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { getLanguageMenuCopy } from "@/lib/i18n/ui-copy";
+import { withUiLanguage } from "@/lib/i18n/ui-language";
+import type { UiLanguageCode } from "@/lib/server/auth/types";
+
+type LanguageMenuProps = {
+  currentHref: string;
+  languageCode: UiLanguageCode;
+};
+
+function GlobeIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle cx="12" cy="12" r="8.25" stroke="currentColor" strokeWidth="1.8" />
+      <path
+        d="M3.75 12h16.5M12 3.75c2.25 2.2 3.5 5.15 3.5 8.25S14.25 18.05 12 20.25M12 3.75c-2.25 2.2-3.5 5.15-3.5 8.25s1.25 6.05 3.5 8.25"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
+export function LanguageMenu({
+  currentHref,
+  languageCode,
+}: LanguageMenuProps) {
+  const copy = getLanguageMenuCopy(languageCode);
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const languages: Array<{ code: UiLanguageCode; label: string }> = [
+    { code: "fr", label: "FR" },
+    { code: "en", label: "EN" },
+    { code: "zh", label: "中文" },
+  ];
+
+  useEffect(() => {
+    if (!open) {
+      return undefined;
+    }
+
+    function handlePointerDown(event: PointerEvent) {
+      if (
+        rootRef.current &&
+        event.target instanceof Node &&
+        !rootRef.current.contains(event.target)
+      ) {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [open]);
+
+  return (
+    <div
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+      ref={rootRef}
+    >
+      <button
+        aria-expanded={open}
+        aria-haspopup="menu"
+        className="theme-toggle"
+        onClick={() => setOpen((value) => !value)}
+        title={copy.buttonLabel}
+        type="button"
+      >
+        <span className="sr-only">{copy.buttonLabel}</span>
+        <GlobeIcon className="h-5 w-5" />
+      </button>
+
+      {open ? (
+        <div className="absolute right-0 top-full z-50 mt-2 min-w-36 rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface-raised)] p-2 shadow-[var(--shadow)]">
+          <p className="px-2 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--ink-muted)]">
+            {copy.menuTitle}
+          </p>
+          <div className="mt-1 grid gap-1">
+            {languages.map((language) => (
+              <Link
+                className={`rounded-[0.95rem] px-3 py-2 text-sm font-medium transition ${
+                  language.code === languageCode
+                    ? "bg-[color:var(--foreground)] text-[color:var(--foreground-inverse)]"
+                    : "text-[color:var(--foreground)] hover:bg-[color:var(--surface)]"
+                }`}
+                href={withUiLanguage(currentHref, language.code)}
+                key={language.code}
+                onClick={() => setOpen(false)}
+              >
+                {language.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}

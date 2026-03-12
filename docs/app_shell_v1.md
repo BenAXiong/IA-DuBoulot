@@ -38,6 +38,8 @@ Rules:
 - the shell now carries the active UI language through shared dictionaries and a small client-side `document.documentElement.lang` sync instead of hardcoded French-only chrome
 - the shell now also exposes the shared light or dark theme toggle instead of leaving theme preference implicit in CSS alone, but the public chrome keeps it to a single icon button rather than a labeled segmented control
 - the landing route now keeps operator and deep-link shortcuts behind a floating helper button so the user-facing page can stay calmer than the previous toolbox-style entry
+- the public chrome now uses a compact globe-menu language selector instead of always-visible inline language pills
+- the home route may opt out of the shared public footer when a page-owned closing CTA gives a cleaner public narrative than the heavier shell footer
 
 ## Authenticated App Shell
 

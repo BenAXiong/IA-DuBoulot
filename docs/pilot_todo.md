@@ -45,7 +45,7 @@ Current carryover blockers that still stay in MVP:
 - [ ] P1.2 Define a calmer brand system for colors, typography, spacing, states, and empty/loading/error views.
 - [ ] P1.3 Remove distracting UI imperfections and obvious polish gaps on the highest-traffic routes.
 
-Status note: the shared shell and primitive layer now has a real light or dark theme system through `app/globals.css`, `components/theme/theme-script.tsx`, `components/theme/theme-toggle.tsx`, and `lib/theme/config.ts`, with updated shared buttons, inputs, cards, auth surfaces, tablet-smoke verification, and a simplified icon-only public theme toggle. The landing page also now has a calmer product-facing structure with a floating quick-access helper instead of a toolbox hero. `P1` stays open because deeper route polish, empty/loading/error consistency, stronger copy iteration, and broader visual cleanup still remain.
+Status note: the shared shell and primitive layer now has a real light or dark theme system through `app/globals.css`, `components/theme/theme-script.tsx`, `components/theme/theme-toggle.tsx`, and `lib/theme/config.ts`, with updated shared buttons, inputs, cards, auth surfaces, tablet-smoke verification, and a simplified icon-only public theme toggle. The landing page now also uses a story-first product layout with preview slots, a floating helper for links plus pilot context, a globe-menu language dropdown, and a page-owned closing CTA instead of the previous toolbox hero. `P1` stays open because real product media, stronger copy iteration, empty/loading/error consistency, and broader route-level visual cleanup still remain.
 
 ### P2 Journey And UX Hardening
 

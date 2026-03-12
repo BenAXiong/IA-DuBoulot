@@ -18,6 +18,11 @@ export function FloatingHelperMenu({
       kind: "internal" as const,
     },
     {
+      href: withUiLanguage("/pricing", languageCode),
+      label: copy.links.pricing,
+      kind: "internal" as const,
+    },
+    {
       href: withUiLanguage("/auth?mode=sign_up&role=student", languageCode),
       label: copy.links.student,
       kind: "internal" as const,
@@ -70,14 +75,26 @@ export function FloatingHelperMenu({
       </summary>
 
       <div className="absolute bottom-16 right-0 w-[min(18rem,calc(100vw-2rem))] rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface-raised)] p-4 shadow-[var(--shadow)]">
-        <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-          {copy.title}
+        <span className="brand-pill">{copy.pilotBadge}</span>
+        <p className="mt-3 font-[family-name:var(--font-heading)] text-lg leading-tight text-[color:var(--foreground)]">
+          {copy.pilotTitle}
         </p>
         <p className="mt-2 text-sm leading-6 text-[color:var(--ink-soft)]">
-          {copy.body}
+          {copy.pilotBody}
         </p>
+        <div className="mt-4 rounded-[1.15rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-3 py-3">
+          <p className="font-[family-name:var(--font-heading)] text-xs uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
+            {copy.title}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-[color:var(--ink-soft)]">
+            {copy.body}
+          </p>
+        </div>
 
-        <div className="mt-4 grid gap-2">
+        <p className="mt-4 px-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--ink-muted)]">
+          {copy.linksTitle}
+        </p>
+        <div className="mt-2 grid gap-2">
           {links.map((link) =>
             link.kind === "external" ? (
               <a
