@@ -82,7 +82,7 @@ export function LanguageMenu({
       </button>
 
       {open ? (
-        <div className="absolute right-0 top-full z-50 mt-2 min-w-36 rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface-raised)] p-2 shadow-[var(--shadow)]">
+        <div className="absolute bottom-full right-0 z-50 mb-2 min-w-36 rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface-raised)] p-2 shadow-[var(--shadow)]">
           <p className="px-2 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--ink-muted)]">
             {copy.menuTitle}
           </p>

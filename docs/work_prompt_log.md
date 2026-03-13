@@ -57,3 +57,4 @@ It is still a manual repo artifact: it cannot auto-start itself at instance boot
 | 2026-03-12 | 16:40 -> 16:49 | 0h09 | A0.3.7 A7.4.7 P1.1 P1.2 P1.3 | correct the landing section rhythm so all three rows share the same gif or cards footprint and only section 2 reverses the layout | |
 | 2026-03-13 | 10:17 -> 10:18 | 0h01 | A0.3.7 | close the 2026-03-12 16:37 session at 16:49, reopen a new session for today, and audit whether the repo already has a canonical list of pages | |
 | 2026-03-13 | 10:18 -> 10:36 | 0h18 | A0.3.7 | fix the clipped public language dropdown by removing header-shell overflow clipping and summarize how to avoid this common agent debugging snag | |
+| 2026-03-13 | 10:36 -> 10:56 | 0h20 | A0.3.7 | anchor the language dropdown above the trigger, add a faint global commit marker in the top-left corner, and verify whether the build hash can auto-refresh on each push | |

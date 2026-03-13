@@ -1,3 +1,4 @@
+import { execSync } from "node:child_process";
 import type { Metadata } from "next";
 import { IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
 import { Suspense } from "react";
@@ -25,15 +26,40 @@ export const metadata: Metadata = {
     "A calm, supervised AI homework coach for students, parents, and tutors.",
 };
 
+function resolveBuildCommitLabel() {
+  const envCommit =
+    process.env.VERCEL_GIT_COMMIT_SHA ??
+    process.env.GIT_COMMIT_SHA ??
+    process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA;
+
+  if (envCommit && envCommit.trim().length > 0) {
+    return envCommit.trim().slice(0, 7);
+  }
+
+  try {
+    return execSync("git rev-parse --short HEAD", {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+  } catch {
+    return "unknown";
+  }
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const commitLabel = resolveBuildCommitLabel();
+
   return (
     <html lang="fr" suppressHydrationWarning>
       <body className={`${bodyFont.variable} ${headingFont.variable} antialiased`}>
         <ThemeScript />
+        <div className="pointer-events-none fixed left-3 top-2 z-[70] select-none text-[0.68rem] font-medium tracking-[0.18em] text-[color:var(--ink-muted)] opacity-55">
+          {commitLabel}
+        </div>
         <Suspense fallback={null}>
           <RouteViewTracker />
         </Suspense>
