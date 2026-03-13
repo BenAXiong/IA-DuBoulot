@@ -68,6 +68,24 @@ export function isDarkLikeThemeMode(theme: ThemeMode) {
   return theme === "dark" || theme === "smooth" || theme === "custom";
 }
 
+function getSystemThemeMode(): ThemeMode {
+  if (typeof window === "undefined") {
+    return "light";
+  }
+
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function clearStoredThemePreference() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  localStorage.removeItem(THEME_STORAGE_KEY);
+  localStorage.removeItem(THEME_VERSION_STORAGE_KEY);
+  localStorage.removeItem(CUSTOM_THEME_STORAGE_KEY);
+}
+
 export function normalizeCustomTheme(
   value: unknown,
   fallback: CustomThemeRecord = DEFAULT_CUSTOM_THEME,
@@ -110,22 +128,11 @@ export function resolveClientThemeMode(): ThemeMode {
 
   const documentTheme = document.documentElement.dataset.theme;
 
-  if (isThemeMode(documentTheme)) {
+  if (documentTheme === "light" || documentTheme === "dark") {
     return documentTheme;
   }
 
-  if (typeof window !== "undefined") {
-    const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-    if (isThemeMode(storedTheme)) {
-      return storedTheme;
-    }
-
-    return window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
-  }
-
-  return "light";
+  return getSystemThemeMode();
 }
 
 function dispatchThemeChangeEvent() {
@@ -184,13 +191,7 @@ export function persistThemeMode(
   }
 
   applyThemeToDocument(document.documentElement, theme, customTheme);
-  localStorage.setItem(THEME_STORAGE_KEY, theme);
-  localStorage.setItem(THEME_VERSION_STORAGE_KEY, THEME_STORAGE_VERSION);
-
-  if (theme === "custom") {
-    localStorage.setItem(CUSTOM_THEME_STORAGE_KEY, JSON.stringify(customTheme));
-  }
-
+  clearStoredThemePreference();
   dispatchThemeChangeEvent();
 }
 
@@ -199,15 +200,7 @@ export function restoreStoredThemeMode() {
     return;
   }
 
-  const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-  const theme = isThemeMode(storedTheme)
-    ? storedTheme
-    : window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
-  const customTheme = readStoredCustomTheme();
-
-  applyThemeToDocument(document.documentElement, theme, customTheme);
+  clearStoredThemePreference();
+  applyThemeToDocument(document.documentElement, getSystemThemeMode());
   dispatchThemeChangeEvent();
 }
-

@@ -1143,10 +1143,9 @@ export function getAuthCompleteCopy(languageCode: UiLanguageCode) {
 export function getAppShellCopy(languageCode: UiLanguageCode) {
   return pickLocalizedValue(languageCode, {
     fr: {
-      pilotBadge: "Pilot privé",
       sessionActive: "Session active",
       unknownEmail: "adresse inconnue",
-      application: "Application",
+      application: "Espace de travail",
       chips: {
         role: "Rôle",
         status: "Statut",
@@ -1214,10 +1213,9 @@ export function getAppShellCopy(languageCode: UiLanguageCode) {
       },
     },
     en: {
-      pilotBadge: "Private pilot",
       sessionActive: "Active session",
       unknownEmail: "unknown address",
-      application: "Application",
+      application: "Workspace",
       chips: {
         role: "Role",
         status: "Status",
@@ -1285,10 +1283,9 @@ export function getAppShellCopy(languageCode: UiLanguageCode) {
       },
     },
     zh: {
-      pilotBadge: "封閉 Pilot",
       sessionActive: "目前 session",
       unknownEmail: "未知地址",
-      application: "Application",
+      application: "工作區",
       chips: {
         role: "角色",
         status: "狀態",

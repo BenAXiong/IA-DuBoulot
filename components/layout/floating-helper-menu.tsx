@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { getHomePageCopy } from "@/lib/i18n/ui-copy";
-import { ThemeMenu } from "@/components/theme/theme-menu";
 import { withUiLanguage } from "@/lib/i18n/ui-language";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 
@@ -96,7 +95,6 @@ export function FloatingHelperMenu({
           {copy.linksTitle}
         </p>
         <div className="mt-2 grid gap-2">
-          <ThemeMenu languageCode={languageCode} />
           {links.map((link) =>
             link.kind === "external" ? (
               <a

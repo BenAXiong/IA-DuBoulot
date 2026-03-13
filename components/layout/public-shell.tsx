@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { DocumentLanguageSync } from "@/components/i18n/document-language-sync";
 import { LanguageMenu } from "@/components/layout/language-menu";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import { getPublicShellCopy } from "@/lib/i18n/ui-copy";
 import { withUiLanguage } from "@/lib/i18n/ui-language";
@@ -54,10 +53,6 @@ export function PublicShell({
           </Link>
 
           <div className={isHudHeader ? "flex items-center gap-1" : "flex flex-wrap items-center gap-2"}>
-            <ThemeToggle
-              languageCode={languageCode}
-              variant={isHudHeader ? "minimal" : "default"}
-            />
             <LanguageMenu
               currentHref={currentHref}
               languageCode={languageCode}

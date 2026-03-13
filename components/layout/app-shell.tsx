@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { DocumentLanguageSync } from "@/components/i18n/document-language-sync";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
 import {
   getAppShellCopy,
   getLanguageLabel,
@@ -31,7 +30,6 @@ export function AppShell({ children, email, appUser }: AppShellProps) {
               <p className="brand-wordmark text-xs text-[color:var(--ink-muted)]">
                 IA DuBoulot
               </p>
-              <span className="brand-pill">{copy.pilotBadge}</span>
               <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.24em] text-[color:var(--ink-soft)]">
                 {roleMeta.label}
               </p>
@@ -59,7 +57,6 @@ export function AppShell({ children, email, appUser }: AppShellProps) {
             </nav>
 
             <div className="shell-card grid gap-3 rounded-[1.5rem] p-4 text-sm">
-              <ThemeToggle languageCode={languageCode} />
               <p className="font-medium">{copy.sessionActive}</p>
               <p className="text-[color:var(--ink-soft)]">
                 {email ?? copy.unknownEmail}
@@ -102,7 +99,6 @@ export function AppShell({ children, email, appUser }: AppShellProps) {
               </div>
 
               <div className="flex flex-wrap items-center gap-2 lg:hidden">
-                <ThemeToggle languageCode={languageCode} />
                 <SignOutButton
                   label={copy.signOut.idle}
                   pendingLabel={copy.signOut.pending}

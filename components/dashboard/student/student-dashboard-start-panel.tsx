@@ -149,7 +149,7 @@ export function StudentDashboardStartPanel({
             {getButtonLabel(snapshot, languageCode)}
           </Link>
           <p className="text-sm text-[color:var(--ink-soft)]">
-            {copy.canonicalRoute}: <code>/app/new</code>
+            {copy.actionHint}
           </p>
         </div>
       </article>

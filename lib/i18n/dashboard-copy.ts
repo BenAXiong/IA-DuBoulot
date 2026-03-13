@@ -181,7 +181,7 @@ export function getStudentDashboardStartPanelCopy(languageCode: UiLanguageCode) 
         viewQuota: "Voir le quota",
         blocked: "Départ bloqué",
       },
-      canonicalRoute: "Point d'entrée",
+      actionHint: "Commence un nouveau devoir ou reprends le fil depuis ici.",
       recentSubjectsEyebrow: "Matières récentes",
       recentSubjectsTitle:
         "Les prochains raccourcis d'intake partiront des sujets déjà vus.",
@@ -206,7 +206,7 @@ export function getStudentDashboardStartPanelCopy(languageCode: UiLanguageCode) 
         viewQuota: "View quota",
         blocked: "Start blocked",
       },
-      canonicalRoute: "Start here",
+      actionHint: "Start a new homework or pick up where you left off from here.",
       recentSubjectsEyebrow: "Recent subjects",
       recentSubjectsTitle:
         "The next intake shortcuts will start from subjects already seen.",
@@ -230,7 +230,7 @@ export function getStudentDashboardStartPanelCopy(languageCode: UiLanguageCode) 
         viewQuota: "查看額度",
         blocked: "起始受阻",
       },
-      canonicalRoute: "開始位置",
+      actionHint: "可從這裡開始新作業，或接續上次進度。",
       recentSubjectsEyebrow: "最近科目",
       recentSubjectsTitle: "下一批 intake 快捷入口會從已出現過的科目出發。",
       noRecentSubjects:
@@ -1342,18 +1342,18 @@ export function getAdminDashboardCopy(languageCode: UiLanguageCode) {
         auditBody:
           "Les lectures parent/tuteur et les mutations de notes privées sont maintenant regroupées dans une vue admin dédiée.",
         volumeBody:
-          "Le flux actuel couvre les ouvertures de session adulte et les notes privées tuteur.",
+          "Retrouve ici les ouvertures de sessions adultes et les changements de notes privées les plus récents.",
         routeBody:
-          "Surface admin initiale pour revue de confiance et support.",
+          "Route dédiée au suivi des accès sensibles et des revues de confiance.",
       },
       ops: {
         eyebrow: "Ops",
         title:
-          "Le shell admin pointe maintenant vers une vraie revue des accès sensibles.",
+          "Le shell admin centralise désormais la revue des accès sensibles.",
         body:
-          "Cette étape ne couvre pas encore toute l'ops du produit, mais elle ferme déjà la boucle sur les accès adultes et les notes privées.",
+          "L'espace regroupe les accès adultes, les notes privées et les points de vigilance dans une vue plus lisible.",
         support:
-          "Les prochaines surfaces admin pourront se brancher ici sans mélanger moderation, support et audit dans un panneau unique.",
+          "L'audit reste séparé du support et de la modération pour garder les revues sensibles faciles à relire.",
         open: "Ouvrir l'audit",
       },
     },
@@ -1368,16 +1368,16 @@ export function getAdminDashboardCopy(languageCode: UiLanguageCode) {
         auditBody:
           "Parent/tutor reads and private-note mutations are now grouped into a dedicated admin view.",
         volumeBody:
-          "The current flow covers adult session openings and tutor private notes.",
-        routeBody: "Initial admin surface for trust review and support.",
+          "Track the latest adult session openings and tutor private-note changes in one place.",
+        routeBody: "Dedicated route for sensitive-access review and trust follow-up.",
       },
       ops: {
         eyebrow: "Ops",
-        title: "The admin shell now points to a real review of sensitive access.",
+        title: "The admin shell now centers the review of sensitive access.",
         body:
-          "This step does not cover the full product ops surface yet, but it already closes the loop on adult access and private notes.",
+          "This space brings adult access, private notes, and trust checks into one clearer operational view.",
         support:
-          "Future admin surfaces can plug in here without mixing moderation, support, and audit into one panel.",
+          "Audit stays separate from support and moderation so sensitive reviews remain easier to read.",
         open: "Open audit",
       },
     },
@@ -1391,16 +1391,16 @@ export function getAdminDashboardCopy(languageCode: UiLanguageCode) {
         routeTitle: "/app/audit",
         auditBody:
           "家長 / 家教讀取，以及私人筆記異動，現在都集中在專用的管理檢視中。",
-        volumeBody: "目前的流程涵蓋成人課程開啟與家教私人筆記。",
-        routeBody: "這是第一個用於信任檢視與支援的管理入口。",
+        volumeBody: "可在這裡查看最近的成人課程開啟與家教私人筆記變更。",
+        routeBody: "這是一條專門用於敏感存取檢視與信任追蹤的路由。",
       },
       ops: {
         eyebrow: "Ops",
-        title: "管理 shell 現在已連到真正的敏感存取檢視。",
+        title: "管理 shell 現在以敏感存取檢視為中心。",
         body:
-          "這一步還沒有覆蓋整個產品營運面，但已經把成人存取與私人筆記的閉環補上。",
+          "這個空間把成人存取、私人筆記與信任檢查集中到同一個更清楚的營運檢視。",
         support:
-          "後續管理介面可以接在這裡，而不必把 moderation、support 與 audit 混成同一個面板。",
+          "稽核會與 support、moderation 分開，讓敏感檢視維持清楚可讀。",
         open: "打開稽核",
       },
     },

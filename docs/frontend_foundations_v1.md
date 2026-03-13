@@ -53,7 +53,7 @@ Shared shell-brand iteration now lives in:
 Rules:
 
 - push color, typography, shell chrome, and motion changes into shared tokens or shared shell classes first
-- keep preset and custom theme behavior in the shared theme layer instead of duplicating page-local color variants
+- keep light or dark theme behavior in the shared theme layer instead of duplicating page-local color variants; user-facing theme selection is currently hidden while MVP routes follow the operating-system preference
 - use `SurfaceCard` and the shared shell classes before adding page-local decorative wrappers
 - for dropdowns, popovers, and hover menus, inspect the clipping ancestor and the winning computed `overflow` or stacking rule before changing the child component; if escape from the shell is required, choose a portal or an explicit overflow-allowing shell variant instead of retrying `z-index` patches on the menu itself
 - when placeholder UI copy is refreshed for MVP or Pilot surfaces, make the default visible text a credible public-facing product suggestion rather than implementation-facing scaffolding, unless the route is intentionally operator-only
@@ -64,7 +64,7 @@ Rules:
 Current MVP boundary:
 
 - the repo now has one branded baseline for shared shells and cards
-- the repo now also has a shared multi-theme bootstrap plus public or authenticated shell controls, including `light`, a ChatGPT-like inferred `dark`, the current `smooth` dark preset, a warmer `warm` preset, and a saved `custom` variant that overrides the shared global tokens
+- the repo now has a shared theme bootstrap that follows the operating-system light or dark preference before hydration, and the visible MVP chrome no longer exposes theme-selection controls while the product copy and shell polish continue to iterate
 - the shared primary CTA now carries a slow gradient drift by default, with reduced-motion fallback still handled at the global CSS layer
 - the auth route now uses a viewport-fit layout with the heavier informational rail kept to desktop widths, so the page does not depend on stacked marketing copy or the shared footer to explain itself on smaller screens
 - deeper route redesign, flow experimentation, and broader UX polishing belong to the pilot lane

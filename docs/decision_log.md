@@ -847,3 +847,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Run a focused copy cleanup across the shared dictionaries that back public and high-traffic app routes. Pricing, onboarding, auth-complete, app-home, landing helper text, and the shared student start/history/workbench surfaces now use product-facing language by default. Internal error envelopes and truly operator-only surfaces can still keep technical wording when needed.
 - Why: User-visible routes should preserve trust and coherence even while the product is still being iterated. Removing scaffold language closes one of the most obvious remaining “unfinished build” signals.
 - Follow-up: Keep revisiting copy quality during Pilot, but treat future copy work as refinement rather than basic placeholder removal. If technical wording remains on a user-visible route, log it as an explicit exception or clean it in the same slice.
+
+### D-20260313-84 - User-Facing Theme Choice Is Hidden Again While The Shared Theme Layer Follows The System
+
+- Date: 2026-03-13
+- Status: accepted
+- Related tasks: `A7.4.7`, `P1.1`, `P1.3`
+- Context: The shared multi-theme work was useful for rapid visual iteration, but visible theme controls and stored local overrides added settings noise back into MVP routes that are still converging on one calmer public presentation. At the same time, the authenticated shell still leaked pilot framing through a badge, a literal `/app/new` route hint, and admin copy that described itself as an incomplete scaffold.
+- Decision: Keep the shared theme-token architecture, but make the live MVP experience follow the operating-system light or dark preference by default and remove user-facing theme controls from the public shell, authenticated shell, and landing floater. Clear older stored theme overrides during bootstrap so hidden legacy choices do not linger. In the same slice, remove the pilot badge from the authenticated shell, replace the student start panel's literal route hint with product-facing action guidance, and rewrite the admin dashboard copy so it describes the actual trust and audit surface instead of an in-progress step.
+- Why: This restores a quieter default experience, reduces configuration chrome on first-use routes, and makes `/app` feel more like a product workspace than a pilot console without throwing away the shared theme foundation underneath.
+- Follow-up: If explicit theme selection returns later, reintroduce it as a deliberate pilot experiment or account-level setting rather than as always-visible shell chrome. Keep auditing authenticated surfaces for any remaining implementation-facing wording as the product copy matures.
