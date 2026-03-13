@@ -38,7 +38,7 @@ Use `OPEN` for the unfinished side of an active session.
 | x | x | 100% | GPT-5.4 | Extra High | / | unexpected quota refresh again|
 | x | P1.3 | 84% | GPT-5.4 | Extra High | / | |
 | x | x | 79% | GPT-5.4 | Extra High | / | localization and UI revamp|
-| x | x | 76% | GPT-5.4 | High | / | |
+| x | x | 74% | GPT-5.4 | High | / | |
 | x | x | xx% | GPT-5.4 | Extra High | / | |
 | x | x | xx% | GPT-5.4 | Extra High | / | |
 
@@ -54,4 +54,5 @@ Use `OPEN` for the unfinished side of an active session.
 | 2026-03-11 | 23:20 -> 04:12 | 4h52 | A0.2.2 A0.2.3 A0.3.6 A0.3.7 A2.1.3 A2.1.5 A7.1.1 A7.1.2 A7.1.3 A7.4.4 A7.4.5 A7.4.6 A7.4.7 A7.4.8 P1.1 P1.2 P1.3 | fresh context rebuild after crash, traceability reconciliation, Resend and GitHub-label follow-up, trilingual UI or accent audit, pilot-plan split, shared shell branding polish, and the first full light or dark theme redesign pass |
 | 2026-03-12 | 09:42 -> 12:59 | 3h17 | A0.3.2 A0.3.6 A0.3.7 A7.4.4 A7.4.5 A7.4.6 A7.4.7 P1.1 P1.2 P1.3 P4.1 P4.2 | tighten pilot or workflow traceability, finish the remaining localization slice, redesign the public landing through multiple calmer product-facing iterations, document the role-test workflow, refresh the affected checks, and publish verified slices |
 | 2026-03-12 | 16:02 -> 16:09 | 0h07 | A0.3.7 A7.4.7 P1.1 P1.2 P1.3 | continue landing polish, reopen the public-shell decisions around motion and chrome, and answer the current product questions around minors, interaction modes, and cursor behavior |
-| 2026-03-12 | 16:37 -> OPEN | OPEN | A0.3.7 A7.4.7 P1.1 P1.2 P1.3 P2.4 P4.5 | continue landing polish again, clarify subject-specific conversation planning, and define the parent-account adulthood-verification follow-up for pilot operations |
+| 2026-03-12 | 16:37 -> 16:49 | 0h12 | A0.3.7 A7.4.7 P1.1 P1.2 P1.3 P2.4 P4.5 | continue landing polish again, clarify subject-specific conversation planning, and define the parent-account adulthood-verification follow-up for pilot operations |
+| 2026-03-13 | 10:17 -> OPEN | OPEN | A0.3.7 | restart after the 2026-03-12 landing-polish thread, reconcile the session boundary, and audit whether a canonical page inventory already exists |
