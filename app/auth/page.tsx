@@ -50,8 +50,8 @@ export default async function AuthPage({
 
   return (
     <PublicShell currentHref={currentHref} languageCode={languageCode} showFooter={false}>
-      <main className="px-5 py-6 sm:px-8 lg:px-12">
-        <div className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-6xl flex-col justify-center">
+      <main className="flex h-[calc(100dvh-7.25rem)] px-4 pb-4 pt-2 sm:h-[calc(100dvh-7.5rem)] sm:px-6 sm:pb-6 sm:pt-3 lg:h-[calc(100dvh-8rem)] lg:px-10 lg:pb-8 lg:pt-4">
+        <div className="mx-auto flex h-full max-w-6xl items-stretch">
           <AuthPanel
             initialError={initialError}
             initialMessage={initialMessage}

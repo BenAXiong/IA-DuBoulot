@@ -777,3 +777,23 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Keep the MVP subject model intentionally flat for now: one shared coaching workflow, one subject tag per conversation, custom subjects allowed through the existing `Other subject` intake path, and no subject-family-specific prompt or memory forks yet. Also treat parent adulthood verification as an operational pilot question rather than a solved product mechanism: the current system knows roles and links, not real-world age or guardianship.
 - Why: This matches the implemented product reality, avoids inventing fake subject specialization late in MVP, and keeps a real compliance or trust gap visible instead of pretending role selection proves adulthood.
 - Follow-up: Use `P2.4` to decide which subject families need distinct coaching modes or normalization, and use `P4.5` to define whether pilot parent trust comes from founder review, payment-method ownership, support verification, or a stronger later verification layer.
+
+### D-20260313-77 - Dropdown And Popover Work Must Name The Clipping Ancestor First
+
+- Date: 2026-03-13
+- Status: accepted
+- Related tasks: `A0.3.7`
+- Context: Repeated public-shell dropdown fixes showed a predictable failure mode in agent-driven UI work: when a menu is clipped, the first patch often targets the child component with `z-index`, placement, or timing tweaks instead of identifying the parent container and the computed rule that actually clips it.
+- Decision: Make clipping analysis an explicit repo workflow rule. Future dropdown, popover, and hover-menu work must identify the clipping ancestor and the exact computed `overflow` or stacking-context rule before changing child geometry. If the menu must escape its container, the implementation should choose between a portal and an explicit overflow-allowing shell variant rather than retrying child-only fixes.
+- Why: This reduces repeated shallow UI debugging, makes the root cause reviewable in code review, and turns a recurring chat lesson into durable operating guidance.
+- Follow-up: Keep the high-level rule in `AGENTS.md`, keep the implementation-facing version in `docs/frontend_foundations_v1.md`, and prefer reusable primitives or patterns when more menus are added later.
+
+### D-20260313-78 - The Auth Route Prioritizes A Viewport-Fit Entry Over Repeated Shell Narrative
+
+- Date: 2026-03-13
+- Status: accepted
+- Related tasks: `A7.4.7`, `P1.1`, `P1.3`
+- Context: The shared public shell and early auth panel were calm, but the route still relied on a repeated footer section, a stacked marketing rail on small screens, and taller implementation-oriented copy. That combination made `/auth` scroll when it should behave like a focused entry screen.
+- Decision: Let `/auth` opt out of the shared public footer, constrain the route to the dynamic viewport height, keep the heavier informational rail to desktop widths, surface a shorter intro inside the main card on smaller screens, and center the segmented `Sign in` or `New user` switch. Also shorten the shared auth-copy strings so the route carries only the minimum orientation needed before the user acts.
+- Why: This keeps the auth page closer to a proper product entry surface, reduces unnecessary scroll pressure, and preserves the clearer public narrative for the landing page instead of repeating it below the auth form.
+- Follow-up: Validate the viewport-fit behavior on real mobile browsers during the pilot device pass, and only re-expand auth copy if a concrete onboarding-comprehension problem appears in testing.

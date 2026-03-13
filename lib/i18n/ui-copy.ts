@@ -753,20 +753,19 @@ export function getAuthPanelCopy(languageCode: UiLanguageCode) {
         default:
           "Compte créé. Confirme l'adresse email depuis le message Supabase avant de continuer.",
       },
-      eyebrow: "Auth branch",
-      title: "Connecter la vraie session Supabase au produit.",
+      eyebrow: "Accès sécurisé",
+      title: "Une seule connexion, puis le bon parcours pour chaque rôle.",
       body:
-        "Cette étape ouvre le flux réel vers l'onboarding, le bootstrap de profil et les pages protégées déjà branchées au backend.",
-      checklistTitle: "Ce qui est déjà branché :",
+        "Élèves, parents et tuteurs passent par la même entrée protégée. Les invitations et l'onboarding reprennent automatiquement dans ce navigateur.",
+      checklistTitle: "Cette page gère",
       checklist: [
-        "email + mot de passe via Supabase SSR",
-        "route de confirmation email `auth/confirm`",
-        "page d'onboarding reliée au bootstrap API",
-        "redirection vers `/app` si le profil existe déjà",
+        "accès email + mot de passe",
+        "reprise d'invitation dans le même navigateur",
+        "redirection vers l'onboarding ou `/app`",
       ],
       tabs: {
         signIn: "Connexion",
-        signUp: "Création",
+        signUp: "Nouveau",
       },
       accountType: "Type de compte",
       roles: [
@@ -788,9 +787,9 @@ export function getAuthPanelCopy(languageCode: UiLanguageCode) {
       },
       footer: {
         signIn:
-          "Si la session est valide mais qu'aucun profil applicatif n'existe encore, la prochaine étape sera l'onboarding.",
+          "Si le compte n'a pas encore son profil produit, l'onboarding s'ouvrira ensuite.",
         signUp:
-          "Si la confirmation email est active, l'utilisateur devra valider le lien avant d'arriver sur l'onboarding.",
+          "Si la confirmation email est active, il faudra valider le message avant l'onboarding.",
       },
     },
     en: {
@@ -801,20 +800,19 @@ export function getAuthPanelCopy(languageCode: UiLanguageCode) {
         default:
           "Account created. Confirm the email address from the Supabase message before continuing.",
       },
-      eyebrow: "Auth branch",
-      title: "Connect the real Supabase session to the product.",
+      eyebrow: "Secure access",
+      title: "One sign-in, then the right route for each role.",
       body:
-        "This step opens the real flow toward onboarding, profile bootstrap, and the protected pages already wired to the backend.",
-      checklistTitle: "Already wired:",
+        "Students, parents, and tutors share the same protected entry. Invitations and onboarding resume automatically in this browser.",
+      checklistTitle: "This page handles",
       checklist: [
-        "email + password through Supabase SSR",
-        "email confirmation route at `auth/confirm`",
-        "onboarding page connected to the bootstrap API",
-        "redirect to `/app` when the profile already exists",
+        "Email + password access",
+        "Invitation recovery in the same browser",
+        "Redirect to onboarding or `/app`",
       ],
       tabs: {
         signIn: "Sign in",
-        signUp: "Create",
+        signUp: "New user",
       },
       accountType: "Account type",
       roles: [
@@ -836,9 +834,9 @@ export function getAuthPanelCopy(languageCode: UiLanguageCode) {
       },
       footer: {
         signIn:
-          "If the session is valid but no application profile exists yet, onboarding will be the next step.",
+          "If the account still needs its product profile, onboarding opens next.",
         signUp:
-          "If email confirmation is enabled, the user must validate the link before arriving on onboarding.",
+          "If email confirmation is enabled, validate the message before onboarding.",
       },
     },
     zh: {
@@ -849,20 +847,19 @@ export function getAuthPanelCopy(languageCode: UiLanguageCode) {
         default:
           "帳號已建立。請先從 Supabase 郵件確認信箱，再繼續下一步。",
       },
-      eyebrow: "Auth branch",
-      title: "把真正的 Supabase session 接到產品流程中。",
+      eyebrow: "安全登入",
+      title: "同一個登入入口，之後再走對應角色的流程。",
       body:
-        "這一步會打開真實的 onboarding、個人資料 bootstrap，以及已經接到後端的受保護頁面。",
-      checklistTitle: "目前已接通：",
+        "學生、家長與家教共用同一個受保護入口。邀請與 onboarding 會在這個瀏覽器裡自動接續。",
+      checklistTitle: "這一頁處理",
       checklist: [
-        "透過 Supabase SSR 的 email + password",
-        "email 確認路由 `auth/confirm`",
-        "已連到 bootstrap API 的 onboarding 頁",
-        "若個人資料已存在就導向 `/app`",
+        "Email + password 登入",
+        "同瀏覽器中的邀請接續",
+        "導向 onboarding 或 `/app`",
       ],
       tabs: {
         signIn: "登入",
-        signUp: "建立帳號",
+        signUp: "新用戶",
       },
       accountType: "帳號類型",
       roles: [
@@ -884,9 +881,9 @@ export function getAuthPanelCopy(languageCode: UiLanguageCode) {
       },
       footer: {
         signIn:
-          "如果 session 有效，但應用層個人資料尚未建立，下一步會進入 onboarding。",
+          "如果帳號還沒有產品內的個人資料，下一步會進入 onboarding。",
         signUp:
-          "如果 email 確認已啟用，使用者必須先驗證連結，才會進入 onboarding。",
+          "如果已啟用 email 確認，請先驗證郵件，再進入 onboarding。",
       },
     },
   });

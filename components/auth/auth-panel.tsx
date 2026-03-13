@@ -131,30 +131,51 @@ export function AuthPanel({
   }
 
   return (
-    <section className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-      <article className="rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] sm:p-8">
-        <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.26em] text-[color:var(--ink-soft)]">
-          {copy.eyebrow}
-        </p>
-        <h1 className="mt-4 font-[family-name:var(--font-heading)] text-4xl leading-tight">
-          {copy.title}
-        </h1>
-        <p className="mt-4 max-w-xl text-base leading-7 text-[color:var(--ink-soft)]">
-          {copy.body}
-        </p>
+    <section className="grid h-full gap-4 lg:grid-cols-[0.84fr_1fr] lg:gap-5">
+      <article className="shell-card hidden h-full rounded-[2rem] border border-[color:var(--line)] p-6 lg:flex lg:flex-col lg:justify-between xl:p-7">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[color:var(--ink-soft)]">
+            {copy.eyebrow}
+          </p>
+          <h1 className="mt-4 font-[family-name:var(--font-heading)] text-4xl leading-[1.05] xl:text-[3.2rem]">
+            {copy.title}
+          </h1>
+          <p className="mt-4 max-w-lg text-sm leading-6 text-[color:var(--ink-soft)] xl:text-base xl:leading-7">
+            {copy.body}
+          </p>
+        </div>
 
-        <div className="mt-8 grid gap-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5 text-sm leading-6 text-[color:var(--foreground)]">
-          <p className="font-medium">{copy.checklistTitle}</p>
-          <ul className="grid gap-2 text-[color:var(--ink-soft)]">
+        <div className="mt-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:var(--ink-muted)]">
+            {copy.checklistTitle}
+          </p>
+          <div className="mt-4 grid gap-3">
             {copy.checklist.map((item) => (
-              <li key={item}>- {item}</li>
+              <div
+                className="rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-3 text-sm leading-6 text-[color:var(--foreground)]"
+                key={item}
+              >
+                {item}
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       </article>
 
-      <article className="rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] sm:p-8">
-        <div className="inline-flex rounded-full border border-[color:var(--line)] bg-[color:var(--surface-muted)] p-1 text-sm">
+      <article className="shell-panel flex h-full min-h-0 flex-col rounded-[2rem] border border-[color:var(--line)] p-5 shadow-[var(--shadow)] sm:p-6 lg:p-7">
+        <div className="lg:hidden">
+          <p className="text-center text-[11px] font-semibold uppercase tracking-[0.24em] text-[color:var(--ink-soft)]">
+            {copy.eyebrow}
+          </p>
+          <h1 className="mt-3 text-center font-[family-name:var(--font-heading)] text-[clamp(2rem,7vw,2.7rem)] leading-[1.05]">
+            {copy.title}
+          </h1>
+          <p className="mx-auto mt-3 max-w-md text-center text-sm leading-6 text-[color:var(--ink-soft)]">
+            {copy.body}
+          </p>
+        </div>
+
+        <div className="mx-auto mt-1 inline-flex w-full max-w-sm justify-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-muted)] p-1 text-sm">
           <button
             className={`rounded-full px-4 py-2 transition ${
               mode === "sign_in"
@@ -186,36 +207,36 @@ export function AuthPanel({
         </div>
 
         {intentLabel ? (
-          <p className="callout-info mt-5 rounded-2xl border px-4 py-3 text-sm">
+          <p className="callout-info mt-4 rounded-2xl border px-4 py-3 text-sm">
             {intentLabel}
           </p>
         ) : null}
 
         {errorMessage ? (
-          <p className="callout-error mt-5 rounded-2xl border px-4 py-3 text-sm">
+          <p className="callout-error mt-4 rounded-2xl border px-4 py-3 text-sm">
             {errorMessage}
           </p>
         ) : null}
 
         {infoMessage ? (
-          <p className="callout-warning mt-5 rounded-2xl border px-4 py-3 text-sm">
+          <p className="callout-warning mt-4 rounded-2xl border px-4 py-3 text-sm">
             {infoMessage}
           </p>
         ) : null}
 
         <form
-          className="mt-6 grid gap-4"
+          className="mt-4 grid flex-1 content-start gap-3"
           onSubmit={mode === "sign_in" ? handleSignIn : handleSignUp}
         >
           {mode === "sign_up" ? (
             <fieldset className="grid gap-3">
-              <legend className="text-sm font-medium">
+              <legend className="text-center text-sm font-medium">
                 {copy.accountType}
               </legend>
-              <div className="grid gap-3 sm:grid-cols-3">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 {copy.roles.map((option) => (
                   <button
-                    className={`rounded-[1.25rem] border p-4 text-left transition ${
+                    className={`rounded-[1.25rem] border px-3 py-3 text-left transition sm:px-4 sm:py-4 ${
                       signupRole === option.value
                         ? "border-[color:var(--brand)] bg-[color:var(--brand-soft)]"
                         : "border-[color:var(--line)] bg-[color:var(--surface-raised)]"
@@ -224,10 +245,10 @@ export function AuthPanel({
                     onClick={() => setSignupRole(option.value as SignupRole)}
                     type="button"
                   >
-                    <p className="font-[family-name:var(--font-heading)] text-base">
+                    <p className="font-[family-name:var(--font-heading)] text-sm sm:text-base">
                       {option.title}
                     </p>
-                    <p className="mt-2 text-xs leading-5 text-[color:var(--ink-soft)]">
+                    <p className="mt-1 hidden text-[11px] leading-4 text-[color:var(--ink-soft)] sm:block">
                       {option.body}
                     </p>
                   </button>
@@ -272,7 +293,7 @@ export function AuthPanel({
           </button>
         </form>
 
-        <p className="mt-4 text-xs leading-6 text-[color:var(--ink-soft)]">
+        <p className="mt-3 text-center text-[11px] leading-5 text-[color:var(--ink-soft)] sm:text-xs sm:leading-6">
           {mode === "sign_in" ? copy.footer.signIn : copy.footer.signUp}
         </p>
       </article>

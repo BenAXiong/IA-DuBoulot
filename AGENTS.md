@@ -208,6 +208,7 @@ If a new folder becomes a stable part of the project, add it to [README.md](READ
 - Prefer stable, swappable service boundaries for AI, uploads, and billing.
 - Prefer domain modules with narrow responsibilities over catch-all folders and mega-files.
 - Keep UI components mostly presentational when possible; move data loading, orchestration, and policy logic into route, server, or service layers.
+- For dropdowns, popovers, and hover menus, identify the clipping ancestor and the exact computed overflow or stacking rule before changing the child geometry, `z-index`, or opening direction; prefer portals or explicit overflow-allowing container variants over child-only fixes.
 - Split a file when it starts mixing layout, fetching, mutation handling, and domain logic in the same place.
 
 Avoid:
