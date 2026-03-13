@@ -817,3 +817,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Add a compact `hud` header variant to `PublicShell`, let `/auth` use it without the extra auth CTA, and expose minimal icon-only `ThemeToggle` and `LanguageMenu` variants to match the lighter chrome. The auth cards themselves no longer stretch to fill the viewport height, so the route stays centered and smaller.
 - Why: This preserves the shared shell and controls while giving `/auth` a more appropriate density and hierarchy, and it fixes the oversized-card feel by removing forced full-height stretching.
 - Follow-up: Reuse the HUD variant only where a route genuinely benefits from tighter chrome, and keep validating the menu behavior against the overflow rules recorded in `D-20260313-77`.
+
+### D-20260313-81 - Auth Defaults To One Centered Card Unless More Explanation Is Proven Necessary
+
+- Date: 2026-03-13
+- Status: accepted
+- Related tasks: `A7.4.7`, `P1.1`, `P1.3`
+- Context: The first compact `/auth` pass still preserved a separate left information rail on larger screens. That kept the page visually heavier than needed and reintroduced explanatory chrome on a route that is primarily about quick entry, not marketing.
+- Decision: Remove the default left auth rail and keep `/auth` as one centered card. The route now carries only a short public-facing headline, one supporting sentence, and compact orientation chips inside the main card. Additional explanatory content should only return if real testing shows that users do not understand the role flow without it.
+- Why: This makes the route calmer, shorter, and more obvious, and it avoids preserving a second panel just because there is desktop width available.
+- Follow-up: Validate the simplified single-card auth route in real user walkthroughs, and only add more explanation back with a concrete evidence note.

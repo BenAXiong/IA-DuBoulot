@@ -131,39 +131,9 @@ export function AuthPanel({
   }
 
   return (
-    <section className="grid w-full max-w-5xl gap-3 lg:grid-cols-[0.76fr_0.94fr] lg:gap-4">
-      <article className="shell-card hidden rounded-[1.75rem] border border-[color:var(--line)] p-5 lg:flex lg:flex-col lg:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[color:var(--ink-soft)]">
-            {copy.eyebrow}
-          </p>
-          <h1 className="mt-3 max-w-md font-[family-name:var(--font-heading)] text-[2.3rem] leading-[1.02]">
-            {copy.title}
-          </h1>
-          <p className="mt-3 max-w-md text-sm leading-6 text-[color:var(--ink-soft)]">
-            {copy.body}
-          </p>
-        </div>
-
-        <div className="mt-5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[color:var(--ink-muted)]">
-            {copy.checklistTitle}
-          </p>
-          <div className="mt-3 grid gap-2">
-            {copy.checklist.map((item) => (
-              <div
-                className="rounded-[1rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-2.5 text-sm leading-5 text-[color:var(--foreground)]"
-                key={item}
-              >
-                {item}
-              </div>
-            ))}
-          </div>
-        </div>
-      </article>
-
+    <section className="w-full max-w-[30rem]">
       <article className="shell-panel flex min-h-0 flex-col rounded-[1.75rem] border border-[color:var(--line)] p-4 shadow-[var(--shadow)] sm:p-5 lg:p-6">
-        <div className="lg:hidden">
+        <div>
           <p className="text-center text-[11px] font-semibold uppercase tracking-[0.24em] text-[color:var(--ink-soft)]">
             {copy.eyebrow}
           </p>
@@ -173,6 +143,16 @@ export function AuthPanel({
           <p className="mx-auto mt-2 max-w-md text-center text-sm leading-5 text-[color:var(--ink-soft)]">
             {copy.body}
           </p>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+            {copy.checklist.map((item) => (
+              <span
+                className="soft-chip border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-3 py-1.5 text-xs leading-5 text-[color:var(--foreground)]"
+                key={item}
+              >
+                {item}
+              </span>
+            ))}
+          </div>
         </div>
 
         <div className="mx-auto mt-1 inline-flex w-full max-w-[16rem] justify-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-muted)] p-1 text-sm">
