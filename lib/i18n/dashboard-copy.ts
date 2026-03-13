@@ -181,14 +181,14 @@ export function getStudentDashboardStartPanelCopy(languageCode: UiLanguageCode) 
         viewQuota: "Voir le quota",
         blocked: "Départ bloqué",
       },
-      canonicalRoute: "Route canonique",
+      canonicalRoute: "Point d'entrée",
       recentSubjectsEyebrow: "Matières récentes",
       recentSubjectsTitle:
         "Les prochains raccourcis d'intake partiront des sujets déjà vus.",
       noRecentSubjects:
         "Aucun sujet récent pour l'instant. Le premier devoir fixera les tags les plus utiles pour la reprise de session.",
       intakeBody:
-        "Le formulaire d'intake détaillé est maintenant relié au quota et à la facturation sans changer la route canonique d'entrée élève.",
+        "C'est ici que l'élève commence un nouveau devoir, avec le bon cadre dès le départ.",
     },
     en: {
       paidPlan: "Family access",
@@ -206,14 +206,14 @@ export function getStudentDashboardStartPanelCopy(languageCode: UiLanguageCode) 
         viewQuota: "View quota",
         blocked: "Start blocked",
       },
-      canonicalRoute: "Canonical route",
+      canonicalRoute: "Start here",
       recentSubjectsEyebrow: "Recent subjects",
       recentSubjectsTitle:
         "The next intake shortcuts will start from subjects already seen.",
       noRecentSubjects:
         "No recent subjects yet. The first homework will establish the most useful tags for resuming work later.",
       intakeBody:
-        "The detailed intake form is now connected to quota and billing without changing the canonical student entry route.",
+        "This is where a new homework session begins, with the right guardrails already in place.",
     },
     zh: {
       paidPlan: "Family 方案",
@@ -230,13 +230,13 @@ export function getStudentDashboardStartPanelCopy(languageCode: UiLanguageCode) 
         viewQuota: "查看額度",
         blocked: "起始受阻",
       },
-      canonicalRoute: "標準路由",
+      canonicalRoute: "開始位置",
       recentSubjectsEyebrow: "最近科目",
       recentSubjectsTitle: "下一批 intake 快捷入口會從已出現過的科目出發。",
       noRecentSubjects:
         "目前還沒有最近科目。第一份作業會建立之後續接最有用的標籤。",
       intakeBody:
-        "詳細 intake 表單現在已接上額度與付費邏輯，同時保留學生入口的標準路由。",
+        "新的作業會從這裡開始，而且一開始就帶著正確的使用框架。",
     },
   });
 }
@@ -252,11 +252,11 @@ export function getStudentDashboardRecentSessionsCopy(
       viewAll: "Tout voir",
       emptyTitle: "Aucune session enregistrée pour l'instant.",
       emptyBody:
-        "Dès que le premier devoir passera par le produit, cette zone affichera l'historique récent, les tags de matière, puis la reprise détaillée depuis `/app/history`.",
+        "Dès que le premier devoir sera lancé, cette zone affichera les reprises utiles et les matières les plus récentes.",
       graded: "Notée",
       practice: "Exercice libre",
       body:
-        "Cette session peut déjà être rouverte, puis l'historique complet reste centralisé sur `/app/history`.",
+        "Cette session peut être rouverte ici, puis approfondie dans l'historique complet si besoin.",
       lastActivity: "Dernière activité",
       noDate: "Date indisponible",
       resume: "Reprendre",
@@ -268,11 +268,11 @@ export function getStudentDashboardRecentSessionsCopy(
       viewAll: "View all",
       emptyTitle: "No saved session yet.",
       emptyBody:
-        "As soon as the first homework goes through the product, this area will show recent history, subject tags, and the detailed resume path from `/app/history`.",
+        "As soon as the first homework starts, this area will show the most useful recent sessions and subjects to pick up again.",
       graded: "Graded",
       practice: "Open exercise",
       body:
-        "This session can already be reopened, while the full history remains centralized on `/app/history`.",
+        "This session can be reopened here first, then revisited in full history when needed.",
       lastActivity: "Last activity",
       noDate: "Date unavailable",
       resume: "Resume",
@@ -284,10 +284,10 @@ export function getStudentDashboardRecentSessionsCopy(
       viewAll: "查看全部",
       emptyTitle: "目前還沒有已儲存的課程。",
       emptyBody:
-        "第一份作業進入產品後，這裡就會顯示最近歷程、科目標籤，以及從 `/app/history` 進行詳細續接的入口。",
+        "第一份作業開始後，這裡就會顯示最值得優先續接的最近課程與科目。",
       graded: "已評分",
       practice: "自由練習",
-      body: "這個課程已可重新打開，而完整歷程仍集中在 `/app/history`。",
+      body: "你可以先在這裡重新打開這個課程，需要時再進入完整歷程。",
       lastActivity: "最近活動",
       noDate: "日期不可用",
       resume: "續接",

@@ -618,7 +618,7 @@ export function getStudentHistoryCopy(languageCode: UiLanguageCode) {
       newHomework: "Nouveau devoir",
       emptyTitle: "Aucune session n'est encore enregistrée.",
       emptyBody:
-        "Lance un premier devoir depuis `/app/new`, puis cette page deviendra la liste canonique de reprise et de consultation.",
+        "Commence un premier devoir, puis cette page deviendra l'endroit naturel pour reprendre et relire le travail.",
       groups: {
         active: {
           title: "Sessions en cours",
@@ -630,7 +630,7 @@ export function getStudentHistoryCopy(languageCode: UiLanguageCode) {
         },
         archived: {
           title: "Archives",
-          body: "Cette zone reste surtout prévue pour un futur nettoyage. Elle devrait rester quasi vide pour le MVP.",
+          body: "Cette zone regroupe les anciennes sessions gardées à part du travail en cours.",
         },
       },
       noDate: "Date indisponible",
@@ -661,7 +661,7 @@ export function getStudentHistoryCopy(languageCode: UiLanguageCode) {
       newHomework: "New homework",
       emptyTitle: "No session has been saved yet.",
       emptyBody:
-        "Start a first homework flow from `/app/new`, then this page will become the canonical list for resume and review.",
+        "Start a first homework flow, then this page will become the natural place to resume and review past work.",
       groups: {
         active: {
           title: "Active sessions",
@@ -673,7 +673,7 @@ export function getStudentHistoryCopy(languageCode: UiLanguageCode) {
         },
         archived: {
           title: "Archive",
-          body: "This area is mostly reserved for future cleanup. It should stay almost empty in the MVP.",
+          body: "This area holds older sessions that stay outside the current working list.",
         },
       },
       noDate: "Date unavailable",
@@ -703,7 +703,7 @@ export function getStudentHistoryCopy(languageCode: UiLanguageCode) {
       newHomework: "新作業",
       emptyTitle: "目前還沒有已儲存的課程。",
       emptyBody:
-        "先從 `/app/new` 開始第一份作業，之後這裡就會成為正式的續接與查閱清單。",
+        "先開始第一份作業，之後這裡就會成為自然的續接與查閱清單。",
       groups: {
         active: {
           title: "進行中的課程",
@@ -715,7 +715,7 @@ export function getStudentHistoryCopy(languageCode: UiLanguageCode) {
         },
         archived: {
           title: "封存",
-          body: "這一區主要保留給未來清理用途，在 MVP 階段應該幾乎是空的。",
+          body: "這一區收納較早的課程，與目前正在進行的工作分開。",
         },
       },
       noDate: "日期不可用",
@@ -752,7 +752,7 @@ export function getStudentConversationComposerCopy(languageCode: UiLanguageCode)
       placeholder:
         "Explique où tu bloques, ce que tu as déjà essayé, ou l'étape que tu veux clarifier.",
       body:
-        "Le coaching s'appuie sur l'IA et sur le texte extrait des pièces déjà confirmées.",
+        "banban s'appuie sur le devoir confirmé et les pièces jointes pour guider l'élève sans perdre le contexte.",
       sending: "Envoi...",
       send: "Envoyer",
     },
@@ -763,7 +763,7 @@ export function getStudentConversationComposerCopy(languageCode: UiLanguageCode)
       placeholder:
         "Explain where you're stuck, what you've already tried, or the step you want to clarify.",
       body:
-        "Coaching now uses the AI path together with the extracted text from confirmed attachments.",
+        "banban uses the confirmed assignment text and attachments to keep the guidance anchored in the real homework.",
       sending: "Sending...",
       send: "Send",
     },
@@ -772,7 +772,7 @@ export function getStudentConversationComposerCopy(languageCode: UiLanguageCode)
       hint: "提示",
       summarize: "摘要",
       placeholder: "說明你卡住的地方、已經試過什麼，或你想釐清的步驟。",
-      body: "這裡的教練回應會使用 AI 路徑，並參考已確認附件中的擷取文字。",
+      body: "banban 會根據已確認的作業文字與附件來提供引導，讓回應始終貼近真正的題目。",
       sending: "傳送中...",
       send: "送出",
     },

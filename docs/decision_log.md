@@ -837,3 +837,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Remove all content above the `Sign in` or `New user` toggle so the segmented control is the first visible block inside the auth card. Keep only the stateful callouts, form fields, and footer note below it.
 - Why: This makes `/auth` faster to parse and matches the current product goal of a minimal entry surface rather than a narrative page.
 - Follow-up: If the product later needs orientation again, add it back only with evidence and place it in the smallest form that preserves the toggle-first hierarchy.
+
+### D-20260313-83 - Visible Routes Should Read Like Product Surfaces, Not Build Scaffolding
+
+- Date: 2026-03-13
+- Status: accepted
+- Related tasks: `A7.4.7`, `P1.1`, `P1.3`
+- Context: Even after the earlier placeholder-copy rule was added, several visible routes still used implementation-facing language such as `Pricing shell`, API-path references, canonical-route notes, future-media caveats, and scaffold-style explanations on onboarding and student surfaces.
+- Decision: Run a focused copy cleanup across the shared dictionaries that back public and high-traffic app routes. Pricing, onboarding, auth-complete, app-home, landing helper text, and the shared student start/history/workbench surfaces now use product-facing language by default. Internal error envelopes and truly operator-only surfaces can still keep technical wording when needed.
+- Why: User-visible routes should preserve trust and coherence even while the product is still being iterated. Removing scaffold language closes one of the most obvious remaining “unfinished build” signals.
+- Follow-up: Keep revisiting copy quality during Pilot, but treat future copy work as refinement rather than basic placeholder removal. If technical wording remains on a user-visible route, log it as an explicit exception or clean it in the same slice.

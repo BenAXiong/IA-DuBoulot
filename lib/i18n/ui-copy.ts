@@ -318,7 +318,7 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
         },
         {
           title: "Résumé qui reste utile.",
-          body: "Chaque session peut se terminer par un résumé clair. Les aperçus média peuvent encore progresser plus tard, sans refaire la structure.",
+          body: "Chaque session peut se terminer par un résumé clair pour repartir plus vite la prochaine fois.",
         },
       ],
       sharingCards: [
@@ -332,14 +332,14 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
         },
         {
           title: "Suivi de progression.",
-          body: "Les résumés, l'historique et les futures vues de progression construisent un fil plus durable qu'un simple chat isolé.",
+          body: "Résumés, historique et suivi adulte transforment chaque session en étape d'un apprentissage plus durable.",
         },
       ],
       previews: {
         primary: {
           label: "Aperçu produit",
           title: "Conversation guidée, brouillon, et devoir réel.",
-          body: "Remplace ce cadre par un GIF ou une capture dès qu'un média propre est prêt.",
+          body: "Faire entrer un vrai devoir, travailler pas à pas, puis garder ce qui reste utile pour la suite.",
           steps: [
             "Capture ou PDF de devoir",
             "Espace de travail guidé",
@@ -349,7 +349,7 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
         content: {
           label: "Flux contenu",
           title: "Importer, approfondir, s'entraîner, résumer.",
-          body: "Le futur travail média pourra rendre ce flux plus démonstratif, mais la structure produit est déjà prête à l'accueillir.",
+          body: "Partir du devoir d'origine, éclaircir le vrai blocage, puis repartir avec un résumé réutilisable.",
           steps: [
             "Upload de contenu réel",
             "Dive et drill ciblés",
@@ -359,7 +359,7 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
         sharing: {
           label: "Flux suivi",
           title: "Partager le bon niveau d'information.",
-          body: "Le suivi long terme s'appuie sur les résumés, l'historique, les liens parent ou tuteur, et les futures itérations de visualisation de progression.",
+          body: "Parents et tuteurs voient le bon niveau de suivi, sans reprendre le travail à la place de l'élève.",
           steps: [
             "Résumé parent ou tuteur",
             "Historique et retour sur sessions",
@@ -369,16 +369,16 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
         },
       closingTitle: "Start with banban.",
       closingBody:
-        "Crée un compte gratuit et teste le parcours élève pendant que le pilot continue à se structurer.",
+        "Crée un compte gratuit et découvre comment banban accompagne le travail réel, étape par étape.",
       closingCta: "S'inscrire gratuitement",
       helper: {
         buttonLabel: "Accès rapide",
         title: "Accès rapide",
-        body: "Les raccourcis produit et opérateur restent ici pour ne pas surcharger la landing.",
+        body: "Garde les parcours d'entrée et les liens utiles à portée de main sans surcharger la landing.",
         pilotBadge: "Pilot privé",
         pilotTitle: "Pilot supervisé",
         pilotBody:
-          "Le produit reste dans un pilot fermé pendant que le design, les devices et les parcours gagnent en maturité.",
+          "banban s'ouvre progressivement, avec un suivi rapproché pendant que les premières familles façonnent le produit.",
         linksTitle: "Liens",
         links: {
           auth: "Connexion",
@@ -421,7 +421,7 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
         },
         {
           title: "Summaries that stay useful.",
-          body: "Each session can end with a clear recap. The media layer can still get richer later without redoing the landing structure.",
+          body: "Each session can end with a clear recap so the next study step starts from what was already understood.",
         },
       ],
       sharingCards: [
@@ -435,14 +435,14 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
         },
         {
           title: "Track progress over time.",
-          body: "Summaries, history, and future progress views create a longer arc than a single isolated AI chat ever could.",
+          body: "Summaries, history, and linked adult follow-through turn each session into part of a longer learning path.",
         },
       ],
       previews: {
         primary: {
           label: "Product preview",
           title: "Guided chat, workspace, and real homework intake.",
-          body: "Swap this frame for a clean GIF or screenshot as soon as one is ready.",
+          body: "Bring real homework into banban, work through it step by step, and keep the useful parts for later.",
           steps: [
             "Real homework upload",
             "Guided workspace",
@@ -452,7 +452,7 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
         content: {
           label: "Content flow",
           title: "Upload, dive, drill, and summarize.",
-          body: "Future media work can make this flow more vivid, but the layout is already ready for a stronger product preview.",
+          body: "Start from the original assignment, focus on the real weak spot, then leave with a recap you can reuse.",
           steps: [
             "Upload real content",
             "Dive and drill weak spots",
@@ -462,7 +462,7 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
         sharing: {
           label: "Progress flow",
           title: "Share the right view with adults.",
-          body: "Long-term follow-through builds on summaries, history, parent or tutor links, and future progress views instead of isolated one-off chats.",
+          body: "Parents and tutors see the right level of follow-up without taking over the student's work.",
           steps: [
             "Parent or tutor summaries",
             "Review past sessions",
@@ -472,16 +472,16 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
         },
       closingTitle: "Start with banban.",
       closingBody:
-        "Create a free account and try the student flow while the private pilot keeps getting sharper.",
+        "Create a free account and see how banban supports real homework, one step at a time.",
       closingCta: "Sign up for free",
       helper: {
         buttonLabel: "Quick access",
         title: "Quick access",
-        body: "Product and operator shortcuts live here so the landing page can stay focused.",
+        body: "Keep the key sign-in paths and project links close without crowding the main page.",
         pilotBadge: "Private pilot",
         pilotTitle: "Supervised pilot",
         pilotBody:
-          "The product is still in a closed pilot while design, devices, and live user journeys are being tightened.",
+          "banban is opening carefully, with close follow-up while the first families shape the product.",
         linksTitle: "Links",
         links: {
           auth: "Sign in",
@@ -524,7 +524,7 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
         },
         {
           title: "保留下來的摘要。",
-          body: "每次 session 都能收斂成清楚摘要。之後即使媒體層再升級，也不需要重做整個 landing 結構。",
+          body: "每次 session 都能收斂成清楚摘要，讓下一次開始時不必從零重來。",
         },
       ],
       sharingCards: [
@@ -538,14 +538,14 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
         },
         {
           title: "長期追蹤進步。",
-          body: "摘要、歷史紀錄與未來的進度視圖，會把學習軌跡拉成比單次 AI 聊天更長的弧線。",
+          body: "摘要、歷史紀錄與大人端跟進，會把每次 session 拉成更長的學習軌跡。",
         },
       ],
       previews: {
         primary: {
           label: "產品預覽",
           title: "引導式對話、工作區與真實作業輸入。",
-          body: "一旦有更乾淨的 GIF 或截圖，就可以直接把這個區塊替換掉。",
+          body: "把真實作業帶進 banban，按步驟前進，再把真正有用的內容留下來。",
           steps: [
             "上傳真實作業",
             "引導式工作區",
@@ -555,7 +555,7 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
         content: {
           label: "內容流程",
           title: "上傳、深挖、drill 與摘要。",
-          body: "之後的媒體素材可以讓這個流程更有臨場感，但版面已經先為更完整的產品預覽做好準備。",
+          body: "從原始作業出發，找出真正卡住的地方，再帶著可重用的摘要離開。",
           steps: [
             "上傳真實內容",
             "針對弱點 dive 與 drill",
@@ -565,7 +565,7 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
         sharing: {
           label: "進度流程",
           title: "把正確的視角分享給大人。",
-          body: "長期追蹤會建立在摘要、歷史紀錄、家長或家教連結，以及未來的進度視圖上，而不是單次聊天後就消失。",
+          body: "家長與家教看到的是剛剛好的跟進視角，不會取代學生自己完成作業。",
           steps: [
             "家長或家教摘要",
             "回看過去的 session",
@@ -575,16 +575,16 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
         },
       closingTitle: "從 banban 開始。",
       closingBody:
-        "先建立免費帳號，試試學生流程，同時讓這個封閉 Pilot 繼續變得更穩、更清楚。",
+        "先建立免費帳號，看看 banban 如何一步一步陪你完成真實作業。",
       closingCta: "免費註冊",
       helper: {
         buttonLabel: "快速入口",
         title: "快速入口",
-        body: "產品與操作捷徑放在這裡，讓 landing 保持更聚焦。",
+        body: "把重要入口與實用連結放在手邊，同時讓 landing 保持聚焦。",
         pilotBadge: "封閉 Pilot",
         pilotTitle: "受監督 Pilot",
         pilotBody:
-          "產品仍在封閉 Pilot 中，會先把設計、裝置表現與真實使用旅程打磨到更可靠。",
+          "banban 會逐步開放，並在第一批家庭使用時保留更近距離的跟進。",
         linksTitle: "連結",
         links: {
           auth: "登入",
@@ -603,104 +603,104 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
 export function getPricingPageCopy(languageCode: UiLanguageCode) {
   return pickLocalizedValue(languageCode, {
     fr: {
-      eyebrow: "Pricing shell",
-      title: "Une page tarifs crédible sans figer trop tôt le business model.",
+      eyebrow: "Tarifs",
+      title: "Une tarification simple pour commencer avec les premières familles.",
       body:
-        "Le MVP ne vend pas encore un abonnement final. Cette page sert à poser le vocabulaire public et à préparer l'intégration Lemon Squeezy sans surpromettre les offres.",
+        "banban avance par étapes. Les accès sont encore resserrés, mais la structure de prix prépare déjà le passage du pilot à un service familial plus large.",
       posture: {
-        title: "Posture MVP",
-        body: "Le parcours parent pointe déjà vers le vrai chemin de checkout et de portail. Le paramétrage Lemon final reste à activer selon l'environnement.",
+        title: "Pendant le pilot",
+        body: "L'accès se fait encore sur invitation ou validation, avec un accompagnement plus direct pendant les premiers usages.",
       },
       tiers: [
         {
           name: "Pilot",
           price: "Gratuit / sur invitation",
-          body: "Pour la phase de construction et les premiers retours terrain avant un packaging stable.",
-          points: ["Accès supervisé", "Auth et invitations réelles", "Quota d'essai actif"],
+          body: "Pour les premières familles et les premiers retours, avec un cadre serré et un suivi proche.",
+          points: ["Accès sur invitation", "Parcours parent, élève et tuteur", "Essai encadré"],
         },
         {
           name: "Family",
-          price: "À définir pour le MVP",
-          body: "Cible parent payeur avec suivi enfant, résumés et futur portail de facturation.",
-          points: ["Compte parent payeur", "Historique et supervision", "Checkout et portail Lemon Squeezy"],
+          price: "Bientôt",
+          body: "Le futur abonnement familial regroupera l'accompagnement élève, la visibilité parent et la continuité dans le temps.",
+          points: ["Compte parent payeur", "Historique et supervision", "Gestion d'abonnement"],
         },
         {
           name: "Tutor",
-          price: "Plus tard",
-          body: "Surface tuteur liée à un élève, pensée pour le suivi pédagogique plutôt que pour une marketplace.",
-          points: ["Lien d'invitation tracé", "Accès restreint par rôle", "Notes privées à venir"],
+          price: "Inclus selon le cadre",
+          body: "Le suivi tuteur reste centré sur l'élève déjà lié, pour prolonger un accompagnement existant.",
+          points: ["Lien sécurisé", "Accès restreint par rôle", "Suivi pédagogique ciblé"],
         },
       ],
       ctas: {
-        auth: "Tester l'auth",
+        auth: "Commencer",
         back: "Retour produit",
       },
     },
     en: {
-      eyebrow: "Pricing shell",
-      title: "A credible pricing page without freezing the business model too early.",
+      eyebrow: "Pricing",
+      title: "Simple pricing for the first families using banban.",
       body:
-        "The MVP is not selling a final subscription yet. This page defines the public vocabulary and prepares Lemon Squeezy integration without overpromising the offers.",
+        "banban is still opening in stages. Access is intentionally controlled for now, but the pricing structure already points toward a broader family service.",
       posture: {
-        title: "MVP posture",
-        body: "The parent journey already points to the real checkout and portal path. Final Lemon configuration still depends on environment setup.",
+        title: "During the pilot",
+        body: "Access still runs through invitations or approvals, with closer follow-up during the first real use.",
       },
       tiers: [
         {
           name: "Pilot",
           price: "Free / invite",
-          body: "For the build phase and the first real feedback cycles before the package is stable.",
-          points: ["Supervised access", "Real auth and invitations", "Trial quota enabled"],
+          body: "For the first families and early feedback, with a tighter frame and close support.",
+          points: ["Invite-only access", "Student, parent, and tutor flows", "Guided trial limits"],
         },
         {
           name: "Family",
-          price: "TBD for MVP",
-          body: "Parent payer target with child follow-up, summaries, and the future billing portal.",
-          points: ["Parent payer account", "History and oversight", "Lemon Squeezy checkout and portal"],
+          price: "Coming soon",
+          body: "The future family plan will bundle student guidance, parent visibility, and longer-term follow-through.",
+          points: ["Parent payer account", "History and oversight", "Subscription management"],
         },
         {
           name: "Tutor",
-          price: "Later",
-          body: "Tutor surface linked to one student, built for pedagogical follow-up rather than a marketplace.",
-          points: ["Tracked invitation link", "Role-restricted access", "Private notes later"],
+          price: "Included when relevant",
+          body: "Tutor access stays focused on already linked students, so support can continue without rebuilding context.",
+          points: ["Secure link", "Role-restricted access", "Focused pedagogical follow-up"],
         },
       ],
       ctas: {
-        auth: "Try auth",
+        auth: "Get started",
         back: "Back to product",
       },
     },
     zh: {
-      eyebrow: "Pricing shell",
-      title: "先做可信的方案頁，但不要太早把商業模式鎖死。",
+      eyebrow: "方案",
+      title: "為最早使用 banban 的家庭準備的簡單方案。",
       body:
-        "MVP 還不是最終訂閱方案。這一頁的目的，是先建立公開對外的語言，同時為 Lemon Squeezy 整合預留位置，而不是過度承諾。",
+        "banban 仍在分階段開放。現在的存取方式仍然較保守，但方案結構已經朝更完整的家庭服務前進。",
       posture: {
-        title: "MVP 姿態",
-        body: "家長路徑已經指向真正的 checkout 與 portal。最終 Lemon 參數仍要依環境再打開。",
+        title: "Pilot 期間",
+        body: "目前仍以邀請或核准為主，並在第一批真實使用時保留更密切的跟進。",
       },
       tiers: [
         {
           name: "Pilot",
           price: "免費 / 邀請制",
-          body: "用於建置階段與第一輪真實使用回饋，先不要急著定義最終包裝。",
-          points: ["受監督存取", "真實 auth 與邀請", "試用額度啟用"],
+          body: "提供給第一批家庭與早期回饋，框架更緊，支援也更近。",
+          points: ["邀請制存取", "學生、家長與家教流程", "受引導的試用額度"],
         },
         {
           name: "Family",
-          price: "MVP 待定",
-          body: "面向付費家長，提供孩子追蹤、摘要與未來帳務入口。",
-          points: ["家長付費帳號", "歷史與監督", "Lemon Squeezy checkout / portal"],
+          price: "即將推出",
+          body: "未來的家庭方案會整合學生引導、家長可見性，以及更長期的追蹤。",
+          points: ["家長付費帳號", "歷史與監督", "訂閱管理"],
         },
         {
           name: "Tutor",
-          price: "之後再做",
-          body: "與單一學生綁定的家教介面，重點是教學追蹤，不是 marketplace。",
-          points: ["可追蹤邀請連結", "角色限制存取", "日後補上私人筆記"],
+          price: "依情境包含",
+          body: "家教權限仍聚焦在已連結的學生，讓教學支援可以直接延續。",
+          points: ["安全連結", "角色限制存取", "聚焦式教學追蹤"],
         },
       ],
       ctas: {
-        auth: "試用登入",
+        auth: "開始使用",
         back: "回產品頁",
       },
     },
@@ -729,10 +729,10 @@ export function getAuthIntentLabel(
   if (intent === "tutor_link") {
     return pickLocalizedValue(languageCode, {
       fr: role === "tutor"
-        ? "Flux tuteur présélectionné pour une future liaison élève-tuteur."
+        ? "Flux tuteur présélectionné pour relier un tuteur à cet élève."
         : "Flux tuteur détecté. Le rôle tuteur est recommandé pour continuer.",
       en: role === "tutor"
-        ? "Tutor flow preselected for a future student-tutor link."
+        ? "Tutor flow preselected to link a tutor to this student."
         : "Tutor-link flow detected. The tutor role is recommended to continue.",
       zh: role === "tutor"
         ? "已預選家教流程，供後續建立學生與家教的連結。"
@@ -893,21 +893,21 @@ export function getOnboardingPageCopy(languageCode: UiLanguageCode) {
   return pickLocalizedValue(languageCode, {
     fr: {
       eyebrow: "Onboarding",
-      title: "Finaliser le profil applicatif avant d'entrer dans l'espace protégé.",
+      title: "Prépare le compte pour entrer dans le bon espace.",
       body:
-        "Cette étape crée ou répare la ligne `public.users` et branche le compte sur les contraintes de rôle déjà définies dans le schéma.",
+        "Choisis le rôle, la langue, et les informations essentielles pour que banban ouvre la bonne expérience dès la première session.",
     },
     en: {
       eyebrow: "Onboarding",
-      title: "Finish the application profile before entering the protected workspace.",
+      title: "Set up the account before entering the right workspace.",
       body:
-        "This step creates or repairs the `public.users` row and connects the account to the role constraints already defined in the schema.",
+        "Choose the role, language, and a few essentials so banban can open the right experience from the very first session.",
     },
     zh: {
       eyebrow: "Onboarding",
-      title: "在進入受保護工作區前，先完成應用層個人資料。",
+      title: "先把帳號準備好，再進入對應的工作空間。",
       body:
-        "這一步會建立或修復 `public.users` 這一列，並讓帳號接上 schema 中既有的角色限制。",
+        "先選好角色、語言與必要資訊，讓 banban 從第一個 session 就能打開正確的使用體驗。",
     },
   });
 }
@@ -933,8 +933,8 @@ export function getOnboardingFormCopy(languageCode: UiLanguageCode) {
       displayNamePlaceholder: "Ex : Léa Martin",
       under13Label: "Compte élève de moins de 13 ans",
       studentStatus: {
-        under13: "Le compte restera en attente d'approbation parentale après le bootstrap.",
-        default: "Les comptes élève de 13 ans et plus restent actifs immédiatement dans la baseline MVP.",
+        under13: "Le compte restera en attente jusqu'à la validation parentale.",
+        default: "Les comptes élève de 13 ans et plus peuvent continuer juste après l'inscription.",
       },
       buttons: {
         pending: "Création du profil...",
@@ -960,8 +960,8 @@ export function getOnboardingFormCopy(languageCode: UiLanguageCode) {
       displayNamePlaceholder: "Example: Lea Martin",
       under13Label: "Student account under 13",
       studentStatus: {
-        under13: "The account will stay pending parent approval after bootstrap.",
-        default: "Student accounts aged 13 and above stay active immediately in the MVP baseline.",
+        under13: "The account will stay pending until a parent approves it.",
+        default: "Student accounts aged 13 and above can continue right after sign-up.",
       },
       buttons: {
         pending: "Creating profile...",
@@ -987,8 +987,8 @@ export function getOnboardingFormCopy(languageCode: UiLanguageCode) {
       displayNamePlaceholder: "例如：Lea Martin",
       under13Label: "13 歲以下學生帳號",
       studentStatus: {
-        under13: "bootstrap 後，帳號會維持待家長核准。",
-        default: "13 歲以上學生帳號在 MVP 基線中會立即啟用。",
+        under13: "帳號會先維持待家長核准。",
+        default: "13 歲以上學生帳號可在註冊後直接繼續。",
       },
       buttons: {
         pending: "建立中...",
@@ -1065,7 +1065,7 @@ export function getInvitationAcceptCopy(languageCode: UiLanguageCode) {
         roleMismatch:
           "The current session uses the `{currentRole}` role. This invitation expects a `{targetRole}` account. Sign out and sign back in with the right account if needed.",
         alreadyAccepted:
-          "This invitation has already been accepted by this account. You can return to the protected workspace.",
+          "This invitation has already been accepted by this account. You can return to your workspace.",
       },
       buttons: {
         signIn: "Sign in",
@@ -1128,7 +1128,7 @@ export function getAuthCompleteCopy(languageCode: UiLanguageCode) {
     en: {
       eyebrow: "Confirmation",
       title: "The session is confirmed.",
-      body: "The browser is finishing the flow handoff before returning to the useful page.",
+      body: "banban is getting everything ready before opening the next step.",
       redirecting: "Session confirmed. Redirecting to the next step in the flow.",
     },
     zh: {
@@ -1362,23 +1362,23 @@ export function getAppHomeCopy(languageCode: UiLanguageCode) {
   return pickLocalizedValue(languageCode, {
     fr: {
       eyebrow: "Réglages du compte",
-      title: "Les champs éditables passent maintenant par `PATCH /api/auth/profile`.",
+      title: "Garder le compte à jour, sans quitter l'espace principal.",
       body:
-        "Cette surface reste simple, mais elle exerce déjà la persistance du profil applicatif et la synchronisation de metadata côté auth.",
+        "Retrouve ici les informations du compte avant d'ouvrir les réglages complets pour la langue, la confidentialité et la gestion du profil.",
       cta: "Ouvrir les réglages complets",
     },
     en: {
       eyebrow: "Account settings",
-      title: "Editable fields now flow through `PATCH /api/auth/profile`.",
+      title: "Keep the account up to date without leaving the main space.",
       body:
-        "This surface stays simple, but it already exercises application-profile persistence and auth-metadata synchronization.",
+        "This is the quick place to review the account before opening the full settings for language, privacy, and profile details.",
       cta: "Open full settings",
     },
     zh: {
       eyebrow: "帳號設定",
-      title: "可編輯欄位現在都會走 `PATCH /api/auth/profile`。",
+      title: "不用離開主空間，也能把帳號維持在最新狀態。",
       body:
-        "這個介面目前仍然簡潔，但已經實際驗證應用層個人資料持久化與 auth metadata 同步。",
+        "先在這裡快速查看帳號，再打開完整設定處理語言、隱私與個人資料細節。",
       cta: "打開完整設定",
     },
   });
