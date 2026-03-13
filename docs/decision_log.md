@@ -827,3 +827,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Remove the default left auth rail and keep `/auth` as one centered card. The route now carries only a short public-facing headline, one supporting sentence, and compact orientation chips inside the main card. Additional explanatory content should only return if real testing shows that users do not understand the role flow without it.
 - Why: This makes the route calmer, shorter, and more obvious, and it avoids preserving a second panel just because there is desktop width available.
 - Follow-up: Validate the simplified single-card auth route in real user walkthroughs, and only add more explanation back with a concrete evidence note.
+
+### D-20260313-82 - The Auth Toggle Becomes The First Visible Content
+
+- Date: 2026-03-13
+- Status: accepted
+- Related tasks: `A7.4.7`, `P1.1`, `P1.3`
+- Context: Even the reduced single-card auth route still carried headline, body, and chip content above the segmented toggle. That kept visual noise on a screen whose main job is immediate entry.
+- Decision: Remove all content above the `Sign in` or `New user` toggle so the segmented control is the first visible block inside the auth card. Keep only the stateful callouts, form fields, and footer note below it.
+- Why: This makes `/auth` faster to parse and matches the current product goal of a minimal entry surface rather than a narrative page.
+- Follow-up: If the product later needs orientation again, add it back only with evidence and place it in the smallest form that preserves the toggle-first hierarchy.
