@@ -60,3 +60,4 @@ It is still a manual repo artifact: it cannot auto-start itself at instance boot
 | 2026-03-13 | 10:36 -> 10:56 | 0h20 | A0.3.7 | anchor the language dropdown above the trigger, add a faint global commit marker in the top-left corner, and verify whether the build hash can auto-refresh on each push | |
 | 2026-03-13 | 10:56 -> 11:04 | 0h08 | A0.3.7 | restore the language dropdown below the trigger and fix the real clipping bug by adding an explicit overflow-allowing shell variant instead of relying on a losing utility override | |
 | 2026-03-13 | 11:04 -> 11:18 | 0h14 | A0.3.7 | add a hover-close grace period to the language dropdown and harden the active-item contrast so the highlighted language stays readable | |
+| 2026-03-13 | 11:18 -> 11:22 | 0h04 | A0.3.7 | remove the shared supervised-pilot footer block from the auth page as the first no-scroll simplification step and clarify the preemptive dropdown-debugging instruction pattern | |
