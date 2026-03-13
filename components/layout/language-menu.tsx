@@ -36,6 +36,7 @@ export function LanguageMenu({
 }: LanguageMenuProps) {
   const copy = getLanguageMenuCopy(languageCode);
   const [open, setOpen] = useState(false);
+  const closeTimeoutRef = useRef<number | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const languages: Array<{ code: UiLanguageCode; label: string }> = [
     { code: "fr", label: "FR" },
@@ -43,37 +44,60 @@ export function LanguageMenu({
     { code: "zh", label: "中文" },
   ];
 
-  useEffect(() => {
-    if (!open) {
-      return undefined;
+  function clearCloseTimer() {
+    if (closeTimeoutRef.current !== null) {
+      window.clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
     }
+  }
 
+  function openMenu() {
+    clearCloseTimer();
+    setOpen(true);
+  }
+
+  function closeMenuSoon() {
+    clearCloseTimer();
+    closeTimeoutRef.current = window.setTimeout(() => {
+      setOpen(false);
+      closeTimeoutRef.current = null;
+    }, 180);
+  }
+
+  useEffect(() => {
     function handlePointerDown(event: PointerEvent) {
       if (
         rootRef.current &&
         event.target instanceof Node &&
         !rootRef.current.contains(event.target)
       ) {
+        clearCloseTimer();
         setOpen(false);
       }
     }
 
     document.addEventListener("pointerdown", handlePointerDown);
-    return () => document.removeEventListener("pointerdown", handlePointerDown);
-  }, [open]);
+    return () => {
+      clearCloseTimer();
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, []);
 
   return (
     <div
       className="relative"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      onMouseEnter={openMenu}
+      onMouseLeave={closeMenuSoon}
       ref={rootRef}
     >
       <button
         aria-expanded={open}
         aria-haspopup="menu"
         className="theme-toggle"
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => {
+          clearCloseTimer();
+          setOpen((value) => !value);
+        }}
         title={copy.buttonLabel}
         type="button"
       >
@@ -91,12 +115,15 @@ export function LanguageMenu({
               <Link
                 className={`rounded-[0.95rem] px-3 py-2 text-sm font-medium transition ${
                   language.code === languageCode
-                    ? "bg-[color:var(--foreground)] text-[color:var(--foreground-inverse)]"
+                    ? "bg-[color:var(--highlight)] text-[#141414]"
                     : "text-[color:var(--foreground)] hover:bg-[color:var(--surface)]"
                 }`}
                 href={withUiLanguage(currentHref, language.code)}
                 key={language.code}
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  clearCloseTimer();
+                  setOpen(false);
+                }}
               >
                 {language.label}
               </Link>
