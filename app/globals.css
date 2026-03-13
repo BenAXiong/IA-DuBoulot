@@ -341,6 +341,10 @@ code {
   opacity: 0.85;
 }
 
+.shell-panel--allow-overflow {
+  overflow: visible;
+}
+
 .shell-card {
   position: relative;
   overflow: hidden;

@@ -31,7 +31,7 @@ export function PublicShell({
       <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[radial-gradient(circle_at_top,rgba(203,95,44,0.17),transparent_62%)]" />
 
       <header className="px-5 py-5 sm:px-8 lg:px-12">
-        <div className="shell-panel overflow-visible mx-auto flex max-w-[92rem] flex-wrap items-center justify-between gap-4 rounded-[2rem] px-5 py-4 sm:px-6">
+        <div className="shell-panel shell-panel--allow-overflow mx-auto flex max-w-[92rem] flex-wrap items-center justify-between gap-4 rounded-[2rem] px-5 py-4 sm:px-6">
           <Link
             className="flex items-center gap-3"
             href={withUiLanguage("/", languageCode)}
