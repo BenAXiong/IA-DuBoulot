@@ -45,7 +45,7 @@ Rules:
 - the home route now also uses a wider canvas with centered hero and closing CTA copy, while the product-story body alternates `1 preview + 3 glass cards` rows so future GIFs can scale without collapsing text legibility
 - the current landing media frames now use neutral moving placeholder GIFs from public sources, stored locally in `public/landing/`, so the layout can be judged with real motion before actual product captures are ready
 - the shared primary CTA now uses a slow background-position drift, so motion stays at the token layer instead of becoming page-local decoration
-- the auth route now uses a compact viewport-fit layout with a desktop-only information rail, a centered segmented `Sign in` or `New user` switch, and reduced vertical copy on smaller screens so the entry flow stays usable without page scroll
+- the auth route now uses a compact viewport-fit layout with a mini HUD-style header, a desktop-only information rail, a centered segmented `Sign in` or `New user` switch, and reduced vertical copy on smaller screens so the entry flow stays usable without page scroll
 
 ## Authenticated App Shell
 

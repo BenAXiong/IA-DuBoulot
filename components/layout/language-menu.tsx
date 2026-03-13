@@ -9,6 +9,7 @@ import type { UiLanguageCode } from "@/lib/server/auth/types";
 type LanguageMenuProps = {
   currentHref: string;
   languageCode: UiLanguageCode;
+  variant?: "default" | "minimal";
 };
 
 function GlobeIcon({ className }: { className?: string }) {
@@ -33,6 +34,7 @@ function GlobeIcon({ className }: { className?: string }) {
 export function LanguageMenu({
   currentHref,
   languageCode,
+  variant = "default",
 }: LanguageMenuProps) {
   const copy = getLanguageMenuCopy(languageCode);
   const [open, setOpen] = useState(false);
@@ -93,7 +95,7 @@ export function LanguageMenu({
       <button
         aria-expanded={open}
         aria-haspopup="menu"
-        className="theme-toggle"
+        className={variant === "minimal" ? "theme-toggle theme-toggle--minimal" : "theme-toggle"}
         onClick={() => {
           clearCloseTimer();
           setOpen((value) => !value);

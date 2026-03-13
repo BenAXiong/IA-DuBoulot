@@ -753,15 +753,15 @@ export function getAuthPanelCopy(languageCode: UiLanguageCode) {
         default:
           "Compte créé. Confirme l'adresse email depuis le message Supabase avant de continuer.",
       },
-      eyebrow: "Accès sécurisé",
-      title: "Une seule connexion, puis le bon parcours pour chaque rôle.",
+      eyebrow: "banban pour les familles",
+      title: "Une aide aux devoirs calme, guidée, avec de la visibilité pour les adultes.",
       body:
-        "Élèves, parents et tuteurs passent par la même entrée protégée. Les invitations et l'onboarding reprennent automatiquement dans ce navigateur.",
-      checklistTitle: "Cette page gère",
+        "L'élève avance sans réponse toute faite, le parent garde le fil du travail, et le tuteur peut reprendre le contexte sans repartir de zéro.",
+      checklistTitle: "Depuis ici",
       checklist: [
-        "accès email + mot de passe",
-        "reprise d'invitation dans le même navigateur",
-        "redirection vers l'onboarding ou `/app`",
+        "continuer comme élève",
+        "suivre comme parent",
+        "intervenir comme tuteur",
       ],
       tabs: {
         signIn: "Connexion",
@@ -787,9 +787,9 @@ export function getAuthPanelCopy(languageCode: UiLanguageCode) {
       },
       footer: {
         signIn:
-          "Si le compte n'a pas encore son profil produit, l'onboarding s'ouvrira ensuite.",
+          "Après la connexion, banban ouvre automatiquement le bon espace.",
         signUp:
-          "Si la confirmation email est active, il faudra valider le message avant l'onboarding.",
+          "Crée d'abord le compte, puis l'onboarding adapte l'espace au bon rôle.",
       },
     },
     en: {
@@ -800,15 +800,15 @@ export function getAuthPanelCopy(languageCode: UiLanguageCode) {
         default:
           "Account created. Confirm the email address from the Supabase message before continuing.",
       },
-      eyebrow: "Secure access",
-      title: "One sign-in, then the right route for each role.",
+      eyebrow: "banban for families",
+      title: "Calm homework help, guided for students and visible to adults.",
       body:
-        "Students, parents, and tutors share the same protected entry. Invitations and onboarding resume automatically in this browser.",
-      checklistTitle: "This page handles",
+        "Students move forward without direct answers, parents keep the thread, and tutors can rejoin the context without starting from scratch.",
+      checklistTitle: "From here",
       checklist: [
-        "Email + password access",
-        "Invitation recovery in the same browser",
-        "Redirect to onboarding or `/app`",
+        "Continue as a student",
+        "Review as a parent",
+        "Support as a tutor",
       ],
       tabs: {
         signIn: "Sign in",
@@ -834,9 +834,9 @@ export function getAuthPanelCopy(languageCode: UiLanguageCode) {
       },
       footer: {
         signIn:
-          "If the account still needs its product profile, onboarding opens next.",
+          "After sign-in, banban opens the right workspace automatically.",
         signUp:
-          "If email confirmation is enabled, validate the message before onboarding.",
+          "Create the account first, then onboarding adapts the space to the right role.",
       },
     },
     zh: {
@@ -847,15 +847,15 @@ export function getAuthPanelCopy(languageCode: UiLanguageCode) {
         default:
           "帳號已建立。請先從 Supabase 郵件確認信箱，再繼續下一步。",
       },
-      eyebrow: "安全登入",
-      title: "同一個登入入口，之後再走對應角色的流程。",
+      eyebrow: "banban 給家庭用",
+      title: "平靜的作業協助，學生有引導，大人也看得到進度。",
       body:
-        "學生、家長與家教共用同一個受保護入口。邀請與 onboarding 會在這個瀏覽器裡自動接續。",
-      checklistTitle: "這一頁處理",
+        "學生在沒有直接答案的情況下繼續前進，家長能掌握脈絡，家教也能在不中斷情境的情況下接手。",
+      checklistTitle: "從這裡可以",
       checklist: [
-        "Email + password 登入",
-        "同瀏覽器中的邀請接續",
-        "導向 onboarding 或 `/app`",
+        "以學生身分繼續",
+        "以家長身分查看",
+        "以家教身分支援",
       ],
       tabs: {
         signIn: "登入",
@@ -881,9 +881,9 @@ export function getAuthPanelCopy(languageCode: UiLanguageCode) {
       },
       footer: {
         signIn:
-          "如果帳號還沒有產品內的個人資料，下一步會進入 onboarding。",
+          "登入後，banban 會自動打開正確的工作空間。",
         signUp:
-          "如果已啟用 email 確認，請先驗證郵件，再進入 onboarding。",
+          "先建立帳號，再由 onboarding 把空間調整到正確角色。",
       },
     },
   });

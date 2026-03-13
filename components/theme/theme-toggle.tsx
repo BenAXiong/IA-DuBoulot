@@ -15,6 +15,7 @@ import {
 
 type ThemeToggleProps = {
   languageCode: UiLanguageCode;
+  variant?: "default" | "minimal";
 };
 
 function SunIcon({ className }: { className?: string }) {
@@ -79,7 +80,10 @@ function subscribeToThemeChange(callback: () => void) {
   };
 }
 
-export function ThemeToggle({ languageCode }: ThemeToggleProps) {
+export function ThemeToggle({
+  languageCode,
+  variant = "default",
+}: ThemeToggleProps) {
   const copy = getThemeToggleCopy(languageCode);
   const theme: ThemeMode = useSyncExternalStore(
     subscribeToThemeChange,
@@ -95,7 +99,7 @@ export function ThemeToggle({ languageCode }: ThemeToggleProps) {
     <button
       aria-label={ariaLabel}
       aria-pressed={isDarkLikeThemeMode(theme)}
-      className="theme-toggle"
+      className={variant === "minimal" ? "theme-toggle theme-toggle--minimal" : "theme-toggle"}
       onClick={() => persistThemeMode(nextTheme)}
       title={ariaLabel}
       type="button"

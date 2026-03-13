@@ -439,6 +439,15 @@ code {
     0 18px 36px rgba(8, 15, 24, 0.18);
 }
 
+.brand-mark--mini {
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 0.8rem;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    0 10px 22px rgba(8, 15, 24, 0.12);
+}
+
 .brand-wordmark {
   font-family: var(--font-heading), sans-serif;
   letter-spacing: 0.14em;
@@ -587,6 +596,20 @@ code {
   border-color: var(--line-strong);
   background: var(--surface-raised);
   color: var(--foreground);
+}
+
+.theme-toggle--minimal {
+  min-height: 2.2rem;
+  min-width: 2.2rem;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.theme-toggle--minimal:hover {
+  border-color: transparent;
+  background: var(--surface-muted);
+  box-shadow: none;
 }
 
 .theme-toggle-label {

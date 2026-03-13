@@ -49,9 +49,15 @@ export default async function AuthPage({
   const currentHref = buildHrefWithSearchParams("/auth", resolvedSearchParams);
 
   return (
-    <PublicShell currentHref={currentHref} languageCode={languageCode} showFooter={false}>
-      <main className="flex h-[calc(100dvh-7.25rem)] px-4 pb-4 pt-2 sm:h-[calc(100dvh-7.5rem)] sm:px-6 sm:pb-6 sm:pt-3 lg:h-[calc(100dvh-8rem)] lg:px-10 lg:pb-8 lg:pt-4">
-        <div className="mx-auto flex h-full max-w-6xl items-stretch">
+    <PublicShell
+      currentHref={currentHref}
+      headerVariant="hud"
+      languageCode={languageCode}
+      showAuthLink={false}
+      showFooter={false}
+    >
+      <main className="flex h-[calc(100dvh-4.75rem)] px-4 pb-5 pt-1 sm:h-[calc(100dvh-5rem)] sm:px-6 sm:pb-6 lg:h-[calc(100dvh-5.5rem)] lg:px-8 lg:pb-8">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-center">
           <AuthPanel
             initialError={initialError}
             initialMessage={initialMessage}

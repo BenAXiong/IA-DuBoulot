@@ -797,3 +797,23 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Let `/auth` opt out of the shared public footer, constrain the route to the dynamic viewport height, keep the heavier informational rail to desktop widths, surface a shorter intro inside the main card on smaller screens, and center the segmented `Sign in` or `New user` switch. Also shorten the shared auth-copy strings so the route carries only the minimum orientation needed before the user acts.
 - Why: This keeps the auth page closer to a proper product entry surface, reduces unnecessary scroll pressure, and preserves the clearer public narrative for the landing page instead of repeating it below the auth form.
 - Follow-up: Validate the viewport-fit behavior on real mobile browsers during the pilot device pass, and only re-expand auth copy if a concrete onboarding-comprehension problem appears in testing.
+
+### D-20260313-79 - Public-Facing Placeholder Copy Is The Default For MVP And Pilot UI Iteration
+
+- Date: 2026-03-13
+- Status: accepted
+- Related tasks: `A0.3.7`, `A7.4.7`, `P1.1`, `P1.3`
+- Context: Recent auth and landing iterations showed that placeholder or in-progress UI text can easily drift into implementation-facing wording, even when the route is already user-visible and the founder expects suggestion-quality public copy by default.
+- Decision: Treat public-facing suggestion copy as the default whenever placeholder UI is refreshed on MVP or Pilot routes. Internal or implementation-facing wording should only remain on clearly operator-only surfaces or when the user explicitly asks for temporary dev copy. The rule now lives in both `AGENTS.md` and `docs/frontend_foundations_v1.md`.
+- Why: This keeps visible routes closer to the intended product tone during iteration, reduces rework on copy that has to be public again a few prompts later, and prevents user-facing surfaces from feeling like scaffolding.
+- Follow-up: Keep `fr`, `en`, and `zh` aligned whenever public placeholder copy changes, and revisit the wording again once real product copy is finalized.
+
+### D-20260313-80 - The Auth Header Splits Into A Minimal HUD Variant
+
+- Date: 2026-03-13
+- Status: accepted
+- Related tasks: `A7.4.7`, `P1.1`, `P1.3`
+- Context: Even after the auth footer was removed, the shared public header still consumed more vertical space and visual weight than the auth route needed. The route should read like a compact entry screen, not like the landing page with one more form below it.
+- Decision: Add a compact `hud` header variant to `PublicShell`, let `/auth` use it without the extra auth CTA, and expose minimal icon-only `ThemeToggle` and `LanguageMenu` variants to match the lighter chrome. The auth cards themselves no longer stretch to fill the viewport height, so the route stays centered and smaller.
+- Why: This preserves the shared shell and controls while giving `/auth` a more appropriate density and hierarchy, and it fixes the oversized-card feel by removing forced full-height stretching.
+- Follow-up: Reuse the HUD variant only where a route genuinely benefits from tighter chrome, and keep validating the menu behavior against the overflow rules recorded in `D-20260313-77`.

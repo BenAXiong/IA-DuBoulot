@@ -56,6 +56,7 @@ Rules:
 - keep preset and custom theme behavior in the shared theme layer instead of duplicating page-local color variants
 - use `SurfaceCard` and the shared shell classes before adding page-local decorative wrappers
 - for dropdowns, popovers, and hover menus, inspect the clipping ancestor and the winning computed `overflow` or stacking rule before changing the child component; if escape from the shell is required, choose a portal or an explicit overflow-allowing shell variant instead of retrying `z-index` patches on the menu itself
+- when placeholder UI copy is refreshed for MVP or Pilot surfaces, make the default visible text a credible public-facing product suggestion rather than implementation-facing scaffolding, unless the route is intentionally operator-only
 - keep the tone calm, reassuring, and low-noise on both student and adult surfaces
 - keep subtle motion such as CTA background drift in shared token or primitive classes, not in page-local one-off effects
 - reserve route-by-route redesign work for [Pilot_todo](pilot_todo.md) once a concrete UX problem is identified
