@@ -38,7 +38,7 @@ Use `OPEN` for the unfinished side of an active session.
 | x | x | 100% | GPT-5.4 | Extra High | / | unexpected quota refresh again|
 | x | P1.3 | 84% | GPT-5.4 | Extra High | / | |
 | x | x | 79% | GPT-5.4 | Extra High | / | localization and UI revamp|
-| x | x | 74% | GPT-5.4 | High | / | |
+| x | x | 70% | GPT-5.4 | High | / | |
 | x | x | xx% | GPT-5.4 | Extra High | / | |
 | x | x | xx% | GPT-5.4 | Extra High | / | |
 
@@ -57,4 +57,5 @@ Use `OPEN` for the unfinished side of an active session.
 | 2026-03-12 | 16:37 -> 16:49 | 0h12 | A0.3.7 A7.4.7 P1.1 P1.2 P1.3 P2.4 P4.5 | continue landing polish again, clarify subject-specific conversation planning, and define the parent-account adulthood-verification follow-up for pilot operations |
 | 2026-03-13 | 10:17 -> 11:36 | 1h19 | A0.3.7 | restart after the 2026-03-12 landing-polish thread, reconcile the session boundary, and audit whether a canonical page inventory already exists |
 | 2026-03-13 | 12:27 -> 12:56 | 0h29 | A0.3.7 A7.4.7 P1.1 P1.3 | reopen after the auth viewport-fit pass, shrink `/auth` into a compact HUD-style entry, tighten the auth cards, and align placeholder copy with public-facing product suggestions |
-| 2026-03-13 | 15:25 -> OPEN | OPEN | A0.3.7 A7.4.7 P1.1 P1.3 | restart after the auth copy cleanup, switch the site theme to hidden system-default behavior, and refine `/app` so the authenticated surfaces read like product UI instead of pilot scaffolding |
+| 2026-03-13 | 15:25 -> 15:46 | 0h21 | A0.3.7 A7.4.7 P1.1 P1.3 | restart after the auth copy cleanup, switch the site theme to hidden system-default behavior, and refine `/app` so the authenticated surfaces read like product UI instead of pilot scaffolding |
+| 2026-03-17 | 15:12 -> OPEN | OPEN | A0.3.7 | restart after closing the stale 2026-03-13 session boundary and prepare the trace for the next implementation slice |
