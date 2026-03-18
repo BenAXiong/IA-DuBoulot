@@ -72,7 +72,7 @@ export function AppShell({ children, email, appUser }: AppShellProps) {
         </aside>
 
         <div className="flex flex-col gap-6">
-          <header className="shell-panel shell-panel--allow-overflow page-glow rounded-[2rem] p-5">
+          <header className="shell-panel shell-panel--allow-overflow page-glow page-glow--allow-overflow rounded-[2rem] p-5">
             <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <div className="space-y-3">
                 <div className="flex flex-wrap gap-2 text-sm">

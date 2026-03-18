@@ -379,6 +379,10 @@ code {
   overflow: hidden;
 }
 
+.page-glow--allow-overflow {
+  overflow: visible;
+}
+
 .page-glow::before {
   content: "";
   pointer-events: none;

@@ -11,6 +11,18 @@ type AppLanguageMenuProps = {
   variant?: "default" | "minimal";
 };
 
+function applyAppUiLanguageOverride(
+  language: AppUserRecord["preferred_ui_language"],
+) {
+  if (typeof document === "undefined") {
+    return;
+  }
+
+  document.documentElement.lang = language;
+  document.documentElement.dataset.uiLanguage = language;
+  document.cookie = `${APP_UI_LANGUAGE_COOKIE_NAME}=${language}; Path=/; Max-Age=31536000; SameSite=Lax`;
+}
+
 function GlobeIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -82,9 +94,7 @@ export function AppLanguageMenu({
   }
 
   useEffect(() => {
-    document.documentElement.lang = selectedLanguage;
-    document.documentElement.dataset.uiLanguage = selectedLanguage;
-    document.cookie = `${APP_UI_LANGUAGE_COOKIE_NAME}=${selectedLanguage}; Path=/; Max-Age=31536000; SameSite=Lax`;
+    applyAppUiLanguageOverride(selectedLanguage);
   }, [selectedLanguage]);
 
   useEffect(() => {
@@ -118,6 +128,7 @@ export function AppLanguageMenu({
     });
     setOpen(false);
     setIsSaving(true);
+    applyAppUiLanguageOverride(nextLanguage);
     startTransition(() => {
       router.refresh();
     });
@@ -144,12 +155,14 @@ export function AppLanguageMenu({
 
         setOptimisticLanguage(null);
         setIsSaving(false);
+        applyAppUiLanguageOverride(appUser.preferred_ui_language);
         startTransition(() => {
           router.refresh();
         });
       } catch {
         setOptimisticLanguage(null);
         setIsSaving(false);
+        applyAppUiLanguageOverride(appUser.preferred_ui_language);
         startTransition(() => {
           router.refresh();
         });
