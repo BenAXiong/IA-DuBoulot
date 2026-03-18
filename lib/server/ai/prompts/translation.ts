@@ -21,7 +21,7 @@ export function buildTranslationPrompt(input: TranslateTextInput) {
     version: TRANSLATION_PROMPT_VERSION,
     instruction: [
       "Tu traduis un texte de suivi scolaire sans en changer le sens.",
-      "Ne resume pas et n'ajoute aucune interpretation.",
+      "Ne résume pas et n'ajoute aucune interprétation.",
       `Langue source: ${getLanguageLabel(input.sourceLanguage)}.`,
       `Langue cible: ${getLanguageLabel(input.targetLanguage)}.`,
       "Retourne uniquement le texte traduit.",

@@ -16,13 +16,13 @@ import {
   truncateForAiContext,
 } from "@/lib/server/ai/guardrails";
 
-export const STUDENT_COACH_PROMPT_VERSION = "student-coach-v1";
-export const STUDENT_SUMMARY_PROMPT_VERSION = "student-summary-v1";
-export const PARENT_SUMMARY_PROMPT_VERSION = "parent-summary-v1";
-export const TUTOR_SUMMARY_PROMPT_VERSION = "tutor-summary-v1";
+export const STUDENT_COACH_PROMPT_VERSION = "student-coach-v2";
+export const STUDENT_SUMMARY_PROMPT_VERSION = "student-summary-v2";
+export const PARENT_SUMMARY_PROMPT_VERSION = "parent-summary-v2";
+export const TUTOR_SUMMARY_PROMPT_VERSION = "tutor-summary-v2";
 export const ATTACHMENT_EXTRACTION_PROMPT_VERSION = "attachment-extraction-v1";
-export const TRANSLATION_PROMPT_VERSION = "translation-v1";
-export const MEMORY_PROFILE_PROMPT_VERSION = "memory-profile-v1";
+export const TRANSLATION_PROMPT_VERSION = "translation-v2";
+export const MEMORY_PROFILE_PROMPT_VERSION = "memory-profile-v2";
 
 function normalizeText(value: string | null | undefined) {
   const normalized = value?.trim() ?? "";
@@ -31,21 +31,21 @@ function normalizeText(value: string | null | undefined) {
 
 export function getLanguageLabel(languageCode: UiLanguageCode | AiLanguageCode) {
   if (languageCode === "fr") {
-    return "francais";
+    return "français";
   }
 
   if (languageCode === "en") {
-    return "english";
+    return "English";
   }
 
-  return "zhongwen";
+  return "中文";
 }
 
 export function buildAttachmentContextLines(
   attachments: ConversationAttachmentRecord[],
 ) {
   if (attachments.length === 0) {
-    return ["- aucune piece jointe durable"];
+    return ["- aucune pièce jointe durable"];
   }
 
   return attachments.map((attachment) => {
@@ -53,7 +53,7 @@ export function buildAttachmentContextLines(
       attachment.extraction_status === "ready"
         ? "texte extrait disponible"
         : attachment.extraction_status === "failed"
-          ? "extraction a revoir"
+          ? "extraction à revoir"
           : "extraction en attente";
     const extractedText = truncateForAiContext(
       normalizeText(attachment.raw_extracted_text),
@@ -97,27 +97,27 @@ export function buildWorkspaceContext(workspace: WorkspaceStateRecord | null) {
       truncateForAiContext(
         normalizeText(workspace?.assignment_text),
         AI_CONTEXT_LIMITS.assignmentTextChars,
-      ) ?? "non renseigne",
+      ) ?? "non renseigné",
     editedExtractedText:
       truncateForAiContext(
         normalizeText(workspace?.edited_extracted_text),
         AI_CONTEXT_LIMITS.editedExtractedTextChars,
-      ) ?? "non renseigne",
+      ) ?? "non renseigné",
     planText:
       truncateForAiContext(
         normalizeText(workspace?.plan_text),
         AI_CONTEXT_LIMITS.planTextChars,
-      ) ?? "aucun plan note",
+      ) ?? "aucun plan noté",
     draftAnswerText:
       truncateForAiContext(
         normalizeText(workspace?.draft_answer_text),
         AI_CONTEXT_LIMITS.draftAnswerTextChars,
-      ) ?? "aucun brouillon note",
+      ) ?? "aucun brouillon noté",
     studentNotes:
       truncateForAiContext(
         normalizeText(workspace?.student_notes),
         AI_CONTEXT_LIMITS.studentNotesChars,
-      ) ?? "aucune note etudiante",
+      ) ?? "aucune note élève",
   };
 }
 
@@ -131,8 +131,8 @@ export function buildConversationCoreContext(input: {
 
   return [
     `Titre: ${input.conversation.title}`,
-    `Matiere: ${input.conversation.subject_tag}`,
-    `Devoir note: ${input.conversation.graded_homework ? "oui" : "non"}`,
+    `Matière: ${input.conversation.subject_tag}`,
+    `Devoir noté: ${input.conversation.graded_homework ? "oui" : "non"}`,
     "",
     "Texte de devoir",
     workspace.assignmentText,
@@ -146,13 +146,13 @@ export function buildConversationCoreContext(input: {
     "Brouillon",
     workspace.draftAnswerText,
     "",
-    "Notes eleve",
+    "Notes élève",
     workspace.studentNotes,
     "",
-    "Pieces jointes",
+    "Pièces jointes",
     ...buildAttachmentContextLines(input.attachments),
     "",
-    "Extrait recent du transcript",
+    "Extrait récent du transcript",
     buildTranscriptExcerpt(input.messages),
   ].join("\n");
 }
@@ -169,7 +169,7 @@ export function buildSummarySourceContext(input: GenerateSummaryInput) {
 export function buildMemorySourceContext(input: GenerateMemoryProfileInput) {
   const summaryLines =
     input.summaries.length === 0
-      ? ["- aucun resume de session encore disponible"]
+      ? ["- aucun résumé de session encore disponible"]
       : input.summaries.slice(0, AI_CONTEXT_LIMITS.summaryCount).map((summary) => {
           const weaknessTags =
             summary.weakness_tags.length > 0
@@ -180,7 +180,7 @@ export function buildMemorySourceContext(input: GenerateMemoryProfileInput) {
             truncateForAiContext(
               summary.summary_text,
               AI_CONTEXT_LIMITS.summaryTextChars,
-            ) ?? "resume indisponible";
+            ) ?? "résumé indisponible";
 
           return `- [${summary.audience}/${summary.language_code}] ${summaryText}${weaknessTags}`;
         });
@@ -193,7 +193,7 @@ export function buildMemorySourceContext(input: GenerateMemoryProfileInput) {
       attachments: input.attachments,
     }),
     "",
-    "Resumes deja generes",
+    "Résumés déjà générés",
     ...summaryLines,
   ].join("\n");
 }
