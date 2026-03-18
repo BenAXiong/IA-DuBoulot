@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { DocumentLanguageSync } from "@/components/i18n/document-language-sync";
+import { AppToolbarControls } from "@/components/layout/app-toolbar-controls";
 import {
   getAppShellCopy,
   getLanguageLabel,
@@ -74,18 +75,18 @@ export function AppShell({ children, email, appUser }: AppShellProps) {
           <header className="shell-panel page-glow rounded-[2rem] p-5">
             <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <div className="space-y-3">
-              <div className="flex flex-wrap gap-2 text-sm">
-                <span className="brand-pill">
-                  {copy.chips.role}: {roleMeta.badge}
+                <div className="flex flex-wrap gap-2 text-sm">
+                  <span className="brand-pill">
+                    {copy.chips.role}: {roleMeta.badge}
                   </span>
                   <span className="brand-pill">
                     {copy.chips.status}: {copy.accountStatus[appUser.account_status]}
                   </span>
                   <span className="brand-pill">
                     {copy.chips.interface}: {getLanguageLabel(languageCode)}
-                </span>
-              </div>
-              <div>
+                  </span>
+                </div>
+                <div>
                   <p className="brand-wordmark text-xs text-[color:var(--ink-muted)]">
                     {copy.application}
                   </p>
@@ -98,12 +99,15 @@ export function AppShell({ children, email, appUser }: AppShellProps) {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2 lg:hidden">
-                <SignOutButton
-                  label={copy.signOut.idle}
-                  pendingLabel={copy.signOut.pending}
-                  redirectHref={withUiLanguage("/auth", languageCode)}
-                />
+              <div className="flex flex-wrap items-center gap-2 md:self-start">
+                <AppToolbarControls languageCode={languageCode} />
+                <div className="lg:hidden">
+                  <SignOutButton
+                    label={copy.signOut.idle}
+                    pendingLabel={copy.signOut.pending}
+                    redirectHref={withUiLanguage("/auth", languageCode)}
+                  />
+                </div>
               </div>
             </div>
 

@@ -1,7 +1,7 @@
 export const THEME_STORAGE_KEY = "iadb-theme";
 export const CUSTOM_THEME_STORAGE_KEY = "iadb-theme-custom";
 export const THEME_VERSION_STORAGE_KEY = "iadb-theme-version";
-export const THEME_STORAGE_VERSION = "2";
+export const THEME_STORAGE_VERSION = "3";
 export const THEME_CHANGE_EVENT = "iadb-themechange";
 export const THEME_MODES = ["light", "dark", "smooth", "warm", "custom"] as const;
 
@@ -76,6 +76,15 @@ function getSystemThemeMode(): ThemeMode {
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
+function readStoredLightDarkThemeMode(): ThemeMode | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+  return storedTheme === "light" || storedTheme === "dark" ? storedTheme : null;
+}
+
 function clearStoredThemePreference() {
   if (typeof window === "undefined") {
     return;
@@ -130,6 +139,11 @@ export function resolveClientThemeMode(): ThemeMode {
 
   if (documentTheme === "light" || documentTheme === "dark") {
     return documentTheme;
+  }
+
+  const storedTheme = readStoredLightDarkThemeMode();
+  if (storedTheme) {
+    return storedTheme;
   }
 
   return getSystemThemeMode();
@@ -191,7 +205,15 @@ export function persistThemeMode(
   }
 
   applyThemeToDocument(document.documentElement, theme, customTheme);
-  clearStoredThemePreference();
+
+  if (theme === "light" || theme === "dark") {
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+    localStorage.setItem(THEME_VERSION_STORAGE_KEY, THEME_STORAGE_VERSION);
+    localStorage.removeItem(CUSTOM_THEME_STORAGE_KEY);
+  } else {
+    clearStoredThemePreference();
+  }
+
   dispatchThemeChangeEvent();
 }
 
@@ -200,7 +222,16 @@ export function restoreStoredThemeMode() {
     return;
   }
 
-  clearStoredThemePreference();
-  applyThemeToDocument(document.documentElement, getSystemThemeMode());
+  const storedTheme = readStoredLightDarkThemeMode();
+
+  if (storedTheme) {
+    localStorage.setItem(THEME_VERSION_STORAGE_KEY, THEME_STORAGE_VERSION);
+    localStorage.removeItem(CUSTOM_THEME_STORAGE_KEY);
+    applyThemeToDocument(document.documentElement, storedTheme);
+  } else {
+    clearStoredThemePreference();
+    applyThemeToDocument(document.documentElement, getSystemThemeMode());
+  }
+
   dispatchThemeChangeEvent();
 }

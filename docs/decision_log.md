@@ -867,3 +867,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Treat the accent audit as covering both visible shared MVP surfaces and the French prompt layer that directly shapes user-facing generated text. Restore proper accented French in `lib/server/ai/prompts/`, switch the prompt language labels to real Unicode values such as `français`, and bump the affected prompt versions to `v2` so generated summaries, translations, coach replies, and memory items remain traceable after the wording cleanup.
 - Why: French quality in this product is not only a UI-copy problem. The AI prompt text is part of the user-facing language surface because it determines the tone and correctness of the generated summaries and replies shown to students and adults.
 - Follow-up: Keep `A7.4.5` and `A7.4.6` focused on the remaining route-level localization gaps, parent-summary default behavior, language-switch verification, and residual generic provider or service strings that still bypass the shared copy modules.
+
+### D-20260318-86 - Bring Back Only The Simple Light-Or-Dark Toggle In Shared Shell Chrome
+
+- Date: 2026-03-18
+- Status: accepted
+- Related tasks: `A7.4.7`, `P1.1`, `P1.3`
+- Context: The earlier decision to hide theme controls entirely reduced chrome, but it also removed a familiar and low-confusion affordance from both the public header and the authenticated shell. The broader preset/custom theme system was the real source of dev-only complexity, not the single light-or-dark toggle itself. The founder specifically wants the `/app` parent work to reuse the public hero-toolbar utility pattern for language and theme without reopening the old theme lab.
+- Decision: Restore only the simple light-or-dark `ThemeToggle` in shared shell chrome, keep the public `LanguageMenu`, and add the same compact utility cluster to the authenticated header through a dedicated `components/layout/app-toolbar-controls.tsx` helper. Re-enable stored theme preference only for `light` or `dark`, while keeping unsupported legacy theme values and the old preset/custom menu path hidden from MVP users.
+- Why: This preserves a familiar, low-noise control that users already understand, aligns the public and authenticated headers visually, and avoids reintroducing the more confusing dev-style preset/custom theme system.
+- Follow-up: Keep the utility cluster compact, validate it against the parent dashboard work now starting, and only revisit richer theme controls if the pilot produces a real reason to expose more than light-or-dark again.
