@@ -877,3 +877,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Restore only the simple light-or-dark `ThemeToggle` in shared shell chrome, keep the public `LanguageMenu`, and add the same compact utility cluster to the authenticated header through a dedicated `components/layout/app-toolbar-controls.tsx` helper. Re-enable stored theme preference only for `light` or `dark`, while keeping unsupported legacy theme values and the old preset/custom menu path hidden from MVP users.
 - Why: This preserves a familiar, low-noise control that users already understand, aligns the public and authenticated headers visually, and avoids reintroducing the more confusing dev-style preset/custom theme system.
 - Follow-up: Keep the utility cluster compact, validate it against the parent dashboard work now starting, and only revisit richer theme controls if the pilot produces a real reason to expose more than light-or-dark again.
+
+### D-20260318-87 - The Authenticated Language Menu Must Write Profile State, Not Public-Route Query State
+
+- Date: 2026-03-18
+- Status: accepted
+- Related tasks: `A7.4.7`, `P1.3`
+- Context: After the shared toolbar controls were added to `/app`, the language menu looked wired but was effectively broken. The public menu works by rewriting `?lang=` on routes that already resolve copy from the URL, but authenticated app surfaces resolve copy from `appUser.preferred_ui_language`. Reusing the public menu there only changed the URL and left the real UI language unchanged. The authenticated header also clipped the dropdown because it lacked the explicit overflow-allowing shell variant already used on the public header.
+- Decision: Keep the public `LanguageMenu` behavior for public routes, but introduce a dedicated authenticated `AppLanguageMenu` that patches `/api/auth/profile` with the next `preferred_ui_language`, then refreshes the current route. Also mark the authenticated header with `shell-panel--allow-overflow` so the dropdown can escape the shell correctly.
+- Why: Public and authenticated routes do not derive UI language from the same source of truth. Treating them as identical creates a control that appears interactive while failing to change the actual app state.
+- Follow-up: Reuse this rule for any future authenticated language controls: if the view is profile-driven, mutate profile state; if the view is URL-driven, mutate the URL. Do not conflate the two paths again.

@@ -72,7 +72,7 @@ export function AppShell({ children, email, appUser }: AppShellProps) {
         </aside>
 
         <div className="flex flex-col gap-6">
-          <header className="shell-panel page-glow rounded-[2rem] p-5">
+          <header className="shell-panel shell-panel--allow-overflow page-glow rounded-[2rem] p-5">
             <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <div className="space-y-3">
                 <div className="flex flex-wrap gap-2 text-sm">
@@ -100,7 +100,10 @@ export function AppShell({ children, email, appUser }: AppShellProps) {
               </div>
 
               <div className="flex flex-wrap items-center gap-2 md:self-start">
-                <AppToolbarControls languageCode={languageCode} />
+                <AppToolbarControls
+                  appUser={appUser}
+                  languageCode={languageCode}
+                />
                 <div className="lg:hidden">
                   <SignOutButton
                     label={copy.signOut.idle}

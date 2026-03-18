@@ -56,6 +56,7 @@ Rules:
 - keep light or dark theme behavior in the shared theme layer instead of duplicating page-local color variants; the current MVP allows only a simple light-or-dark toggle in shared shell chrome while keeping the old preset/custom theme system hidden
 - use `SurfaceCard` and the shared shell classes before adding page-local decorative wrappers
 - for dropdowns, popovers, and hover menus, inspect the clipping ancestor and the winning computed `overflow` or stacking rule before changing the child component; if escape from the shell is required, choose a portal or an explicit overflow-allowing shell variant instead of retrying `z-index` patches on the menu itself
+- do not reuse public-route language-switch behavior blindly on authenticated routes; if `/app` is driven by saved profile state, the control must mutate that state and refresh instead of only changing the URL
 - when placeholder UI copy is refreshed for MVP or Pilot surfaces, make the default visible text a credible public-facing product suggestion rather than implementation-facing scaffolding, unless the route is intentionally operator-only
 - keep the tone calm, reassuring, and low-noise on both student and adult surfaces
 - keep subtle motion such as CTA background drift in shared token or primitive classes, not in page-local one-off effects

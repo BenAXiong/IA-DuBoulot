@@ -73,6 +73,8 @@ Rules:
 - non-admin accounts already queued for deletion are redirected back toward `/app/settings`, and the shell repeats that frozen-state warning in the shared header
 - shared shell chrome and the account-settings block on `/app` now localize from `lib/i18n/ui-copy.ts`; deeper role dashboards still own their own remaining translation debt
 - the authenticated shell still shares the same theme bootstrap as the public shell, and now mirrors the public utility cluster with a simple light-or-dark toggle plus the language menu in the top header
+- the authenticated header must use the overflow-allowing shell variant whenever hover menus are mounted inside it
+- the authenticated language control must update the saved app profile language, not just rewrite the URL query string used on public routes
 - the authenticated shell should not surface pilot badges, literal route hints, or other implementation-facing framing on the main role dashboards
 
 ## Role Dashboard Variants
