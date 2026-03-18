@@ -54,6 +54,11 @@ Pages:
 Dashboard and review components:
 
 - `components/dashboard/parent-dashboard.tsx`
+- `components/dashboard/parent/parent-account-dock.tsx`
+- `components/dashboard/parent/parent-learners-rail.tsx`
+- `components/dashboard/parent/parent-activity-hub.tsx`
+- `components/dashboard/parent/parent-dashboard-presenters.ts`
+- `components/dashboard/parent/profile-avatar.tsx`
 - `components/dashboard/tutor-dashboard.tsx`
 - `components/dashboard/admin-dashboard.tsx`
 - `components/dashboard/oversight/parent-student-detail.tsx`
@@ -87,9 +92,11 @@ Verification:
 
 Dashboard:
 
-- shows linked students
-- shows cross-student recent sessions
-- shows a 7-day parent-summary rollup
+- suppresses the generic authenticated shell sidebar and replaces it with a parent-owned left rail plus a grouped right-column activity hub
+- keeps the parent account, payer status, and billing/settings actions in a compact account dock instead of repeating a full bottom-of-page account-settings block
+- shows linked learners in their own rail with visible status, recent activity, open homework count, usage, and recurring difficulty tags
+- groups the 7-day parent-summary rollup and cross-student recent sessions in one activity area instead of scattering them across unrelated cards
+- surfaces one spotlight learner as the clearest next parent follow-up when recent activity makes that useful
 - shows payer subscription status from `subscriptions`
 - shows each linked student's quota state from the shared usage service
 - leaves the richer billing/privacy controls to `/app/settings`, while still surfacing the parent billing status inside the dashboard
@@ -171,13 +178,13 @@ Current automated coverage now includes:
 - `npm run smoke:adult-oversight`
 - `npm run smoke:billing`
 
-Latest local result on 2026-03-12:
+Latest local result on 2026-03-18:
 
 - RLS fixture verification passed with `17` checks and `0` failures
 - memory smoke passed across student and parent memory surfaces while confirming tutor raw-memory denial
 - student-flow smoke passed with provider-fallback warnings
 - adult-oversight smoke passed across parent, tutor, and admin surfaces after the localized tutor-note and admin-audit updates
-- billing smoke passed against the signed Lemon webhook route and the parent dashboard billing surface, while intentionally blanking local checkout env to keep the graceful `503` branch covered and rechecking the localized billing-management conflict path
+- billing smoke passed against the signed Lemon webhook route and the parent dashboard billing surface after normalizing streamed HTML comments or tags in the assertion layer, while intentionally blanking local checkout env to keep the graceful `503` branch covered and rechecking the localized billing-management conflict path
 - deployed Vercel billing verification also passed in Lemon test mode, including checkout open, payment completion, redirect back to `/app`, dashboard subscription visibility, confirmation email, and Lemon order logging
 
 ## Known Boundaries

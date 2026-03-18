@@ -20,11 +20,19 @@ export function AppShell({ children, email, appUser }: AppShellProps) {
   const copy = getAppShellCopy(languageCode);
   const navItems = copy.navigation[appUser.role];
   const roleMeta = copy.roles[appUser.role];
+  const showsDesktopSidebar = appUser.role !== "parent";
 
   return (
     <main className="px-5 py-6 sm:px-8 lg:px-12" lang={languageCode}>
       <DocumentLanguageSync languageCode={languageCode} />
-      <div className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-7xl flex-col gap-6 lg:grid lg:grid-cols-[18rem_minmax(0,1fr)]">
+      <div
+        className={`mx-auto flex min-h-[calc(100vh-3rem)] flex-col gap-6 ${
+          showsDesktopSidebar
+            ? "max-w-7xl lg:grid lg:grid-cols-[18rem_minmax(0,1fr)]"
+            : "max-w-[92rem]"
+        }`}
+      >
+        {showsDesktopSidebar ? (
         <aside className="hidden lg:block">
           <div className="shell-panel page-glow sticky top-6 grid gap-5 rounded-[2rem] p-6">
             <div className="space-y-3">
@@ -70,6 +78,7 @@ export function AppShell({ children, email, appUser }: AppShellProps) {
             </div>
           </div>
         </aside>
+        ) : null}
 
         <div className="flex flex-col gap-6">
           <header className="shell-panel shell-panel--allow-overflow page-glow page-glow--allow-overflow rounded-[2rem] p-5">
@@ -104,7 +113,7 @@ export function AppShell({ children, email, appUser }: AppShellProps) {
                   appUser={appUser}
                   languageCode={languageCode}
                 />
-                <div className="lg:hidden">
+                <div className={showsDesktopSidebar ? "lg:hidden" : ""}>
                   <SignOutButton
                     label={copy.signOut.idle}
                     pendingLabel={copy.signOut.pending}
@@ -120,7 +129,11 @@ export function AppShell({ children, email, appUser }: AppShellProps) {
               </div>
             ) : null}
 
-            <nav className="mt-5 flex gap-3 overflow-x-auto pb-1 lg:hidden">
+            <nav
+              className={`mt-5 flex gap-3 overflow-x-auto pb-1 ${
+                showsDesktopSidebar ? "lg:hidden" : ""
+              }`}
+            >
               {navItems.map((item) => (
                 <Link
                   className="interactive-card min-w-[11rem] rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-3"

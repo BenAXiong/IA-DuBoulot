@@ -15,16 +15,18 @@ import { loadParentDashboardSnapshot } from "@/lib/server/oversight/parent-servi
 import { loadTutorDashboardSnapshot } from "@/lib/server/oversight/tutor-service";
 
 async function renderRoleDashboard(
-  role: AppUserRecord["role"],
   appUser: AppUserRecord,
+  email: string | null,
 ) {
-  switch (role) {
+  switch (appUser.role) {
     case "student":
       return <StudentDashboard appUser={appUser} />;
     case "parent": {
       const snapshot = await loadParentDashboardSnapshot(appUser);
       return (
         <ParentDashboard
+          appUser={appUser}
+          email={email}
           languageCode={appUser.preferred_ui_language}
           snapshot={snapshot}
         />
@@ -54,40 +56,43 @@ async function renderRoleDashboard(
 }
 
 export default async function AppHomePage() {
-  const { appUser } = await requireAppPageContext();
+  const { context, appUser } = await requireAppPageContext();
   redirectDeletionRequestedAppUser(appUser);
   const copy = getAppHomeCopy(appUser.preferred_ui_language);
+  const showAccountSettingsBlock = appUser.role !== "parent";
 
   return (
     <div className="grid gap-6">
-      {await renderRoleDashboard(appUser.role, appUser)}
+      {await renderRoleDashboard(appUser, context.email)}
 
-      <section
-        className="grid gap-6 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] md:grid-cols-[0.7fr_1.3fr]"
-        id="account"
-      >
-        <article className="space-y-3">
-          <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-            {copy.eyebrow}
-          </p>
-          <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
-            {copy.title}
-          </h2>
-          <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-            {copy.body}
-          </p>
-          <Link
-            className="button-base button-secondary"
-            href="/app/settings"
-          >
-            {copy.cta}
-          </Link>
-        </article>
+      {showAccountSettingsBlock ? (
+        <section
+          className="grid gap-6 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] md:grid-cols-[0.7fr_1.3fr]"
+          id="account"
+        >
+          <article className="space-y-3">
+            <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
+              {copy.eyebrow}
+            </p>
+            <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
+              {copy.title}
+            </h2>
+            <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
+              {copy.body}
+            </p>
+            <Link
+              className="button-base button-secondary"
+              href="/app/settings"
+            >
+              {copy.cta}
+            </Link>
+          </article>
 
-        <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5">
-          <AccountSettingsForm appUser={appUser} />
-        </article>
-      </section>
+          <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5">
+            <AccountSettingsForm appUser={appUser} />
+          </article>
+        </section>
+      ) : null}
     </div>
   );
 }

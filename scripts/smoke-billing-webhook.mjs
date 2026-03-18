@@ -38,6 +38,9 @@ function assert(condition, message) {
 
 function normalizeAssertionText(value) {
   return value
+    .replace(/<!--[\s\S]*?-->/g, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
