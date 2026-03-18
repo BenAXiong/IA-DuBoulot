@@ -887,3 +887,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Keep the public `LanguageMenu` behavior for public routes, but introduce a dedicated authenticated `AppLanguageMenu` that patches `/api/auth/profile` with the next `preferred_ui_language`, then refreshes the current route. Also mark the authenticated header with `shell-panel--allow-overflow` so the dropdown can escape the shell correctly.
 - Why: Public and authenticated routes do not derive UI language from the same source of truth. Treating them as identical creates a control that appears interactive while failing to change the actual app state.
 - Follow-up: Reuse this rule for any future authenticated language controls: if the view is profile-driven, mutate profile state; if the view is URL-driven, mutate the URL. Do not conflate the two paths again.
+
+### D-20260318-88 - Authenticated Language Switching Should Refresh Immediately, Then Persist
+
+- Date: 2026-03-18
+- Status: accepted
+- Related tasks: `A7.4.6`, `P1.3`
+- Context: After the authenticated language menu was wired correctly, the founder still observed an unusual multi-second delay before `/app` visibly changed language. The root cause was not only the menu state. The authenticated control waited for `PATCH /api/auth/profile` to finish before it even started `router.refresh()`, and parent or tutor dashboards can take noticeable time to re-render because they reload linked students, conversations, summaries, usage, and billing snapshots server-side.
+- Decision: Treat authenticated language switching as a two-step path. `AppLanguageMenu` now applies an optimistic local selection, writes a short-lived `ia_ui_lang` cookie override, and starts `router.refresh()` immediately. Authenticated page context in `lib/server/auth/page-guards.ts` now honors that cookie over `appUser.preferred_ui_language` while rendering `/app`, so visible server-rendered copy can switch during the refresh even before the slower profile PATCH completes. The saved profile update still runs in the background and falls back cleanly if it fails.
+- Why: The user expectation for a language toggle is immediate visible feedback. Starting the route refresh only after the write completed made the control feel broken on heavier authenticated dashboards even when the mutation itself succeeded.
+- Follow-up: Keep `A7.4.6` open until the rest of the end-to-end language-switch verification is complete, especially parent-summary default behavior and real tablet or iPad checks. If more profile-driven preferences later need the same feel, reuse this pattern deliberately instead of waiting on the write path first.

@@ -5,6 +5,7 @@ import {
 
 export type SearchParamValue = string | string[] | undefined | null;
 export type SearchParamsRecord = Record<string, SearchParamValue>;
+export const APP_UI_LANGUAGE_COOKIE_NAME = "ia_ui_lang";
 
 export function readFirstSearchParam(value: SearchParamValue) {
   if (Array.isArray(value)) {
@@ -14,17 +15,22 @@ export function readFirstSearchParam(value: SearchParamValue) {
   return value ?? null;
 }
 
+export function resolveUiLanguageCode(
+  value: string | null | undefined,
+  fallback: UiLanguageCode = "fr",
+) {
+  if (value && UI_LANGUAGE_CODES.includes(value as UiLanguageCode)) {
+    return value as UiLanguageCode;
+  }
+
+  return fallback;
+}
+
 export function resolveUiLanguageFromSearchParam(
   value: SearchParamValue,
   fallback: UiLanguageCode = "fr",
 ) {
-  const candidate = readFirstSearchParam(value);
-
-  if (candidate && UI_LANGUAGE_CODES.includes(candidate as UiLanguageCode)) {
-    return candidate as UiLanguageCode;
-  }
-
-  return fallback;
+  return resolveUiLanguageCode(readFirstSearchParam(value), fallback);
 }
 
 export function buildHrefWithSearchParams(

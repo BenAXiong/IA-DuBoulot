@@ -75,6 +75,7 @@ Rules:
 - the authenticated shell still shares the same theme bootstrap as the public shell, and now mirrors the public utility cluster with a simple light-or-dark toggle plus the language menu in the top header
 - the authenticated header must use the overflow-allowing shell variant whenever hover menus are mounted inside it
 - the authenticated language control must update the saved app profile language, not just rewrite the URL query string used on public routes
+- authenticated app routes may honor the short-lived `ia_ui_lang` cookie as an immediate UI-language override during the refresh triggered by the authenticated language menu, so the visible server-rendered copy can switch before the slower profile write fully completes
 - the authenticated shell should not surface pilot badges, literal route hints, or other implementation-facing framing on the main role dashboards
 
 ## Role Dashboard Variants

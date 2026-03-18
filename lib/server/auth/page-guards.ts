@@ -1,6 +1,11 @@
 import "server-only";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import {
+  APP_UI_LANGUAGE_COOKIE_NAME,
+  resolveUiLanguageCode,
+} from "@/lib/i18n/ui-language";
 import { getAuthenticatedUserContext } from "@/lib/server/auth/authorization";
 import type {
   AppUserRecord,
@@ -47,9 +52,22 @@ export async function requireAppPageContext(): Promise<{
     redirect("/onboarding");
   }
 
+  const cookieStore = await cookies();
+  const overrideLanguage = resolveUiLanguageCode(
+    cookieStore.get(APP_UI_LANGUAGE_COOKIE_NAME)?.value,
+    context.appUser.preferred_ui_language,
+  );
+  const appUser =
+    overrideLanguage === context.appUser.preferred_ui_language
+      ? context.appUser
+      : {
+          ...context.appUser,
+          preferred_ui_language: overrideLanguage,
+        };
+
   return {
     context,
-    appUser: context.appUser,
+    appUser,
   };
 }
 

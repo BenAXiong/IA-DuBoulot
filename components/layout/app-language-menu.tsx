@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { getLanguageMenuCopy } from "@/lib/i18n/ui-copy";
+import { APP_UI_LANGUAGE_COOKIE_NAME } from "@/lib/i18n/ui-language";
 import type { AppUserRecord } from "@/lib/server/auth/types";
 
 type AppLanguageMenuProps = {
@@ -34,9 +35,21 @@ export function AppLanguageMenu({
   variant = "default",
 }: AppLanguageMenuProps) {
   const router = useRouter();
-  const copy = getLanguageMenuCopy(appUser.preferred_ui_language);
+  const [optimisticLanguage, setOptimisticLanguage] = useState<{
+    from: AppUserRecord["preferred_ui_language"];
+    to: AppUserRecord["preferred_ui_language"];
+  } | null>(
+    null,
+  );
+  const selectedLanguage =
+    optimisticLanguage &&
+    optimisticLanguage.from === appUser.preferred_ui_language
+      ? optimisticLanguage.to
+      : appUser.preferred_ui_language;
+  const copy = getLanguageMenuCopy(selectedLanguage);
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [isSaving, setIsSaving] = useState(false);
   const closeTimeoutRef = useRef<number | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const languages: Array<{
@@ -69,6 +82,12 @@ export function AppLanguageMenu({
   }
 
   useEffect(() => {
+    document.documentElement.lang = selectedLanguage;
+    document.documentElement.dataset.uiLanguage = selectedLanguage;
+    document.cookie = `${APP_UI_LANGUAGE_COOKIE_NAME}=${selectedLanguage}; Path=/; Max-Age=31536000; SameSite=Lax`;
+  }, [selectedLanguage]);
+
+  useEffect(() => {
     function handlePointerDown(event: PointerEvent) {
       if (
         rootRef.current &&
@@ -88,32 +107,54 @@ export function AppLanguageMenu({
   }, []);
 
   function updateLanguage(nextLanguage: AppUserRecord["preferred_ui_language"]) {
-    if (nextLanguage === appUser.preferred_ui_language) {
+    if (nextLanguage === selectedLanguage || isSaving) {
       setOpen(false);
       return;
     }
 
+    setOptimisticLanguage({
+      from: appUser.preferred_ui_language,
+      to: nextLanguage,
+    });
     setOpen(false);
-    startTransition(async () => {
-      const response = await fetch("/api/auth/profile", {
-        method: "PATCH",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({
-          displayName: appUser.display_name,
-          preferredUiLanguage: nextLanguage,
-          aiHelpLanguage: appUser.ai_help_language,
-          ageBand: appUser.role === "student" ? appUser.age_band : null,
-        }),
-      });
-
-      if (!response.ok) {
-        return;
-      }
-
+    setIsSaving(true);
+    startTransition(() => {
       router.refresh();
     });
+
+    void (async () => {
+      try {
+        const response = await fetch("/api/auth/profile", {
+          method: "PATCH",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            displayName: appUser.display_name,
+            preferredUiLanguage: nextLanguage,
+            aiHelpLanguage: appUser.ai_help_language,
+            ageBand: appUser.role === "student" ? appUser.age_band : null,
+          }),
+        });
+
+        if (response.ok) {
+          setIsSaving(false);
+          return;
+        }
+
+        setOptimisticLanguage(null);
+        setIsSaving(false);
+        startTransition(() => {
+          router.refresh();
+        });
+      } catch {
+        setOptimisticLanguage(null);
+        setIsSaving(false);
+        startTransition(() => {
+          router.refresh();
+        });
+      }
+    })();
   }
 
   return (
@@ -127,7 +168,7 @@ export function AppLanguageMenu({
         aria-expanded={open}
         aria-haspopup="menu"
         className={variant === "minimal" ? "theme-toggle theme-toggle--minimal" : "theme-toggle"}
-        disabled={isPending}
+        disabled={isPending || isSaving}
         onClick={() => {
           clearCloseTimer();
           setOpen((value) => !value);
@@ -148,11 +189,11 @@ export function AppLanguageMenu({
             {languages.map((language) => (
               <button
                 className={`rounded-[0.95rem] px-3 py-2 text-left text-sm font-medium transition ${
-                  language.code === appUser.preferred_ui_language
+                  language.code === selectedLanguage
                     ? "bg-[color:var(--highlight)] text-[#141414]"
                     : "text-[color:var(--foreground)] hover:bg-[color:var(--surface)]"
                 }`}
-                disabled={isPending}
+                disabled={isPending || isSaving}
                 key={language.code}
                 onClick={() => updateLanguage(language.code)}
                 type="button"

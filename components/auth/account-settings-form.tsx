@@ -13,6 +13,7 @@ import {
   UNDER_13_AGE_BAND_VALUES,
   getStudentAgeBandOptions,
 } from "@/lib/i18n/config";
+import { APP_UI_LANGUAGE_COOKIE_NAME } from "@/lib/i18n/ui-language";
 import { getAccountSettingsFormCopy } from "@/lib/i18n/ui-copy";
 import type { AppUserRecord } from "@/lib/server/auth/types";
 
@@ -92,6 +93,9 @@ export function AccountSettingsForm({ appUser }: AccountSettingsFormProps) {
         return;
       }
 
+      document.documentElement.lang = preferredUiLanguage;
+      document.documentElement.dataset.uiLanguage = preferredUiLanguage;
+      document.cookie = `${APP_UI_LANGUAGE_COOKIE_NAME}=${preferredUiLanguage}; Path=/; Max-Age=31536000; SameSite=Lax`;
       setSuccessMessage(copy.success);
       router.refresh();
     });
