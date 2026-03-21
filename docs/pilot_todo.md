@@ -80,6 +80,8 @@ Status note: `docs/pilot_todo.md` maintenance is now mandatory whenever a sessio
 - [ ] P5.1 Run a targeted structural audit on MVP-era files that grew during delivery, and log concrete mixed-responsibility or dead-code hotspots with evidence.
 - [ ] P5.2 Turn structural-audit findings into bounded refactor slices, dead-code cleanup, or reopened MVP bugs instead of one sweeping rewrite.
 
+Status note: the first `P5.1` hotspot audit flags six areas as the highest-value refactor targets. `lib/server/conversations/conversation-service.ts` currently mixes request parsing, validation, auth, persistence, moderation, AI orchestration, usage tracking, and completion side effects in one module. `lib/server/links/invitation-service.ts` mixes parsing, token lifecycle, invitation creation, acceptance flows, link activation, and route-href derivation in one file. `lib/server/memory/service.ts` combines sensitive-text policy, fallback generation, parsing, loading, mutation handling, and completion-triggered refresh logic. The shared copy layer is now split by domain but still concentrated into very large dictionaries in `lib/i18n/ui-copy.ts`, `lib/i18n/student-flow-copy.ts`, and `lib/i18n/dashboard-copy.ts`, which makes copy iteration and review harder than it should be. `components/dashboard/student/student-conversation-workbench.tsx` still owns too much client state plus fetch and mutation orchestration for the student session surface. The smoke suite also duplicates server-bootstrap, cookie-jar, and authenticated-request harness code across `scripts/smoke-*.mjs`, so test maintenance will keep getting more expensive unless that harness is extracted.
+
 ## Working Method
 
 For each pilot slice record:
