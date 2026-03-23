@@ -76,3 +76,4 @@ It is still a manual repo artifact: it cannot auto-start itself at instance boot
 | 2026-03-18 | 13:24 -> 13:53 | 0h29 | P1.1 P1.3 P2.2 | redesign the parent `/app` dashboard around a learner rail, grouped activity hub, and compact account or billing dock, then harden the billing smoke assertion and reconcile the parent-dashboard docs | |
 | 2026-03-21 | 15:13 -> 15:13 | 0h00 | A0.3.7 | cancel the unused 2026-03-19 19:20 session opening and resync today’s trace row so the logs stay aligned | |
 | 2026-03-21 | 15:13 -> 15:18 | 0h05 | P5.1 | audit the current repo for structural hotspots and rank the areas most in need of refactor based on mixed responsibilities, file concentration, and duplication evidence | |
+| 2026-03-23 | 11:30 -> 11:35 | 0h05 | A0.3.7 A7.3.4 P2.4 | explain the current AI instruction layering, identify which prompt families are actually implemented, and clarify the planned future forks for subject-specific coaching and adult-triggered AI | |
