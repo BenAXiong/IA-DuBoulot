@@ -94,11 +94,13 @@ Dashboard:
 
 - suppresses the generic authenticated shell sidebar and replaces it with a parent-owned left rail plus a grouped right-column activity hub
 - keeps the parent account, payer status, and billing/settings actions in a compact account dock instead of repeating a full bottom-of-page account-settings block
+- surfaces parent-targeted pending approval requests addressed to the signed-in email in the left rail, with one-click acceptance from `/app`
 - shows linked learners in their own rail with visible status, recent activity, open homework count, usage, and recurring difficulty tags
 - groups the 7-day parent-summary rollup and cross-student recent sessions in one activity area instead of scattering them across unrelated cards
 - surfaces one spotlight learner as the clearest next parent follow-up when recent activity makes that useful
 - shows payer subscription status from `subscriptions`
 - shows each linked student's quota state from the shared usage service
+- keeps the invite-link flow valid, but no longer requires the parent to reopen the raw `/invite/[token]` URL once they are already signed in and the pending request can be resolved from the dashboard
 - leaves the richer billing/privacy controls to `/app/settings`, while still surfacing the parent billing status inside the dashboard
 - now localizes its own `/app` dashboard copy through `lib/i18n/dashboard-copy.ts`
 - the linked-student detail, parent review, and admin audit list now also localize their interface copy through `lib/i18n/oversight-copy.ts`
@@ -184,6 +186,7 @@ Latest local result on 2026-03-18:
 - memory smoke passed across student and parent memory surfaces while confirming tutor raw-memory denial
 - student-flow smoke passed with provider-fallback warnings
 - adult-oversight smoke passed across parent, tutor, and admin surfaces after the localized tutor-note and admin-audit updates
+- adult-oversight smoke now also seeds one temporary pending parent approval, verifies that `/app` surfaces it in the parent rail, and confirms that the parent can accept it directly from the dashboard path without reopening the raw invite URL
 - billing smoke passed against the signed Lemon webhook route and the parent dashboard billing surface after normalizing streamed HTML comments or tags in the assertion layer, while intentionally blanking local checkout env to keep the graceful `503` branch covered and rechecking the localized billing-management conflict path
 - deployed Vercel billing verification also passed in Lemon test mode, including checkout open, payment completion, redirect back to `/app`, dashboard subscription visibility, confirmation email, and Lemon order logging
 
@@ -191,6 +194,7 @@ Latest local result on 2026-03-18:
 
 - the local billing smoke still forces `/api/billing/checkout` through the explicit `503` path even though real Lemon env can now be provisioned locally or in Vercel
 - parent summary translation depends on the available stored summary variants; no on-demand translation UI exists yet
+- pending parent approvals now surface in `/app`, but there is still no separate notifications inbox or background delivery system; Resend-backed delivery remains a later slice
 - tutor raw-memory access remains intentionally blocked even though the linked-parent surface now exposes the same memory panel used on the student dashboard
 - tutor notes do not yet support rich categorization, attachments, or admin annotation
 - admin audit review is intentionally narrow and does not replace broader moderation or support tooling

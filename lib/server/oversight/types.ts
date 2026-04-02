@@ -62,8 +62,18 @@ export type ParentWeeklySummary = {
   studentSnapshots: ParentWeeklyStudentSnapshot[];
 };
 
+export type ParentPendingApprovalSnapshot = {
+  id: string;
+  invitationKind: "parent_approval" | "parent_link";
+  student: OversightStudentSnapshot;
+  relationshipLabel: string | null;
+  createdAt: string;
+  expiresAt: string;
+};
+
 export type ParentDashboardSnapshot = {
   linkedStudents: ParentLinkedStudentSnapshot[];
+  pendingApprovals: ParentPendingApprovalSnapshot[];
   recentSessions: OversightConversationPreview[];
   weeklySummary: ParentWeeklySummary;
   billing: ParentBillingSnapshot;

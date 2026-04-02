@@ -5,6 +5,7 @@ import {
   buildParentDashboardViewModel,
 } from "@/components/dashboard/parent/parent-dashboard-presenters";
 import { ParentLearnersRail } from "@/components/dashboard/parent/parent-learners-rail";
+import { ParentPendingApprovalsPanel } from "@/components/dashboard/parent/parent-pending-approvals-panel";
 import type { AppUserRecord, UiLanguageCode } from "@/lib/server/auth/types";
 import type { ParentDashboardSnapshot } from "@/lib/server/oversight/types";
 
@@ -34,6 +35,10 @@ export function ParentDashboard({
         <ParentAccountDock
           account={account}
           billing={snapshot.billing}
+          languageCode={languageCode}
+        />
+        <ParentPendingApprovalsPanel
+          approvals={model.pendingApprovals}
           languageCode={languageCode}
         />
         <ParentLearnersRail

@@ -106,7 +106,8 @@ export type InvitationAcceptanceInput = {
   context: AuthenticatedUserContext;
   requestId: string;
   route: string;
-  token: string;
+  token?: string;
+  invitationId?: string;
   expectedKinds?: InvitationKind[];
 };
 

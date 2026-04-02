@@ -77,7 +77,7 @@ Rules:
 - the authenticated language control must update the saved app profile language, not just rewrite the URL query string used on public routes
 - authenticated app routes may honor the short-lived `ia_ui_lang` cookie as an immediate UI-language override during the refresh triggered by the authenticated language menu, so the visible server-rendered copy can switch before the slower profile write fully completes
 - the authenticated shell should not surface pilot badges, literal route hints, or other implementation-facing framing on the main role dashboards
-- the parent role now suppresses the generic desktop shell sidebar and instead lets the dashboard own a parent-specific information architecture: account and billing dock plus linked-learners rail on the left, with grouped weekly and recent activity on the right
+- the parent role now suppresses the generic desktop shell sidebar and instead lets the dashboard own a parent-specific information architecture: account and billing dock, pending parent-approval requests, and linked-learners rail on the left, with grouped weekly and recent activity on the right
 
 ## Role Dashboard Variants
 
@@ -96,6 +96,7 @@ Rule:
 
 - each role gets its own dashboard module to avoid a god `/app/page.tsx`
 - the parent dashboard is now further split into dedicated parent-owned building blocks instead of one placeholder surface: `parent-account-dock.tsx`, `parent-learners-rail.tsx`, `parent-activity-hub.tsx`, and `parent-dashboard-presenters.ts`
+- the parent dashboard now also includes `parent-pending-approvals-panel.tsx`, which surfaces parent-targeted pending invitations addressed to the signed-in email and lets the parent accept them directly from `/app` without reopening the original invite URL
 
 ## Navigation Model
 

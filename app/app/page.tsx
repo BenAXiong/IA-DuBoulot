@@ -22,7 +22,7 @@ async function renderRoleDashboard(
     case "student":
       return <StudentDashboard appUser={appUser} />;
     case "parent": {
-      const snapshot = await loadParentDashboardSnapshot(appUser);
+      const snapshot = await loadParentDashboardSnapshot(appUser, email);
       return (
         <ParentDashboard
           appUser={appUser}

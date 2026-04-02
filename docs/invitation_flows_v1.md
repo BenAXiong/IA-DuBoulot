@@ -111,6 +111,8 @@ Current behavior:
 
 - the route returns `inviteUrl`
 - the current UI exposes that URL for copy/share
+- signed-in parents now also see matching pending parent-approval requests inside `/app`, based on their authenticated email
+- those parent-side requests can be accepted directly from the dashboard through the same canonical parent-confirm route, even though the raw token value is never stored
 - acceptance and auditing work immediately once the recipient opens the link
 - invitation creation and acceptance routes now resolve user-facing validation, conflict, expired-link, role-mismatch, and service-failure messages from the active `preferred_ui_language`
 
@@ -141,6 +143,7 @@ Remaining caveat:
 
 - cross-browser or cross-device confirmation still loses the local pending-invite cookie
 - in that case the recipient may still need to reopen the original `/invite/[token]` link after confirming email
+- once a parent is already signed in on the same app account and the request targets their authenticated email, the new `/app` pending-approvals section removes that dependency on the original invite link for acceptance itself
 
 Validation note:
 

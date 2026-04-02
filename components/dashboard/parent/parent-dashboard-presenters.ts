@@ -59,6 +59,16 @@ export type ParentDashboardWeeklyModel = {
   nextStepRecommendation: string | null;
 };
 
+export type ParentDashboardPendingApprovalModel = {
+  id: string;
+  studentDisplayName: string;
+  relationshipLabel: string | null;
+  ageBandLabel: string | null;
+  under13Label: string | null;
+  createdAtLabel: string | null;
+  expiresAtLabel: string | null;
+};
+
 export type ParentDashboardViewModel = {
   learnerCount: number;
   activeAssignmentsCount: number;
@@ -66,6 +76,7 @@ export type ParentDashboardViewModel = {
   attentionCount: number;
   learners: ParentDashboardLearnerCardModel[];
   focusLearner: ParentDashboardLearnerCardModel | null;
+  pendingApprovals: ParentDashboardPendingApprovalModel[];
   recentSessions: ParentDashboardRecentSessionModel[];
   weeklyEntries: ParentDashboardWeeklyModel[];
 };
@@ -264,6 +275,18 @@ export function buildParentDashboardViewModel(
       .length,
     learners,
     focusLearner: learners[0] ?? null,
+    pendingApprovals: snapshot.pendingApprovals.map((approval) => ({
+      id: approval.id,
+      studentDisplayName: approval.student.displayName,
+      relationshipLabel: approval.relationshipLabel,
+      ageBandLabel: getDashboardAgeBandLabel(
+        approval.student.ageBand,
+        languageCode,
+      ),
+      under13Label: approval.student.isUnder13 ? copy.learners.under13 : null,
+      createdAtLabel: formatDateLabel(approval.createdAt, languageCode),
+      expiresAtLabel: formatDateLabel(approval.expiresAt, languageCode),
+    })),
     recentSessions: snapshot.recentSessions.map((session) => ({
       id: session.id,
       studentDisplayName: session.studentDisplayName,

@@ -6,6 +6,7 @@ import { loadPayerBillingSnapshot } from "@/lib/server/billing/service";
 import { AppError } from "@/lib/server/errors/app-error";
 import { loadConversationDetail } from "@/lib/server/conversations/conversation-service";
 import { loadVisibleStudentMemory } from "@/lib/server/memory/service";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { resolveStudentUsageSnapshot } from "@/lib/server/usage/service";
 import type { SessionSummaryRecord } from "@/lib/server/conversations/types";
@@ -20,6 +21,7 @@ import type {
   ParentConversationSummaryVariant,
   ParentDashboardSnapshot,
   ParentLinkedStudentSnapshot,
+  ParentPendingApprovalSnapshot,
   ParentStudentDetail,
   ParentWeeklyStudentSnapshot,
   ParentWeeklySummary,
@@ -37,6 +39,15 @@ type StudentRow = {
 type ParentLinkRow = {
   student_user_id: string;
   relationship_label: string | null;
+};
+
+type PendingParentApprovalRow = {
+  id: string;
+  invitation_kind: "parent_approval" | "parent_link";
+  student_user_id: string;
+  relationship_label: string | null;
+  created_at: string;
+  expires_at: string;
 };
 
 type ConversationRow = {
@@ -311,17 +322,104 @@ async function loadParentSummaryRows(conversationIds: string[]) {
   return (data ?? []) as SummaryRow[];
 }
 
+async function loadPendingParentApprovals(input: {
+  parentEmail: string | null;
+}) {
+  if (!input.parentEmail) {
+    return [] as ParentPendingApprovalSnapshot[];
+  }
+
+  const normalizedEmail = input.parentEmail.trim().toLowerCase();
+
+  if (!normalizedEmail) {
+    return [] as ParentPendingApprovalSnapshot[];
+  }
+
+  const supabase = createSupabaseAdminClient();
+  const { data: invitations, error: invitationError } = await supabase
+    .from("account_link_invitations")
+    .select(
+      "id, invitation_kind, student_user_id, relationship_label, created_at, expires_at",
+    )
+    .eq("target_role", "parent")
+    .eq("target_email", normalizedEmail)
+    .eq("invitation_status", "pending")
+    .in("invitation_kind", ["parent_approval", "parent_link"])
+    .order("created_at", { ascending: false });
+
+  if (invitationError) {
+    throw toServiceError(
+      "Unable to load pending parent approvals.",
+      invitationError,
+    );
+  }
+
+  const activeRows = ((invitations ?? []) as PendingParentApprovalRow[]).filter(
+    (invitation) => new Date(invitation.expires_at).getTime() > Date.now(),
+  );
+
+  if (activeRows.length === 0) {
+    return [] as ParentPendingApprovalSnapshot[];
+  }
+
+  const studentIds = Array.from(
+    new Set(activeRows.map((invitation) => invitation.student_user_id)),
+  );
+  const { data: students, error: studentError } = await supabase
+    .from("users")
+    .select(
+      "id, display_name, preferred_ui_language, age_band, is_under_13, account_status",
+    )
+    .in("id", studentIds);
+
+  if (studentError) {
+    throw toServiceError(
+      "Unable to load pending-approval student profiles.",
+      studentError,
+    );
+  }
+
+  const studentsById = new Map(
+    ((students ?? []) as StudentRow[]).map((student) => [student.id, student]),
+  );
+
+  return activeRows
+    .map((invitation): ParentPendingApprovalSnapshot | null => {
+      const student = studentsById.get(invitation.student_user_id);
+
+      if (!student) {
+        return null;
+      }
+
+      return {
+        id: invitation.id,
+        invitationKind: invitation.invitation_kind,
+        student: toStudentSnapshot(student),
+        relationshipLabel: invitation.relationship_label,
+        createdAt: invitation.created_at,
+        expiresAt: invitation.expires_at,
+      };
+    })
+    .filter(
+      (invitation): invitation is ParentPendingApprovalSnapshot =>
+        invitation !== null,
+    );
+}
+
 export async function loadParentDashboardSnapshot(
   appUser: AppUserRecord,
+  parentEmail: string | null,
 ): Promise<ParentDashboardSnapshot> {
   requireAppUserRole(appUser, ["parent"]);
 
   const { students } = await loadLinkedStudents(appUser.id);
   const studentIds = students.map((student) => student.id);
-  const [conversations, billing, linkedStudents] = await Promise.all([
+  const [conversations, billing, linkedStudents, pendingApprovals] =
+    await Promise.all([
     loadConversationRows(studentIds, 12),
     loadPayerBillingSnapshot(appUser.id),
     Promise.all(students.map((student) => toParentLinkedStudentSnapshot(student))),
+    loadPendingParentApprovals({ parentEmail }),
   ]);
   const summaries = await loadParentSummaryRows(
     conversations.map((conversation) => conversation.id),
@@ -332,6 +430,7 @@ export async function loadParentDashboardSnapshot(
   return {
     linkedStudents: linkedStudents
       .sort((left, right) => left.displayName.localeCompare(right.displayName)),
+    pendingApprovals,
     recentSessions: buildConversationPreviews({
       conversations,
       studentsById,

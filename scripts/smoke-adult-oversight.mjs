@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { createHash } from "node:crypto";
 import { access } from "node:fs/promises";
 import net from "node:net";
 import path from "node:path";
@@ -345,6 +346,7 @@ async function main() {
   const fixtureUserIds = await resolveFixtureUserIds(adminClient);
   const state = {
     createdNoteId: null,
+    pendingInvitationId: null,
   };
   let startedServer = false;
   let childProcess = null;
@@ -369,6 +371,73 @@ async function main() {
       tutor.signInFixture(FIXTURE.emails.tutor),
       admin.signInFixture(FIXTURE.emails.admin),
     ]);
+
+    const approvalRelationshipLabel = `Smoke approval ${Date.now()}`;
+    const { data: pendingInvitation, error: pendingInvitationError } =
+      await adminClient
+        .from("account_link_invitations")
+        .insert({
+          invitation_kind: "parent_approval",
+          invitation_status: "pending",
+          student_user_id: fixtureUserIds.student,
+          inviter_user_id: fixtureUserIds.student,
+          target_role: "parent",
+          target_email: FIXTURE.emails.parent,
+          relationship_label: approvalRelationshipLabel,
+          token_hash: createHash("sha256")
+            .update(`smoke_parent_pending_${Date.now()}`)
+            .digest("hex"),
+          expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          metadata: {
+            source: "smoke-adult-oversight",
+          },
+        })
+        .select("id")
+        .single();
+
+    if (pendingInvitationError || !pendingInvitation?.id) {
+      throw new Error("Failed to create the temporary pending parent approval.");
+    }
+
+    state.pendingInvitationId = pendingInvitation.id;
+
+    const parentDashboardPage = await parent.requestText("/app");
+    assert(
+      parentDashboardPage.response.ok &&
+        parentDashboardPage.text.includes(approvalRelationshipLabel),
+      "Parent dashboard did not render the pending approval request section.",
+    );
+
+    const acceptPendingApprovalResult = await parent.requestJson(
+      "/api/auth/parent-approval/confirm",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          invitationId: pendingInvitation.id,
+        }),
+      },
+    );
+    expectOkJson(
+      acceptPendingApprovalResult,
+      "Parent failed to accept the pending approval from the dashboard path",
+    );
+
+    const { data: acceptedInvitation, error: acceptedInvitationError } =
+      await adminClient
+        .from("account_link_invitations")
+        .select("invitation_status, accepted_by_user_id")
+        .eq("id", pendingInvitation.id)
+        .maybeSingle();
+
+    if (acceptedInvitationError) {
+      throw acceptedInvitationError;
+    }
+
+    assert(
+      acceptedInvitation?.invitation_status === "accepted" &&
+        acceptedInvitation.accepted_by_user_id,
+      "Dashboard acceptance did not mark the parent approval as accepted.",
+    );
 
     const parentStudentPage = await parent.requestText(
       `/app/students/${fixtureUserIds.student}`,
@@ -530,6 +599,8 @@ async function main() {
           startedServer,
           checks: [
             "parent student detail page rendered",
+            "parent dashboard surfaced a pending approval request",
+            "parent dashboard acceptance route marked the request accepted",
             "parent session review page rendered",
             "parent API detail stayed filtered to parent summaries",
             "parent could not create tutor notes",
@@ -554,6 +625,20 @@ async function main() {
 
       if (error) {
         console.error("Cleanup warning: failed to delete the temporary tutor note.");
+        console.error(error);
+      }
+    }
+
+    if (state.pendingInvitationId) {
+      const { error } = await adminClient
+        .from("account_link_invitations")
+        .delete()
+        .eq("id", state.pendingInvitationId);
+
+      if (error) {
+        console.error(
+          "Cleanup warning: failed to delete the temporary pending parent approval.",
+        );
         console.error(error);
       }
     }

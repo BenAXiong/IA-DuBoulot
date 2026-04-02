@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   acceptInvitation,
-  parseInvitationTokenInput,
+  parseInvitationAcceptIdentifierInput,
 } from "@/lib/server/links/invitation-service";
 import { requireAuthenticatedUserContext } from "@/lib/server/auth/authorization";
 import { withRouteErrorHandling } from "@/lib/server/errors/with-route-error-handling";
@@ -10,7 +10,7 @@ const ROUTE = "/api/auth/parent-approval/confirm";
 
 export const POST = withRouteErrorHandling(async (request, { requestId }) => {
   const context = await requireAuthenticatedUserContext();
-  const { token } = await parseInvitationTokenInput(
+  const acceptInput = await parseInvitationAcceptIdentifierInput(
     request,
     context.appUser?.preferred_ui_language ?? "fr",
   );
@@ -18,7 +18,7 @@ export const POST = withRouteErrorHandling(async (request, { requestId }) => {
     context,
     requestId,
     route: ROUTE,
-    token,
+    ...acceptInput,
     expectedKinds: ["parent_approval", "parent_link"],
   });
 

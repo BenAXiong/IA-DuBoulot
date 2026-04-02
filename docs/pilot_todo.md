@@ -58,6 +58,7 @@ Status note: the parent `/app` dashboard now has a role-specific oversight layou
 
 Status note: the current MVP still runs one shared coaching workflow across subjects. The product already stores a `subject_tag`, shows recent-subject rollups, uses subject text inside prompts and summaries, and allows a custom subject through the intake `Other subject` path, but memory, prompts, and UI flows are not yet specialized by subject family. Pilot work should decide whether math/science/humanities/language-study need different coaching modes, and whether custom subjects stay free-text, become admin-curated, or need alias normalization.
 Status note: the first parent-dashboard rethink now gives the parent route a calmer entry shape, but `P2.2` remains open because the full parent or tutor journey still needs evidence from invite or approval through linked-learner follow-up, review, settings, and billing, with screenshots or notes captured as friction is found.
+Status note: the parent journey now also closes one major friction point from that walkthrough path: pending parent-approval requests addressed to the signed-in adult now surface inside the parent `/app` rail and can be accepted there without reopening the raw invite link. `P2.2` still remains open because the broader invite, settings, billing, and tutor-side walkthrough evidence still needs to be captured end to end.
 
 ### P3 Device, Accessibility, And Reliability
 

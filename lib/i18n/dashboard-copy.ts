@@ -1072,6 +1072,18 @@ export function getParentDashboardCopy(languageCode: UiLanguageCode) {
           deletion_requested: "Suppression demandée",
         },
       },
+      pendingApprovals: {
+        eyebrow: "Demandes en attente",
+        title: "Demandes parentales à traiter",
+        body:
+          "Quand un élève demande cette adresse pour activer la supervision parentale, la demande apparaît ici jusqu'à acceptation ou expiration.",
+        requestedOn: (value: string) => `Demandée le ${value}`,
+        expiresOn: (value: string) => `Expire le ${value}`,
+        relationshipLabel: (value: string) => `Relation : ${value}`,
+        accept: "Accepter la supervision",
+        pending: "Activation...",
+        errorFallback: "Impossible d'accepter cette demande pour l'instant.",
+      },
       learners: {
         eyebrow: "Élèves liés",
         body:
@@ -1169,6 +1181,18 @@ export function getParentDashboardCopy(languageCode: UiLanguageCode) {
           deletion_requested: "Deletion requested",
         },
       },
+      pendingApprovals: {
+        eyebrow: "Pending requests",
+        title: "Parent approvals waiting here",
+        body:
+          "When a learner uses this email to request parent supervision, the request appears here until it is accepted or expires.",
+        requestedOn: (value: string) => `Requested on ${value}`,
+        expiresOn: (value: string) => `Expires on ${value}`,
+        relationshipLabel: (value: string) => `Relationship: ${value}`,
+        accept: "Accept supervision",
+        pending: "Activating...",
+        errorFallback: "Unable to accept this request right now.",
+      },
       learners: {
         eyebrow: "Linked learners",
         body:
@@ -1264,6 +1288,18 @@ export function getParentDashboardCopy(languageCode: UiLanguageCode) {
           suspended: "已停用",
           deletion_requested: "已要求刪除",
         },
+      },
+      pendingApprovals: {
+        eyebrow: "待處理請求",
+        title: "待家長處理的核准",
+        body:
+          "當學習者用這個 email 申請家長監督時，請求會顯示在這裡，直到接受或過期。",
+        requestedOn: (value: string) => `申請時間：${value}`,
+        expiresOn: (value: string) => `到期時間：${value}`,
+        relationshipLabel: (value: string) => `關係：${value}`,
+        accept: "接受監督",
+        pending: "啟用中...",
+        errorFallback: "目前無法接受這個請求。",
       },
       learners: {
         eyebrow: "已連結學習者",

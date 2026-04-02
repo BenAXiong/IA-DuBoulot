@@ -141,6 +141,26 @@ function parseInvitationToken(
   return normalized;
 }
 
+function parseInvitationId(
+  invitationId: string,
+  copy: InvitationServerCopy = getInvitationServerCopy("fr"),
+) {
+  const normalized = invitationId.trim();
+
+  if (!/^[0-9a-fA-F-]{36}$/.test(normalized)) {
+    throw new AppError({
+      code: "validation_error",
+      message: copy.invalidFields,
+      status: 400,
+      fieldErrors: {
+        invitationId: copy.fieldErrors.token,
+      },
+    });
+  }
+
+  return normalized;
+}
+
 function hashInvitationToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
 }
@@ -192,6 +212,30 @@ async function loadInvitationByToken(
     .from("account_link_invitations")
     .select(INVITATION_SELECT)
     .eq("token_hash", hashInvitationToken(token))
+    .maybeSingle<LinkInvitationRecord>();
+
+  if (error) {
+    throw new AppError({
+      code: "service_unavailable",
+      message: copy.service.loadInvitation,
+      status: 503,
+      retryable: true,
+      cause: error,
+    });
+  }
+
+  return data;
+}
+
+async function loadInvitationById(
+  invitationId: string,
+  copy: InvitationServerCopy = getInvitationServerCopy("fr"),
+) {
+  const supabase = createSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from("account_link_invitations")
+    .select(INVITATION_SELECT)
+    .eq("id", invitationId)
     .maybeSingle<LinkInvitationRecord>();
 
   if (error) {
@@ -713,6 +757,53 @@ export async function parseInvitationTokenInput(
   };
 }
 
+export async function parseInvitationAcceptIdentifierInput(
+  request: Request,
+  languageCode: UiLanguageCode = "fr",
+) {
+  let body: unknown;
+  const copy = getInvitationServerCopy(languageCode);
+
+  try {
+    body = await request.json();
+  } catch (error) {
+    throw new AppError({
+      code: "bad_request",
+      message: copy.invalidJson,
+      status: 400,
+      cause: error,
+    });
+  }
+
+  const payload = requireBodyObject<{
+    token?: string;
+    invitationId?: string;
+  }>(body, copy);
+  const hasToken = typeof payload.token === "string" && payload.token.trim() !== "";
+  const hasInvitationId =
+    typeof payload.invitationId === "string" &&
+    payload.invitationId.trim() !== "";
+
+  if ((hasToken && hasInvitationId) || (!hasToken && !hasInvitationId)) {
+    throw new AppError({
+      code: "validation_error",
+      message: copy.invalidFields,
+      status: 400,
+      fieldErrors: {
+        token: copy.fieldErrors.token,
+      },
+    });
+  }
+
+  return hasToken
+    ? {
+        token: parseInvitationToken(payload.token ?? "", copy),
+      }
+    : {
+        invitationId: parseInvitationId(payload.invitationId ?? "", copy),
+      };
+}
+
 export async function createParentApprovalRequest(input: {
   context: NonNullable<Awaited<ReturnType<typeof getAuthenticatedUserContext>>>;
   requestId: string;
@@ -952,7 +1043,18 @@ export async function acceptInvitation(
 ): Promise<AcceptInvitationResult> {
   const appUser = requireAppUserContext(input.context);
   const copy = getInvitationServerCopy(appUser.preferred_ui_language);
-  const token = parseInvitationToken(input.token, copy);
+  const token = input.token ? parseInvitationToken(input.token, copy) : null;
+  const invitationId = input.invitationId
+    ? parseInvitationId(input.invitationId, copy)
+    : null;
+
+  if ((token && invitationId) || (!token && !invitationId)) {
+    throw new AppError({
+      code: "bad_request",
+      message: copy.invalidFields,
+      status: 400,
+    });
+  }
 
   if (appUser.account_status !== "active") {
     throw new AppError({
@@ -962,7 +1064,9 @@ export async function acceptInvitation(
     });
   }
 
-  const invitation = await loadInvitationByToken(token, copy);
+  const invitation = token
+    ? await loadInvitationByToken(token, copy)
+    : await loadInvitationById(invitationId!, copy);
 
   if (!invitation) {
     throw new AppError({
@@ -1091,7 +1195,7 @@ export async function acceptInvitation(
     acceptedByUserId: appUser.id,
   }, copy);
 
-  const acceptedInvitation = await loadInvitationByToken(token, copy);
+  const acceptedInvitation = await loadInvitationById(invitation.id, copy);
 
   if (!acceptedInvitation) {
     throw new AppError({
