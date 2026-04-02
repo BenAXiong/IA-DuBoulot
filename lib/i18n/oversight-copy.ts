@@ -119,6 +119,7 @@ export function getAdminAuditActionLabel(
   const labels = pickLocalizedValue(languageCode, {
     fr: {
       parent_session_review_view: "lecture parent",
+      parent_managed_learner_create: "compte élève créé par parent",
       tutor_session_review_view: "lecture tuteur",
       tutor_note_create: "note privée créée",
       tutor_note_update: "note privée modifiée",
@@ -126,6 +127,7 @@ export function getAdminAuditActionLabel(
     },
     en: {
       parent_session_review_view: "parent review",
+      parent_managed_learner_create: "learner account created by parent",
       tutor_session_review_view: "tutor review",
       tutor_note_create: "private note created",
       tutor_note_update: "private note updated",
@@ -133,6 +135,7 @@ export function getAdminAuditActionLabel(
     },
     zh: {
       parent_session_review_view: "家長檢視",
+      parent_managed_learner_create: "家長建立學習者帳號",
       tutor_session_review_view: "家教檢視",
       tutor_note_create: "已建立私人筆記",
       tutor_note_update: "已更新私人筆記",
@@ -151,14 +154,17 @@ export function getAdminAuditTargetTableLabel(
     fr: {
       conversations: "sessions",
       tutor_notes: "notes privées tuteur",
+      users: "comptes",
     },
     en: {
       conversations: "sessions",
       tutor_notes: "tutor private notes",
+      users: "accounts",
     },
     zh: {
       conversations: "課程",
       tutor_notes: "家教私人筆記",
+      users: "帳號",
     },
   });
 
@@ -826,6 +832,103 @@ export function getBillingServerCopy(languageCode: UiLanguageCode) {
     zh: {
       noManageableSubscription:
         "目前還沒有可管理的付費訂閱。",
+    },
+  });
+}
+
+export function getParentLearnerBootstrapServerCopy(languageCode: UiLanguageCode) {
+  return pickLocalizedValue(languageCode, {
+    fr: {
+      expectedObject: "Le corps JSON doit être un objet.",
+      invalidJson: "Corps JSON invalide.",
+      invalidFields: "Un ou plusieurs champs sont invalides.",
+      fieldErrors: {
+        displayName:
+          "Le prénom ou nom affiché est requis et doit contenir 80 caractères ou moins.",
+        learnerEmail: "Une adresse email élève valide est requise.",
+        learnerEmailDifferent:
+          "L'email élève doit être différent de l'email parent connecté.",
+        temporaryPassword:
+          "Le mot de passe temporaire doit contenir entre 8 et 72 caractères.",
+        preferredUiLanguage:
+          "La langue de l'interface doit être fr, en ou zh.",
+        aiHelpLanguage: "La langue d'aide IA doit être fr ou en.",
+        ageBand: "La tranche d'âge doit faire partie des valeurs prises en charge.",
+        relationshipLabel:
+          "Le libellé de relation doit contenir 80 caractères ou moins.",
+      },
+      service: {
+        createAuthUser: "Impossible de créer les accès de l'élève.",
+        createAppProfile: "Impossible de créer le profil applicatif élève.",
+        createStudentProfile: "Impossible d'initialiser le profil élève.",
+        createParentLink: "Impossible d'activer le lien parent pour cet élève.",
+        syncAuthMetadata:
+          "Impossible de synchroniser les métadonnées du compte élève.",
+      },
+      errors: {
+        parentMustBeActive:
+          "Le compte parent doit être actif pour créer un compte élève.",
+        learnerEmailTaken:
+          "Cette adresse email est déjà utilisée par un autre compte.",
+      },
+    },
+    en: {
+      expectedObject: "The JSON body must be an object.",
+      invalidJson: "Invalid JSON body.",
+      invalidFields: "One or more fields are invalid.",
+      fieldErrors: {
+        displayName:
+          "Learner display name is required and must be 80 characters or fewer.",
+        learnerEmail: "A valid learner email is required.",
+        learnerEmailDifferent:
+          "Learner email must be different from the signed-in parent email.",
+        temporaryPassword:
+          "Temporary password must contain between 8 and 72 characters.",
+        preferredUiLanguage: "Interface language must be fr, en, or zh.",
+        aiHelpLanguage: "AI help language must be fr or en.",
+        ageBand: "Age band must be one of the supported values.",
+        relationshipLabel:
+          "Relationship label must be 80 characters or fewer.",
+      },
+      service: {
+        createAuthUser: "Unable to create learner sign-in access.",
+        createAppProfile: "Unable to create the learner app profile.",
+        createStudentProfile: "Unable to initialize the learner profile.",
+        createParentLink: "Unable to activate the parent link for this learner.",
+        syncAuthMetadata: "Unable to sync the learner account metadata.",
+      },
+      errors: {
+        parentMustBeActive:
+          "Parent account must be active before creating a learner account.",
+        learnerEmailTaken: "That learner email is already used by another account.",
+      },
+    },
+    zh: {
+      expectedObject: "JSON 內容必須是物件。",
+      invalidJson: "JSON 內容無效。",
+      invalidFields: "一個或多個欄位無效。",
+      fieldErrors: {
+        displayName: "學習者顯示名稱為必填，且不得超過 80 個字元。",
+        learnerEmail: "必須提供有效的學習者 email。",
+        learnerEmailDifferent:
+          "學習者 email 必須與目前登入的家長 email 不同。",
+        temporaryPassword: "暫時密碼必須介於 8 到 72 個字元之間。",
+        preferredUiLanguage: "介面語言必須是 fr、en 或 zh。",
+        aiHelpLanguage: "AI 協助語言必須是 fr 或 en。",
+        ageBand: "年齡區間必須是支援的值之一。",
+        relationshipLabel: "關係標籤不得超過 80 個字元。",
+      },
+      service: {
+        createAuthUser: "無法建立學習者登入帳號。",
+        createAppProfile: "無法建立學習者的應用程式檔案。",
+        createStudentProfile: "無法初始化學習者檔案。",
+        createParentLink: "無法啟用這位學習者的家長連結。",
+        syncAuthMetadata: "無法同步學習者帳號的中繼資料。",
+      },
+      errors: {
+        parentMustBeActive: "家長帳號必須為啟用狀態，才能建立學習者帳號。",
+        learnerEmailTaken: "這個學習者 email 已被其他帳號使用。",
+      },
     },
   });
 }

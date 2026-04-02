@@ -299,6 +299,12 @@ interface ParentOversightService {
   loadConversationReview(input: ParentConversationReviewInput): Promise<ParentConversationReview>;
 }
 
+interface ParentLearnerBootstrapService {
+  createManagedLearner(
+    input: CreateParentManagedLearnerInput
+  ): Promise<CreateParentManagedLearnerResult>;
+}
+
 interface TutorOversightService {
   loadDashboardSnapshot(input: TutorOversightInput): Promise<TutorDashboardSnapshot>;
   loadStudentDetail(input: TutorStudentDetailInput): Promise<TutorStudentDetail>;
@@ -319,6 +325,8 @@ interface AdminAuditReviewService {
 Rules:
 
 - parent/tutor reads must explicitly revalidate linked-student access even though RLS already exists
+- parent-created learner bootstrap must stay additive and keep the learner-created flow intact instead of silently replacing it
+- the current parent-created learner path may create a real learner auth account, but that should remain an explicit interim compromise until a later managed-profile/claim model is designed
 - tutor notes stay behind canonical mutation routes so writes are auditable and reviewable
 - admin audit review stays narrow to sensitive access events instead of becoming a generic reporting service
 

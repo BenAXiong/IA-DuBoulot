@@ -75,6 +75,7 @@ Current blocking failure class:
 ### Parent
 
 - parent dashboard loads linked students and billing state
+- parent can create a learner account from `/app`, and the new learner appears in the parent rail
 - linked-student detail page loads recent sessions and pedagogical memory
 - parent session review stays filtered to parent summaries only
 - linked-child deletion can be queued from settings
@@ -157,4 +158,5 @@ These remain required before an external demo even if the regression command pas
 - 2026-03-12 local `SMOKE_UI_LANGUAGE=zh npm run smoke:tablet-emulation`: success on the same student tablet surfaces after a temporary fixture-language flip, with no horizontal overflow and no detected sub-`44x44` controls
 - 2026-03-12 local rerun of both tablet-emulation commands after the student-flow server-text and deterministic-fallback localization pass: success again on `/app`, `/app/new`, and `/app/conversations/[conversationId]`, with no horizontal overflow and no detected sub-`44x44` controls in either the default French or temporary `zh` fixture-language mode
 - 2026-03-12 local `SMOKE_THEME_MODE=dark npm run smoke:tablet-emulation`: success on `/app`, `/app/new`, and `/app/conversations/[conversationId]` after the shared light or dark theme redesign, with no horizontal overflow and no detected sub-`44x44` controls on the checked student tablet surfaces
+- 2026-04-02 local `npm run smoke:adult-oversight`: success after adding the parent-created learner bootstrap path, including parent dashboard learner creation, immediate learner-rail visibility, learner sign-in with the parent-chosen credentials, pending parent-approval visibility, direct dashboard acceptance, tutor-note mutations, and admin audit visibility
 - latest observed non-blocking warnings: provider-backed extraction, coach reply, student summary, or memory refresh may fall back to the documented deterministic path; optional adult summary variants can also be missing in some student-flow runs without breaking the student contract

@@ -1,5 +1,6 @@
 import { ParentActivityHub } from "@/components/dashboard/parent/parent-activity-hub";
 import { ParentAccountDock } from "@/components/dashboard/parent/parent-account-dock";
+import { ParentCreateLearnerPanel } from "@/components/dashboard/parent/parent-create-learner-panel";
 import {
   buildParentDashboardAccountModel,
   buildParentDashboardViewModel,
@@ -39,6 +40,11 @@ export function ParentDashboard({
         />
         <ParentPendingApprovalsPanel
           approvals={model.pendingApprovals}
+          languageCode={languageCode}
+        />
+        <ParentCreateLearnerPanel
+          defaultAiHelpLanguage={appUser.ai_help_language}
+          defaultUiLanguage={appUser.preferred_ui_language}
           languageCode={languageCode}
         />
         <ParentLearnersRail

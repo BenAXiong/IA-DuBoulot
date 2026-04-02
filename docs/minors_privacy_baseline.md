@@ -35,6 +35,7 @@ Engineering consequence:
 
 - account state should support `pending_parent_approval`, `active`, and `deletion_requested`
 - parent-student linking is not optional for under-13 accounts
+- because the current product still maps each learner directly to `auth.users`, the first parent-created path may need interim learner credentials before a later managed-profile/claim redesign exists cleanly
 
 Reason:
 
@@ -243,6 +244,12 @@ Pros:
 Why not chosen:
 
 - too risky for MVP and hard to defend operationally
+
+Current implementation note:
+
+- the product now supports both the original learner-created plus parent-approval flow and an additive parent-created learner-account flow from the parent workspace
+- the parent-created path is intentionally narrow for Pilot: it creates a real learner auth account with parent-chosen initial credentials, rather than a profile-only learner record
+- a later managed-profile plus learner-claim flow may still be preferable if parent-led usage becomes the dominant path
 
 ### Alternative C: Collect Exact Birth Date
 

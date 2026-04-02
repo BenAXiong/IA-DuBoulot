@@ -6,6 +6,7 @@ Related: [README](../README.md) | [Implementation plan](implementation_plan.md) 
 
 - Student data belongs to the student workflow, but under-13 access is parent-linked by default.
 - Parent access exists only through explicit parent-student links.
+- Parents may now bootstrap a linked learner account from the parent workspace, but that path supplements rather than replaces learner self-bootstrap.
 - Tutor access exists only through explicit tutor-student links.
 - Admin access is exceptional and should be audited.
 - Tutor private notes are never visible to the student.
@@ -16,6 +17,7 @@ Related: [README](../README.md) | [Implementation plan](implementation_plan.md) 
 | Resource | Student | Parent | Tutor | Admin | Notes |
 | --- | --- | --- | --- | --- | --- |
 | Own account profile | read/update own | read/update own | read/update own | manage all, audited | Account settings remain role-scoped |
+| Learner bootstrap | create own account through onboarding | create linked learner account from `/app` | none | manage all, audited | Parent-owned bootstrap is additive; learner self-bootstrap still exists |
 | Student profile basics | read own, limited update | read linked child, limited update | read linked child | manage all, audited | Includes language, age band, linked status |
 | Parent-student links | read own links | create/revoke linked child access | none | manage all, audited | Under-13 requires parent link |
 | Tutor-student links | request/view own links | approve/revoke for linked child | request/view own links | manage all, audited | Parent approval required for under-13 |

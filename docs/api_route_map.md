@@ -110,7 +110,7 @@ These routes manage role links and adult visibility setup.
 | --- | --- | --- | --- | --- |
 | `/api/parent/links` | `POST` | parent | create or confirm parent-student link | under-13 flow depends on this |
 | `/api/parent/links/[linkId]` | `PATCH` | parent | update or revoke parent-student link | sensitive access should be audited |
-| `/api/parent/students` | `GET` | parent | list linked students and overview state | summary-oriented response |
+| `/api/parent/students` | `POST` | parent | create a linked learner account from the parent workspace | additive parent-owned bootstrap path; keeps the learner-created flow valid |
 | `/api/tutor/links` | `POST` | linked parent or eligible student | create a canonical tutor invitation | current V1 returns a shareable invite URL |
 | `/api/tutor/links/[linkId]` | `PATCH` | tutor or parent | approve, revoke, or update tutor link | parent approval rules apply |
 | `/api/tutor/students` | `GET` | tutor | list linked students with recent status | no raw memory exposure |
@@ -120,7 +120,7 @@ These routes manage role links and adult visibility setup.
 
 Current V1 note:
 
-- `POST /api/auth/parent-approval/request`, `POST /api/auth/parent-approval/confirm`, and `/invite/[token]` currently carry the under-13 parent-link flow before a richer parent dashboard exists.
+- `POST /api/auth/parent-approval/request`, `POST /api/auth/parent-approval/confirm`, and `/invite/[token]` still carry the canonical under-13 parent-approval flow, but the richer parent dashboard now also exposes pending approvals and the new parent-created learner bootstrap path directly from `/app`.
 
 ### Billing
 

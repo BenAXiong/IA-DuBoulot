@@ -1084,11 +1084,38 @@ export function getParentDashboardCopy(languageCode: UiLanguageCode) {
         pending: "Activation...",
         errorFallback: "Impossible d'accepter cette demande pour l'instant.",
       },
+      createLearner: {
+        eyebrow: "Créer un élève",
+        title: "Préparer le compte élève depuis l'espace parent",
+        body:
+          "Utilise ce parcours quand le parent veut piloter la configuration, la supervision et la facturation avant de laisser l'élève se connecter.",
+        helper:
+          "Pour cette première version, l'élève se connectera avec l'email et le mot de passe choisis ici.",
+        open: "Ajouter un élève",
+        close: "Fermer",
+        create: "Créer l'élève",
+        pending: "Création...",
+        fields: {
+          displayName: "Prénom ou nom affiché",
+          learnerEmail: "Email de connexion élève",
+          temporaryPassword: "Mot de passe initial",
+          ageBand: "Tranche d'âge",
+          relationshipLabel: "Relation avec l'élève",
+          uiLanguage: "Langue de l'interface",
+          aiLanguage: "Langue d'aide IA",
+        },
+        placeholders: {
+          learnerEmail: "eleve@example.com",
+          temporaryPassword: "8 caractères minimum",
+          relationshipLabel: "ex. Mère, Père, Tuteur légal",
+        },
+      },
       learners: {
         eyebrow: "Élèves liés",
         body:
           "Chaque fiche garde l'état du moment, les difficultés visibles et l'accès direct vers le suivi détaillé.",
-        empty: "Aucun élève lié pour l'instant.",
+        empty:
+          "Aucun élève lié pour l'instant. Commence par créer le premier compte élève depuis cet espace.",
         under13: "Moins de 13 ans",
         openLearner: "Ouvrir le suivi",
         reviewLatest: "Dernière session",
@@ -1193,11 +1220,38 @@ export function getParentDashboardCopy(languageCode: UiLanguageCode) {
         pending: "Activating...",
         errorFallback: "Unable to accept this request right now.",
       },
+      createLearner: {
+        eyebrow: "Create a learner",
+        title: "Set up the learner account from the parent workspace",
+        body:
+          "Use this path when the parent wants to handle setup, supervision, and billing first, then let the learner sign in later.",
+        helper:
+          "In this first version, the learner signs in with the email and password chosen here.",
+        open: "Add learner",
+        close: "Close",
+        create: "Create learner",
+        pending: "Creating...",
+        fields: {
+          displayName: "Learner display name",
+          learnerEmail: "Learner sign-in email",
+          temporaryPassword: "Initial password",
+          ageBand: "Age band",
+          relationshipLabel: "Relationship to learner",
+          uiLanguage: "Interface language",
+          aiLanguage: "AI help language",
+        },
+        placeholders: {
+          learnerEmail: "learner@example.com",
+          temporaryPassword: "8 characters minimum",
+          relationshipLabel: "e.g. Mother, Father, Guardian",
+        },
+      },
       learners: {
         eyebrow: "Linked learners",
         body:
           "Each card keeps the current state, visible difficulties, and the direct path into the detailed learner view.",
-        empty: "No linked learner yet.",
+        empty:
+          "No linked learner yet. Start by creating the first learner account from this workspace.",
         under13: "Under 13",
         openLearner: "Open learner",
         reviewLatest: "Latest session",
@@ -1301,11 +1355,38 @@ export function getParentDashboardCopy(languageCode: UiLanguageCode) {
         pending: "啟用中...",
         errorFallback: "目前無法接受這個請求。",
       },
+      createLearner: {
+        eyebrow: "建立學習者",
+        title: "從家長工作區先完成學習者帳號設定",
+        body:
+          "當家長希望先掌握設定、監督與付費，再交給孩子使用時，就走這個流程。",
+        helper:
+          "在這個第一版流程中，學習者會用你在這裡設定的 email 與密碼登入。",
+        open: "新增學習者",
+        close: "關閉",
+        create: "建立學習者",
+        pending: "建立中...",
+        fields: {
+          displayName: "學習者顯示名稱",
+          learnerEmail: "學習者登入 email",
+          temporaryPassword: "初始密碼",
+          ageBand: "年齡區間",
+          relationshipLabel: "與學習者的關係",
+          uiLanguage: "介面語言",
+          aiLanguage: "AI 協助語言",
+        },
+        placeholders: {
+          learnerEmail: "learner@example.com",
+          temporaryPassword: "至少 8 個字元",
+          relationshipLabel: "例如：母親、父親、監護人",
+        },
+      },
       learners: {
         eyebrow: "已連結學習者",
         body:
           "每張卡片都保留當前狀態、看得見的困難點，以及進入詳細檢視的直接入口。",
-        empty: "目前還沒有已連結的學習者。",
+        empty:
+          "目前還沒有已連結的學習者。先從這裡建立第一個學習者帳號。",
         under13: "13 歲以下",
         openLearner: "打開追蹤",
         reviewLatest: "最近課程",

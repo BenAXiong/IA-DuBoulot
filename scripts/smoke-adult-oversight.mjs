@@ -261,7 +261,7 @@ function buildHttpClient(baseUrl, roleLabel) {
   let requestSequence = 0;
 
   return {
-    async signInFixture(email) {
+    async signInPassword(email, password) {
       const supabase = createServerClient(
         fixtureEnv.supabaseUrl,
         fixtureEnv.supabaseAnonKey,
@@ -271,12 +271,15 @@ function buildHttpClient(baseUrl, roleLabel) {
       );
       const { error } = await supabase.auth.signInWithPassword({
         email,
-        password: fixtureEnv.fixturePassword,
+        password,
       });
 
       if (error) {
-        throw new Error(`Fixture ${roleLabel} sign-in failed: ${error.message}`);
+        throw new Error(`Sign-in failed for ${roleLabel}: ${error.message}`);
       }
+    },
+    async signInFixture(email) {
+      await this.signInPassword(email, fixtureEnv.fixturePassword);
     },
     async requestJson(pathname, init = {}) {
       requestSequence += 1;
@@ -346,6 +349,7 @@ async function main() {
   const fixtureUserIds = await resolveFixtureUserIds(adminClient);
   const state = {
     createdNoteId: null,
+    createdLearnerUserId: null,
     pendingInvitationId: null,
   };
   let startedServer = false;
@@ -406,6 +410,57 @@ async function main() {
       parentDashboardPage.response.ok &&
         parentDashboardPage.text.includes(approvalRelationshipLabel),
       "Parent dashboard did not render the pending approval request section.",
+    );
+
+    const createdLearnerEmail = `smoke-parent-learner-${Date.now()}@iaduboulot.local`;
+    const createdLearnerPassword = "PilotFlowTemp2026!";
+    const createdLearnerName = "Smoke Parent Learner";
+    const createLearnerResult = await parent.requestJson("/api/parent/students", {
+      method: "POST",
+      body: JSON.stringify({
+        displayName: createdLearnerName,
+        learnerEmail: createdLearnerEmail,
+        temporaryPassword: createdLearnerPassword,
+        preferredUiLanguage: "fr",
+        aiHelpLanguage: "fr",
+        ageBand: "nine_ten",
+        relationshipLabel: "Parent smoke",
+      }),
+    });
+    const createLearnerPayload = expectOkJson(
+      createLearnerResult,
+      "Parent failed to create a learner account from the dashboard flow",
+    );
+    const createdLearner = createLearnerPayload.data?.learner ?? null;
+    assert(createdLearner?.id, "Learner creation did not return the new learner id.");
+    state.createdLearnerUserId = createdLearner.id;
+
+    const parentDashboardAfterCreate = await parent.requestText("/app");
+    assert(
+      parentDashboardAfterCreate.response.ok &&
+        parentDashboardAfterCreate.text.includes(createdLearnerName),
+      "Parent dashboard did not surface the newly created learner.",
+    );
+
+    const managedLearner = buildHttpClient(baseUrl, "managed_learner");
+    await managedLearner.signInPassword(
+      createdLearnerEmail,
+      createdLearnerPassword,
+    );
+    const managedLearnerMe = await managedLearner.requestJson("/api/auth/me");
+    const managedLearnerMePayload = expectOkJson(
+      managedLearnerMe,
+      "Parent-created learner could not resolve authenticated profile state",
+    );
+    assert(
+      managedLearnerMePayload.data?.appUser?.role === "student",
+      "Parent-created learner did not resolve as a student account.",
+    );
+
+    const managedLearnerAppPage = await managedLearner.requestText("/app");
+    assert(
+      managedLearnerAppPage.response.ok,
+      "Parent-created learner could not load the authenticated app surface.",
     );
 
     const acceptPendingApprovalResult = await parent.requestJson(
@@ -600,6 +655,8 @@ async function main() {
           checks: [
             "parent student detail page rendered",
             "parent dashboard surfaced a pending approval request",
+            "parent dashboard created a learner account and showed it in the learner rail",
+            "parent-created learner account could sign in as a student",
             "parent dashboard acceptance route marked the request accepted",
             "parent session review page rendered",
             "parent API detail stayed filtered to parent summaries",
@@ -625,6 +682,19 @@ async function main() {
 
       if (error) {
         console.error("Cleanup warning: failed to delete the temporary tutor note.");
+        console.error(error);
+      }
+    }
+
+    if (state.createdLearnerUserId) {
+      const { error } = await adminClient.auth.admin.deleteUser(
+        state.createdLearnerUserId,
+      );
+
+      if (error) {
+        console.error(
+          "Cleanup warning: failed to delete the temporary parent-created learner.",
+        );
         console.error(error);
       }
     }

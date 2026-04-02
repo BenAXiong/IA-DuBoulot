@@ -72,7 +72,21 @@ UI modules:
 
 ## Flow Definitions
 
-### 1. Under-13 Parent Approval
+### 1. Parent-Created Learner Bootstrap
+
+1. Signed-in parent opens the learner-creation panel inside `/app`.
+2. Parent submits learner display name, learner email, temporary password, age band, default UI/help languages, and optional relationship label.
+3. Server creates the learner auth user, canonical app profile, student profile, and active parent-student link in one bounded service path.
+4. The learner appears immediately in the parent dashboard rail and can sign in with the credentials the parent chose.
+5. The existing learner-created flow remains valid and unchanged for students who still self-bootstrap first.
+
+Current boundary in V1:
+
+- this is an additive parent-owned setup path, not a replacement for student self-bootstrap
+- because learner identity still maps directly to `auth.users`, the current parent-created path creates a real learner account with initial credentials rather than a profile-only managed learner record
+- tutor-created learner bootstrap remains out of scope
+
+### 2. Under-13 Parent Approval
 
 1. Under-13 student completes bootstrap and lands in `pending_parent_approval`.
 2. Student uses `POST /api/auth/parent-approval/request` with parent email.
@@ -87,7 +101,7 @@ UI modules:
 - syncs the child auth metadata from the canonical app profile
 - marks the invitation `accepted`
 
-### 2. Tutor Link Invitation
+### 3. Tutor Link Invitation
 
 1. Eligible actor creates a tutor invite with `POST /api/tutor/links`.
 2. Server creates one `account_link_invitations` row and returns a shareable `/invite/[token]` URL.
@@ -113,6 +127,7 @@ Current behavior:
 - the current UI exposes that URL for copy/share
 - signed-in parents now also see matching pending parent-approval requests inside `/app`, based on their authenticated email
 - those parent-side requests can be accepted directly from the dashboard through the same canonical parent-confirm route, even though the raw token value is never stored
+- the parent-created learner bootstrap path does not depend on invitation delivery at all; it lives entirely inside the signed-in parent workspace
 - acceptance and auditing work immediately once the recipient opens the link
 - invitation creation and acceptance routes now resolve user-facing validation, conflict, expired-link, role-mismatch, and service-failure messages from the active `preferred_ui_language`
 
@@ -167,3 +182,4 @@ Runtime logs may include invite domain and status metadata, but should not log r
 - add invitation cleanup jobs for expired and stale pending rows
 - decide whether cross-device invite recovery is worth adding before beta
 - decide whether future parent-link flows should reuse `parent_link` or stay inside dedicated parent dashboards only
+- decide whether a later managed-learner plus claim flow should replace the current credential-based parent-created learner bootstrap
