@@ -14,23 +14,23 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
     case "en":
       return {
         placeholder: "Ask anything about this homework...",
-        addSources: "Add sources",
+        addSources: "File uploads open once the chat starts",
         submit: "Start chat",
-        voice: "Voice input coming later",
+        voice: "Voice input coming soon!",
       };
     case "zh":
       return {
         placeholder: "直接輸入你對這份作業的問題...",
-        addSources: "加入來源",
+        addSources: "開始聊天後才能加入檔案",
         submit: "開始聊天",
-        voice: "語音輸入之後再加入",
+        voice: "語音輸入即將推出！",
       };
     default:
       return {
         placeholder: "Écris directement ta question sur ce devoir...",
-        addSources: "Ajouter des sources",
+        addSources: "Les fichiers s'ajoutent une fois le chat lancé",
         submit: "Lancer le chat",
-        voice: "Saisie vocale plus tard",
+        voice: "Saisie vocale bientôt !",
       };
   }
 }
@@ -101,28 +101,24 @@ export function StudentSubjectQuickStart({
     router.push(`/app/new?${params.toString()}`);
   }
 
-  function openSourceRoute() {
-    router.push(`/app/new?subject=${encodeURIComponent(subjectTag)}`);
-  }
-
   return (
     <form
-      className="grid gap-3 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-4"
+      className="grid gap-2 rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-3"
       onSubmit={handleSubmit}
     >
       <textarea
-        className="min-h-28 resize-none bg-transparent px-2 pt-2 text-sm leading-7 outline-none placeholder:text-[color:var(--ink-soft)]"
+        className="min-h-14 resize-none bg-transparent px-1.5 pt-1 text-sm leading-6 outline-none placeholder:text-[color:var(--ink-soft)]"
         onChange={(event) => setDraft(event.target.value)}
         placeholder={copy.placeholder}
         value={draft}
       />
 
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-3 px-1 py-0.5">
         <div className="flex items-center gap-2">
           <button
             aria-label={copy.addSources}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] text-[color:var(--foreground)] transition hover:-translate-y-0.5"
-            onClick={openSourceRoute}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] disabled:cursor-not-allowed disabled:opacity-60"
+            disabled
             title={copy.addSources}
             type="button"
           >
@@ -130,7 +126,7 @@ export function StudentSubjectQuickStart({
           </button>
           <button
             aria-label={copy.voice}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] text-[color:var(--ink-soft)]"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)]"
             disabled
             title={copy.voice}
             type="button"
@@ -141,7 +137,7 @@ export function StudentSubjectQuickStart({
 
         <button
           aria-label={copy.submit}
-          className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[color:var(--foreground)] text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--foreground)] text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
           disabled={draft.trim().length === 0}
           type="submit"
         >

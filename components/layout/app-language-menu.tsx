@@ -190,7 +190,13 @@ export function AppLanguageMenu({
         type="button"
       >
         <span className="sr-only">{copy.buttonLabel}</span>
-        <GlobeIcon className="h-[1.1rem] w-[1.1rem] shrink-0 overflow-visible" />
+        <GlobeIcon
+          className={
+            variant === "minimal"
+              ? "h-4 w-4 shrink-0 overflow-visible"
+              : "h-[1.1rem] w-[1.1rem] shrink-0 overflow-visible"
+          }
+        />
       </button>
 
       {open ? (

@@ -124,6 +124,7 @@ Why:
 - the subject rail itself no longer expands recent chat lists inline; subject-level recent discussions now stay in the main homework canvas, where the student also sees the dedicated right-side panel
 - the subject view itself now keeps a two-pane rhythm: chat-entry and recent-discussion list on the left, right-side sources/meta panel on the other side
 - the live conversation route now follows the same split-pane rhythm, with the message stream on the left and the summary/sources/workspace stack living inside the right panel instead of a floating dashboard column
+- the pre-chat subject quick-start keeps the `+` control visually for continuity, but it must stay non-active until the product has a real pre-chat file-staging flow; only the live conversation composer currently owns real upload behavior
 
 ## Next Extension Points
 

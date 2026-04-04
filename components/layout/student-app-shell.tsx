@@ -252,7 +252,7 @@ function TestIcon() {
 
 function MenuIcon() {
   return (
-    <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24">
+    <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
       <path
         d="M5 7h14M5 12h14M5 17h14"
         stroke="currentColor"
@@ -265,7 +265,7 @@ function MenuIcon() {
 
 function PanelIcon() {
   return (
-    <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24">
+    <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
       <rect
         height="14.5"
         rx="2"
@@ -342,10 +342,10 @@ export function StudentAppShell({
   }
 
   const content = (
-    <div className="flex h-full flex-col">
-      <div className="flex min-h-[4.5rem] items-center justify-between px-4">
+      <div className="flex h-full flex-col">
+      <div className="flex min-h-[3.25rem] items-center justify-between px-3">
         <div className="flex min-w-0 items-center gap-3">
-          <div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface-strong)] font-[family-name:var(--font-heading)] text-sm font-semibold">
+          <div className="brand-mark inline-flex h-8 w-8 items-center justify-center rounded-2xl font-[family-name:var(--font-heading)] text-xs font-semibold text-white">
             bb
           </div>
           {!sidebarCollapsed ? (
@@ -358,7 +358,7 @@ export function StudentAppShell({
         </div>
 
         <button
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] text-[color:var(--foreground)] transition hover:-translate-y-0.5"
+          className="theme-toggle theme-toggle--minimal"
           onClick={() => setSidebarCollapsed((value) => !value)}
           type="button"
         >
@@ -370,7 +370,7 @@ export function StudentAppShell({
       <nav className="flex-1 overflow-y-auto px-3 py-4">
         <div className="grid gap-2">
           <Link
-            className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium transition ${
+            className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
               activeView === "homework"
                 ? "bg-[color:var(--surface-strong)] text-[color:var(--foreground)]"
                 : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
@@ -409,7 +409,7 @@ export function StudentAppShell({
 
                     return (
                       <Link
-                        className={`flex items-center justify-between rounded-[1rem] px-3 py-2 text-sm transition ${
+                        className={`flex items-center justify-between rounded-[1rem] px-3 py-1.5 text-sm transition ${
                           isActive
                             ? "bg-[color:var(--surface-raised)] text-[color:var(--foreground)]"
                             : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface)] hover:text-[color:var(--foreground)]"
@@ -431,7 +431,7 @@ export function StudentAppShell({
           ) : null}
 
           <Link
-            className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium transition ${
+            className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
               activeView === "maps"
                 ? "bg-[color:var(--surface-strong)] text-[color:var(--foreground)]"
                 : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
@@ -451,7 +451,7 @@ export function StudentAppShell({
           </Link>
 
           <Link
-            className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium transition ${
+            className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
               activeView === "tests"
                 ? "bg-[color:var(--surface-strong)] text-[color:var(--foreground)]"
                 : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
@@ -472,7 +472,7 @@ export function StudentAppShell({
         </div>
       </nav>
 
-      <div className="px-3 py-4">
+      <div className="px-3 py-3">
         <div
           className="relative"
           onMouseEnter={openProfileMenu}
@@ -510,7 +510,7 @@ export function StudentAppShell({
           ) : null}
 
           <button
-            className="flex w-full items-center gap-3 rounded-[1.5rem] px-3 py-2 text-left transition hover:bg-[color:var(--surface-strong)]"
+            className="flex w-full items-center gap-3 rounded-[1.5rem] px-2.5 py-2 text-left transition hover:bg-[color:var(--surface-strong)]"
             onClick={() => {
               if (profileMenuOpen) {
                 closeProfileMenuWithDelay();
@@ -559,11 +559,11 @@ export function StudentAppShell({
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-20 min-h-[4.5rem] border-b border-[color:var(--line)] bg-[color:var(--background)]/88 px-4 py-0 backdrop-blur sm:px-6">
+          <header className="sticky top-0 z-20 min-h-[3.25rem] border-b border-[color:var(--line)] bg-[color:var(--background)]/88 px-3 py-0 backdrop-blur sm:px-4">
             <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4">
               <div className="flex min-w-0 items-center gap-3">
                 <button
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface)] md:hidden"
+                  className="theme-toggle theme-toggle--minimal md:hidden"
                   onClick={() => setSidebarOpen(true)}
                   type="button"
                 >
@@ -590,7 +590,7 @@ export function StudentAppShell({
             </div>
           </header>
 
-          <div className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+          <div className="flex-1 px-4 py-4 sm:px-5 lg:px-6">
             <div className="mx-auto w-full max-w-7xl">{children}</div>
           </div>
         </div>

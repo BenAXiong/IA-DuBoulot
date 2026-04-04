@@ -82,6 +82,7 @@ Rules:
 - the student shell header now uses a simple eyebrow-and-title pattern instead of helper subtitles that describe the interface itself
 - the left student rail no longer shows a divider under the wordmark block; its top strip should visually match the main-pane header height without introducing a second header rule
 - the learner profile dock no longer shows a permanent outlined account section; the dock stays minimal by default, and the profile/settings/sign-out menu stays open while hovered with a short close grace period
+- the student shell top strips are intentionally slimmer than the earlier MVP shell, and the utility/collapse icons should use the same smaller outline-free treatment instead of looking like a second layer of heavy controls
 - the parent role now suppresses the generic desktop shell sidebar and instead lets the dashboard own a parent-specific information architecture: account and billing dock, pending parent-approval requests, a learner-creation panel, and linked-learners rail on the left, with grouped weekly and recent activity on the right
 
 ## Role Dashboard Variants

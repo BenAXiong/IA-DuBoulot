@@ -458,6 +458,19 @@ code {
   text-transform: uppercase;
 }
 
+.brand-mark {
+  background: linear-gradient(
+    135deg,
+    var(--accent) 0%,
+    var(--brand) 38%,
+    var(--highlight) 68%,
+    var(--accent) 100%
+  );
+  background-size: 220% 220%;
+  animation: cta-shift 8s ease-in-out infinite;
+  box-shadow: 0 14px 28px rgba(16, 41, 69, 0.18);
+}
+
 .muted-grid {
   background-image:
     linear-gradient(var(--line) 1px, transparent 1px),
@@ -603,8 +616,8 @@ code {
 }
 
 .theme-toggle--minimal {
-  min-height: 2.2rem;
-  min-width: 2.2rem;
+  min-height: 1.95rem;
+  min-width: 1.95rem;
   border-color: transparent;
   background: transparent;
   box-shadow: none;

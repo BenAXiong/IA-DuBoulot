@@ -396,9 +396,9 @@ export function StudentConversationWorkbench({
         type="file"
       />
 
-      <section className="grid gap-0 xl:-my-6 xl:-mr-8 xl:min-h-[calc(100vh-4.5rem)] xl:grid-cols-[minmax(0,1fr)_18.5rem]">
-        <article className="grid gap-4 py-2 xl:py-6 xl:pr-8">
-          <div className="flex flex-col gap-4 border-b border-[color:var(--line)] pb-4 lg:flex-row lg:items-start lg:justify-between">
+      <section className="grid gap-0 xl:-my-4 xl:-mr-8 xl:min-h-[calc(100vh-3.25rem)] xl:grid-cols-[minmax(0,1fr)_18.5rem]">
+        <article className="grid gap-4 py-1 xl:py-4 xl:pr-8">
+          <div className="flex flex-col gap-3 border-b border-[color:var(--line)] pb-3 lg:flex-row lg:items-start lg:justify-between">
             <div className="min-w-0 space-y-2">
               <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--ink-muted)]">
                 {conversation.subject_tag}
@@ -472,7 +472,7 @@ export function StudentConversationWorkbench({
           ) : null}
         </article>
 
-        <aside className="border-l border-[color:var(--line)] bg-[color:var(--surface)] px-5 py-6 xl:min-h-[calc(100vh-4.5rem)]">
+        <aside className="border-l border-[color:var(--line)] bg-[color:var(--surface)] px-5 py-4 xl:min-h-[calc(100vh-3.25rem)]">
           <div className="grid gap-4 xl:sticky xl:top-24 xl:self-start">
             <StudentSessionSummaryPanel
               conversation={conversation}

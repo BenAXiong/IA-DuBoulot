@@ -43,7 +43,6 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         testsTitle: "Tests will live here later.",
         testsBody:
           "This space is reserved for future quiz practice. Homework remains the main learner experience for now.",
-        subjectEyebrow: "Homework subject",
         noSubjectChats: "No discussion has been saved for this subject yet.",
         needsAttention: "Open learner settings",
         subjectSourcesTitle: "Sources",
@@ -72,7 +71,6 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         testsTitle: "測驗工具之後會在這裡。",
         testsBody:
           "這裡會保留給未來的測驗練習功能。目前學生的主要體驗仍以作業為主。",
-        subjectEyebrow: "作業科目",
         noSubjectChats: "這個科目目前還沒有已儲存的對話。",
         needsAttention: "打開設定",
         subjectSourcesTitle: "來源",
@@ -99,7 +97,6 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         testsTitle: "Les tests viendront ici plus tard.",
         testsBody:
           "Cet espace est réservé aux futurs quiz. Pour l'instant, l'expérience élève reste centrée sur les devoirs.",
-        subjectEyebrow: "Matière",
         noSubjectChats: "Aucune discussion enregistrée pour cette matière.",
         needsAttention: "Ouvrir les réglages",
         subjectSourcesTitle: "Sources",
@@ -297,12 +294,9 @@ export async function StudentDashboard({
           </p>
         </section>
       ) : selectedGroup ? (
-        <section className="mx-auto grid w-full max-w-none gap-0 xl:-my-6 xl:-mr-8 xl:min-h-[calc(100vh-4.5rem)] xl:grid-cols-[minmax(0,1fr)_18.5rem]">
-          <div className="grid gap-6 py-2 xl:py-6 xl:pr-8">
-            <div className="space-y-3">
-              <p className="text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-                {copy.subjectEyebrow}
-              </p>
+        <section className="mx-auto grid w-full max-w-none gap-0 xl:-my-4 xl:-mr-8 xl:min-h-[calc(100vh-3.25rem)] xl:grid-cols-[minmax(0,1fr)_18.5rem]">
+          <div className="grid gap-4 py-1 xl:py-4 xl:pr-8">
+            <div className="space-y-1">
               <h1 className="font-[family-name:var(--font-heading)] text-4xl leading-tight">
                 {selectedGroup.subjectTag}
               </h1>
@@ -347,7 +341,7 @@ export async function StudentDashboard({
           })}
         </section>
       ) : (
-        <section className="mx-auto grid w-full max-w-5xl gap-8 py-2">
+        <section className="mx-auto grid w-full max-w-5xl gap-8 py-1">
           <div className="space-y-3">
             <p className="text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
               {copy.homeworkEyebrow}

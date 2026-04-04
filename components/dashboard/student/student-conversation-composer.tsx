@@ -70,29 +70,30 @@ export function StudentConversationComposer({
   const copy = getStudentConversationComposerCopy(languageCode);
 
   return (
-    <div className="rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-4">
+    <div className="rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-3">
       <textarea
-        className="min-h-28 w-full resize-none bg-transparent px-2 pt-2 text-sm leading-7 outline-none placeholder:text-[color:var(--ink-soft)]"
+        className="min-h-14 w-full resize-none bg-transparent px-1.5 pt-1 text-sm leading-6 outline-none placeholder:text-[color:var(--ink-soft)]"
         disabled={disabled || isSending}
         onChange={(event) => onComposerTextChange(event.target.value)}
         placeholder={copy.placeholder}
         value={composerText}
       />
 
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-3 px-1 py-0.5">
         <div className="flex items-center gap-2">
           <button
             aria-label={copy.addAttachment}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] text-[color:var(--foreground)] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] disabled:cursor-not-allowed disabled:opacity-60"
             disabled={disabled || isSending}
             onClick={onUploadAttachments}
+            title={copy.addAttachment}
             type="button"
           >
             <PlusIcon />
           </button>
           <button
             aria-label={copy.voice}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] text-[color:var(--ink-soft)]"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)]"
             disabled
             title={copy.voice}
             type="button"
@@ -103,7 +104,7 @@ export function StudentConversationComposer({
 
         <button
           aria-label={isSending ? copy.sending : copy.send}
-          className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[color:var(--foreground)] text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--foreground)] text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
           disabled={disabled || isSending || composerText.trim().length === 0}
           onClick={onSendMessage}
           type="button"

@@ -650,28 +650,28 @@ export function getStudentChatThreadCopy(languageCode: UiLanguageCode) {
 
 export function getStudentConversationComposerCopy(languageCode: UiLanguageCode) {
   return pickLocalizedValue(languageCode, {
-    fr: {
-      addAttachment: "Ajouter une pièce",
-      voice: "Saisie vocale plus tard",
-      placeholder:
-        "Explique où tu bloques, ce que tu as déjà essayé, ou l'étape que tu veux clarifier.",
-      sending: "Envoi...",
-      send: "Envoyer",
-    },
-    en: {
-      addAttachment: "Add attachment",
-      voice: "Voice input coming later",
-      placeholder:
-        "Explain where you're stuck, what you've already tried, or the step you want to clarify.",
-      sending: "Sending...",
-      send: "Send",
-    },
-    zh: {
-      addAttachment: "加入附件",
-      voice: "語音輸入之後再加入",
-      placeholder: "說明你卡住的地方、已經試過什麼，或你想釐清的步驟。",
-      sending: "傳送中...",
-      send: "送出",
+      fr: {
+        addAttachment: "Ajouter une pièce",
+        voice: "Saisie vocale bientôt !",
+        placeholder:
+          "Explique où tu bloques, ce que tu as déjà essayé, ou l'étape que tu veux clarifier.",
+        sending: "Envoi...",
+        send: "Envoyer",
+      },
+      en: {
+        addAttachment: "Add attachment",
+        voice: "Voice input coming soon!",
+        placeholder:
+          "Explain where you're stuck, what you've already tried, or the step you want to clarify.",
+        sending: "Sending...",
+        send: "Send",
+      },
+      zh: {
+        addAttachment: "加入附件",
+        voice: "語音輸入即將推出！",
+        placeholder: "說明你卡住的地方、已經試過什麼，或你想釐清的步驟。",
+        sending: "傳送中...",
+        send: "送出",
     },
   });
 }

@@ -106,9 +106,9 @@ export function ThemeToggle({
     >
       <span className="sr-only">{ariaLabel}</span>
       {isDarkLikeThemeMode(theme) ? (
-        <SunIcon className="h-5 w-5" />
+        <SunIcon className={variant === "minimal" ? "h-4 w-4" : "h-5 w-5"} />
       ) : (
-        <MoonIcon className="h-5 w-5" />
+        <MoonIcon className={variant === "minimal" ? "h-4 w-4" : "h-5 w-5"} />
       )}
     </button>
   );
