@@ -16,27 +16,18 @@ function getFirstHomeworkCopy(languageCode: UiLanguageCode) {
   switch (languageCode) {
     case "en":
       return {
-        subjectLabel: "Subject",
-        subjectPlaceholder: "Choose a subject",
         customSubjectLabel: "Other subject",
         customSubjectPlaceholder: "Type the subject name",
-        subjectRequired: "Pick a subject before starting the first chat.",
       };
     case "zh":
       return {
-        subjectLabel: "科目",
-        subjectPlaceholder: "選擇科目",
         customSubjectLabel: "其他科目",
         customSubjectPlaceholder: "輸入科目名稱",
-        subjectRequired: "開始第一段對話前，請先選擇科目。",
       };
     default:
       return {
-        subjectLabel: "Matière",
-        subjectPlaceholder: "Choisir une matière",
         customSubjectLabel: "Autre matière",
         customSubjectPlaceholder: "Écrire le nom de la matière",
-        subjectRequired: "Choisis d'abord une matière avant de lancer la première discussion.",
       };
   }
 }
@@ -60,37 +51,38 @@ export function StudentFirstHomeworkLauncher({
 
   return (
     <div className="grid gap-4 rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-6 py-6">
-      <div className="grid gap-3 sm:max-w-xs">
-        <label className="grid gap-2 text-sm text-[color:var(--ink-soft)]">
-          <span>{copy.subjectLabel}</span>
-          <select
-            className="min-h-11 rounded-[1rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 text-sm text-[color:var(--foreground)] outline-none transition focus:border-[color:var(--accent)]"
-            onChange={(event) => setSelectedSubject(event.target.value)}
-            value={selectedSubject}
-          >
-            <option disabled value="">
-              {copy.subjectPlaceholder}
-            </option>
-            {subjectOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
+      <div className="flex flex-wrap gap-2">
+        {subjectOptions.map((option) => {
+          const isActive = selectedSubject === option.value;
 
-        {selectedSubject === "autre" ? (
-          <label className="grid gap-2 text-sm text-[color:var(--ink-soft)]">
-            <span>{copy.customSubjectLabel}</span>
-            <input
-              className="min-h-11 rounded-[1rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 text-sm text-[color:var(--foreground)] outline-none transition placeholder:text-[color:var(--ink-muted)] focus:border-[color:var(--accent)]"
-              onChange={(event) => setCustomSubject(event.target.value)}
-              placeholder={copy.customSubjectPlaceholder}
-              value={customSubject}
-            />
-          </label>
-        ) : null}
+          return (
+            <button
+              className={
+                isActive
+                  ? "inline-flex min-h-11 items-center justify-center rounded-full bg-[color:var(--foreground)] px-4 text-sm font-medium text-[color:var(--background)] transition"
+                  : "inline-flex min-h-11 items-center justify-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 text-sm text-[color:var(--foreground)] transition hover:border-[color:var(--accent)] hover:text-[color:var(--accent)]"
+              }
+              key={option.value}
+              onClick={() => setSelectedSubject(option.value)}
+              type="button"
+            >
+              {option.label}
+            </button>
+          );
+        })}
       </div>
+
+      {selectedSubject === "autre" ? (
+        <label className="grid gap-2 text-sm text-[color:var(--ink-soft)] sm:max-w-xs">
+          <span>{copy.customSubjectLabel}</span>
+          <input
+            className="min-h-11 rounded-[1rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 text-sm text-[color:var(--foreground)] outline-none transition placeholder:text-[color:var(--ink-muted)] focus:border-[color:var(--accent)]"
+            onChange={(event) => setCustomSubject(event.target.value)}
+            placeholder={copy.customSubjectPlaceholder}
+            value={customSubject}
+          />
+        </label>
+      ) : null}
 
       {resolvedSubjectTag ? (
         <StudentSubjectQuickStart
@@ -98,11 +90,7 @@ export function StudentFirstHomeworkLauncher({
           languageCode={languageCode}
           subjectTag={resolvedSubjectTag}
         />
-      ) : (
-        <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-          {copy.subjectRequired}
-        </p>
-      )}
+      ) : null}
     </div>
   );
 }

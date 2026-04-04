@@ -29,12 +29,12 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
     case "en":
       return {
         homeworkEyebrow: "Homework",
-        homeworkTitle: "Pick a subject, continue a discussion, or start a fresh one.",
+        homeworkTitle: "Start where your homework already lives.",
         homeworkBody:
-          "Keep your active homework within reach, return to recent conversations, or open a new discussion when you need a fresh start.",
+          "Pick a subject and jump back into the discussion that helps right now.",
         noSubjectTitle: "No homework yet",
         noSubjectBody:
-          "Choose the first subject here, ask the question in your own words, and the sidebar will grow around the subjects you actually use.",
+          "Choose the subject here and ask banban for advices. Don't forget to upload any class content or practice material that banban will need to help you!",
         recentTitle: "Recent homework chats",
         open: "Open",
         active: "Continue",
@@ -50,12 +50,12 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
     case "zh":
       return {
         homeworkEyebrow: "作業",
-        homeworkTitle: "選擇科目、接續對話，或開始新的作業。",
+        homeworkTitle: "從作業真正所在的地方開始。",
         homeworkBody:
-          "把正在進行的作業放在手邊，回到最近的對話，或在需要時開始新的討論。",
+          "選一個科目，直接回到現在最需要的那段討論。",
         noSubjectTitle: "還沒有作業",
         noSubjectBody:
-          "先在這裡選第一個科目，再用自己的話輸入問題，之後側邊欄就會依照你實際使用的科目慢慢長出來。",
+          "先在這裡選擇科目，再向 banban 詢問建議。別忘了上傳 banban 需要的課堂內容或練習資料，才能更好地幫助你！",
         recentTitle: "最近作業對話",
         open: "打開",
         active: "續接",
@@ -71,12 +71,12 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
     default:
       return {
         homeworkEyebrow: "Devoirs",
-        homeworkTitle: "Choisir une matière, reprendre une discussion, ou en lancer une nouvelle.",
+        homeworkTitle: "Commence là où vivent déjà tes devoirs.",
         homeworkBody:
-          "Garde les devoirs actifs à portée de main, reprends les discussions récentes, ou relance un nouveau départ quand il le faut.",
+          "Choisis une matière et replonge directement dans la discussion utile du moment.",
         noSubjectTitle: "Aucun devoir pour l'instant",
         noSubjectBody:
-          "Choisis ici la première matière, écris la question avec tes mots, puis la barre latérale se construira autour des matières réellement utilisées.",
+          "Choisis la matière ici et demande conseil à banban. N'oublie pas d'ajouter les supports de cours ou les exercices dont banban aura besoin pour t'aider !",
         recentTitle: "Discussions récentes",
         open: "Ouvrir",
         active: "Reprendre",
