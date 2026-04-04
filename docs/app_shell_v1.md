@@ -60,7 +60,7 @@ Current routes using it:
 
 - `/app`
 - `/app/history`
-- `/app/new`
+- `/app/new` (compatibility redirect into `/app?view=homework`)
 - `/app/conversations/[conversationId]`
 - `/app/settings`
 - `/app/students/[studentUserId]`
@@ -113,7 +113,7 @@ Rule:
 The authenticated shell now mixes stable sub-routes with a few local anchors:
 
 - student workflow routes:
-  - `/app/new`
+  - `/app/new` compatibility redirect
   - `/app/history`
   - `/app/conversations/[conversationId]`
   - `/app/settings`
@@ -165,4 +165,4 @@ Scope boundary:
 - validate the shell on actual iPad Safari during `A7.1`
 - add role-specific empty states that consume real data rather than static MVP guidance copy
 - validate the new parent-specific shell rhythm in real walkthroughs so the learner rail, billing dock, and grouped activity panels stay calmer than the generic shared-sidebar pattern they replaced
-- decide later whether the student shell should keep subject filters only, whether the older `/app/new` fallback can disappear, and whether conversation creation can become even more implicit than the current shell-first quick-start
+- decide later whether the student shell should keep subject filters only, whether the hidden legacy intake code behind the `/app/new` redirect should be repurposed or removed, and whether conversation creation can become even more implicit than the current shell-first quick-start

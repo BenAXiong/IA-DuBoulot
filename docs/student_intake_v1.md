@@ -4,11 +4,11 @@ Related: [README](../README.md) | [MVP to-do list](mvp_todo.md) | [Student dashb
 
 ## Purpose
 
-Describe the current student intake boundary so future sessions know what still lives on `/app/new`, what already moved into the faster subject quick-start, and where persistence starts.
+Describe the current student intake boundary so future sessions know what moved into the faster subject quick-start, what the retired `/app/new` route now redirects to, and where persistence starts.
 
 ## Scope
 
-This document covers `A3.2.1` to `A3.2.4`, plus the later student-shell adjustment that demoted `/app/new` behind the faster subject quick-start:
+This document covers `A3.2.1` to `A3.2.4`, plus the later student-shell adjustments that first demoted and then retired `/app/new` from the visible learner journey:
 
 - subject entry
 - image, screenshot, and PDF staging from the browser
@@ -16,33 +16,26 @@ This document covers `A3.2.1` to `A3.2.4`, plus the later student-shell adjustme
 - graded-homework toggle
 - extracted-text review and manual edit panel
 - student-facing "open chat" entry copy over the existing persisted-session bootstrap
-- the remaining legacy `/app/new` fallback after the newer subject-level direct chat start
+- the retired richer intake path that no longer owns a student-facing route
 
 ## Source Files
 
-- Entry page: `app/app/new/page.tsx`
-- Entry wrapper: `components/dashboard/student/new-homework-entry.tsx`
-- Intake form: `components/dashboard/student/new-homework-intake-form.tsx`
-- File list: `components/dashboard/student/intake-file-list.tsx`
+- Compatibility redirect page: `app/app/new/page.tsx`
 - Client-side intake config: `lib/intake/intake-config.ts`
 - Student flow localization copy: `lib/i18n/student-flow-copy.ts`
 
 ## Current Behavior
 
-The route is real and protected, but it is no longer the primary student entry point for normal homework chats.
+The route still exists for compatibility, but it is no longer a real student destination.
 
 What works now:
 
 - the main subject quick-start on `/app?view=homework&subject=...` now creates a bare conversation shell, optionally uploads staged files, sends the learner's first real message through the normal message route, and only then opens `/app/conversations/[conversationId]`
 - the direct subject quick-start now uses the learner's actual typed text as the first visible student message, instead of persisting the older machine-written intake summary
 - the `+` control inside the subject quick-start now opens a real file picker and stages files before the chat starts
-- `/app/new` still checks student access and start-state gating through the existing dashboard snapshot
-- `/app/new` still lets the student enter or reuse a subject, including a subject prefilled from the student shell quick-start or a fallback route link
-- `/app/new` still supports browser file staging, pasted-text input, the graded-homework toggle, and the editable source-text review panel
-- the validated `/app/new` fallback still creates a conversation draft, uploads the selected files through the signed upload flow, confirms them, runs extraction, syncs extracted text back into the workspace, and then redirects into the persisted session page
+- `/app/new` now redirects straight into `/app?view=homework`, preserving `subject` and `draft` query params so older links still land in the current subject launcher
 - if provider extraction fails during confirmation, the attachment is kept, marked `failed`, and returned with a manual-review warning instead of breaking the student flow
-- the intake route copy, subject labels, staged-file labels, client upload fallbacks, and provisional extraction draft now localize through `lib/i18n/student-flow-copy.ts` plus the localized helpers inside `lib/intake/intake-config.ts`
-- the server-owned intake validations, upload validation errors, extraction warnings, and extracted-text source labels now also localize from the student's `preferred_ui_language`, so the route no longer drops back to mixed English or French when the server rejects or repairs part of the flow
+- the direct subject quick-start now owns the visible student start flow, while any older richer intake code is no longer presented as part of the product path
 
 What does not happen yet:
 
@@ -78,15 +71,15 @@ This means the review/edit surface can already be designed and tested before the
 
 ## Relationship To A3.3
 
-`A3.2` still defines the richer intake fallback and source-review surface.
+`A3.2` still defines the historical richer intake and source-review contract.
 `A3.3` still defines how either student entry path becomes a reusable session.
 
 Current UX compromise:
 
 - the student now sees a subject-level chat box first, not an explicit session-creation ritual
 - under the hood, the quick-start still persists the conversation before the chat opens
-- `/app/new` remains available as a quieter fallback for the richer intake path rather than the default learner journey
-- the graded toggle and extracted-text review flow are still tied to `/app/new` while the main subject quick-start stays chat-first
+- `/app/new` no longer acts as a learner destination; old links collapse into the homework dashboard instead
+- any future richer source-review surface will need a new home inside the homework dashboard or live chat rather than reviving `/app/new` as a visible route
 
 That split is intentional for now because it improves the learner-facing tone without forcing a full upload-plus-first-message backend rewrite in the same slice.
 
@@ -95,4 +88,4 @@ That split is intentional for now because it improves the learner-facing tone wi
 - tighten the upload limits and metadata capture to match [Storage and attachment rules](storage_attachment_rules.md)
 - add a local non-provider extraction fallback or retry path if provider extraction failures stay common
 - move long-running extraction or retry work into a queued path if synchronous confirmation becomes too slow
-- decide later whether `/app/new` should disappear completely once the subject quick-start can cover richer source-review needs without a fallback route
+- decide later whether the retired richer intake code should be repurposed into a new in-flow source-review surface or removed completely once the chat-first launcher proves sufficient

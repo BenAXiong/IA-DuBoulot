@@ -25,7 +25,7 @@ Revisit PWA only after:
 
 Keep in the launch candidate:
 
-- student web flow from `/app/new` through upload, coaching, completion, history, and memory refresh
+- student web flow from `/app` homework launch through upload, coaching, completion, history, and memory refresh
 - parent, tutor, and admin visibility with documented role separation
 - Lemon Squeezy checkout, portal, and webhook wiring
 - privacy/settings, deletion-request queueing, and audit visibility

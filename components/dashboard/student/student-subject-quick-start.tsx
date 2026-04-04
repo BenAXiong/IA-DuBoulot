@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   INTAKE_ACCEPT_ATTR,
@@ -11,6 +11,7 @@ import { uploadConversationFiles } from "@/lib/uploads/client-upload";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 
 type StudentSubjectQuickStartProps = {
+  initialDraft?: string | null;
   subjectTag: string;
   languageCode: UiLanguageCode;
 };
@@ -159,16 +160,21 @@ function SendIcon() {
 }
 
 export function StudentSubjectQuickStart({
+  initialDraft = null,
   subjectTag,
   languageCode,
 }: StudentSubjectQuickStartProps) {
   const router = useRouter();
   const copy = getQuickStartCopy(languageCode);
-  const [draft, setDraft] = useState("");
+  const [draft, setDraft] = useState(initialDraft ?? "");
   const [stagedFiles, setStagedFiles] = useState<StagedIntakeFile[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isStarting, setIsStarting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    setDraft(initialDraft ?? "");
+  }, [initialDraft, subjectTag]);
 
   function handleFilePick(event: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files ?? []);

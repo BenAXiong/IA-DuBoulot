@@ -190,13 +190,6 @@ function buildHeaderContent(input: {
     };
   }
 
-  if (input.pathname.startsWith("/app/new")) {
-    return {
-      eyebrow: input.copy.pageTitles.homework,
-      title: input.copy.pageTitles.homework,
-    };
-  }
-
   return {
     eyebrow: input.copy.pageTitles.homework,
     title: input.copy.pageTitles.fallback,
@@ -364,18 +357,10 @@ export function StudentAppShell({
 
           {!sidebarCollapsed ? (
             <div className="grid gap-2 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-3 py-3">
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--ink-muted)]">
                   {copy.homework}
                 </p>
-                <Link
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[color:var(--line)] bg-white text-base"
-                  href="/app/new"
-                  onClick={() => setSidebarOpen(false)}
-                  title={copy.addSubject}
-                >
-                  +
-                </Link>
               </div>
 
               {subjectGroups.length === 0 ? (

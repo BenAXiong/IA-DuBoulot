@@ -106,7 +106,7 @@ Use this when demonstrating the deployed app, even after the automated pass is g
 ### Student Manual Pass
 
 - sign in as a student on the deployed app
-- create a new homework from `/app/new`
+- open `/app`, choose a subject, and start a homework from the subject quick-start
 - upload or paste homework content
 - exchange at least one coaching turn
 - complete the session and confirm the student summary appears
@@ -137,7 +137,7 @@ Use this when demonstrating the deployed app, even after the automated pass is g
 
 These remain required before an external demo even if the regression command passes.
 
-- run `npm run smoke:tablet-emulation` from a local production build as the repeatable tablet pre-pass for `/app`, `/app/new`, and `/app/conversations/[conversationId]`
+- run `npm run smoke:tablet-emulation` from a local production build as the repeatable tablet pre-pass for `/app`, the subject-level homework launcher, and `/app/conversations/[conversationId]`
 - rerun that same command with `SMOKE_UI_LANGUAGE=zh` when the tablet pre-pass needs to validate the translated student-route shell without manually editing the fixture profile first
 - rerun that same command with `SMOKE_THEME_MODE=dark` when a shared theme or shell change needs dark-mode verification on the tablet-critical student routes
 - confirm the deployed environment has the expected AI, Supabase, and Lemon env vars
@@ -158,6 +158,7 @@ These remain required before an external demo even if the regression command pas
 - 2026-03-12 local `SMOKE_UI_LANGUAGE=zh npm run smoke:tablet-emulation`: success on the same student tablet surfaces after a temporary fixture-language flip, with no horizontal overflow and no detected sub-`44x44` controls
 - 2026-03-12 local rerun of both tablet-emulation commands after the student-flow server-text and deterministic-fallback localization pass: success again on `/app`, `/app/new`, and `/app/conversations/[conversationId]`, with no horizontal overflow and no detected sub-`44x44` controls in either the default French or temporary `zh` fixture-language mode
 - 2026-03-12 local `SMOKE_THEME_MODE=dark npm run smoke:tablet-emulation`: success on `/app`, `/app/new`, and `/app/conversations/[conversationId]` after the shared light or dark theme redesign, with no horizontal overflow and no detected sub-`44x44` controls on the checked student tablet surfaces
+- 2026-04-04 local `npm run smoke:tablet-emulation`: route alignment updated successfully to `/app`, the subject-level homework launcher on `/app?view=homework&subject=...`, and `/app/conversations/[conversationId]`, with no horizontal overflow, but the current student shell still exposes several sub-`44x44` tap targets on the sidebar toggle, theme or language controls, subject links, quick-start actions, and live composer actions. Treat that as an open `A7.1.2` layout issue, not as a route-retirement regression.
 - 2026-04-02 local `npm run smoke:adult-oversight`: success after adding the parent-created learner bootstrap path, including parent dashboard learner creation, immediate learner-rail visibility, learner sign-in with the parent-chosen credentials, pending parent-approval visibility, direct dashboard acceptance, tutor-note mutations, and admin audit visibility
 - 2026-04-04 local `npm run smoke:student-flow`: failed again on the existing sample-PDF extraction assertion after the newer student quick-start pass; the harness still drives the older `/app/new` draft-creation flow, the API path still created the draft and completed provider extraction, but the harness rejected a shorter-than-expected extracted-text block (`[Source : fractions-partage.pdf]` plus one line of body text). This still looks like smoke-harness or corpus drift rather than a student-chat regression, but the automated student smoke now also needs to be expanded so it covers the new subject quick-start path before the next full demo-regression run.
 - latest observed non-blocking warnings: provider-backed extraction, coach reply, student summary, or memory refresh may fall back to the documented deterministic path; optional adult summary variants can also be missing in some student-flow runs without breaking the student contract

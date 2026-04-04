@@ -72,7 +72,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 - Date: `2026-03-11`
 - Method: repeatable Playwright tablet-emulation smoke via `scripts/smoke-tablet-emulation.mjs`
 - Widths checked: `820x1180` portrait and `1180x820` landscape
-- Routes checked: `/app`, `/app/new`, and `/app/conversations/[conversationId]`
+- Routes checked: `/app`, the subject-level homework launcher on `/app?view=homework&subject=...`, and `/app/conversations/[conversationId]`
 - Result: no horizontal overflow detected, no sub-`44x44` controls detected on the checked student surfaces, and the transcript surface plus workspace save control remained reachable at both widths
 
 ## Next Extension Points

@@ -471,7 +471,7 @@ async function main() {
     const student = buildHttpClient(server.baseUrl, "student");
     await student.signInFixture(FIXTURE.emails.student);
 
-    const studentPageResult = await student.requestText("/app/new", {
+    const studentPageResult = await student.requestText("/app?view=homework", {
       redirect: "manual",
     });
     assert(

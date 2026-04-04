@@ -117,8 +117,8 @@ export function StudentSessionHistoryList({
                 className="inline-flex justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 font-medium transition hover:-translate-y-0.5"
                 href={
                   selectedSubject
-                    ? `/app/new?subject=${encodeURIComponent(selectedSubject)}`
-                    : "/app/new"
+                    ? `/app?view=homework&subject=${encodeURIComponent(selectedSubject)}`
+                    : "/app?view=homework"
                 }
               >
                 {copy.newHomework}

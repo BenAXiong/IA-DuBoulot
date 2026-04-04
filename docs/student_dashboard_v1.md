@@ -14,7 +14,7 @@ This document started with `A3.1.1` to `A3.1.3` and now also records the later s
 - homework-focused home view with recent conversations grouped by subject-tag filters
 - placeholder `Maps` and `Tests` activity slots
 - subject-level quick-start that now opens the live chat directly
-- legacy richer intake fallback at `/app/new`
+- legacy `/app/new` compatibility redirect into the homework dashboard
 - learner-owned profile, adult-link actions, and memory review moved to `/app/settings`
 
 ## Source Files
@@ -24,8 +24,7 @@ This document started with `A3.1.1` to `A3.1.3` and now also records the later s
 - Student dashboard container: `components/dashboard/student-dashboard.tsx`
 - Subject quick start: `components/dashboard/student/student-subject-quick-start.tsx`
 - Student settings support sections: `components/dashboard/student/student-settings-support-sections.tsx`
-- Canonical intake entry route: `app/app/new/page.tsx`
-- Intake entry component: `components/dashboard/student/new-homework-entry.tsx`
+- Compatibility redirect route: `app/app/new/page.tsx`
 - Server snapshot service: `lib/server/student-dashboard/student-dashboard-service.ts`
 - Conversation list service: `lib/server/conversations/conversation-service.ts`
 - Memory service: `lib/server/memory/service.ts`
@@ -58,7 +57,7 @@ The page does not query Supabase directly. The service owns that logic.
 Current rule:
 
 - under-13 students cannot start a new homework flow while `account_status` is `pending_parent_approval` or while no active parent approval is visible yet
-- quota-blocked students stay on the dashboard and `/app/new`, but cannot create a fresh session until the next period or a paying adult subscription restores access
+- quota-blocked students stay on the dashboard, but cannot create a fresh session until the next period or a paying adult subscription restores access
 - suspended and deletion-requested accounts cannot start new homework
 - everyone else is `ready`
 
@@ -92,13 +91,7 @@ Current role:
 - it sends the learner's first real message through the canonical message route
 - it only opens `/app/conversations/[conversationId]` after that first turn is persisted
 
-`/app/new` still remains in the product as a quieter fallback:
-
-- it repeats the current start-state gate
-- it hosts the richer intake form from [Student intake V1](student_intake_v1.md)
-- it still exposes the current graded-homework toggle and source-text review path
-
-This means the student home now behaves more like a chat launcher, while `/app/new` survives only as the richer fallback until Pilot decides whether it is still worth keeping.
+`/app/new` no longer acts as a destination in the product. Old student links now redirect into `/app?view=homework`, preserving optional `subject` and `draft` query params so the learner lands on the current subject launcher instead of the retired intake page.
 
 ## Settings Split
 
@@ -118,7 +111,7 @@ Why:
 ## Known Boundaries
 
 - recent sessions on `/app` are intentionally short and subject-filtered; the canonical long-form list now lives at `/app/history`
-- the student dashboard no longer foregrounds quota or adult-link cards on the home surface, but the same server-owned start-state gate still controls `/app` and `/app/new`
+- the student dashboard no longer foregrounds quota or adult-link cards on the home surface, but the same server-owned start-state gate still controls the homework launcher
 - billing remains a parent-owned workflow surfaced on `/app/settings`
 - under-13 blocking still depends on the existing parent-approval flow documented in [Invitation flows V1](invitation_flows_v1.md)
 - tutor-facing derived insights still belong to the tutor oversight surface; tutors do not receive raw student memory
@@ -132,5 +125,5 @@ Why:
 
 - decide whether subject filters stay lightweight or become canonical subject entities with alias normalization
 - decide whether the current shell-first subject quick-start is "implicit enough" or whether the first learner message should eventually create the conversation in one hidden server step
-- decide whether the richer `/app/new` fallback should survive at all once the chat-first path covers the remaining setup needs
+- decide later whether any richer pre-chat source-review UI should return inside the homework dashboard or remain unnecessary after the `/app/new` retirement
 - replace the placeholder learner avatar with a real pilot-level profile media flow if pilot usage justifies it

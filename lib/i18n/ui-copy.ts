@@ -1173,7 +1173,7 @@ export function getAppShellCopy(languageCode: UiLanguageCode) {
       },
       navigation: {
         student: [
-          { href: "/app/new", label: "Nouveau devoir", hint: "entrée rapide et reprise" },
+          { href: "/app?view=homework", label: "Devoirs", hint: "discussions et reprise" },
           { href: "/app/history", label: "Historique", hint: "sessions et résumés" },
           { href: "/app/settings", label: "Réglages", hint: "profil et confidentialité" },
         ],
@@ -1243,7 +1243,7 @@ export function getAppShellCopy(languageCode: UiLanguageCode) {
       },
       navigation: {
         student: [
-          { href: "/app/new", label: "New homework", hint: "quick entry and resume" },
+          { href: "/app?view=homework", label: "Homework", hint: "discussions and restart" },
           { href: "/app/history", label: "History", hint: "sessions and summaries" },
           { href: "/app/settings", label: "Settings", hint: "profile and privacy" },
         ],
@@ -1313,7 +1313,7 @@ export function getAppShellCopy(languageCode: UiLanguageCode) {
       },
       navigation: {
         student: [
-          { href: "/app/new", label: "新作業", hint: "快速開始與續接" },
+          { href: "/app?view=homework", label: "作業", hint: "討論與續接" },
           { href: "/app/history", label: "歷程", hint: "課程與摘要" },
           { href: "/app/settings", label: "設定", hint: "個人資料與隱私" },
         ],

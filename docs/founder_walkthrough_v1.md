@@ -66,8 +66,8 @@ If the walkthrough needs a real checkout:
 
 - sign in as the fixture student on `/auth`
 - land on `/app` and point out recent sessions, quota state, and the memory panel
-- open `/app/new`
-- create a fresh homework using the sample PDF or pasted text
+- choose a subject from the homework dashboard and start a fresh chat from the subject quick-start
+- add a file in the subject quick-start or the live chat if needed
 - show the extracted-text workspace, the plan area, and one coaching turn
 - complete the session and show the student summary
 

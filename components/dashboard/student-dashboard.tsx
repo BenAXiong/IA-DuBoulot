@@ -18,6 +18,7 @@ import type { ListConversationSummary } from "@/lib/server/conversations/types";
 type StudentDashboardProps = {
   appUser: AppUserRecord;
   context: AuthenticatedUserContext;
+  initialDraft: string | null;
   selectedSubject: string | null;
   view: "homework" | "maps" | "tests";
 };
@@ -186,6 +187,7 @@ function renderSubjectCards(input: {
 export async function StudentDashboard({
   appUser,
   context,
+  initialDraft,
   selectedSubject,
   view,
 }: StudentDashboardProps) {
@@ -198,8 +200,12 @@ export async function StudentDashboard({
   const languageCode = appUser.preferred_ui_language;
   const copy = getStudentHubCopy(languageCode);
   const subjectGroups = buildSubjectGroups(conversations);
-  const selectedGroup =
-    subjectGroups.find((group) => group.subjectTag === selectedSubject) ?? null;
+  const selectedGroup = selectedSubject
+    ? subjectGroups.find((group) => group.subjectTag === selectedSubject) ?? {
+        subjectTag: selectedSubject,
+        conversations: [],
+      }
+    : null;
 
   return (
     <div className="grid gap-8">
@@ -256,6 +262,7 @@ export async function StudentDashboard({
             </div>
 
             <StudentSubjectQuickStart
+              initialDraft={initialDraft}
               languageCode={languageCode}
               subjectTag={selectedGroup.subjectTag}
             />
@@ -309,7 +316,10 @@ export async function StudentDashboard({
                 {copy.noSubjectBody}
               </p>
               <div>
-                <Link className="button-base button-primary" href="/app/new">
+                <Link
+                  className="button-base button-primary"
+                  href="/app?view=homework"
+                >
                   {copy.firstHomework}
                 </Link>
               </div>

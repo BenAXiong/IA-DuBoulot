@@ -145,7 +145,7 @@ The tablet-emulation smoke script currently checks that:
 
 - the seeded fixture student can authenticate through the same Supabase SSR cookie shape the app expects
 - a local production-build `next start` instance is started automatically when no URL override is provided
-- `/app`, `/app/new`, and `/app/conversations/[conversationId]` render in portrait and landscape tablet viewports without horizontal overflow
+- `/app`, the subject-level homework launcher on `/app?view=homework&subject=...`, and `/app/conversations/[conversationId]` render in portrait and landscape tablet viewports without horizontal overflow
 - key student controls stay reachable and the tracked critical controls meet the `44x44` tap-target floor
 - screenshots are written for later review while real iPad Safari remains a separate required manual step
 
@@ -168,7 +168,7 @@ The tablet-emulation smoke script currently checks that:
 - 2026-03-11 local adult-oversight smoke: success against a temporary local `next start` instance across parent, tutor, and admin routes
 - 2026-03-11 local privacy smoke: success against a temporary local `next start` instance for `/app/settings`, linked-child deletion queueing, tutor-link revocation, redirect-to-settings behavior, and write blocking after deletion request
 - 2026-03-11 local billing smoke: success against a temporary local `next start` instance for checkout-config failure handling, signed webhook sync, and parent dashboard billing visibility
-- 2026-03-11 local tablet-emulation smoke: success against a temporary local `next start` instance for `/app`, `/app/new`, and `/app/conversations/[conversationId]`, with no horizontal overflow or detected sub-`44x44` controls on those checked student surfaces
+- 2026-03-11 local tablet-emulation smoke: success against a temporary local `next start` instance for `/app`, the subject-level homework launcher on `/app?view=homework&subject=...`, and `/app/conversations/[conversationId]`, with no horizontal overflow or detected sub-`44x44` controls on those checked student surfaces
 - 2026-03-11 local `npm run regress:mvp`: success across typecheck, lint, build, deterministic fixture reseed, hosted RLS verification, and the full non-device smoke suite
 - 2026-03-11 deployed billing verification: success on `https://ia-du-boulot.vercel.app` with real Lemon test-mode checkout open, completed payment, redirect back to `/app`, parent dashboard subscription visibility, Lemon confirmation email, and Lemon dashboard order logging
 

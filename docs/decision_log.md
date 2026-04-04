@@ -1017,3 +1017,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Remove the redundant role selector from `/onboarding`, keep only the remaining profile-essential fields on that route, and opt the route out of the shared public footer so it reads like a short transitional setup step. Treat the standalone onboarding page as temporary, and log a Pilot follow-up to merge it into sign-up once account creation can safely own role, age-gating, and profile essentials in one flow.
 - Why: This keeps the current auth and minors-approval logic stable while removing an unnecessary extra decision from the user-facing flow. The route becomes shorter immediately without prematurely deleting the fields that still matter for student activation and parent-approval rules.
 - Follow-up: Complete `P2.6` by moving the remaining onboarding fields into sign-up, then remove or repurpose the standalone `/onboarding` route instead of continuing to polish it as a permanent page.
+
+### D-20260404-101 - `/app/new` Is Retired From The Student Journey And Now Redirects Into The Homework Dashboard
+
+- Date: 2026-04-04
+- Status: accepted
+- Related tasks: `P1.3`, `P2.1`, `P2.6`
+- Context: The newer subject quick-start already made `/app/new` structurally obsolete for learners. The visible product flow had become chat-first on `/app`, while `/app/new` still advertised a second start path based on the older richer intake page and its `graded homework` framing.
+- Decision: Retire `/app/new` from the visible student journey. The route now acts only as a compatibility redirect into `/app?view=homework`, preserving `subject` and `draft` query params so older links still land on the current subject-level composer. Update the student dashboard, history CTAs, sidebar affordances, and shared student navigation copy so every visible student start or restart path now routes back through the homework dashboard instead of the retired page.
+- Why: This makes the product honest. Students now have one obvious place to start homework and resume discussions, which matches the current chat-first design direction and removes the last visible CTA paths that still pulled learners toward the older intake ritual.
+- Follow-up: Decide later whether the now-hidden richer intake code should be repurposed into an in-flow source-review surface or deleted entirely once the homework dashboard path proves sufficient.

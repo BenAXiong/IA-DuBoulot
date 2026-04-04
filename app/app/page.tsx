@@ -23,6 +23,7 @@ async function renderRoleDashboard(
   context: AuthenticatedUserContext,
   studentView: "homework" | "maps" | "tests",
   selectedSubject: string | null,
+  initialDraft: string | null,
 ) {
   switch (appUser.role) {
     case "student":
@@ -30,6 +31,7 @@ async function renderRoleDashboard(
         <StudentDashboard
           appUser={appUser}
           context={context}
+          initialDraft={initialDraft}
           selectedSubject={selectedSubject}
           view={studentView}
         />
@@ -88,6 +90,7 @@ export default async function AppHomePage({
   const { context, appUser } = await requireAppPageContext();
   redirectDeletionRequestedAppUser(appUser);
   const resolvedSearchParams = searchParams ? await searchParams : {};
+  const initialDraft = getSearchParam(resolvedSearchParams, "draft");
   const selectedSubject = getSearchParam(resolvedSearchParams, "subject");
   const studentViewParam = getSearchParam(resolvedSearchParams, "view");
   const studentView =
@@ -106,6 +109,7 @@ export default async function AppHomePage({
         context,
         studentView,
         selectedSubject,
+        initialDraft,
       )}
 
       {showAccountSettingsBlock ? (
