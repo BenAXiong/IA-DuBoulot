@@ -83,6 +83,7 @@ Rules:
 - the left student rail no longer shows a divider under the wordmark block; its top strip should visually match the main-pane header height without introducing a second header rule
 - the learner profile dock no longer shows a permanent outlined account section; the dock stays minimal by default, and the profile/settings/sign-out menu stays open while hovered with a short close grace period
 - the student shell top strips are intentionally slimmer than the earlier MVP shell, and the utility/collapse icons should use the same smaller outline-free treatment instead of looking like a second layer of heavy controls
+- the left rail now uses `Dashboard` as the top student entry instead of repeating `Homework`, while the sidebar header itself keeps only the animated `bb` mark and collapse control
 - the parent role now suppresses the generic desktop shell sidebar and instead lets the dashboard own a parent-specific information architecture: account and billing dock, pending parent-approval requests, a learner-creation panel, and linked-learners rail on the left, with grouped weekly and recent activity on the right
 
 ## Role Dashboard Variants
@@ -132,6 +133,7 @@ Why:
 - the subject rail now keeps only subject filters and counters; recent conversation lists stay in the main content area instead of expanding inside the sidebar
 - the profile dock now defaults to a minimal identity row with no outline, while settings and sign-out live in a hover/focus menu above it
 - the student subject view and live conversation surface now both use a true right-side panel treatment instead of floating cards, so the workspace reads like a split main pane rather than a dashboard grid
+- only the live conversation route keeps that right-side panel; the subject-selection view returns to a single main column until a real chat exists
 
 ## iPad Validation
 

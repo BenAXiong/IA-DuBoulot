@@ -67,11 +67,11 @@ The student role no longer inherits the generic authenticated-shell rhythm used 
 
 Current shell behavior:
 
-- left rail owns activity switching and subject-filter navigation
+- left rail owns activity switching and subject-filter navigation, with `Dashboard` as the top student entry
 - `Homework` is the only real student activity today
 - `Maps` and `Tests` are placeholder modes held in the shell so future learning tools can grow without another shell rewrite
 - the bottom profile dock shows placeholder avatar, learner name, and plan label by default; the settings/sign-out actions now open from a hover or focus menu instead of staying permanently visible
-- the top bar is intentionally quiet and keeps only a simple eyebrow-and-title pair plus the language/theme utility controls
+- the top bar is intentionally quiet, slimmer than the earlier MVP chrome, and keeps only a simple eyebrow-and-title pair plus the smaller language/theme utility controls
 
 Current boundary:
 
@@ -121,8 +121,8 @@ Why:
 - under-13 blocking still depends on the existing parent-approval flow documented in [Invitation flows V1](invitation_flows_v1.md)
 - tutor-facing derived insights still belong to the tutor oversight surface; tutors do not receive raw student memory
 - the current student-shell subject folders are not canonical entities; they are the existing conversation tags presented as filters
-- the subject rail itself no longer expands recent chat lists inline; subject-level recent discussions now stay in the main homework canvas, where the student also sees the dedicated right-side panel
-- the subject view itself now keeps a two-pane rhythm: chat-entry and recent-discussion list on the left, right-side sources/meta panel on the other side
+- the subject rail itself no longer expands recent chat lists inline; subject-level recent discussions stay in the main homework canvas
+- the subject view itself now keeps a single main column until a chat is actually started
 - the live conversation route now follows the same split-pane rhythm, with the message stream on the left and the summary/sources/workspace stack living inside the right panel instead of a floating dashboard column
 - the pre-chat subject quick-start keeps the `+` control visually for continuity, but it must stay non-active until the product has a real pre-chat file-staging flow; only the live conversation composer currently owns real upload behavior
 

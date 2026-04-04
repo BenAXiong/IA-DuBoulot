@@ -70,16 +70,16 @@ export function StudentConversationComposer({
   const copy = getStudentConversationComposerCopy(languageCode);
 
   return (
-    <div className="rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-3">
+    <div className="rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-2.5">
       <textarea
-        className="min-h-14 w-full resize-none bg-transparent px-1.5 pt-1 text-sm leading-6 outline-none placeholder:text-[color:var(--ink-soft)]"
+        className="min-h-8 w-full resize-none bg-transparent px-1 py-0.5 text-sm leading-5 outline-none placeholder:text-[color:var(--ink-soft)]"
         disabled={disabled || isSending}
         onChange={(event) => onComposerTextChange(event.target.value)}
         placeholder={copy.placeholder}
         value={composerText}
       />
 
-      <div className="flex items-center justify-between gap-3 px-1 py-0.5">
+      <div className="flex items-center justify-between gap-3 px-0.5 py-0">
         <div className="flex items-center gap-2">
           <button
             aria-label={copy.addAttachment}

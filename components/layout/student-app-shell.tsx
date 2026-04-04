@@ -31,7 +31,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
   switch (languageCode) {
     case "en":
       return {
-        brand: "banban",
+        dashboard: "Dashboard",
         homework: "Homework",
         maps: "Maps",
         tests: "Tests",
@@ -56,7 +56,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
       };
     case "zh":
       return {
-        brand: "banban",
+        dashboard: "總覽",
         homework: "作業",
         maps: "地圖",
         tests: "測驗",
@@ -81,7 +81,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
       };
     default:
       return {
-        brand: "banban",
+        dashboard: "Tableau",
         homework: "Devoirs",
         maps: "Cartes",
         tests: "Tests",
@@ -250,19 +250,6 @@ function TestIcon() {
   );
 }
 
-function MenuIcon() {
-  return (
-    <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
-      <path
-        d="M5 7h14M5 12h14M5 17h14"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="1.8"
-      />
-    </svg>
-  );
-}
-
 function PanelIcon() {
   return (
     <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
@@ -348,13 +335,6 @@ export function StudentAppShell({
           <div className="brand-mark inline-flex h-8 w-8 items-center justify-center rounded-2xl font-[family-name:var(--font-heading)] text-xs font-semibold text-white">
             bb
           </div>
-          {!sidebarCollapsed ? (
-            <div className="min-w-0">
-              <p className="brand-wordmark text-sm text-[color:var(--foreground)]">
-                {copy.brand}
-              </p>
-            </div>
-          ) : null}
         </div>
 
         <button
@@ -379,7 +359,7 @@ export function StudentAppShell({
             onClick={() => setSidebarOpen(false)}
           >
             <HomeIcon />
-            {!sidebarCollapsed ? <span>{copy.homework}</span> : null}
+            {!sidebarCollapsed ? <span>{copy.dashboard}</span> : null}
           </Link>
 
           {!sidebarCollapsed ? (
@@ -560,17 +540,9 @@ export function StudentAppShell({
 
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="sticky top-0 z-20 min-h-[3.25rem] border-b border-[color:var(--line)] bg-[color:var(--background)]/88 px-3 py-0 backdrop-blur sm:px-4">
-            <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4">
-              <div className="flex min-w-0 items-center gap-3">
-                <button
-                  className="theme-toggle theme-toggle--minimal md:hidden"
-                  onClick={() => setSidebarOpen(true)}
-                  type="button"
-                >
-                  <span className="sr-only">Open sidebar</span>
-                  <MenuIcon />
-                </button>
-                <div className="min-w-0">
+            <div className="mx-auto flex min-h-[3.25rem] w-full max-w-7xl items-center justify-between gap-4">
+              <div className="flex min-w-0 items-center">
+                <div className="flex min-w-0 flex-col justify-center">
                   <p className="truncate text-xs uppercase tracking-[0.18em] text-[color:var(--ink-muted)]">
                     {headerContent.eyebrow}
                   </p>

@@ -103,17 +103,17 @@ export function StudentSubjectQuickStart({
 
   return (
     <form
-      className="grid gap-2 rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-3"
+      className="grid gap-1.5 rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-2.5"
       onSubmit={handleSubmit}
     >
       <textarea
-        className="min-h-14 resize-none bg-transparent px-1.5 pt-1 text-sm leading-6 outline-none placeholder:text-[color:var(--ink-soft)]"
+        className="min-h-8 resize-none bg-transparent px-1 py-0.5 text-sm leading-5 outline-none placeholder:text-[color:var(--ink-soft)]"
         onChange={(event) => setDraft(event.target.value)}
         placeholder={copy.placeholder}
         value={draft}
       />
 
-      <div className="flex items-center justify-between gap-3 px-1 py-0.5">
+      <div className="flex items-center justify-between gap-3 px-0.5 py-0">
         <div className="flex items-center gap-2">
           <button
             aria-label={copy.addSources}

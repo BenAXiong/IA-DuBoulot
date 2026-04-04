@@ -45,12 +45,6 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
           "This space is reserved for future quiz practice. Homework remains the main learner experience for now.",
         noSubjectChats: "No discussion has been saved for this subject yet.",
         needsAttention: "Open learner settings",
-        subjectSourcesTitle: "Sources",
-        subjectSourcesBody:
-          "Add PDFs, photos, and screenshots once the discussion opens.",
-        subjectChatsTitle: "Saved chats",
-        subjectCount: (count: number) =>
-          `${count} ${count === 1 ? "saved chat" : "saved chats"}`,
       };
     case "zh":
       return {
@@ -73,10 +67,6 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
           "這裡會保留給未來的測驗練習功能。目前學生的主要體驗仍以作業為主。",
         noSubjectChats: "這個科目目前還沒有已儲存的對話。",
         needsAttention: "打開設定",
-        subjectSourcesTitle: "來源",
-        subjectSourcesBody: "聊天打開後，就可以加入 PDF、照片與截圖。",
-        subjectChatsTitle: "已保存對話",
-        subjectCount: (count: number) => `已儲存 ${count} 段對話`,
       };
     default:
       return {
@@ -99,12 +89,6 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
           "Cet espace est réservé aux futurs quiz. Pour l'instant, l'expérience élève reste centrée sur les devoirs.",
         noSubjectChats: "Aucune discussion enregistrée pour cette matière.",
         needsAttention: "Ouvrir les réglages",
-        subjectSourcesTitle: "Sources",
-        subjectSourcesBody:
-          "Ajoute les PDF, photos et captures une fois la discussion ouverte.",
-        subjectChatsTitle: "Discussions enregistrées",
-        subjectCount: (count: number) =>
-          `${count} ${count === 1 ? "discussion enregistrée" : "discussions enregistrées"}`,
       };
   }
 }
@@ -199,37 +183,6 @@ function renderSubjectCards(input: {
   );
 }
 
-function renderSubjectRightRail(input: {
-  sourcesTitle: string;
-  sourcesBody: string;
-  countTitle: string;
-  countLabel: string;
-}) {
-  return (
-    <aside className="border-l border-[color:var(--line)] bg-[color:var(--surface)] px-5 py-6 xl:min-h-[calc(100vh-4.5rem)]">
-      <div className="grid gap-8">
-        <section className="grid gap-3">
-          <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-            {input.sourcesTitle}
-          </p>
-          <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-            {input.sourcesBody}
-          </p>
-        </section>
-
-        <section className="grid gap-3">
-          <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-            {input.countTitle}
-          </p>
-          <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-            {input.countLabel}
-          </p>
-        </section>
-      </div>
-    </aside>
-  );
-}
-
 export async function StudentDashboard({
   appUser,
   context,
@@ -294,8 +247,8 @@ export async function StudentDashboard({
           </p>
         </section>
       ) : selectedGroup ? (
-        <section className="mx-auto grid w-full max-w-none gap-0 xl:-my-4 xl:-mr-8 xl:min-h-[calc(100vh-3.25rem)] xl:grid-cols-[minmax(0,1fr)_18.5rem]">
-          <div className="grid gap-4 py-1 xl:py-4 xl:pr-8">
+        <section className="mx-auto grid w-full max-w-5xl gap-3 py-0.5">
+          <div className="grid gap-3">
             <div className="space-y-1">
               <h1 className="font-[family-name:var(--font-heading)] text-4xl leading-tight">
                 {selectedGroup.subjectTag}
@@ -332,13 +285,6 @@ export async function StudentDashboard({
               )}
             </section>
           </div>
-
-          {renderSubjectRightRail({
-            sourcesTitle: copy.subjectSourcesTitle,
-            sourcesBody: copy.subjectSourcesBody,
-            countTitle: copy.subjectChatsTitle,
-            countLabel: copy.subjectCount(selectedGroup.conversations.length),
-          })}
         </section>
       ) : (
         <section className="mx-auto grid w-full max-w-5xl gap-8 py-1">
