@@ -1,20 +1,15 @@
 "use client";
 
-import Link from "next/link";
 import { useRef, useState, useTransition } from "react";
 import { INTAKE_ACCEPT_ATTR, stageIntakeFiles } from "@/lib/intake/intake-config";
 import {
   formatDateLabel,
-  getConversationStatusLabel,
 } from "@/components/dashboard/student/student-dashboard-presenters";
 import { StudentAttachmentList } from "@/components/dashboard/student/student-attachment-list";
 import { StudentChatThread } from "@/components/dashboard/student/student-chat-thread";
 import { StudentConversationComposer } from "@/components/dashboard/student/student-conversation-composer";
 import { StudentSessionSummaryPanel } from "@/components/dashboard/student/student-session-summary-panel";
-import {
-  StudentWorkspacePanel,
-  type WorkspaceDraftState,
-} from "@/components/dashboard/student/student-workspace-panel";
+import type { WorkspaceDraftState } from "@/components/dashboard/student/student-workspace-panel";
 import { getStudentWorkbenchCopy } from "@/lib/i18n/student-flow-copy";
 import type { ConversationAttachmentRecord } from "@/lib/server/ai/types";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
@@ -119,12 +114,10 @@ export function StudentConversationWorkbench({
   );
   const [composerText, setComposerText] = useState("");
   const [chatError, setChatError] = useState<string | null>(null);
-  const [workspaceMessage, setWorkspaceMessage] = useState<string | null>(null);
   const [workspaceError, setWorkspaceError] = useState<string | null>(null);
   const [completionMessage, setCompletionMessage] = useState<string | null>(null);
   const [completionError, setCompletionError] = useState<string | null>(null);
   const [isSending, startSending] = useTransition();
-  const [isSaving, startSaving] = useTransition();
   const [isUploading, startUploading] = useTransition();
   const [isCompleting, startCompleting] = useTransition();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -271,31 +264,12 @@ export function StudentConversationWorkbench({
         };
 
         await persistWorkspace(nextWorkspace);
-        setWorkspaceMessage(copy.errors.uploadAdded);
         setWorkspaceError(null);
       } catch (error) {
         setWorkspaceError(
           error instanceof Error
             ? error.message
             : copy.errors.addAttachment,
-        );
-      }
-    });
-  }
-
-  function saveWorkspace() {
-    setWorkspaceError(null);
-    setWorkspaceMessage(null);
-
-    startSaving(async () => {
-      try {
-        await persistWorkspace(workspace);
-        setWorkspaceMessage(copy.errors.workspaceSaved);
-      } catch (error) {
-        setWorkspaceError(
-          error instanceof Error
-            ? error.message
-            : copy.errors.saveWorkspace,
         );
       }
     });
@@ -334,7 +308,6 @@ export function StudentConversationWorkbench({
 
   function retryAttachmentExtraction(attachmentId: string) {
     setWorkspaceError(null);
-    setWorkspaceMessage(null);
 
     startUploading(async () => {
       const response = await fetch("/api/uploads/extract", {
@@ -378,15 +351,14 @@ export function StudentConversationWorkbench({
                 .join("\n\n")
             : currentWorkspace.editedExtractedText,
       }));
-      setWorkspaceMessage(
-        payload.data.warningMessage ??
-          copy.errors.extractionRetried,
+      setWorkspaceError(
+        payload.data.warningMessage ?? copy.errors.extractionRetried,
       );
     });
   }
 
   return (
-    <div className="grid gap-6">
+    <div className="grid gap-4">
       <input
         accept={INTAKE_ACCEPT_ATTR}
         className="hidden"
@@ -397,49 +369,29 @@ export function StudentConversationWorkbench({
       />
 
       <section className="grid gap-0 xl:-my-4 xl:-mr-8 xl:min-h-[calc(100vh-3.25rem)] xl:grid-cols-[minmax(0,1fr)_18.5rem]">
-        <article className="grid gap-4 py-1 xl:py-4 xl:pr-8">
-          <div className="flex flex-col gap-3 border-b border-[color:var(--line)] pb-3 lg:flex-row lg:items-start lg:justify-between">
-            <div className="min-w-0 space-y-2">
+        <article className="flex min-h-0 flex-col gap-3 py-1 xl:py-4 xl:pr-8">
+          <div className="border-b border-[color:var(--line)] pb-3">
+            <div className="min-w-0 space-y-1.5">
               <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--ink-muted)]">
                 {conversation.subject_tag}
               </p>
               <h1 className="truncate font-[family-name:var(--font-heading)] text-3xl leading-tight sm:text-4xl">
                 {conversation.title}
               </h1>
-              <div className="flex flex-wrap gap-3 text-sm text-[color:var(--ink-soft)]">
-                <span>
-                  {getConversationStatusLabel(conversation.status, languageCode)}
-                </span>
-                <span>
-                  {copy.lastActivity(
-                    formatDateLabel(
-                      messages.at(-1)?.created_at ??
-                        conversation.last_message_at ??
-                        conversation.created_at,
-                      languageCode,
-                    ),
-                  )}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-3 lg:justify-end">
-              <Link
-                className="inline-flex min-h-11 items-center justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 font-medium transition hover:-translate-y-0.5"
-                href="/app/history"
-              >
-                {copy.viewHistory}
-              </Link>
-              <Link
-                className="inline-flex min-h-11 items-center justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 font-medium transition hover:-translate-y-0.5"
-                href="/app/new"
-              >
-                {copy.newHomework}
-              </Link>
+              <p className="text-sm text-[color:var(--ink-soft)]">
+                {copy.lastActivity(
+                  formatDateLabel(
+                    messages.at(-1)?.created_at ??
+                      conversation.last_message_at ??
+                      conversation.created_at,
+                    languageCode,
+                  ),
+                )}
+              </p>
             </div>
           </div>
 
-          <div className="xl:min-h-0 xl:flex-1 xl:overflow-y-auto">
+          <div className="min-h-0 flex-1 overflow-y-auto pt-1">
             <StudentChatThread languageCode={languageCode} messages={messages} />
           </div>
 
@@ -456,6 +408,12 @@ export function StudentConversationWorkbench({
           {chatError ? (
             <p className="rounded-[1.25rem] border border-[#d07c5b] bg-[#fff0ea] px-4 py-3 text-sm leading-6 text-[#8d3b1f]">
               {chatError}
+            </p>
+          ) : null}
+
+          {workspaceError ? (
+            <p className="rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-sm leading-6 text-[color:var(--ink-soft)]">
+              {workspaceError}
             </p>
           ) : null}
 
@@ -500,16 +458,6 @@ export function StudentConversationWorkbench({
                 onRetryExtraction={retryAttachmentExtraction}
               />
             </aside>
-
-            <StudentWorkspacePanel
-              disabled={isReadOnly}
-              isSaving={isSaving || isUploading}
-              languageCode={languageCode}
-              onSaveWorkspace={saveWorkspace}
-              onWorkspaceChange={setWorkspace}
-              saveMessage={workspaceError ?? workspaceMessage}
-              workspace={workspace}
-            />
           </div>
         </aside>
       </section>

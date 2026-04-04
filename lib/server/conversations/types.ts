@@ -26,6 +26,13 @@ export type CreateConversationDraftInput = {
   attachmentReferences: DraftAttachmentReferenceInput[];
 };
 
+export type CreateConversationShellInput = {
+  title: string;
+  subjectTag: string;
+  gradedHomework: boolean;
+  attachmentReferences: DraftAttachmentReferenceInput[];
+};
+
 export type ConversationRecord = {
   id: string;
   student_user_id: string;
@@ -118,6 +125,11 @@ export type CreateConversationDraftResult = {
   conversation: ConversationRecord;
   workspace: WorkspaceStateRecord;
   initialMessage: ConversationMessageRecord;
+};
+
+export type CreateConversationShellResult = {
+  conversation: ConversationRecord;
+  workspace: WorkspaceStateRecord;
 };
 
 export type CompleteConversationResult = {

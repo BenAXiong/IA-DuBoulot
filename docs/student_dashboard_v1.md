@@ -13,7 +13,8 @@ This document started with `A3.1.1` to `A3.1.3` and now also records the later s
 - student-owned `/app` shell with a collapsible subject rail
 - homework-focused home view with recent conversations grouped by subject-tag filters
 - placeholder `Maps` and `Tests` activity slots
-- canonical intake entry route at `/app/new`
+- subject-level quick-start that now opens the live chat directly
+- legacy richer intake fallback at `/app/new`
 - learner-owned profile, adult-link actions, and memory review moved to `/app/settings`
 
 ## Source Files
@@ -79,24 +80,25 @@ Current boundary:
 - there is still no canonical learner avatar upload
 - the shell does not yet expose a subject-creation model independent of creating or reopening homework
 
-## Canonical Entry Route
+## Student Entry Model
 
-`/app/new` now exists as the stable entry route for the student intake flow.
+The main learner entry now happens from the subject view itself.
 
 Current role:
 
-- receives the student from the dashboard CTA
-- repeats the current start-state gate
-- hosts the real intake form from [Student intake V1](student_intake_v1.md)
-- hands off into the persisted student workbench once the intake context is validated
+- the subject quick-start on `/app?view=homework&subject=...` creates a bare conversation shell
+- it can stage files before the chat starts
+- it uploads those files to the new conversation
+- it sends the learner's first real message through the canonical message route
+- it only opens `/app/conversations/[conversationId]` after that first turn is persisted
 
-What it does not do yet:
+`/app/new` still remains in the product as a quieter fallback:
 
-- billing and privacy controls now live on `/app/settings` instead of expanding the student dashboard itself
-- learner-owned adult-link actions and memory now also live on `/app/settings`
-- the route still creates the persisted conversation before the student enters the chat, even though the visible copy now reads more like "open chat" than "create session"
+- it repeats the current start-state gate
+- it hosts the richer intake form from [Student intake V1](student_intake_v1.md)
+- it still exposes the current graded-homework toggle and source-text review path
 
-Those belong to later business and privacy phases rather than the dashboard shell itself.
+This means the student home now behaves more like a chat launcher, while `/app/new` survives only as the richer fallback until Pilot decides whether it is still worth keeping.
 
 ## Settings Split
 
@@ -123,11 +125,12 @@ Why:
 - the current student-shell subject folders are not canonical entities; they are the existing conversation tags presented as filters
 - the subject rail itself no longer expands recent chat lists inline; subject-level recent discussions stay in the main homework canvas
 - the subject view itself now keeps a single main column until a chat is actually started
-- the live conversation route now follows the same split-pane rhythm, with the message stream on the left and the summary/sources/workspace stack living inside the right panel instead of a floating dashboard column
-- the pre-chat subject quick-start keeps the `+` control visually for continuity, but it must stay non-active until the product has a real pre-chat file-staging flow; only the live conversation composer currently owns real upload behavior
+- the live conversation route now follows the same split-pane rhythm, with the message stream on the left and a lighter summary/sources rail on the right instead of the earlier heavier dashboard stack
+- the pre-chat subject quick-start now owns real file staging, but it still creates the conversation shell first and only then uploads files plus sends the first message
 
 ## Next Extension Points
 
 - decide whether subject filters stay lightweight or become canonical subject entities with alias normalization
-- decide whether the first learner message should implicitly create the conversation instead of routing through `/app/new`
+- decide whether the current shell-first subject quick-start is "implicit enough" or whether the first learner message should eventually create the conversation in one hidden server step
+- decide whether the richer `/app/new` fallback should survive at all once the chat-first path covers the remaining setup needs
 - replace the placeholder learner avatar with a real pilot-level profile media flow if pilot usage justifies it

@@ -50,6 +50,8 @@ import type {
   ConversationViewer,
   CreateConversationDraftInput,
   CreateConversationDraftResult,
+  CreateConversationShellInput,
+  CreateConversationShellResult,
   DraftAttachmentReferenceInput,
   ListConversationSummary,
   SessionSummaryRecord,
@@ -216,6 +218,69 @@ export async function parseCreateConversationDraftInput(
     gradedHomework: payload.gradedHomework ?? true,
     pastedText,
     editedExtractedText,
+    attachmentReferences,
+  };
+}
+
+export async function parseCreateConversationShellInput(
+  request: Request,
+  languageCode: UiLanguageCode = "fr",
+): Promise<CreateConversationShellInput> {
+  const copy = getStudentConversationServerCopy(languageCode);
+  let body: unknown;
+
+  try {
+    body = await request.json();
+  } catch (error) {
+    throw new AppError({
+      code: "bad_request",
+      message: copy.requestErrors.invalidJson,
+      status: 400,
+      cause: error,
+    });
+  }
+
+  const payload = requireBodyObject(body, languageCode) as Partial<{
+    title: string;
+    subjectTag: string;
+    gradedHomework: boolean;
+    attachmentReferences: DraftAttachmentReferenceInput[];
+  }>;
+
+  const title = payload.title?.trim() ?? "";
+  const subjectTag = payload.subjectTag?.trim() ?? "";
+  const attachmentReferences = validateAttachmentReferences(
+    Array.isArray(payload.attachmentReferences)
+      ? payload.attachmentReferences
+      : [],
+  );
+
+  if (!title || title.length > 120) {
+    throw new AppError({
+      code: "validation_error",
+      message: copy.requestErrors.invalidFields,
+      status: 400,
+      fieldErrors: {
+        title: copy.createDraft.titleInvalid,
+      },
+    });
+  }
+
+  if (!subjectTag || subjectTag.length > 60) {
+    throw new AppError({
+      code: "validation_error",
+      message: copy.requestErrors.invalidFields,
+      status: 400,
+      fieldErrors: {
+        subjectTag: copy.createDraft.subjectInvalid,
+      },
+    });
+  }
+
+  return {
+    title,
+    subjectTag,
+    gradedHomework: payload.gradedHomework ?? false,
     attachmentReferences,
   };
 }
@@ -429,38 +494,35 @@ async function deleteConversationBestEffort(conversationId: string) {
   }
 }
 
-export async function createConversationDraft(input: {
-  context: AuthenticatedUserContext;
-  payload: CreateConversationDraftInput;
-  requestId: string;
-  route: string;
-}): Promise<CreateConversationDraftResult> {
-  const appUser = requireAppUserContext(input.context);
-  requireAppUserRole(appUser, ["student"]);
-  requireActiveAppUser(appUser);
-  await assertStudentUsageActionAllowed({
-    studentUserId: appUser.id,
-    action: "create_conversation",
-    languageCode: appUser.preferred_ui_language,
-  });
-
+async function insertConversationShell(input: {
+  appUser: ReturnType<typeof requireAppUserContext>;
+  payload: {
+    title: string;
+    subjectTag: string;
+    gradedHomework: boolean;
+    assignmentText?: string;
+    editedExtractedText?: string;
+    workspaceNotes?: string | null;
+  };
+}) {
   const supabase = await createSupabaseServerClient();
   const now = new Date().toISOString();
-  const initialWorkspace = buildInitialWorkspaceFromDraft(input.payload);
-  const assignmentText = normalizeText(initialWorkspace.assignmentText);
-  const editedExtractedText = normalizeText(initialWorkspace.editedExtractedText);
+  const assignmentText = normalizeText(input.payload.assignmentText ?? "");
+  const editedExtractedText = normalizeText(
+    input.payload.editedExtractedText ?? "",
+  );
 
   const { data: conversation, error: conversationError } = await supabase
     .from("conversations")
     .insert({
-      student_user_id: appUser.id,
-      created_by_user_id: appUser.id,
+      student_user_id: input.appUser.id,
+      created_by_user_id: input.appUser.id,
       title: input.payload.title,
       subject_tag: input.payload.subjectTag,
       graded_homework: input.payload.gradedHomework,
       assignment_text: assignmentText,
       edited_extracted_text: editedExtractedText,
-      source_language: appUser.preferred_ui_language,
+      source_language: input.appUser.preferred_ui_language,
       last_message_at: now,
     })
     .select(CONVERSATION_SELECT)
@@ -476,11 +538,8 @@ export async function createConversationDraft(input: {
       conversation_id: conversation.id,
       assignment_text: assignmentText,
       edited_extracted_text: editedExtractedText,
-      student_notes: buildWorkspaceNotes(
-        input.payload,
-        appUser.preferred_ui_language,
-      ),
-      last_saved_by_user_id: appUser.id,
+      student_notes: normalizeText(input.payload.workspaceNotes ?? ""),
+      last_saved_by_user_id: input.appUser.id,
     })
     .select(WORKSPACE_SELECT)
     .single<WorkspaceStateRecord>();
@@ -490,10 +549,97 @@ export async function createConversationDraft(input: {
     throw toServiceError("Unable to create the workspace draft.", workspaceError);
   }
 
+  return {
+    conversation,
+    workspace,
+  };
+}
+
+async function recordConversationCreated(input: {
+  appUser: ReturnType<typeof requireAppUserContext>;
+  conversationId: string;
+  attachmentReferenceCount: number;
+  requestId: string;
+  route: string;
+}) {
+  logRuntimeInfo({
+    message: "Created conversation draft",
+    requestId: input.requestId,
+    route: input.route,
+    method: "POST",
+    actorUserId: input.appUser.id,
+    actorRole: input.appUser.role,
+    targetStudentUserId: input.appUser.id,
+    details: {
+      conversationId: input.conversationId,
+      attachmentReferenceCount: input.attachmentReferenceCount,
+    },
+  });
+
+  try {
+    await recordAuditEvent({
+      actorUserId: input.appUser.id,
+      actorRole: input.appUser.role,
+      action: "conversation_create",
+      targetTable: "conversations",
+      targetId: input.conversationId,
+      studentUserId: input.appUser.id,
+      conversationId: input.conversationId,
+      metadata: {
+        request_id: input.requestId,
+        route: input.route,
+        attachment_reference_count: input.attachmentReferenceCount,
+      },
+      requestId: input.requestId,
+    });
+  } catch {
+    // Audit failures should not block the student flow.
+  }
+
+  await recordStudentUsageDeltaBestEffort({
+    studentUserId: input.appUser.id,
+    delta: {
+      sessions: 1,
+    },
+  });
+}
+
+export async function createConversationDraft(input: {
+  context: AuthenticatedUserContext;
+  payload: CreateConversationDraftInput;
+  requestId: string;
+  route: string;
+}): Promise<CreateConversationDraftResult> {
+  const appUser = requireAppUserContext(input.context);
+  requireAppUserRole(appUser, ["student"]);
+  requireActiveAppUser(appUser);
+  await assertStudentUsageActionAllowed({
+    studentUserId: appUser.id,
+    action: "create_conversation",
+    languageCode: appUser.preferred_ui_language,
+  });
+
+  const initialWorkspace = buildInitialWorkspaceFromDraft(input.payload);
+  const shell = await insertConversationShell({
+    appUser,
+    payload: {
+      title: input.payload.title,
+      subjectTag: input.payload.subjectTag,
+      gradedHomework: input.payload.gradedHomework,
+      assignmentText: initialWorkspace.assignmentText,
+      editedExtractedText: initialWorkspace.editedExtractedText,
+      workspaceNotes: buildWorkspaceNotes(
+        input.payload,
+        appUser.preferred_ui_language,
+      ),
+    },
+  });
+
+  const supabase = await createSupabaseServerClient();
   const { data: initialMessage, error: messageError } = await supabase
     .from("messages")
     .insert({
-      conversation_id: conversation.id,
+      conversation_id: shell.conversation.id,
       author_user_id: appUser.id,
       role: "student",
       content_text: buildInitialStudentMessageContent(
@@ -506,56 +652,66 @@ export async function createConversationDraft(input: {
     .single<ConversationMessageRecord>();
 
   if (messageError) {
-    await deleteConversationBestEffort(conversation.id);
+    await deleteConversationBestEffort(shell.conversation.id);
     throw toServiceError("Unable to persist the intake message.", messageError);
   }
 
-  logRuntimeInfo({
-    message: "Created conversation draft",
+  await recordConversationCreated({
+    appUser,
+    conversationId: shell.conversation.id,
+    attachmentReferenceCount: input.payload.attachmentReferences.length,
     requestId: input.requestId,
     route: input.route,
-    method: "POST",
-    actorUserId: appUser.id,
-    actorRole: appUser.role,
-    targetStudentUserId: appUser.id,
-    details: {
-      conversationId: conversation.id,
-      attachmentReferenceCount: input.payload.attachmentReferences.length,
-    },
-  });
-
-  try {
-    await recordAuditEvent({
-      actorUserId: appUser.id,
-      actorRole: appUser.role,
-      action: "conversation_create",
-      targetTable: "conversations",
-      targetId: conversation.id,
-      studentUserId: appUser.id,
-      conversationId: conversation.id,
-      metadata: {
-        request_id: input.requestId,
-        route: input.route,
-        attachment_reference_count: input.payload.attachmentReferences.length,
-      },
-      requestId: input.requestId,
-    });
-  } catch {
-    // Audit failures should not block the student flow.
-  }
-
-  await recordStudentUsageDeltaBestEffort({
-    studentUserId: appUser.id,
-    delta: {
-      sessions: 1,
-    },
   });
 
   return {
-    conversation,
-    workspace,
+    conversation: shell.conversation,
+    workspace: shell.workspace,
     initialMessage,
   };
+}
+
+export async function createConversationShell(input: {
+  context: AuthenticatedUserContext;
+  payload: CreateConversationShellInput;
+  requestId: string;
+  route: string;
+}): Promise<CreateConversationShellResult> {
+  const appUser = requireAppUserContext(input.context);
+  requireAppUserRole(appUser, ["student"]);
+  requireActiveAppUser(appUser);
+  await assertStudentUsageActionAllowed({
+    studentUserId: appUser.id,
+    action: "create_conversation",
+    languageCode: appUser.preferred_ui_language,
+  });
+
+  const shell = await insertConversationShell({
+    appUser,
+    payload: {
+      title: input.payload.title,
+      subjectTag: input.payload.subjectTag,
+      gradedHomework: input.payload.gradedHomework,
+      workspaceNotes: buildWorkspaceNotes(
+        {
+          ...input.payload,
+          pastedText: "",
+          editedExtractedText: "",
+        },
+        appUser.preferred_ui_language,
+      ),
+    },
+  });
+
+  await recordConversationCreated({
+    appUser,
+    conversationId: shell.conversation.id,
+    attachmentReferenceCount: input.payload.attachmentReferences.length,
+    requestId: input.requestId,
+    route: input.route,
+  });
+
+  return shell;
 }
 
 async function requireWritableStudentConversation(input: {

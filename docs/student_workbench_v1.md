@@ -11,9 +11,9 @@ Describe the first real student session workbench so future sessions can extend 
 This document covers `A3.4.1` to `A3.4.4`:
 
 - real transcript rendering on `/app/conversations/[conversationId]`
-- chat-first layout with a secondary sources/notes rail
-- workspace editing and saving during the session
-- hint, summarize, and attachment controls
+- chat-first layout with a secondary sources rail and a lighter completion area
+- the still-persisted workspace data that now sits mostly behind the learner-facing UI
+- attachment controls inside the live composer
 - iPad-width layout validation for the conversation workbench
 
 ## Source Files
@@ -25,7 +25,7 @@ This document covers `A3.4.1` to `A3.4.4`:
 - Thread UI: `components/dashboard/student/student-chat-thread.tsx`
 - Composer UI: `components/dashboard/student/student-conversation-composer.tsx`
 - Attachment UI: `components/dashboard/student/student-attachment-list.tsx`
-- Workspace UI: `components/dashboard/student/student-workspace-panel.tsx`
+- Hidden workspace UI: `components/dashboard/student/student-workspace-panel.tsx`
 - Conversation service: `lib/server/conversations/conversation-service.ts`
 - Upload client helper: `lib/uploads/client-upload.ts`
 - Upload service: `lib/server/uploads/service.ts`
@@ -40,13 +40,13 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 
 1. loads the persisted conversation, messages, and workspace state
 2. loads the persisted attachments and visible summaries
-3. renders the transcript as a real thread instead of a static detail card, and now flattens it into a chat-first conversation surface rather than one bordered message card per turn
+3. renders the transcript as a real thread instead of a static detail card, and now keeps it closer to a minimal chat surface by removing the old role or timestamp line above every learner-visible turn
 4. lets the student send a freeform message, ask for a hint, or request a summary
 5. sends message turns through the Gemini-backed coach flow plus moderation checks before persisting assistant output, and falls back to the older deterministic draft coach if the provider call fails
-6. saves workspace edits through a dedicated server route, but now demotes most of that workspace to a secondary notes rail instead of a primary split-screen panel
-7. uploads attachments through signed upload targets, confirms them, shows their extraction state, lets the student retry failed extraction, and keeps the file plus warning if extraction fails
-8. renders the summary/closure panel that now drives `A3.5`, but with lighter learner-facing wording and a quieter presence in the right rail
-9. localizes the workbench shell, composer, attachment list, workspace panel, and completion panel through `lib/i18n/student-flow-copy.ts`
+6. still keeps the persisted workspace fields and save route under the hood, but no longer foregrounds the old workspace panel in the learner UI
+7. uploads attachments through signed upload targets, confirms them, shows their extraction state inside the right-side sources rail, lets the student retry failed extraction, and keeps the file plus warning if extraction fails
+8. renders a much lighter completion area that keeps explicit completion available without dominating the active chat
+9. localizes the workbench shell, composer, attachment rail, and completion panel through `lib/i18n/student-flow-copy.ts`
 
 ## Interaction Rules
 
@@ -55,6 +55,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 - attachment upload/confirm/extract stays server-owned through `/api/uploads/...` plus private attachment access through `/api/attachments/[attachmentId]/access`
 - only the student owner or an admin can mutate the conversation state
 - moderation outcomes are recorded before blocked or flagged content leaves the server boundary
+- the student-facing shell now assumes the conversation already exists before the live workbench opens; the newer subject quick-start creates that shell and first turn before routing here
 
 ## Important Boundaries
 
@@ -64,7 +65,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 - adult review surfaces now live separately under [Oversight surfaces V1](oversight_surfaces_v1.md); the student workbench remains a student-only mutation surface
 - the core student workbench path now localizes its server-side validation messages, upload warnings, moderation-safe fallback reply, and deterministic coach fallback through `lib/i18n/student-flow-copy.ts`; the remaining language risk near this surface is now mostly the broader accented-French or Unicode audit and any residual generic provider or service fallback strings
 - this redesign still keeps explicit completion as the current backend contract; it does not yet auto-generate summaries on an implicit chat-close event
-- the workbench still uses the persisted workspace fields under the hood, even though the student now sees them as lighter notes rather than a full separate workspace product
+- the workbench still uses the persisted workspace fields under the hood, even though the learner no longer sees that workspace as a full separate product surface
 
 ## Validation Record
 

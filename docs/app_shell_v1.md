@@ -132,6 +132,7 @@ Why:
 - the student shell now treats subjects as filter views over existing `subject_tag` values and sends learner-owned support settings to `/app/settings`, so the main `/app` page can behave more like a chat workspace than a control center
 - the subject rail now keeps only subject filters and counters; recent conversation lists stay in the main content area instead of expanding inside the sidebar
 - the profile dock now defaults to a minimal identity row with no outline, while settings and sign-out live in a hover/focus menu above it
+- the subject quick-start now creates a bare conversation shell, uploads any staged files, sends the learner's first real message, and only then routes into `/app/conversations/[conversationId]`, so the main student view behaves more like a chat launcher than a wizard entry
 - the student subject view and live conversation surface now both use a true right-side panel treatment instead of floating cards, so the workspace reads like a split main pane rather than a dashboard grid
 - only the live conversation route keeps that right-side panel; the subject-selection view returns to a single main column until a real chat exists
 
@@ -163,4 +164,4 @@ Scope boundary:
 - validate the shell on actual iPad Safari during `A7.1`
 - add role-specific empty states that consume real data rather than static MVP guidance copy
 - validate the new parent-specific shell rhythm in real walkthroughs so the learner rail, billing dock, and grouped activity panels stay calmer than the generic shared-sidebar pattern they replaced
-- decide later whether the student shell should keep subject filters only, or graduate to real subject entities and implicit first-message conversation creation
+- decide later whether the student shell should keep subject filters only, whether the older `/app/new` fallback can disappear, and whether conversation creation can become even more implicit than the current shell-first quick-start

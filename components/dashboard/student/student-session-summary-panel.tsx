@@ -41,11 +41,7 @@ export function StudentSessionSummaryPanel({
             label={getConversationStatusLabel(conversation.status, languageCode)}
             tone={isCompleted ? "accent" : "neutral"}
           />
-          {summary ? (
-            <StudentStatusPill
-              label={copy.summaryBadge(summary.language_code)}
-            />
-          ) : null}
+          {summary ? <StudentStatusPill label={copy.summaryBadge(summary.language_code)} /> : null}
         </div>
 
         <div>
@@ -53,19 +49,11 @@ export function StudentSessionSummaryPanel({
             {copy.eyebrow}
           </p>
           <h2 className="mt-2 font-[family-name:var(--font-heading)] text-2xl leading-tight">
-            {isCompleted
-              ? copy.titleCompleted
-              : copy.titleActive}
+            {isCompleted ? copy.titleCompleted : copy.titleActive}
           </h2>
         </div>
-      </div>
 
-      <div className="grid gap-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5 text-sm">
-        <p className="font-medium">{copy.stateTitle}</p>
-        <p className="text-[color:var(--ink-soft)]">
-          {copy.createdOn(formatDateLabel(conversation.created_at, languageCode))}
-        </p>
-        <p className="text-[color:var(--ink-soft)]">
+        <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
           {isCompleted && conversation.completed_at
             ? copy.completedOn(
                 formatDateLabel(conversation.completed_at, languageCode),
@@ -86,7 +74,7 @@ export function StudentSessionSummaryPanel({
 
         {feedbackMessage ? (
           <p
-            className={`rounded-[1.25rem] px-4 py-3 leading-6 ${
+            className={`rounded-[1.25rem] px-4 py-3 text-sm leading-6 ${
               isCompleted
                 ? "border border-[#cbbf8d] bg-[#fff8df] text-[#69551b]"
                 : "border border-[color:var(--line)] bg-white text-[color:var(--ink-soft)]"
@@ -124,13 +112,7 @@ export function StudentSessionSummaryPanel({
             </div>
           ) : null}
         </article>
-      ) : (
-        <article className="rounded-[1.5rem] border border-dashed border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5 text-sm leading-6 text-[color:var(--ink-soft)]">
-          {isCompleted
-            ? copy.pendingAfterComplete
-            : copy.pendingBeforeComplete}
-        </article>
-      )}
+      ) : null}
     </aside>
   );
 }
