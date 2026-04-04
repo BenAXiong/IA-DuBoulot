@@ -88,7 +88,7 @@ export function StudentConversationComposer({
   return (
     <div className="rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-2.5">
       <textarea
-        className="min-h-8 w-full resize-none bg-transparent px-1 py-0.5 text-sm leading-5 outline-none placeholder:text-[color:var(--ink-soft)]"
+        className="min-h-8 w-full resize-none bg-transparent px-1 py-0.5 text-sm leading-5 outline-none placeholder:text-[color:var(--ink-soft)] focus:shadow-none focus-visible:shadow-none"
         disabled={disabled || isSending}
         onChange={(event) => onComposerTextChange(event.target.value)}
         onKeyDown={handleComposerKeyDown}
@@ -100,7 +100,7 @@ export function StudentConversationComposer({
         <div className="flex items-center gap-2">
           <button
             aria-label={copy.addAttachment}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
             disabled={disabled || isSending}
             onClick={onUploadAttachments}
             title={copy.addAttachment}
@@ -110,7 +110,7 @@ export function StudentConversationComposer({
           </button>
           <button
             aria-label={copy.voice}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)]"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] focus:shadow-none focus-visible:shadow-none"
             disabled
             title={copy.voice}
             type="button"
@@ -121,7 +121,7 @@ export function StudentConversationComposer({
 
         <button
           aria-label={isSending ? copy.sending : copy.send}
-          className="inline-flex h-8 w-8 items-center justify-center text-[color:var(--foreground)] transition hover:text-[color:var(--accent)] disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex h-8 w-8 items-center justify-center text-[color:var(--foreground)] transition hover:text-[color:var(--accent)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-40"
           disabled={disabled || isSending || composerText.trim().length === 0}
           onClick={onSendMessage}
           type="button"

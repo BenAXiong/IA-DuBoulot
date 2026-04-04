@@ -36,9 +36,9 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
         forward: "Forward",
         maps: "Maps",
         tests: "Tests",
-        forwardHint: "See what may come next",
-        mapsHint: "Knowledge maps coming soon",
-        testsHint: "Quiz mode coming soon",
+        forwardHint: "Preview what comes next",
+        mapsHint: "Knowledge maps, later",
+        testsHint: "Quiz mode, later",
         addSubject: "Add subject",
         noSubjects: "No subject yet",
         profileSettings: "Profile & settings",
@@ -64,9 +64,9 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
         forward: "Forward",
         maps: "地圖",
         tests: "測驗",
-        forwardHint: "看看接下來可能會學到什麼",
-        mapsHint: "知識地圖即將推出",
-        testsHint: "測驗模式即將推出",
+        forwardHint: "預覽接下來會學什麼",
+        mapsHint: "知識地圖，之後推出",
+        testsHint: "測驗模式，之後推出",
         addSubject: "新增科目",
         noSubjects: "還沒有科目",
         profileSettings: "個人檔案與設定",
@@ -92,9 +92,9 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
         forward: "Forward",
         maps: "Cartes",
         tests: "Tests",
-        forwardHint: "Voir ce qui pourrait venir ensuite",
-        mapsHint: "Cartes de connaissances à venir",
-        testsHint: "Mode quiz à venir",
+        forwardHint: "Voir ce qui vient ensuite",
+        mapsHint: "Cartes, plus tard",
+        testsHint: "Quiz, plus tard",
         addSubject: "Ajouter une matière",
         noSubjects: "Aucune matière pour l'instant",
         profileSettings: "Profil et réglages",
@@ -303,6 +303,20 @@ function PlusIcon() {
   );
 }
 
+function ChevronIcon() {
+  return (
+    <svg aria-hidden="true" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
+      <path
+        d="m9 6 6 6-6 6"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
 export function StudentAppShell({
   children,
   appUser,
@@ -399,15 +413,18 @@ export function StudentAppShell({
           </Link>
 
           {!sidebarCollapsed ? (
-            <div className="group grid gap-2 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-3 py-3">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--ink-muted)]">
-                  {copy.homework}
-                </p>
+            <div className="group grid gap-1">
+              <div className="flex items-center justify-between gap-3 px-3 py-2.5">
+                <div className="flex items-center gap-1.5 text-sm font-medium text-[color:var(--foreground)]">
+                  <span>{copy.homework}</span>
+                  <span className="text-[color:var(--ink-muted)]">
+                    <ChevronIcon />
+                  </span>
+                </div>
                 <Link
                   aria-label={copy.addSubject}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] opacity-0 transition hover:bg-[color:var(--surface)] hover:text-[color:var(--foreground)] group-hover:opacity-100 focus-visible:opacity-100"
-                  href="/app?view=homework&create=1"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] opacity-0 transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)] group-hover:opacity-100 focus-visible:opacity-100"
+                  href="/app?view=homework&newSubject=1"
                   onClick={() => setSidebarOpen(false)}
                   title={copy.addSubject}
                 >
@@ -416,11 +433,11 @@ export function StudentAppShell({
               </div>
 
               {subjectGroups.length === 0 ? (
-                <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
+                <p className="px-3 text-sm leading-6 text-[color:var(--ink-soft)]">
                   {copy.noSubjects}
                 </p>
               ) : (
-                <div className="grid gap-1">
+                <div className="grid gap-1 pl-3">
                   {subjectGroups.map((group) => {
                     const isActive = selectedSubject === group.subjectTag;
 
@@ -428,8 +445,8 @@ export function StudentAppShell({
                       <Link
                         className={`flex items-center justify-between rounded-[1rem] px-3 py-1.5 text-sm transition ${
                           isActive
-                            ? "bg-[color:var(--surface-raised)] text-[color:var(--foreground)]"
-                            : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface)] hover:text-[color:var(--foreground)]"
+                            ? "bg-[color:var(--surface-strong)] text-[color:var(--foreground)]"
+                            : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
                         }`}
                         href={`/app?view=homework&subject=${encodeURIComponent(group.subjectTag)}`}
                         key={group.subjectTag}

@@ -340,7 +340,7 @@ export function StudentSubjectQuickStart({
       />
 
       <textarea
-        className="min-h-6 resize-none bg-transparent px-1 py-0 text-sm leading-5 outline-none placeholder:text-[color:var(--ink-soft)]"
+        className="min-h-6 resize-none bg-transparent px-1 py-0 text-sm leading-5 outline-none placeholder:text-[color:var(--ink-soft)] focus:shadow-none focus-visible:shadow-none"
         onChange={(event) => setDraft(event.target.value)}
         onKeyDown={handleComposerKeyDown}
         placeholder={copy.placeholder}
@@ -351,7 +351,7 @@ export function StudentSubjectQuickStart({
         <div className="flex min-w-0 items-center gap-2">
           <button
             aria-label={copy.addSources}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
             disabled={isStarting}
             onClick={() => fileInputRef.current?.click()}
             title={copy.addSources}
@@ -361,7 +361,7 @@ export function StudentSubjectQuickStart({
           </button>
           <button
             aria-label={copy.voice}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)]"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] focus:shadow-none focus-visible:shadow-none"
             disabled
             title={copy.voice}
             type="button"
@@ -377,7 +377,7 @@ export function StudentSubjectQuickStart({
 
         <button
           aria-label={isStarting ? copy.sending : copy.submit}
-          className="inline-flex h-8 w-8 items-center justify-center text-[color:var(--foreground)] transition hover:text-[color:var(--accent)] disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex h-8 w-8 items-center justify-center text-[color:var(--foreground)] transition hover:text-[color:var(--accent)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-40"
           disabled={isStarting || draft.trim().length === 0}
           type="submit"
         >
