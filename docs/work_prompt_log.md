@@ -22,8 +22,13 @@ It is still a manual repo artifact: it cannot auto-start itself at instance boot
 - Use `A*` task IDs for MVP work and `P*` task IDs for pilot-hardening work when that separate lane is active.
 - Use actual wall-clock start and end times for the prompt; do not infer durations from rough assistant progress messages.
 - Do not merge several prompts into one row unless the exact prompt boundaries are already lost; if that happens, mark the row as approximate in the scope.
+- Create the row immediately when prompt handling starts, with `OPEN` as the temporary end marker, then close that same row before the final response.
 
 ## Format
+
+`YYYY-MM-DD | HH:mm -> OPEN | OPEN | A0.0 P1.0 | short human-readable scope | 90%`
+
+then close it as:
 
 `YYYY-MM-DD | HH:mm -> HH:mm | 0h00 | A0.0 P1.0 | short human-readable scope | 90%`
 

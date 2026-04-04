@@ -74,6 +74,7 @@ If a file above is outdated, update it before or alongside the code change that 
 - If there is no open row, append a new row with the current date, start time, `OPEN` as the end marker, planned task IDs, and a short scope description.
 - If the experimental prompt log is active, append or update the current prompt row in [docs/work_prompt_log.md](docs/work_prompt_log.md) in parallel.
 - Treat the prompt log as a prompt-level trace, not a merged work-slice summary. Short back-and-forth prompts are fine as separate rows as long as the timestamps stay accurate.
+- When the prompt log is active, create or update the prompt row immediately at prompt start with an `OPEN` end marker, then close that same row with the real end time before the final response.
 - Treat the prompt log as a prompt-driven work-slice trace, not a literal row-for-every-fast-back-and-forth transcript. Small clarification bursts that do not create a distinct implementation or audit slice should be folded into the current active row instead of creating misleading micro-rows.
 
 ### 2. Rebuild Context
@@ -137,6 +138,7 @@ Prompt-log timing rule:
 - Use actual wall-clock start and end times for the individual prompt being handled.
 - Do not derive the row duration from rough commentary messages like "worked for X minutes".
 - Do not merge several prompts into one row unless the user explicitly asks for that aggregation or the exact prompt boundaries are already lost and you mark the row as approximate.
+- Prefer logging the prompt row at start with `OPEN` instead of waiting until the end; this avoids losing short prompts entirely.
 
 ### Decisions
 

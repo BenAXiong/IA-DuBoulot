@@ -977,3 +977,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Restore the prompt log to prompt-level granularity. Each handled user prompt should get its own row with actual wall-clock start and end times. Rough commentary messages like "worked for X minutes" remain non-canonical and must never drive the logged timestamps. If prompt boundaries are already lost for an older row, keep the row but mark it as approximate rather than pretending it is exact.
 - Why: The prompt log exists to reconstruct the conversation timeline accurately. Merged slices may be useful for summaries, but they are not acceptable as the canonical prompt-level trace the operator expects.
 - Follow-up: Keep [work_sessions.md](work_sessions.md) as the higher-level execution trace and [work_prompt_log.md](work_prompt_log.md) as the exact per-prompt timing trace. When in doubt, prefer over-logging prompts to merging them.
+
+### D-20260404-97 - Prompt Rows Must Open Immediately At Prompt Start
+
+- Date: 2026-04-04
+- Status: accepted
+- Related tasks: `A0.3.7`
+- Context: Even after restoring per-prompt logging, a prompt can still be missed entirely if the row is only written at the end of the turn. That is exactly what happened with the immediately previous pass: the work was real, but no prompt row was created while the turn was in progress, so there was nothing to close accurately afterward.
+- Decision: When [work_prompt_log.md](work_prompt_log.md) is active, create or update the current prompt row immediately at prompt start with `OPEN` as the temporary end marker. Before the final response, replace `OPEN` with the real end time and computed duration on that same row.
+- Why: This is the only reliable way to prevent missing prompts without inventing timestamps after the fact. It also keeps short prompts accurate instead of forcing retrospective recovery.
+- Follow-up: Use this rule going forward. For older missed prompts whose exact boundaries were never recorded, do not fabricate exact timestamps; either leave them missing or mark any recovery row as approximate.
