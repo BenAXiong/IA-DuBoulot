@@ -24,7 +24,7 @@ This document covers `A3.4.1` to `A3.4.4`:
 - Workbench UI: `components/dashboard/student/student-conversation-workbench.tsx`
 - Thread UI: `components/dashboard/student/student-chat-thread.tsx`
 - Composer UI: `components/dashboard/student/student-conversation-composer.tsx`
-- Attachment UI: `components/dashboard/student/student-attachment-list.tsx`
+- Side rail UI: `components/dashboard/student/student-conversation-side-rail.tsx`
 - Hidden workspace UI: `components/dashboard/student/student-workspace-panel.tsx`
 - Conversation service: `lib/server/conversations/conversation-service.ts`
 - Upload client helper: `lib/uploads/client-upload.ts`
@@ -44,15 +44,16 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 4. lets the student send a freeform message, ask for a hint, or request a summary
 5. sends message turns through the Gemini-backed coach flow plus moderation checks before persisting assistant output, and falls back to the older deterministic draft coach if the provider call fails
 6. still keeps the persisted workspace fields and save route under the hood, but no longer foregrounds the old workspace panel in the learner UI
-7. uploads attachments through signed upload targets, confirms them, shows their extraction state inside the right-side sources rail, lets the student retry failed extraction, and keeps the file plus warning if extraction fails
-8. renders a much lighter completion area that keeps explicit completion available without dominating the active chat
-9. localizes the workbench shell, composer, attachment rail, and completion panel through `lib/i18n/student-flow-copy.ts`
+7. uploads attachments through signed upload targets, confirms them, and keeps the current file list in a minimal right-side rail
+8. lets the student remove an uploaded file directly from that rail, with a confirmation step before the server-owned delete
+9. renders only one explicit completion control at the bottom of the right rail, keeping completion available without the older session-summary card dominating the active chat
+10. localizes the workbench shell, composer, and side rail through `lib/i18n/student-flow-copy.ts`
 
 ## Interaction Rules
 
 - message appends stay server-owned through `POST /api/conversations/[conversationId]/messages`
 - workspace saves stay server-owned through `PATCH /api/conversations/[conversationId]/workspace`
-- attachment upload/confirm/extract stays server-owned through `/api/uploads/...` plus private attachment access through `/api/attachments/[attachmentId]/access`
+- attachment upload/confirm/extract stays server-owned through `/api/uploads/...`, private attachment access stays behind `/api/attachments/[attachmentId]/access`, and attachment removal now stays server-owned through `DELETE /api/attachments/[attachmentId]`
 - only the student owner or an admin can mutate the conversation state
 - moderation outcomes are recorded before blocked or flagged content leaves the server boundary
 - the student-facing shell now assumes the conversation already exists before the live workbench opens; the newer subject quick-start creates that shell and first turn before routing here
@@ -66,6 +67,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 - the core student workbench path now localizes its server-side validation messages, upload warnings, moderation-safe fallback reply, and deterministic coach fallback through `lib/i18n/student-flow-copy.ts`; the remaining language risk near this surface is now mostly the broader accented-French or Unicode audit and any residual generic provider or service fallback strings
 - this redesign still keeps explicit completion as the current backend contract; it does not yet auto-generate summaries on an implicit chat-close event
 - the workbench still uses the persisted workspace fields under the hood, even though the learner no longer sees that workspace as a full separate product surface
+- attachment removal currently deletes the file record plus private storage object, but it does not yet scrub extracted text that may already have been copied into the hidden workspace
 
 ## Validation Record
 

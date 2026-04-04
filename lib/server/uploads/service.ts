@@ -39,6 +39,8 @@ import type {
   ConfirmUploadResult,
   CreateUploadTargetInput,
   CreateUploadTargetResult,
+  DeleteAttachmentInput,
+  DeleteAttachmentResult,
   RetryAttachmentExtractionResult,
 } from "@/lib/server/uploads/types";
 
@@ -409,6 +411,53 @@ async function loadAttachmentForOwner(input: {
 
   return {
     appUser,
+    conversation,
+    attachment: attachment as ConversationAttachmentRecord,
+  };
+}
+
+async function loadAttachmentForOwnerById(input: {
+  context: DeleteAttachmentInput["context"];
+  attachmentId: string;
+}) {
+  const appUser = requireAppUserContext(input.context);
+  const copy = getStudentUploadServerCopy(appUser.preferred_ui_language);
+  requireAppUserRole(appUser, ["student"]);
+  requireActiveAppUser(appUser);
+  const admin = createSupabaseAdminClient();
+  const { data: attachment, error } = await admin
+    .from("attachments")
+    .select(ATTACHMENT_SELECT)
+    .eq("id", input.attachmentId)
+    .maybeSingle();
+
+  if (error) {
+    throw toServiceError("Unable to load the attachment.", error);
+  }
+
+  if (!attachment) {
+    throw new AppError({
+      code: "not_found",
+      message: copy.access.attachmentNotFound,
+      status: 404,
+    });
+  }
+
+  const { appUser: ownerAppUser, conversation } = await requireWritableConversation({
+    context: input.context,
+    conversationId: attachment.conversation_id,
+  });
+
+  if (attachment.uploaded_by_user_id !== ownerAppUser.id) {
+    throw new AppError({
+      code: "forbidden",
+      message: copy.access.attachmentForbidden,
+      status: 403,
+    });
+  }
+
+  return {
+    appUser: ownerAppUser,
     conversation,
     attachment: attachment as ConversationAttachmentRecord,
   };
@@ -845,5 +894,49 @@ export async function createAttachmentAccessUrl(
 
   return {
     signedUrl: signedUrlData.signedUrl,
+  };
+}
+
+export async function deleteAttachment(
+  input: DeleteAttachmentInput,
+): Promise<DeleteAttachmentResult> {
+  const { appUser, conversation, attachment } =
+    await loadAttachmentForOwnerById({
+      context: input.context,
+      attachmentId: input.attachmentId,
+    });
+
+  const admin = createSupabaseAdminClient();
+  await admin.storage
+    .from(attachment.storage_bucket)
+    .remove([attachment.storage_path])
+    .catch(() => null);
+
+  const { error: deleteError } = await admin
+    .from("attachments")
+    .delete()
+    .eq("id", attachment.id);
+
+  if (deleteError) {
+    throw toServiceError("Unable to delete the attachment.", deleteError);
+  }
+
+  logRuntimeInfo({
+    message: "Deleted conversation attachment",
+    requestId: input.requestId,
+    route: input.route,
+    method: "DELETE",
+    actorUserId: appUser.id,
+    actorRole: "student",
+    targetStudentUserId: appUser.id,
+    details: {
+      conversationId: conversation.id,
+      attachmentId: attachment.id,
+    },
+  });
+
+  return {
+    attachmentId: attachment.id,
+    conversationId: conversation.id,
   };
 }

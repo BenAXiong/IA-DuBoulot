@@ -676,33 +676,6 @@ export function getStudentConversationComposerCopy(languageCode: UiLanguageCode)
   });
 }
 
-export function getStudentAttachmentListCopy(languageCode: UiLanguageCode) {
-  return pickLocalizedValue(languageCode, {
-    fr: {
-      empty:
-        "Les pièces jointes confirmées apparaîtront ici avec leur statut d'extraction.",
-      noExtractedText:
-        "Aucun texte exploitable n'a encore été sauvegardé pour cette pièce.",
-      open: "Ouvrir",
-      retryExtraction: "Relancer l'extraction",
-    },
-    en: {
-      empty:
-        "Confirmed attachments will appear here with their extraction status.",
-      noExtractedText:
-        "No usable extracted text has been saved for this attachment yet.",
-      open: "Open",
-      retryExtraction: "Retry extraction",
-    },
-    zh: {
-      empty: "已確認的附件會顯示在這裡，並附上擷取狀態。",
-      noExtractedText: "這份附件目前還沒有可用的擷取文字。",
-      open: "打開",
-      retryExtraction: "重新擷取",
-    },
-  });
-}
-
 export function getStudentWorkspacePanelCopy(languageCode: UiLanguageCode) {
   return pickLocalizedValue(languageCode, {
     fr: {
@@ -770,67 +743,6 @@ export function getStudentWorkspacePanelCopy(languageCode: UiLanguageCode) {
   });
 }
 
-export function getStudentSessionSummaryCopy(languageCode: UiLanguageCode) {
-  return pickLocalizedValue(languageCode, {
-    fr: {
-      summaryBadge: (language: string) => `Résumé ${language.toUpperCase()}`,
-      eyebrow: "Résumé de session",
-      titleCompleted: "La discussion est terminée, mais le résumé reste ici.",
-      titleActive:
-        "Tu peux finir pour aujourd'hui quand la discussion te semble suffisante.",
-      stateTitle: "État courant",
-      createdOn: (dateLabel: string | null) => `Créée le ${dateLabel}`,
-      completedOn: (dateLabel: string | null) => `Terminée le ${dateLabel}`,
-      activeBody:
-        "Le chat reste ouvert tant que tu ne choisis pas de terminer cette session.",
-      completing: "Clôture...",
-      completeSession: "Finir pour aujourd'hui",
-      summaryTitle: "Résumé élève",
-      nextStep: (text: string) => `Prochaine étape : ${text}`,
-      pendingAfterComplete:
-        "Le résumé est en attente. Recharge la page si la clôture vient d'être faite.",
-      pendingBeforeComplete:
-        "Le résumé final apparaîtra ici une fois la session terminée.",
-    },
-    en: {
-      summaryBadge: (language: string) => `Summary ${language.toUpperCase()}`,
-      eyebrow: "Session summary",
-      titleCompleted: "The conversation is closed, but its summary stays here.",
-      titleActive:
-        "You can finish for today once the conversation has taken you far enough.",
-      stateTitle: "Current state",
-      createdOn: (dateLabel: string | null) => `Created on ${dateLabel}`,
-      completedOn: (dateLabel: string | null) => `Completed on ${dateLabel}`,
-      activeBody:
-        "The chat stays open until you decide to wrap up this session.",
-      completing: "Completing...",
-      completeSession: "Finish for today",
-      summaryTitle: "Student summary",
-      nextStep: (text: string) => `Next step: ${text}`,
-      pendingAfterComplete:
-        "The summary is still pending. Reload the page if the completion just happened.",
-      pendingBeforeComplete:
-        "The final summary will appear here once the session is completed.",
-    },
-    zh: {
-      summaryBadge: (language: string) => `摘要 ${language.toUpperCase()}`,
-      eyebrow: "課程摘要",
-      titleCompleted: "這段對話已結束，但摘要會留在這裡。",
-      titleActive: "當你覺得今天的討論已經足夠時，就可以先結束。",
-      stateTitle: "目前狀態",
-      createdOn: (dateLabel: string | null) => `建立於 ${dateLabel}`,
-      completedOn: (dateLabel: string | null) => `完成於 ${dateLabel}`,
-      activeBody: "只要你還沒選擇結束，聊天就會保持開放。",
-      completing: "結束中...",
-      completeSession: "今天先到這裡",
-      summaryTitle: "學生摘要",
-      nextStep: (text: string) => `下一步：${text}`,
-      pendingAfterComplete:
-        "摘要還在準備中。如果你剛完成課程，請重新整理頁面。",
-      pendingBeforeComplete: "課程完成後，最終摘要會顯示在這裡。",
-    },
-  });
-}
 
 export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
   return pickLocalizedValue(languageCode, {
@@ -850,6 +762,7 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
         retryExtraction: "Impossible de relancer l'extraction.",
         extractionRetried:
           "Extraction relancée. Pense à sauvegarder si le texte a changé.",
+        deleteAttachment: "Impossible de retirer cette pièce jointe.",
       },
       graded: "Notée",
       practice: "Exercice libre",
@@ -867,8 +780,13 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       uploadInProgress: "Upload et extraction en cours...",
       readOnly:
         "Cette session est terminée. Le transcript reste lisible, mais les nouvelles écritures passent maintenant par une nouvelle session.",
-      attachmentsEyebrow: "Sources",
-      attachmentsTitle: "Pièces privées et texte récupéré",
+      noFilesUploaded: "Aucun fichier uploadé",
+      removeAttachment: "Retirer",
+      removeAttachmentConfirm:
+        "Retirer ce fichier de cette discussion ?",
+      completeTooltip:
+        "Le chat reste ouvert tant que tu ne choisis pas de terminer cette session.",
+      completeButton: "Devoir terminé !",
     },
     en: {
       errors: {
@@ -885,6 +803,7 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
         retryExtraction: "Unable to retry extraction.",
         extractionRetried:
           "Extraction retried. Save the workspace if the text changed.",
+        deleteAttachment: "Unable to remove this file.",
       },
       graded: "Graded",
       practice: "Open exercise",
@@ -902,8 +821,13 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       uploadInProgress: "Upload and extraction in progress...",
       readOnly:
         "This session is completed. The transcript stays readable, but new writing now belongs in a new session.",
-      attachmentsEyebrow: "Sources",
-      attachmentsTitle: "Private files and recovered text",
+      noFilesUploaded: "No files uploaded",
+      removeAttachment: "Remove",
+      removeAttachmentConfirm:
+        "Remove this file from this conversation?",
+      completeTooltip:
+        "The chat stays open until you decide to wrap up this session.",
+      completeButton: "Homework done!",
     },
     zh: {
       errors: {
@@ -917,6 +841,7 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
         sessionCompleted: "課程已結束，學生摘要現在已固定。",
         retryExtraction: "無法重新執行擷取。",
         extractionRetried: "已重新執行擷取；如果文字有變動，記得再儲存一次。",
+        deleteAttachment: "無法移除這個檔案。",
       },
       graded: "已評分",
       practice: "自由練習",
@@ -933,8 +858,13 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       uploadInProgress: "正在上傳並擷取...",
       readOnly:
         "這個課程已完成。對話紀錄仍可閱讀，但新的書寫內容需要放到新的課程中。",
-      attachmentsEyebrow: "來源",
-      attachmentsTitle: "私人檔案與擷取文字",
+      noFilesUploaded: "尚未上傳檔案",
+      removeAttachment: "移除",
+      removeAttachmentConfirm:
+        "要把這個檔案從這段對話中移除嗎？",
+      completeTooltip:
+        "只要你還沒選擇結束，聊天就會保持開放。",
+      completeButton: "作業完成！",
     },
   });
 }

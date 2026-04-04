@@ -36,6 +36,7 @@ Current implemented routes:
 - `POST /api/uploads/confirm`
 - `POST /api/uploads/extract`
 - `GET /api/attachments/[attachmentId]/access`
+- `DELETE /api/attachments/[attachmentId]`
 
 It exists to prevent accidental drift between:
 
@@ -77,6 +78,7 @@ These routes reserve storage locations, confirm uploaded files, and trigger extr
 | `/api/uploads/confirm` | `POST` | student | mark upload complete and attach to conversation | validates ownership + upload metadata; provider extraction failure now returns a warning plus attachment `failed` instead of a hard route error; repeated confirmation reuses the stored extraction result instead of re-running Gemini |
 | `/api/uploads/extract` | `POST` | server-triggered or student | request text extraction for an attachment | should enqueue or async-trigger later |
 | `/api/attachments/[attachmentId]/access` | `GET` | visible role | mint short-lived read access for an attachment | required because buckets stay private |
+| `/api/attachments/[attachmentId]` | `DELETE` | student owner | remove an uploaded file from an active conversation | deletes the attachment record and storage object; hidden workspace text stays untouched for now |
 
 ### Conversations And Workspace
 
@@ -172,6 +174,7 @@ app/api/auth/parent-approval/request/route.ts
 app/api/auth/parent-approval/confirm/route.ts
 app/api/auth/invitations/accept/route.ts
 app/api/attachments/[attachmentId]/access/route.ts
+app/api/attachments/[attachmentId]/route.ts
 app/api/uploads/create/route.ts
 app/api/uploads/confirm/route.ts
 app/api/uploads/extract/route.ts

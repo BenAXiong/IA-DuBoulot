@@ -1047,3 +1047,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Treat Netlify coding-context and Netlify service tools as explicitly opt-in for this repo. Only call them when the task is genuinely about Netlify deployment, Netlify SDK usage, Netlify functions, or Netlify-managed resources. For normal product, UI, auth, dashboard, or docs work, skip them entirely.
 - Why: The preflight adds no value to the current repo, introduces avoidable tool noise, and confuses the user when it appears in otherwise local implementation work.
 - Follow-up: Keep this override in `AGENTS.md` and prefer repo-specific workflow rules over generic external tool prompts when they conflict with the actual stack in use.
+
+### D-20260404-104 - The Student Conversation Rail Now Owns Only Files Plus Explicit Completion
+
+- Date: 2026-04-04
+- Status: accepted
+- Related tasks: `P1.3`, `P2.1`
+- Context: The refreshed student conversation surface still carried too much of the older pilot-era right rail: a full attachment status section plus a large session-summary card. That conflicted with the newer chat-first product direction and made the live homework discussion feel heavier than the intended learner experience.
+- Decision: Collapse the live student right rail into two things only: a minimal file area at the top and one explicit completion control at the bottom. The file area now shows a grey empty state when nothing is uploaded and shows uploaded files as removable pills when attachments exist. The old learner-facing attachment detail list and session-summary card are retired from the live workbench, and a new `DELETE /api/attachments/[attachmentId]` route now owns student attachment removal.
+- Why: This keeps the conversation route closer to a chat tool instead of a structured pilot dashboard, while still preserving the current backend contract that completion is explicit and attachment storage stays private plus server-owned.
+- Follow-up: If the product later keeps attachment deletion long-term, revisit whether extracted text already copied into the hidden workspace should also be scrubbed when its source attachment is removed.

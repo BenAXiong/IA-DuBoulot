@@ -52,3 +52,15 @@ export type AttachmentAccessInput = {
 export type AttachmentAccessResult = {
   signedUrl: string;
 };
+
+export type DeleteAttachmentInput = {
+  context: AuthenticatedUserContext;
+  requestId: string;
+  route: string;
+  attachmentId: string;
+};
+
+export type DeleteAttachmentResult = {
+  attachmentId: string;
+  conversationId: string;
+};

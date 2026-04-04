@@ -5,19 +5,16 @@ import { INTAKE_ACCEPT_ATTR, stageIntakeFiles } from "@/lib/intake/intake-config
 import {
   formatDateLabel,
 } from "@/components/dashboard/student/student-dashboard-presenters";
-import { StudentAttachmentList } from "@/components/dashboard/student/student-attachment-list";
 import { StudentChatThread } from "@/components/dashboard/student/student-chat-thread";
 import { StudentConversationComposer } from "@/components/dashboard/student/student-conversation-composer";
-import { StudentSessionSummaryPanel } from "@/components/dashboard/student/student-session-summary-panel";
+import { StudentConversationSideRail } from "@/components/dashboard/student/student-conversation-side-rail";
 import type { WorkspaceDraftState } from "@/components/dashboard/student/student-workspace-panel";
 import { getStudentWorkbenchCopy } from "@/lib/i18n/student-flow-copy";
-import type { ConversationAttachmentRecord } from "@/lib/server/ai/types";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type {
   ConversationDetail,
   ConversationMessageRecord,
   ConversationRecord,
-  SessionSummaryRecord,
 } from "@/lib/server/conversations/types";
 import { uploadConversationFiles } from "@/lib/uploads/client-upload";
 
@@ -60,23 +57,7 @@ type CompleteRouteResponse =
       ok: true;
       data: {
         conversation: ConversationRecord;
-        summaries: SessionSummaryRecord[];
-      };
-    }
-  | {
-      ok?: false;
-      error?: {
-        message?: string;
-      };
-    };
-
-type RetryExtractionResponse =
-  | {
-      ok: true;
-      data: {
-        attachment: ConversationAttachmentRecord;
-        extractedTextBlock: string | null;
-        warningMessage: string | null;
+        summaries: ConversationDetail["summaries"];
       };
     }
   | {
@@ -108,22 +89,17 @@ export function StudentConversationWorkbench({
   const [conversation, setConversation] = useState(detail.conversation);
   const [messages, setMessages] = useState(detail.messages);
   const [attachments, setAttachments] = useState(detail.attachments);
-  const [summaries, setSummaries] = useState(detail.summaries);
   const [workspace, setWorkspace] = useState<WorkspaceDraftState>(
     buildInitialWorkspace(detail),
   );
   const [composerText, setComposerText] = useState("");
   const [chatError, setChatError] = useState<string | null>(null);
   const [workspaceError, setWorkspaceError] = useState<string | null>(null);
-  const [completionMessage, setCompletionMessage] = useState<string | null>(null);
-  const [completionError, setCompletionError] = useState<string | null>(null);
   const [isSending, startSending] = useTransition();
   const [isUploading, startUploading] = useTransition();
   const [isCompleting, startCompleting] = useTransition();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const isReadOnly = conversation.status !== "active";
-  const studentSummary =
-    summaries.find((summary) => summary.audience === "student") ?? null;
 
   async function sendMessage(intent: "student_message" | "hint" | "summarize") {
     setChatError(null);
@@ -276,8 +252,7 @@ export function StudentConversationWorkbench({
   }
 
   function completeSession() {
-    setCompletionError(null);
-    setCompletionMessage(null);
+    setWorkspaceError(null);
 
     startCompleting(async () => {
       const response = await fetch(
@@ -294,65 +269,43 @@ export function StudentConversationWorkbench({
         payload && "error" in payload ? payload.error?.message : null;
 
       if (!response.ok || !payload?.ok || !payload.data?.conversation) {
-        setCompletionError(routeErrorMessage ?? copy.errors.completeSession);
+        setWorkspaceError(routeErrorMessage ?? copy.errors.completeSession);
         return;
       }
 
       setConversation(payload.data.conversation);
-      setSummaries(payload.data.summaries ?? []);
-      setCompletionMessage(copy.errors.sessionCompleted);
       setChatError(null);
       setWorkspaceError(null);
     });
   }
 
-  function retryAttachmentExtraction(attachmentId: string) {
+  function removeAttachment(attachmentId: string) {
     setWorkspaceError(null);
 
     startUploading(async () => {
-      const response = await fetch("/api/uploads/extract", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({
-          conversationId: conversation.id,
-          attachmentId,
-        }),
+      const response = await fetch(`/api/attachments/${attachmentId}`, {
+        method: "DELETE",
       });
-      const payload = (await response
-        .json()
-        .catch(() => null)) as RetryExtractionResponse | null;
+      const payload = (await response.json().catch(() => null)) as
+        | {
+            ok?: boolean;
+            error?: {
+              message?: string;
+            };
+          }
+        | null;
       const routeErrorMessage =
         payload && "error" in payload ? payload.error?.message : null;
 
-      if (!response.ok || !payload?.ok || !payload.data?.attachment) {
-        setWorkspaceError(routeErrorMessage ?? copy.errors.retryExtraction);
+      if (!response.ok) {
+        setWorkspaceError(
+          routeErrorMessage ?? copy.errors.deleteAttachment,
+        );
         return;
       }
 
       setAttachments((currentAttachments) =>
-        currentAttachments.map((attachment) =>
-          attachment.id === attachmentId ? payload.data.attachment : attachment,
-        ),
-      );
-      setWorkspace((currentWorkspace) => ({
-        ...currentWorkspace,
-        editedExtractedText:
-          payload.data.extractedTextBlock &&
-          !currentWorkspace.editedExtractedText.includes(
-            payload.data.extractedTextBlock,
-          )
-            ? [
-                currentWorkspace.editedExtractedText.trim(),
-                payload.data.extractedTextBlock,
-              ]
-                .filter(Boolean)
-                .join("\n\n")
-            : currentWorkspace.editedExtractedText,
-      }));
-      setWorkspaceError(
-        payload.data.warningMessage ?? copy.errors.extractionRetried,
+        currentAttachments.filter((attachment) => attachment.id !== attachmentId),
       );
     });
   }
@@ -432,32 +385,14 @@ export function StudentConversationWorkbench({
 
         <aside className="border-l border-[color:var(--line)] bg-[color:var(--surface)] px-5 py-4 xl:min-h-[calc(100vh-3.25rem)]">
           <div className="grid gap-4 xl:sticky xl:top-24 xl:self-start">
-            <StudentSessionSummaryPanel
-              conversation={conversation}
-              feedbackMessage={completionError ?? completionMessage}
+            <StudentConversationSideRail
+              attachments={attachments}
+              disabled={isUploading || isReadOnly}
               isCompleting={isCompleting}
               languageCode={languageCode}
               onComplete={completeSession}
-              summary={studentSummary}
+              onRemoveAttachment={removeAttachment}
             />
-
-            <aside className="grid gap-4 rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-[var(--shadow)]">
-              <div className="space-y-3">
-                <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-                  {copy.attachmentsEyebrow}
-                </p>
-                <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
-                  {copy.attachmentsTitle}
-                </h2>
-              </div>
-
-              <StudentAttachmentList
-                attachments={attachments}
-                disabled={isUploading || isReadOnly}
-                languageCode={languageCode}
-                onRetryExtraction={retryAttachmentExtraction}
-              />
-            </aside>
           </div>
         </aside>
       </section>
