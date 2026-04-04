@@ -21,7 +21,7 @@ type StudentDashboardProps = {
   context: AuthenticatedUserContext;
   initialDraft: string | null;
   selectedSubject: string | null;
-  view: "homework" | "maps" | "tests";
+  view: "homework" | "maps" | "tests" | "forward";
 };
 
 function getStudentHubCopy(languageCode: UiLanguageCode) {
@@ -38,6 +38,9 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         recentTitle: "Recent homework chats",
         open: "Open",
         active: "Continue",
+        forwardTitle: "Forward will live here later.",
+        forwardBody:
+          "This space is reserved for future forward-looking guidance on what may come next and how to prepare for it at a high level.",
         mapsTitle: "Maps will live here later.",
         mapsBody:
           "This space is reserved for future knowledge maps. Homework remains the main learner experience for now.",
@@ -59,6 +62,9 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         recentTitle: "最近作業對話",
         open: "打開",
         active: "續接",
+        forwardTitle: "Forward 功能之後會在這裡。",
+        forwardBody:
+          "這裡會保留給未來的前瞻引導功能，幫學生先看接下來可能會學什麼，以及如何做高層次準備。",
         mapsTitle: "地圖工具之後會在這裡。",
         mapsBody:
           "這裡會保留給未來的知識地圖功能。目前學生的主要體驗仍以作業為主。",
@@ -80,6 +86,9 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         recentTitle: "Discussions récentes",
         open: "Ouvrir",
         active: "Reprendre",
+        forwardTitle: "Forward viendra ici plus tard.",
+        forwardBody:
+          "Cet espace est réservé à une future guidance d'anticipation pour voir ce qui pourrait venir ensuite et comment s'y préparer à grands traits.",
         mapsTitle: "Les cartes viendront ici plus tard.",
         mapsBody:
           "Cet espace est réservé aux futures cartes de connaissances. Pour l'instant, l'expérience élève reste centrée sur les devoirs.",
@@ -226,7 +235,19 @@ export async function StudentDashboard({
         </section>
       ) : null}
 
-      {view === "maps" ? (
+      {view === "forward" ? (
+        <section className="mx-auto grid w-full max-w-4xl gap-4 py-10">
+          <p className="text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
+            {copy.forwardTitle}
+          </p>
+          <h1 className="font-[family-name:var(--font-heading)] text-4xl leading-tight">
+            {copy.forwardTitle}
+          </h1>
+          <p className="max-w-2xl text-sm leading-7 text-[color:var(--ink-soft)]">
+            {copy.forwardBody}
+          </p>
+        </section>
+      ) : view === "maps" ? (
         <section className="mx-auto grid w-full max-w-4xl gap-4 py-10">
           <p className="text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
             {copy.mapsTitle}

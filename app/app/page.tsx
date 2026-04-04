@@ -21,7 +21,7 @@ async function renderRoleDashboard(
   appUser: AppUserRecord,
   email: string | null,
   context: AuthenticatedUserContext,
-  studentView: "homework" | "maps" | "tests",
+  studentView: "homework" | "maps" | "tests" | "forward",
   selectedSubject: string | null,
   initialDraft: string | null,
 ) {
@@ -94,7 +94,9 @@ export default async function AppHomePage({
   const selectedSubject = getSearchParam(resolvedSearchParams, "subject");
   const studentViewParam = getSearchParam(resolvedSearchParams, "view");
   const studentView =
-    studentViewParam === "maps" || studentViewParam === "tests"
+    studentViewParam === "maps" ||
+    studentViewParam === "tests" ||
+    studentViewParam === "forward"
       ? studentViewParam
       : "homework";
   const copy = getAppHomeCopy(appUser.preferred_ui_language);

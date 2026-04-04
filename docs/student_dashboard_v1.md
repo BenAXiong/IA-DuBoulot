@@ -12,6 +12,7 @@ This document started with `A3.1.1` to `A3.1.3` and now also records the later s
 
 - student-owned `/app` shell with a collapsible subject rail
 - homework-focused home view with recent conversations grouped by subject-tag filters
+- placeholder `Forward` activity slot for future "what may come next" guidance
 - placeholder `Maps` and `Tests` activity slots
 - subject-level quick-start that now opens the live chat directly
 - legacy `/app/new` compatibility redirect into the homework dashboard
@@ -70,6 +71,7 @@ Current shell behavior:
 
 - left rail owns activity switching and subject-filter navigation, with `Dashboard` as the top student entry
 - `Homework` is the only real student activity today
+- `Forward` is a placeholder mode for future high-level guidance about what notions may come next
 - `Maps` and `Tests` are placeholder modes held in the shell so future learning tools can grow without another shell rewrite
 - the bottom profile dock shows placeholder avatar, learner name, and plan label by default; the settings/sign-out actions now open from a hover or focus menu instead of staying permanently visible
 - the top bar is intentionally quiet, slimmer than the earlier MVP chrome, and keeps only a simple eyebrow-and-title pair plus the smaller language/theme utility controls
@@ -92,6 +94,7 @@ Current role:
 - it uploads those files to the new conversation
 - it sends the learner's first real message through the canonical message route
 - it only opens `/app/conversations/[conversationId]` after that first turn is persisted
+- both the subject quick-start and the live conversation composer now support `Ctrl+Enter` as a submit shortcut while keeping the visible send affordance icon-only
 
 `/app/new` no longer acts as a destination in the product. Old student links now redirect into `/app?view=homework`, preserving optional `subject` and `draft` query params so the learner lands on the current subject launcher instead of the retired intake page.
 

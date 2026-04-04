@@ -176,6 +176,23 @@ export function StudentSubjectQuickStart({
     setDraft(initialDraft ?? "");
   }, [initialDraft, subjectTag]);
 
+  function handleComposerKeyDown(
+    event: React.KeyboardEvent<HTMLTextAreaElement>,
+  ) {
+    if (event.key !== "Enter" || !event.ctrlKey) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const form = event.currentTarget.form;
+    if (!form || isStarting || draft.trim().length === 0) {
+      return;
+    }
+
+    form.requestSubmit();
+  }
+
   function handleFilePick(event: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files ?? []);
     event.target.value = "";
@@ -306,6 +323,7 @@ export function StudentSubjectQuickStart({
       <textarea
         className="min-h-6 resize-none bg-transparent px-1 py-0 text-sm leading-5 outline-none placeholder:text-[color:var(--ink-soft)]"
         onChange={(event) => setDraft(event.target.value)}
+        onKeyDown={handleComposerKeyDown}
         placeholder={copy.placeholder}
         value={draft}
       />

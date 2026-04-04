@@ -80,6 +80,7 @@ Rules:
 - authenticated app routes may honor the short-lived `ia_ui_lang` cookie as an immediate UI-language override during the refresh triggered by the authenticated language menu, so the visible server-rendered copy can switch before the slower profile write fully completes
 - the authenticated shell should not surface pilot badges, literal route hints, or other implementation-facing framing on the main role dashboards
 - the student role now owns its own chat-first shell rhythm through `components/layout/student-app-shell.tsx`: collapsible left subject rail, minimal top bar, profile dock, and a quieter page canvas than the original generic `/app` chrome
+- the student shell now carries four learner activity entries in the left rail: `Dashboard`, `Forward`, `Maps`, and `Tests`; only `Dashboard` is a real workflow today, while the others remain intentional placeholders until the pilot decides which tools deserve a full product surface
 - the student shell header now uses a simple eyebrow-and-title pattern instead of helper subtitles that describe the interface itself
 - the left student rail no longer shows a divider under the wordmark block; its top strip should visually match the main-pane header height without introducing a second header rule
 - the learner profile dock no longer shows a permanent outlined account section; the dock stays minimal by default, and the profile/settings/sign-out menu stays open while hovered with a short close grace period

@@ -19,7 +19,7 @@ type StudentAppShellProps = {
   conversations: ListConversationSummary[];
 };
 
-type StudentView = "homework" | "maps" | "tests";
+type StudentView = "homework" | "maps" | "tests" | "forward";
 
 type SubjectGroup = {
   subjectTag: string;
@@ -33,8 +33,10 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
       return {
         dashboard: "Dashboard",
         homework: "Homework",
+        forward: "Forward",
         maps: "Maps",
         tests: "Tests",
+        forwardHint: "See what may come next",
         mapsHint: "Knowledge maps coming soon",
         testsHint: "Quiz mode coming soon",
         addSubject: "Add subject",
@@ -46,6 +48,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
         familyPlan: "Family plan",
         pageTitles: {
           homework: "Homework",
+          forward: "Forward",
           maps: "Maps",
           tests: "Tests",
           conversation: "Conversation",
@@ -58,8 +61,10 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
       return {
         dashboard: "總覽",
         homework: "作業",
+        forward: "Forward",
         maps: "地圖",
         tests: "測驗",
+        forwardHint: "看看接下來可能會學到什麼",
         mapsHint: "知識地圖即將推出",
         testsHint: "測驗模式即將推出",
         addSubject: "新增科目",
@@ -71,6 +76,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
         familyPlan: "Family 方案",
         pageTitles: {
           homework: "作業",
+          forward: "Forward",
           maps: "地圖",
           tests: "測驗",
           conversation: "對話",
@@ -83,8 +89,10 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
       return {
         dashboard: "Tableau",
         homework: "Devoirs",
+        forward: "Forward",
         maps: "Cartes",
         tests: "Tests",
+        forwardHint: "Voir ce qui pourrait venir ensuite",
         mapsHint: "Cartes de connaissances à venir",
         testsHint: "Mode quiz à venir",
         addSubject: "Ajouter une matière",
@@ -96,6 +104,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
         familyPlan: "Accès Family",
         pageTitles: {
           homework: "Devoirs",
+          forward: "Forward",
           maps: "Cartes",
           tests: "Tests",
           conversation: "Discussion",
@@ -108,7 +117,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
 }
 
 function readActiveView(value: string | null): StudentView {
-  if (value === "maps" || value === "tests") {
+  if (value === "maps" || value === "tests" || value === "forward") {
     return value;
   }
 
@@ -183,6 +192,13 @@ function buildHeaderContent(input: {
     };
   }
 
+  if (input.view === "forward") {
+    return {
+      eyebrow: input.copy.pageTitles.forward,
+      title: input.copy.pageTitles.forward,
+    };
+  }
+
   if (input.view === "tests") {
     return {
       eyebrow: input.copy.pageTitles.tests,
@@ -234,6 +250,20 @@ function TestIcon() {
     <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
       <path
         d="M8.25 4.75h7.5M10 4.75v4.5l-4.5 7a4.75 4.75 0 0 0 4 7h5a4.75 4.75 0 0 0 4-7l-4.5-7v-4.5"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.7"
+      />
+    </svg>
+  );
+}
+
+function ForwardIcon() {
+  return (
+    <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
+      <path
+        d="M6 12h9.5M12.5 6.5 18 12l-5.5 5.5"
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -394,6 +424,26 @@ export function StudentAppShell({
               )}
             </div>
           ) : null}
+
+          <Link
+            className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
+              activeView === "forward"
+                ? "bg-[color:var(--surface-strong)] text-[color:var(--foreground)]"
+                : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
+            }`}
+            href="/app?view=forward"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <ForwardIcon />
+            {!sidebarCollapsed ? (
+              <div className="min-w-0">
+                <p>{copy.forward}</p>
+                <p className="truncate text-xs text-[color:var(--ink-muted)]">
+                  {copy.forwardHint}
+                </p>
+              </div>
+            ) : null}
+          </Link>
 
           <Link
             className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition ${

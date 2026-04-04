@@ -69,12 +69,29 @@ export function StudentConversationComposer({
 }: StudentConversationComposerProps) {
   const copy = getStudentConversationComposerCopy(languageCode);
 
+  function handleComposerKeyDown(
+    event: React.KeyboardEvent<HTMLTextAreaElement>,
+  ) {
+    if (event.key !== "Enter" || !event.ctrlKey) {
+      return;
+    }
+
+    event.preventDefault();
+
+    if (disabled || isSending || composerText.trim().length === 0) {
+      return;
+    }
+
+    onSendMessage();
+  }
+
   return (
     <div className="rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-2.5">
       <textarea
         className="min-h-8 w-full resize-none bg-transparent px-1 py-0.5 text-sm leading-5 outline-none placeholder:text-[color:var(--ink-soft)]"
         disabled={disabled || isSending}
         onChange={(event) => onComposerTextChange(event.target.value)}
+        onKeyDown={handleComposerKeyDown}
         placeholder={copy.placeholder}
         value={composerText}
       />
