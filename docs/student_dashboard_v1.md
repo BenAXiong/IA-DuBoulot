@@ -22,6 +22,7 @@ This document started with `A3.1.1` to `A3.1.3` and now also records the later s
 - Page shell entry: `app/app/page.tsx`
 - Student shell: `components/layout/student-app-shell.tsx`
 - Student dashboard container: `components/dashboard/student-dashboard.tsx`
+- First-homework launcher: `components/dashboard/student/student-first-homework-launcher.tsx`
 - Subject quick start: `components/dashboard/student/student-subject-quick-start.tsx`
 - Student settings support sections: `components/dashboard/student/student-settings-support-sections.tsx`
 - Compatibility redirect route: `app/app/new/page.tsx`
@@ -85,6 +86,7 @@ The main learner entry now happens from the subject view itself.
 
 Current role:
 
+- when the learner has no existing subject tags yet, the empty homework state now renders a real first-homework launcher with subject selection instead of a self-link back to the same page
 - the subject quick-start on `/app?view=homework&subject=...` creates a bare conversation shell
 - it can stage files before the chat starts
 - it uploads those files to the new conversation
@@ -118,6 +120,7 @@ Why:
 - the current student-shell subject folders are not canonical entities; they are the existing conversation tags presented as filters
 - the subject rail itself no longer expands recent chat lists inline; subject-level recent discussions stay in the main homework canvas
 - the subject view itself now keeps a single main column until a chat is actually started
+- the empty homework state no longer depends on a pre-existing subject tag to become usable; the first conversation can now establish that first subject from inside the dashboard itself
 - the live conversation route now follows the same split-pane rhythm, with the message stream on the left and a lighter summary/sources rail on the right instead of the earlier heavier dashboard stack
 - the pre-chat subject quick-start now owns real file staging, but it still creates the conversation shell first and only then uploads files plus sends the first message
 

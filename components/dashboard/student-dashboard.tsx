@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { StudentFirstHomeworkLauncher } from "@/components/dashboard/student/student-first-homework-launcher";
 import { StudentSubjectQuickStart } from "@/components/dashboard/student/student-subject-quick-start";
 import {
   formatDateLabel,
@@ -33,8 +34,7 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
           "Keep your active homework within reach, return to recent conversations, or open a new discussion when you need a fresh start.",
         noSubjectTitle: "No homework yet",
         noSubjectBody:
-          "Start the first discussion, then the sidebar will grow around the subjects you actually use.",
-        firstHomework: "Start first homework",
+          "Choose the first subject here, ask the question in your own words, and the sidebar will grow around the subjects you actually use.",
         recentTitle: "Recent homework chats",
         open: "Open",
         active: "Continue",
@@ -55,8 +55,7 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
           "把正在進行的作業放在手邊，回到最近的對話，或在需要時開始新的討論。",
         noSubjectTitle: "還沒有作業",
         noSubjectBody:
-          "先開始第一段對話，之後側邊欄就會依照你實際使用的科目慢慢長出來。",
-        firstHomework: "開始第一份作業",
+          "先在這裡選第一個科目，再用自己的話輸入問題，之後側邊欄就會依照你實際使用的科目慢慢長出來。",
         recentTitle: "最近作業對話",
         open: "打開",
         active: "續接",
@@ -77,8 +76,7 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
           "Garde les devoirs actifs à portée de main, reprends les discussions récentes, ou relance un nouveau départ quand il le faut.",
         noSubjectTitle: "Aucun devoir pour l'instant",
         noSubjectBody:
-          "Lance la première discussion et la barre latérale se structurera ensuite autour des matières réellement utilisées.",
-        firstHomework: "Commencer le premier devoir",
+          "Choisis ici la première matière, écris la question avec tes mots, puis la barre latérale se construira autour des matières réellement utilisées.",
         recentTitle: "Discussions récentes",
         open: "Ouvrir",
         active: "Reprendre",
@@ -315,14 +313,10 @@ export async function StudentDashboard({
               <p className="max-w-2xl text-sm leading-7 text-[color:var(--ink-soft)]">
                 {copy.noSubjectBody}
               </p>
-              <div>
-                <Link
-                  className="button-base button-primary"
-                  href="/app?view=homework"
-                >
-                  {copy.firstHomework}
-                </Link>
-              </div>
+              <StudentFirstHomeworkLauncher
+                initialDraft={initialDraft}
+                languageCode={languageCode}
+              />
             </article>
           ) : (
             <>

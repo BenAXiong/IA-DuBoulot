@@ -1027,3 +1027,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Retire `/app/new` from the visible student journey. The route now acts only as a compatibility redirect into `/app?view=homework`, preserving `subject` and `draft` query params so older links still land on the current subject-level composer. Update the student dashboard, history CTAs, sidebar affordances, and shared student navigation copy so every visible student start or restart path now routes back through the homework dashboard instead of the retired page.
 - Why: This makes the product honest. Students now have one obvious place to start homework and resume discussions, which matches the current chat-first design direction and removes the last visible CTA paths that still pulled learners toward the older intake ritual.
 - Follow-up: Decide later whether the now-hidden richer intake code should be repurposed into an in-flow source-review surface or deleted entirely once the homework dashboard path proves sufficient.
+
+### D-20260404-102 - The Empty Homework Dashboard Must Be Able To Start The First Subject
+
+- Date: 2026-04-04
+- Status: accepted
+- Related tasks: `P1.3`, `P2.1`, `P2.6`
+- Context: Retiring `/app/new` exposed a new dead end for first-time learners. The empty homework dashboard still assumed that at least one `subject_tag` already existed, so the only visible action on `/app?view=homework` was a CTA that linked back to the same page. That made the new canonical student landing unusable for a brand-new learner.
+- Decision: Keep `/app` as the canonical student landing and make the empty homework state responsible for bootstrapping the first subject. The empty state now renders a lightweight subject selector plus the same direct chat launcher used by the subject view, so the first conversation can be created from the dashboard itself and can establish the first `subject_tag` without reviving `/app/new`.
+- Why: This preserves the simpler chat-first student journey instead of reopening a second intake route. The learner still starts from one place, but the dashboard no longer depends on pre-existing history before it becomes actionable.
+- Follow-up: Revisit later whether subject selection should stay a lightweight first-message affordance or evolve into canonical subject entities with richer creation rules.
