@@ -22,7 +22,8 @@ It is still a manual repo artifact: it cannot auto-start itself at instance boot
 - Use `A*` task IDs for MVP work and `P*` task IDs for pilot-hardening work when that separate lane is active.
 - Use actual wall-clock start and end times for the prompt; do not infer durations from rough assistant progress messages.
 - Do not merge several prompts into one row unless the exact prompt boundaries are already lost; if that happens, mark the row as approximate in the scope.
-- Create the row immediately when prompt handling starts, with `OPEN` as the temporary end marker, then close that same row before the final response.
+- Create the row immediately when prompt handling starts, with `OPEN` as the temporary end marker, then close that same row only after the work is actually finished and just before the final response.
+- Do not pre-close a prompt row during analysis, planning, or mid-turn status updates. A prompt row must stay `OPEN` for the whole active handling window.
 
 ## Format
 
@@ -100,5 +101,6 @@ then close it as:
 | 2026-04-04 | 13:30 -> 13:34 | 0h04 | P1.1 P1.3 P2.1 | tighten the student shell again by moving the build label to the bottom-right, renaming the top rail entry to Dashboard, removing the stray main-header hamburger, dropping the subject-view right panel, and further compressing the subject quick-start input spacing | |
 | 2026-04-04 | 13:47 -> 14:02 | 0h15 | P1.1 P1.3 P2.1 P2.4 | replace the student subject quick-start wizard hop with a shell-first direct chat start, allow staged file uploads from the subject view, simplify the live conversation chrome and right rail, and reconcile the student-flow docs plus smoke notes | |
 | 2026-04-04 | 15:58 -> 15:58 | 0h00 | A0.3.7 | close the current 2026-04-04 session at 14:02 and reopen a fresh one immediately afterward | |
-| 2026-04-04 | 15:58 -> 16:54 | 0h56 | P1.3 P2.1 P2.6 | trim the onboarding page into a shorter single-card flow by removing the bottom footer and redundant role selector, then log the planned merge of onboarding into sign-up as a future auth-journey task | | 
-| 2026-04-04 | 16:56 -> 16:56 | 0h00 | P2.1 P2.6 | assess whether /app/new still belongs in the student conversation workflow, define the right default landing route, and recommend whether the legacy fallback should be hidden, adapted, or removed | | 
+| 2026-04-04 | 16:44 -> 16:54 | 0h10 | P1.3 P2.1 P2.6 | trim the onboarding page into a shorter single-card flow by removing the bottom footer and redundant role selector, then log the planned merge of onboarding into sign-up as a future auth-journey task | | 
+| 2026-04-04 | 16:56 -> 16:58 | 0h02 | P2.1 P2.6 | assess whether /app/new still belongs in the student conversation workflow, define the right default landing route, and recommend whether the legacy fallback should be hidden, adapted, or removed | | 
+| 2026-04-04 | 17:01 -> 17:03 | 0h02 | A0.3.7 | audit and correct the recent prompt-log protocol drift, confirm whether the last pass was committed and pushed, and restate the exact logging rule going forward | | 

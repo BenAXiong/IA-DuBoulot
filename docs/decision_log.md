@@ -998,6 +998,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Why: This removes the most visibly "pilot" or developer-oriented parts of the learner flow without destabilizing persistence, uploads, moderation, summaries, or adult oversight. The learner now sees their own typed message as the first turn, uploads can be staged from the subject view, and the live conversation can behave more like a normal chat while the repo still retains the older intake route for any cases the new path does not cover yet.
 - Follow-up: Decide during Pilot whether `/app/new` should disappear entirely once richer pre-chat source review has a better home, whether the `graded homework` flag should survive anywhere in the student-facing product, whether the shell-first creation step should later collapse into a fully implicit first-message create contract, and whether mid-start failures need a rollback or resumable-pending shell instead of leaving an empty conversation behind.
 
+### D-20260404-100 - Prompt Rows Must Stay Open Until The Work Is Actually Finished
+
+- Date: 2026-04-04
+- Status: accepted
+- Related tasks: `A0.3.7`
+- Context: The first prompt-log fix restored per-prompt rows, but two later failures still happened. One prompt row carried the wrong duration because it inherited an earlier session-boundary timestamp instead of the actual prompt start, and the next prompt row was closed before the substantive repo inspection had finished, producing a `0h00` trace for work that clearly continued afterward.
+- Decision: Keep the prompt log as an exact per-prompt trace, but make the timing rule stricter: create the row immediately with `OPEN`, leave it `OPEN` for the whole active handling window, and only replace `OPEN` with the real end time once the work is actually complete and the final response is about to be sent.
+- Why: Prompt rows are supposed to measure real handling time, not planning checkpoints. Closing a row early makes the trace just as misleading as merging several prompts into one line.
+- Follow-up: Apply this rule going forward, and when a bad row is caught quickly and the operator supplies the intended duration, correct it directly instead of leaving the wrong timing in place.
+
 ### D-20260404-99 - Onboarding Now Collects Only Remaining Profile Essentials, And The Standalone Route Is Transitional
 
 - Date: 2026-04-04
