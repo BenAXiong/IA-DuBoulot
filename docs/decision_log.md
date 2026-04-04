@@ -967,3 +967,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Treat external connector or toolchain boilerplate as implementation noise unless it materially changes the repository or the current task. Do not surface those names in repo-facing status summaries, product explanations, or traceability notes unless the repo itself contains a relevant dependency, integration, or behavior change.
 - Why: Mixing external tooling scaffolding into repo summaries makes the project state look more complex than it is and distracts from the real source of truth inside the repository.
 - Follow-up: Keep references to third-party connectors scoped to the exact operational action they affect. If the repo later adopts a real integration, document it explicitly in the relevant setup or architecture docs instead of relying on incidental tooling context.
+
+### D-20260404-96 - The Prompt Log Returns To Accurate Per-Prompt Timestamps
+
+- Date: 2026-04-04
+- Status: accepted
+- Related tasks: `A0.3.7`
+- Context: A temporary protocol change reinterpreted [work_prompt_log.md](work_prompt_log.md) as a trace of broader prompt-driven slices instead of individual prompts. That drift produced rows whose durations no longer matched the operator's expectation of per-prompt timestamps, including one merged row on 2026-04-04 that could not be split back cleanly after the fact.
+- Decision: Restore the prompt log to prompt-level granularity. Each handled user prompt should get its own row with actual wall-clock start and end times. Rough commentary messages like "worked for X minutes" remain non-canonical and must never drive the logged timestamps. If prompt boundaries are already lost for an older row, keep the row but mark it as approximate rather than pretending it is exact.
+- Why: The prompt log exists to reconstruct the conversation timeline accurately. Merged slices may be useful for summaries, but they are not acceptable as the canonical prompt-level trace the operator expects.
+- Follow-up: Keep [work_sessions.md](work_sessions.md) as the higher-level execution trace and [work_prompt_log.md](work_prompt_log.md) as the exact per-prompt timing trace. When in doubt, prefer over-logging prompts to merging them.
