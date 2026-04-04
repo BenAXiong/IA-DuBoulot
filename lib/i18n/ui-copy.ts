@@ -893,21 +893,21 @@ export function getOnboardingPageCopy(languageCode: UiLanguageCode) {
   return pickLocalizedValue(languageCode, {
     fr: {
       eyebrow: "Onboarding",
-      title: "Prépare le compte pour entrer dans le bon espace.",
+      title: "Finalise le compte avant d'entrer dans le bon espace.",
       body:
-        "Choisis le rôle, la langue, et les informations essentielles pour que banban ouvre la bonne expérience dès la première session.",
+        "Confirme le nom, les langues, et les informations essentielles pour que banban ouvre la bonne expérience dès la première session.",
     },
     en: {
       eyebrow: "Onboarding",
-      title: "Set up the account before entering the right workspace.",
+      title: "Finish setting up the account before entering the right workspace.",
       body:
-        "Choose the role, language, and a few essentials so banban can open the right experience from the very first session.",
+        "Confirm the name, languages, and a few essentials so banban can open the right experience from the very first session.",
     },
     zh: {
       eyebrow: "Onboarding",
-      title: "先把帳號準備好，再進入對應的工作空間。",
+      title: "先完成帳號設定，再進入對應的工作空間。",
       body:
-        "先選好角色、語言與必要資訊，讓 banban 從第一個 session 就能打開正確的使用體驗。",
+        "確認名稱、語言與必要資訊，讓 banban 從第一個 session 就能打開正確的使用體驗。",
     },
   });
 }
@@ -918,12 +918,6 @@ export function getOnboardingFormCopy(languageCode: UiLanguageCode) {
       errorFallback: "Impossible de finaliser le profil.",
       connectedSession: "Session connectée",
       emailUnavailable: "email indisponible",
-      roleLegend: "Rôle",
-      roles: [
-        { value: "student", title: "Élève", body: "Flux principal d'aide aux devoirs et espace de travail." },
-        { value: "parent", title: "Parent", body: "Vision sur les sessions et supervision de l'enfant." },
-        { value: "tutor", title: "Tuteur", body: "Accès supervisé pour suivi pédagogique ciblé." },
-      ],
       fields: {
         displayName: "Nom affiché",
         uiLanguage: "Langue de l'interface",
@@ -945,12 +939,6 @@ export function getOnboardingFormCopy(languageCode: UiLanguageCode) {
       errorFallback: "Unable to finish the profile.",
       connectedSession: "Connected session",
       emailUnavailable: "email unavailable",
-      roleLegend: "Role",
-      roles: [
-        { value: "student", title: "Student", body: "Main homework-help flow and workspace." },
-        { value: "parent", title: "Parent", body: "Session visibility and child oversight." },
-        { value: "tutor", title: "Tutor", body: "Supervised access for focused pedagogical follow-up." },
-      ],
       fields: {
         displayName: "Display name",
         uiLanguage: "Interface language",
@@ -972,12 +960,6 @@ export function getOnboardingFormCopy(languageCode: UiLanguageCode) {
       errorFallback: "無法完成個人資料建立。",
       connectedSession: "已登入 session",
       emailUnavailable: "email 無法取得",
-      roleLegend: "角色",
-      roles: [
-        { value: "student", title: "學生", body: "主要作業協助流程與工作區。" },
-        { value: "parent", title: "家長", body: "查看課程與監督孩子進度。" },
-        { value: "tutor", title: "家教", body: "受監督的教學追蹤權限。" },
-      ],
       fields: {
         displayName: "顯示名稱",
         uiLanguage: "介面語言",

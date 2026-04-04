@@ -37,21 +37,25 @@ export default async function OnboardingPage({
   const currentHref = buildHrefWithSearchParams("/onboarding", resolvedSearchParams);
 
   return (
-    <PublicShell currentHref={currentHref} languageCode={languageCode}>
+    <PublicShell
+      currentHref={currentHref}
+      languageCode={languageCode}
+      showFooter={false}
+    >
       <main className="px-5 py-6 sm:px-8 lg:px-12">
-        <div className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-5xl flex-col justify-center gap-6">
-          <section className="grid gap-6 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] md:grid-cols-[0.8fr_1.2fr] md:p-8">
-            <article className="space-y-4">
+        <div className="mx-auto flex min-h-[calc(100dvh-6rem)] max-w-2xl flex-col justify-center">
+          <section className="grid gap-6 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] md:p-8">
+            <div className="space-y-3">
               <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.24em] text-[color:var(--ink-soft)]">
                 {copy.eyebrow}
               </p>
-              <h1 className="font-[family-name:var(--font-heading)] text-4xl leading-tight">
+              <h1 className="font-[family-name:var(--font-heading)] text-3xl leading-tight sm:text-4xl">
                 {copy.title}
               </h1>
               <p className="text-base leading-7 text-[color:var(--ink-soft)]">
                 {copy.body}
               </p>
-            </article>
+            </div>
 
             <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5">
               <OnboardingForm

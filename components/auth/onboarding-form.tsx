@@ -63,7 +63,7 @@ export function OnboardingForm({
 }: OnboardingFormProps) {
   const router = useRouter();
   const copy = getOnboardingFormCopy(languageCode);
-  const [role, setRole] = useState<"student" | "parent" | "tutor">(defaultRole);
+  const role = defaultRole;
   const [displayName, setDisplayName] = useState("");
   const [preferredUiLanguage, setPreferredUiLanguage] = useState<UiLanguageCode>(
     initialPreferredUiLanguage,
@@ -88,15 +88,6 @@ export function OnboardingForm({
   function resetErrors() {
     setErrorMessage(null);
     setFieldErrors({});
-  }
-
-  function handleRoleChange(nextRole: "student" | "parent" | "tutor") {
-    setRole(nextRole);
-
-    if (nextRole !== "student") {
-      setIsUnder13(false);
-      setAgeBand("");
-    }
   }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -147,38 +138,6 @@ export function OnboardingForm({
       </div>
 
       {errorMessage ? <FormCallout variant="error">{errorMessage}</FormCallout> : null}
-
-      <fieldset className="grid gap-3">
-        <legend className="text-sm font-medium">{copy.roleLegend}</legend>
-        <div className="grid gap-3 sm:grid-cols-3">
-          {copy.roles.map((option) => (
-            <button
-              className={`rounded-[1.5rem] border p-4 text-left transition ${
-                role === option.value
-                  ? "border-[color:var(--brand)] bg-[color:var(--brand-soft)]"
-                  : "border-[color:var(--line)] bg-[color:var(--surface-raised)]"
-              }`}
-              key={option.value}
-              onClick={() =>
-                handleRoleChange(option.value as "student" | "parent" | "tutor")
-              }
-              type="button"
-            >
-              <p className="font-[family-name:var(--font-heading)] text-lg">
-                {option.title}
-              </p>
-              <p className="mt-2 text-sm leading-6 text-[color:var(--ink-soft)]">
-                {option.body}
-              </p>
-            </button>
-          ))}
-        </div>
-        {getFieldError(fieldErrors, "role") ? (
-          <p className="text-sm text-[color:var(--error-ink)]">
-            {getFieldError(fieldErrors, "role")}
-          </p>
-        ) : null}
-      </fieldset>
 
       <FormField
         error={getFieldError(fieldErrors, "displayName")}
