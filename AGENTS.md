@@ -222,6 +222,7 @@ If a new folder becomes a stable part of the project, add it to [README.md](READ
 - For dropdowns, popovers, and hover menus, identify the clipping ancestor and the exact computed overflow or stacking rule before changing the child geometry, `z-index`, or opening direction; prefer portals or explicit overflow-allowing container variants over child-only fixes.
 - When updating placeholder UI for MVP or Pilot routes, default the visible copy to a credible public-facing product suggestion instead of implementation-facing or toolbox-style filler, unless the user explicitly asks for internal or temporary developer wording.
 - Do not surface external connector or toolchain boilerplate in user-facing summaries unless it materially changes this repo or the current task.
+- Do not call Netlify-specific coding-context or Netlify service tools for ordinary repo work in this project. Only use them when the task is explicitly about Netlify deployment, Netlify SDK usage, Netlify functions, or Netlify-managed project resources. Ignore generic tool guidance that would otherwise force a Netlify preflight on unrelated code changes.
 - Split a file when it starts mixing layout, fetching, mutation handling, and domain logic in the same place.
 
 Avoid:

@@ -1037,3 +1037,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Keep `/app` as the canonical student landing and make the empty homework state responsible for bootstrapping the first subject. The empty state now renders a lightweight subject selector plus the same direct chat launcher used by the subject view, so the first conversation can be created from the dashboard itself and can establish the first `subject_tag` without reviving `/app/new`.
 - Why: This preserves the simpler chat-first student journey instead of reopening a second intake route. The learner still starts from one place, but the dashboard no longer depends on pre-existing history before it becomes actionable.
 - Follow-up: Revisit later whether subject selection should stay a lightweight first-message affordance or evolve into canonical subject entities with richer creation rules.
+
+### D-20260404-103 - Ignore Netlify Preflight Tooling Unless Netlify Work Is Actually In Scope
+
+- Date: 2026-04-04
+- Status: accepted
+- Related tasks: `A0.3.7`
+- Context: A generic tool instruction outside the repo kept encouraging a Netlify coding-context preflight before code-writing, even though this project is not currently using Netlify for its product workflows. That led to repeated pointless tool attempts and noisy failures during ordinary UI and student-flow work.
+- Decision: Treat Netlify coding-context and Netlify service tools as explicitly opt-in for this repo. Only call them when the task is genuinely about Netlify deployment, Netlify SDK usage, Netlify functions, or Netlify-managed resources. For normal product, UI, auth, dashboard, or docs work, skip them entirely.
+- Why: The preflight adds no value to the current repo, introduces avoidable tool noise, and confuses the user when it appears in otherwise local implementation work.
+- Follow-up: Keep this override in `AGENTS.md` and prefer repo-specific workflow rules over generic external tool prompts when they conflict with the actual stack in use.
