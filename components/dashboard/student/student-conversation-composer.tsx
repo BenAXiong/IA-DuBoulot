@@ -10,10 +10,53 @@ type StudentConversationComposerProps = {
   isSending?: boolean;
   onComposerTextChange: (value: string) => void;
   onSendMessage: () => void;
-  onRequestHint: () => void;
-  onRequestSummary: () => void;
   onUploadAttachments: () => void;
 };
+
+function PlusIcon() {
+  return (
+    <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24">
+      <path
+        d="M12 5v14M5 12h14"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
+function MicIcon() {
+  return (
+    <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24">
+      <path
+        d="M12 4.75a2.75 2.75 0 0 1 2.75 2.75v4.25a2.75 2.75 0 1 1-5.5 0V7.5A2.75 2.75 0 0 1 12 4.75Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+      />
+      <path
+        d="M7.75 10.75v.75a4.25 4.25 0 0 0 8.5 0v-.75M12 15.75v3.5M9.25 19.25h5.5"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.7"
+      />
+    </svg>
+  );
+}
+
+function SendIcon() {
+  return (
+    <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24">
+      <path
+        d="m5 12 13-7-3.5 14-2.5-5-7-2Z"
+        stroke="currentColor"
+        strokeLinejoin="round"
+        strokeWidth="1.7"
+      />
+      <path d="M11.5 13.5 18 5" stroke="currentColor" strokeLinecap="round" strokeWidth="1.7" />
+    </svg>
+  );
+}
 
 export function StudentConversationComposer({
   composerText,
@@ -22,60 +65,50 @@ export function StudentConversationComposer({
   isSending = false,
   onComposerTextChange,
   onSendMessage,
-  onRequestHint,
-  onRequestSummary,
   onUploadAttachments,
 }: StudentConversationComposerProps) {
   const copy = getStudentConversationComposerCopy(languageCode);
 
   return (
-    <div className="grid gap-4 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-4 shadow-[0_18px_40px_rgba(15,23,42,0.08)]">
-      <div className="flex flex-wrap gap-2">
-        <button
-          className="inline-flex min-h-10 items-center justify-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
-          disabled={disabled || isSending}
-          onClick={onUploadAttachments}
-          type="button"
-        >
-          {copy.addAttachment}
-        </button>
-        <button
-          className="inline-flex min-h-10 items-center justify-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
-          disabled={disabled || isSending}
-          onClick={onRequestHint}
-          type="button"
-        >
-          {copy.hint}
-        </button>
-        <button
-          className="inline-flex min-h-10 items-center justify-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
-          disabled={disabled || isSending}
-          onClick={onRequestSummary}
-          type="button"
-        >
-          {copy.summarize}
-        </button>
-      </div>
-
+    <div className="rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-4">
       <textarea
-        className="min-h-36 rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-4 text-sm leading-7 outline-none transition focus:border-[color:var(--accent)]"
+        className="min-h-28 w-full resize-none bg-transparent px-2 pt-2 text-sm leading-7 outline-none placeholder:text-[color:var(--ink-soft)]"
         disabled={disabled || isSending}
         onChange={(event) => onComposerTextChange(event.target.value)}
         placeholder={copy.placeholder}
         value={composerText}
       />
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="max-w-2xl text-sm text-[color:var(--ink-soft)]">
-          {copy.body}
-        </p>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <button
+            aria-label={copy.addAttachment}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] text-[color:var(--foreground)] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+            disabled={disabled || isSending}
+            onClick={onUploadAttachments}
+            type="button"
+          >
+            <PlusIcon />
+          </button>
+          <button
+            aria-label={copy.voice}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] text-[color:var(--ink-soft)]"
+            disabled
+            title={copy.voice}
+            type="button"
+          >
+            <MicIcon />
+          </button>
+        </div>
+
         <button
-          className="rounded-full bg-[color:var(--accent)] px-5 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
+          aria-label={isSending ? copy.sending : copy.send}
+          className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[color:var(--foreground)] text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
           disabled={disabled || isSending || composerText.trim().length === 0}
           onClick={onSendMessage}
           type="button"
         >
-          {isSending ? copy.sending : copy.send}
+          <SendIcon />
         </button>
       </div>
     </div>

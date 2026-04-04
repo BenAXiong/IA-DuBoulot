@@ -80,6 +80,8 @@ Rules:
 - the authenticated shell should not surface pilot badges, literal route hints, or other implementation-facing framing on the main role dashboards
 - the student role now owns its own chat-first shell rhythm through `components/layout/student-app-shell.tsx`: collapsible left subject rail, minimal top bar, profile dock, and a quieter page canvas than the original generic `/app` chrome
 - the student shell header now uses a simple eyebrow-and-title pattern instead of helper subtitles that describe the interface itself
+- the left student rail no longer shows a divider under the wordmark block; its top strip should visually match the main-pane header height without introducing a second header rule
+- the learner profile dock no longer shows a permanent outlined account section; the dock stays minimal by default, and the profile/settings/sign-out menu stays open while hovered with a short close grace period
 - the parent role now suppresses the generic desktop shell sidebar and instead lets the dashboard own a parent-specific information architecture: account and billing dock, pending parent-approval requests, a learner-creation panel, and linked-learners rail on the left, with grouped weekly and recent activity on the right
 
 ## Role Dashboard Variants
@@ -127,6 +129,8 @@ Why:
 - `#account` remains relevant for the shared settings block used by non-parent roles, while parent account and billing controls now live inside the parent dashboard rail instead of a separate bottom section on `/app`
 - the student shell now treats subjects as filter views over existing `subject_tag` values and sends learner-owned support settings to `/app/settings`, so the main `/app` page can behave more like a chat workspace than a control center
 - the subject rail now keeps only subject filters and counters; recent conversation lists stay in the main content area instead of expanding inside the sidebar
+- the profile dock now defaults to a minimal identity row with no outline, while settings and sign-out live in a hover/focus menu above it
+- the student subject view and live conversation surface now both use a true right-side panel treatment instead of floating cards, so the workspace reads like a split main pane rather than a dashboard grid
 
 ## iPad Validation
 

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { StudentStatusPill } from "@/components/dashboard/student/student-status-pill";
 import { StudentSubjectQuickStart } from "@/components/dashboard/student/student-subject-quick-start";
 import {
   formatDateLabel,
@@ -50,6 +49,7 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         subjectSourcesTitle: "Sources",
         subjectSourcesBody:
           "Add PDFs, photos, and screenshots once the discussion opens.",
+        subjectChatsTitle: "Saved chats",
         subjectCount: (count: number) =>
           `${count} ${count === 1 ? "saved chat" : "saved chats"}`,
       };
@@ -77,6 +77,7 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         needsAttention: "打開設定",
         subjectSourcesTitle: "來源",
         subjectSourcesBody: "聊天打開後，就可以加入 PDF、照片與截圖。",
+        subjectChatsTitle: "已保存對話",
         subjectCount: (count: number) => `已儲存 ${count} 段對話`,
       };
     default:
@@ -104,6 +105,7 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         subjectSourcesTitle: "Sources",
         subjectSourcesBody:
           "Ajoute les PDF, photos et captures une fois la discussion ouverte.",
+        subjectChatsTitle: "Discussions enregistrées",
         subjectCount: (count: number) =>
           `${count} ${count === 1 ? "discussion enregistrée" : "discussions enregistrées"}`,
       };
@@ -131,49 +133,103 @@ function buildSubjectGroups(conversations: ListConversationSummary[]) {
 function renderConversationRows(input: {
   conversations: ListConversationSummary[];
   languageCode: UiLanguageCode;
-  ctaLabel: string;
+  showSubject?: boolean;
 }) {
   return (
-    <div className="grid gap-3">
+    <div className="divide-y divide-[color:var(--line)]">
       {input.conversations.map((conversation) => (
-        <article
-          className="flex flex-col gap-4 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-5 py-4 md:flex-row md:items-center md:justify-between"
+        <Link
+          className="flex items-start justify-between gap-4 py-4 transition hover:bg-[color:var(--surface-strong)]"
+          href={`/app/conversations/${conversation.id}?subject=${encodeURIComponent(conversation.subject_tag)}`}
           key={conversation.id}
         >
-          <div className="min-w-0 space-y-2">
-            <div className="flex flex-wrap gap-2">
-              <StudentStatusPill label={conversation.subject_tag} tone="accent" />
-              <StudentStatusPill
-                label={getConversationStatusLabel(
+          <div className="min-w-0 space-y-1">
+            <h3 className="truncate font-[family-name:var(--font-heading)] text-xl leading-tight">
+              {conversation.title}
+            </h3>
+            <div className="flex flex-wrap items-center gap-2 text-sm text-[color:var(--ink-soft)]">
+              {input.showSubject ? <span>{conversation.subject_tag}</span> : null}
+              <span>
+                {getConversationStatusLabel(
                   conversation.status,
                   input.languageCode,
                 )}
-              />
-            </div>
-            <div className="min-w-0">
-              <h3 className="truncate font-[family-name:var(--font-heading)] text-2xl leading-tight">
-                {conversation.title}
-              </h3>
-              <p className="mt-1 text-sm text-[color:var(--ink-soft)]">
-                {formatDateLabel(
-                  conversation.last_message_at ??
-                    conversation.completed_at ??
-                    conversation.created_at,
-                  input.languageCode,
-                ) ?? ""}
-              </p>
+              </span>
             </div>
           </div>
 
-          <Link
-            className="inline-flex min-h-11 items-center justify-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5"
-            href={`/app/conversations/${conversation.id}?subject=${encodeURIComponent(conversation.subject_tag)}`}
-          >
-            {input.ctaLabel}
-          </Link>
-        </article>
+          <div className="shrink-0 text-sm text-[color:var(--ink-soft)]">
+            {formatDateLabel(
+              conversation.last_message_at ??
+                conversation.completed_at ??
+                conversation.created_at,
+              input.languageCode,
+            ) ?? ""}
+          </div>
+        </Link>
       ))}
     </div>
+  );
+}
+
+function renderSubjectCards(input: {
+  groups: ReturnType<typeof buildSubjectGroups>;
+  emptyFallback: string;
+}) {
+  return (
+    <div className="divide-y divide-[color:var(--line)]">
+      {input.groups.map((group) => (
+        <Link
+          className="flex items-center justify-between gap-4 py-4 transition hover:bg-[color:var(--surface-strong)]"
+          href={`/app?view=homework&subject=${encodeURIComponent(group.subjectTag)}`}
+          key={group.subjectTag}
+        >
+          <div className="min-w-0 space-y-1">
+            <h2 className="truncate font-[family-name:var(--font-heading)] text-xl leading-tight">
+              {group.subjectTag}
+            </h2>
+            <p className="truncate text-sm text-[color:var(--ink-soft)]">
+              {group.conversations[0]?.title ?? input.emptyFallback}
+            </p>
+          </div>
+
+          <span className="shrink-0 text-sm text-[color:var(--ink-soft)]">
+            {group.conversations.length}
+          </span>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+function renderSubjectRightRail(input: {
+  sourcesTitle: string;
+  sourcesBody: string;
+  countTitle: string;
+  countLabel: string;
+}) {
+  return (
+    <aside className="border-l border-[color:var(--line)] bg-[color:var(--surface)] px-5 py-6 xl:min-h-[calc(100vh-4.5rem)]">
+      <div className="grid gap-8">
+        <section className="grid gap-3">
+          <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
+            {input.sourcesTitle}
+          </p>
+          <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
+            {input.sourcesBody}
+          </p>
+        </section>
+
+        <section className="grid gap-3">
+          <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
+            {input.countTitle}
+          </p>
+          <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
+            {input.countLabel}
+          </p>
+        </section>
+      </div>
+    </aside>
   );
 }
 
@@ -241,8 +297,8 @@ export async function StudentDashboard({
           </p>
         </section>
       ) : selectedGroup ? (
-        <section className="mx-auto grid w-full max-w-6xl gap-6 py-2 xl:grid-cols-[minmax(0,1fr)_19rem]">
-          <div className="grid gap-6">
+        <section className="mx-auto grid w-full max-w-none gap-0 xl:-my-6 xl:-mr-8 xl:min-h-[calc(100vh-4.5rem)] xl:grid-cols-[minmax(0,1fr)_18.5rem]">
+          <div className="grid gap-6 py-2 xl:py-6 xl:pr-8">
             <div className="space-y-3">
               <p className="text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
                 {copy.subjectEyebrow}
@@ -277,32 +333,18 @@ export async function StudentDashboard({
               ) : (
                 renderConversationRows({
                   conversations: selectedGroup.conversations,
-                  ctaLabel: copy.active,
                   languageCode,
                 })
               )}
             </section>
           </div>
 
-          <aside className="grid gap-4 xl:sticky xl:top-24 xl:self-start">
-            <section className="grid gap-3 rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-[var(--shadow)]">
-              <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-                {copy.subjectSourcesTitle}
-              </p>
-              <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-                {copy.subjectSourcesBody}
-              </p>
-            </section>
-
-            <section className="grid gap-3 rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-[var(--shadow)]">
-              <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-                {selectedGroup.subjectTag}
-              </p>
-              <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-                {copy.subjectCount(selectedGroup.conversations.length)}
-              </p>
-            </section>
-          </aside>
+          {renderSubjectRightRail({
+            sourcesTitle: copy.subjectSourcesTitle,
+            sourcesBody: copy.subjectSourcesBody,
+            countTitle: copy.subjectChatsTitle,
+            countLabel: copy.subjectCount(selectedGroup.conversations.length),
+          })}
         </section>
       ) : (
         <section className="mx-auto grid w-full max-w-5xl gap-8 py-2">
@@ -334,25 +376,10 @@ export async function StudentDashboard({
             </article>
           ) : (
             <>
-              <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                {subjectGroups.map((group) => (
-                  <Link
-                    className="grid gap-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-5 py-5 transition hover:-translate-y-0.5 hover:border-[color:var(--line-strong)]"
-                    href={`/app?view=homework&subject=${encodeURIComponent(group.subjectTag)}`}
-                    key={group.subjectTag}
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
-                        {group.subjectTag}
-                      </h2>
-                      <StudentStatusPill label={`${group.conversations.length}`} tone="accent" />
-                    </div>
-                    <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-                      {group.conversations[0]?.title ?? copy.noSubjectChats}
-                    </p>
-                  </Link>
-                ))}
-              </section>
+              {renderSubjectCards({
+                groups: subjectGroups,
+                emptyFallback: copy.noSubjectChats,
+              })}
 
               <section className="grid gap-4">
                 <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
@@ -360,8 +387,8 @@ export async function StudentDashboard({
                 </h2>
                 {renderConversationRows({
                   conversations: conversations.slice(0, 8),
-                  ctaLabel: copy.active,
                   languageCode,
+                  showSubject: true,
                 })}
               </section>
             </>

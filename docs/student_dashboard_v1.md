@@ -121,7 +121,9 @@ Why:
 - under-13 blocking still depends on the existing parent-approval flow documented in [Invitation flows V1](invitation_flows_v1.md)
 - tutor-facing derived insights still belong to the tutor oversight surface; tutors do not receive raw student memory
 - the current student-shell subject folders are not canonical entities; they are the existing conversation tags presented as filters
-- the subject rail itself no longer expands recent chat lists inline; subject-level recent discussions now stay in the main homework canvas, where the student also sees the lightweight right-side meta rail
+- the subject rail itself no longer expands recent chat lists inline; subject-level recent discussions now stay in the main homework canvas, where the student also sees the dedicated right-side panel
+- the subject view itself now keeps a two-pane rhythm: chat-entry and recent-discussion list on the left, right-side sources/meta panel on the other side
+- the live conversation route now follows the same split-pane rhythm, with the message stream on the left and the summary/sources/workspace stack living inside the right panel instead of a floating dashboard column
 
 ## Next Extension Points
 

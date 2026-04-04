@@ -14,12 +14,14 @@ It is still a manual repo artifact: it cannot auto-start itself at instance boot
 
 ## Rules
 
-- Add one row per handled user prompt.
+- Add one row per meaningful prompt-driven work slice.
 - Keep the canonical session lifecycle in [work_sessions.md](work_sessions.md) unchanged.
 - Use `OPEN` only if a prompt is still actively being worked.
 - Fill `Credits Left` only when the operator-visible Codex usage percentage is known.
 - If usage is not accessible from the assistant side, leave `Credits Left` blank for manual fill.
 - Use `A*` task IDs for MVP work and `P*` task IDs for pilot-hardening work when that separate lane is active.
+- Fold short clarification bursts into the active row when they do not create a distinct implementation, audit, or verification slice.
+- Use actual wall-clock start and end times for the slice; do not infer durations from rough assistant progress messages.
 
 ## Format
 
@@ -87,3 +89,4 @@ It is still a manual repo artifact: it cannot auto-start itself at instance boot
 | 2026-04-04 | 10:22 -> 11:03 | 0h41 | P1.1 P1.3 P2.1 P2.4 | audit the current student `/app` information architecture against a planned ChatGPT-like revamp, separate what a pure UI pass can change from what still needs product or data-model work, and identify the missing learner-facing features behind the proposed sidebars and activity modes | |
 | 2026-04-04 | 11:03 -> 11:52 | 0h49 | P1.1 P1.3 P2.1 P2.4 | implement the first student UI pass with a dedicated learner shell, settings-side support controls, a quieter `/app/new` chat entry, a flatter conversation workbench, and Pilot logging for filter-only subjects plus deferred implicit-session work | |
 | 2026-04-04 | 11:52 -> 12:25 | 0h33 | P1.1 P1.3 P2.1 | trim the first student-shell pass by removing structural helper copy, simplifying `/app/new`, hiding profile actions behind hover, flattening subject quick-start entry, restoring a visible subject-side meta rail, and clarifying the trace questions raised during review | |
+| 2026-04-04 | 12:25 -> 12:58 | 0h33 | A0.3.7 P1.1 P1.3 P2.1 | harden the student shell by turning the subject and live-chat views into real split panes, simplifying recent homework lists, fixing the hoverable learner profile menu, embedding the chat actions inside the input, and tightening the prompt-log or external-tool summary rules | |

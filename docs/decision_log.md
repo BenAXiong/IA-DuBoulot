@@ -947,3 +947,23 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Keep the same student-shell architecture, but tighten the presentation. The top header now uses a simple eyebrow-and-title pattern instead of structural subtitles. `/app/new` is reduced to a simple back-to-homework link plus the intake form. The left rail keeps only subject filters and counts, not nested conversation lists. The bottom profile dock stays visible, while the settings/sign-out controls move into a hover or focus menu. The subject view keeps only the essential heading, bare chat-entry field, recent chats, and a small right-side meta rail.
 - Why: The learner shell should read like a calm product surface, not like a guided tour of its own structure. Removing explanatory chrome makes the interface easier to scan and better aligned with the intended client-facing tone.
 - Follow-up: Continue trimming similar structural wording from the student history and any remaining student-facing empty states as the shell settles.
+
+### D-20260404-94 - The Experimental Prompt Log Tracks Coherent Prompt-Driven Slices, Not Every Micro-Clarification
+
+- Date: 2026-04-04
+- Status: accepted
+- Related tasks: `A0.3.7`
+- Context: The experimental prompt log had drifted away from the actual chat rhythm. Some rows covered quick clarification or planning exchanges but looked like full implementation slices, while later assistant progress messages referenced rough elapsed time that did not match the manual row timestamps. This made the prompt log feel more precise than it really was and created avoidable confusion during review.
+- Decision: Keep the prompt log experimental and manual, but redefine it as a trace of meaningful prompt-driven work slices rather than a literal row-for-every-user-message transcript. Short clarification bursts that stay inside the same active implementation or audit slice should be folded into the current row. Row durations must use real wall-clock start and end times, not elapsed estimates quoted in commentary messages.
+- Why: The prompt log should help future agents reconstruct what kind of work happened when. Over-fragmenting it on every short back-and-forth produces misleading rows, while commentary-based elapsed estimates are too imprecise to act as canonical timing data.
+- Follow-up: Continue using [work_sessions.md](work_sessions.md) as the canonical trace. If the prompt log remains noisy even after this rule change, consider deprecating it or reducing it to only major prompt slices.
+
+### D-20260404-95 - External Connector Boilerplate Should Stay Out Of Repo-Facing Summaries Unless It Changes The Product
+
+- Date: 2026-04-04
+- Status: accepted
+- Related tasks: `A0.3.7`
+- Context: During recent student-shell work, the user noticed toolchain-level Netlify mentions surfacing in assistant summaries even though the project itself does not use Netlify for product behavior. The only actual Netlify references in the workspace live in dependency readmes under `node_modules`, and the visible assistant mention came from external connector instructions rather than a repo-owned artifact or a project decision.
+- Decision: Treat external connector or toolchain boilerplate as implementation noise unless it materially changes the repository or the current task. Do not surface those names in repo-facing status summaries, product explanations, or traceability notes unless the repo itself contains a relevant dependency, integration, or behavior change.
+- Why: Mixing external tooling scaffolding into repo summaries makes the project state look more complex than it is and distracts from the real source of truth inside the repository.
+- Follow-up: Keep references to third-party connectors scoped to the exact operational action they affect. If the repo later adopts a real integration, document it explicitly in the relevant setup or architecture docs instead of relying on incidental tooling context.

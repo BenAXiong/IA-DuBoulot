@@ -652,32 +652,24 @@ export function getStudentConversationComposerCopy(languageCode: UiLanguageCode)
   return pickLocalizedValue(languageCode, {
     fr: {
       addAttachment: "Ajouter une pièce",
-      hint: "Indice",
-      summarize: "Résumer",
+      voice: "Saisie vocale plus tard",
       placeholder:
         "Explique où tu bloques, ce que tu as déjà essayé, ou l'étape que tu veux clarifier.",
-      body:
-        "banban garde le contexte du devoir en arrière-plan, donc le chat peut rester simple : dire ce qui bloque, tester une idée, puis avancer pas à pas.",
       sending: "Envoi...",
       send: "Envoyer",
     },
     en: {
       addAttachment: "Add attachment",
-      hint: "Hint",
-      summarize: "Summarize",
+      voice: "Voice input coming later",
       placeholder:
         "Explain where you're stuck, what you've already tried, or the step you want to clarify.",
-      body:
-        "banban keeps the homework context in the background, so the chat can stay simple: say what is blocking you, test an idea, then move step by step.",
       sending: "Sending...",
       send: "Send",
     },
     zh: {
       addAttachment: "加入附件",
-      hint: "提示",
-      summarize: "摘要",
+      voice: "語音輸入之後再加入",
       placeholder: "說明你卡住的地方、已經試過什麼，或你想釐清的步驟。",
-      body: "banban 會在背景保留作業脈絡，所以聊天可以保持簡單：直接說你卡住的地方、試一個想法，然後一步一步往前走。",
       sending: "傳送中...",
       send: "送出",
     },

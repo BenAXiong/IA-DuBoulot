@@ -73,6 +73,7 @@ If a file above is outdated, update it before or alongside the code change that 
 - If there is already an `OPEN` session and the user has not explicitly said `end session`, continue that row instead of creating a second open session.
 - If there is no open row, append a new row with the current date, start time, `OPEN` as the end marker, planned task IDs, and a short scope description.
 - If the experimental prompt log is active, append or update the current prompt row in [docs/work_prompt_log.md](docs/work_prompt_log.md) in parallel.
+- Treat the prompt log as a prompt-driven work-slice trace, not a literal row-for-every-fast-back-and-forth transcript. Small clarification bursts that do not create a distinct implementation or audit slice should be folded into the current active row instead of creating misleading micro-rows.
 
 ### 2. Rebuild Context
 
@@ -129,6 +130,12 @@ Each entry should contain:
 - task IDs
 - a short human-readable scope summary
 - Codex credits left when visible, otherwise blank for manual fill
+
+Prompt-log timing rule:
+
+- Use actual wall-clock start and end times for the coherent slice triggered by the prompt.
+- Do not derive the row duration from rough commentary messages like "worked for X minutes".
+- If the prompt only causes a short clarification or review loop inside the same active slice, update the existing row instead of adding a new one.
 
 ### Decisions
 
@@ -210,6 +217,7 @@ If a new folder becomes a stable part of the project, add it to [README.md](READ
 - Keep UI components mostly presentational when possible; move data loading, orchestration, and policy logic into route, server, or service layers.
 - For dropdowns, popovers, and hover menus, identify the clipping ancestor and the exact computed overflow or stacking rule before changing the child geometry, `z-index`, or opening direction; prefer portals or explicit overflow-allowing container variants over child-only fixes.
 - When updating placeholder UI for MVP or Pilot routes, default the visible copy to a credible public-facing product suggestion instead of implementation-facing or toolbox-style filler, unless the user explicitly asks for internal or temporary developer wording.
+- Do not surface external connector or toolchain boilerplate in user-facing summaries unless it materially changes this repo or the current task.
 - Split a file when it starts mixing layout, fetching, mutation handling, and domain logic in the same place.
 
 Avoid:

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { ProfileAvatar } from "@/components/dashboard/parent/profile-avatar";
@@ -51,7 +51,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
           conversation: "Conversation",
           history: "History",
           settings: "Profile",
-          fallback: "Learner workspace",
+          fallback: "Homework",
         },
       };
     case "zh":
@@ -76,7 +76,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
           conversation: "對話",
           history: "歷程",
           settings: "個人檔案",
-          fallback: "學習者工作區",
+          fallback: "作業",
         },
       };
     default:
@@ -101,7 +101,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
           conversation: "Discussion",
           history: "Historique",
           settings: "Profil",
-          fallback: "Espace élève",
+          fallback: "Devoirs",
         },
       };
   }
@@ -291,6 +291,9 @@ export function StudentAppShell({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const profileMenuCloseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const languageCode = appUser.preferred_ui_language;
   const copy = getStudentShellCopy(languageCode);
   const activeView = readActiveView(searchParams.get("view"));
@@ -310,9 +313,37 @@ export function StudentAppShell({
       ? copy.familyPlan
       : copy.trialPlan;
 
+  useEffect(() => {
+    return () => {
+      if (profileMenuCloseTimeoutRef.current) {
+        clearTimeout(profileMenuCloseTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  function openProfileMenu() {
+    if (profileMenuCloseTimeoutRef.current) {
+      clearTimeout(profileMenuCloseTimeoutRef.current);
+      profileMenuCloseTimeoutRef.current = null;
+    }
+
+    setProfileMenuOpen(true);
+  }
+
+  function closeProfileMenuWithDelay() {
+    if (profileMenuCloseTimeoutRef.current) {
+      clearTimeout(profileMenuCloseTimeoutRef.current);
+    }
+
+    profileMenuCloseTimeoutRef.current = setTimeout(() => {
+      setProfileMenuOpen(false);
+      profileMenuCloseTimeoutRef.current = null;
+    }, 400);
+  }
+
   const content = (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between border-b border-[color:var(--line)] px-4 py-4">
+      <div className="flex min-h-[4.5rem] items-center justify-between px-4">
         <div className="flex min-w-0 items-center gap-3">
           <div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface-strong)] font-[family-name:var(--font-heading)] text-sm font-semibold">
             bb
@@ -441,19 +472,21 @@ export function StudentAppShell({
         </div>
       </nav>
 
-      <div className="border-t border-[color:var(--line)] px-3 py-4">
+      <div className="px-3 py-4">
         <div
           className="relative"
-          onMouseEnter={() => setProfileMenuOpen(true)}
-          onMouseLeave={() => setProfileMenuOpen(false)}
+          onMouseEnter={openProfileMenu}
+          onMouseLeave={closeProfileMenuWithDelay}
         >
           {!sidebarCollapsed ? (
             <div
-              className={`pointer-events-none absolute bottom-full left-0 right-0 mb-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-3 shadow-[var(--shadow)] transition ${
+              className={`absolute bottom-full left-0 right-0 mb-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-3 shadow-[var(--shadow)] transition ${
                 profileMenuOpen
-                  ? "translate-y-0 opacity-100 pointer-events-auto"
-                  : "translate-y-2 opacity-0"
+                  ? "pointer-events-auto translate-y-0 opacity-100"
+                  : "pointer-events-none translate-y-2 opacity-0"
               }`}
+              onMouseEnter={openProfileMenu}
+              onMouseLeave={closeProfileMenuWithDelay}
             >
               <div className="grid gap-2">
                 <Link
@@ -477,8 +510,15 @@ export function StudentAppShell({
           ) : null}
 
           <button
-            className="flex w-full items-center gap-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-3 text-left transition hover:border-[color:var(--line-strong)]"
-            onClick={() => setProfileMenuOpen((value) => !value)}
+            className="flex w-full items-center gap-3 rounded-[1.5rem] px-3 py-2 text-left transition hover:bg-[color:var(--surface-strong)]"
+            onClick={() => {
+              if (profileMenuOpen) {
+                closeProfileMenuWithDelay();
+                return;
+              }
+
+              openProfileMenu();
+            }}
             type="button"
           >
             <ProfileAvatar name={appUser.display_name} />
@@ -519,7 +559,7 @@ export function StudentAppShell({
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-20 border-b border-[color:var(--line)] bg-[color:var(--background)]/88 px-4 py-3 backdrop-blur sm:px-6">
+          <header className="sticky top-0 z-20 min-h-[4.5rem] border-b border-[color:var(--line)] bg-[color:var(--background)]/88 px-4 py-0 backdrop-blur sm:px-6">
             <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4">
               <div className="flex min-w-0 items-center gap-3">
                 <button
