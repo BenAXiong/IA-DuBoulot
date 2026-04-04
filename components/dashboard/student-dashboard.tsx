@@ -274,8 +274,8 @@ export async function StudentDashboard({
       ) : selectedGroup ? (
         <section className="mx-auto grid w-full max-w-5xl gap-3 py-0.5">
           <div className="grid gap-3">
-            <div className="space-y-1">
-              <h1 className="font-[family-name:var(--font-heading)] text-4xl leading-tight">
+            <div className="min-w-0 space-y-1">
+              <h1 className="max-w-full break-words font-[family-name:var(--font-heading)] text-4xl leading-tight">
                 {selectedGroup.subjectTag}
               </h1>
             </div>

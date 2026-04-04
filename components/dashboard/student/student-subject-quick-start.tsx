@@ -93,15 +93,34 @@ function buildConversationTitle(input: {
 }) {
   const compactDraft = input.draft.trim().replace(/\s+/g, " ");
 
+  function shortenTitle(source: string) {
+    const cleaned = source
+      .replace(/^[\s"'`“”‘’]+|[\s"'`“”‘’]+$/g, "")
+      .replace(
+        /^(help me with|help me|can you help me with|can you help me|i need help with|please help me with|please help me|explain|review|check)\s+/i,
+        "",
+      )
+      .trim();
+    const words = cleaned.split(/\s+/).filter(Boolean);
+    const shortened =
+      words.length > 8 ? words.slice(0, 8).join(" ") : cleaned;
+
+    if (shortened.length <= 52) {
+      return shortened;
+    }
+
+    return `${shortened.slice(0, 49).trimEnd()}...`;
+  }
+
   if (compactDraft.length > 0) {
-    return compactDraft.slice(0, 120);
+    return shortenTitle(compactDraft);
   }
 
   if (input.stagedFiles.length > 0) {
-    return input.stagedFiles[0].file.name.slice(0, 120);
+    return shortenTitle(input.stagedFiles[0].file.name);
   }
 
-  return input.subjectTag.slice(0, 120);
+  return shortenTitle(input.subjectTag);
 }
 
 function getRouteErrorMessage(
@@ -358,7 +377,7 @@ export function StudentSubjectQuickStart({
 
         <button
           aria-label={isStarting ? copy.sending : copy.submit}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--foreground)] text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex h-8 w-8 items-center justify-center text-[color:var(--foreground)] transition hover:text-[color:var(--accent)] disabled:cursor-not-allowed disabled:opacity-40"
           disabled={isStarting || draft.trim().length === 0}
           type="submit"
         >

@@ -328,7 +328,7 @@ export function StudentConversationWorkbench({
               <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--ink-muted)]">
                 {conversation.subject_tag}
               </p>
-              <h1 className="truncate font-[family-name:var(--font-heading)] text-3xl leading-tight sm:text-4xl">
+              <h1 className="max-w-full break-words font-[family-name:var(--font-heading)] text-3xl leading-tight sm:text-4xl">
                 {conversation.title}
               </h1>
               <p className="text-sm text-[color:var(--ink-soft)]">
