@@ -36,7 +36,6 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
           "Start the first discussion, then the sidebar will grow around the subjects you actually use.",
         firstHomework: "Start first homework",
         recentTitle: "Recent homework chats",
-        subjectTitle: "Subjects in motion",
         open: "Open",
         active: "Continue",
         mapsTitle: "Maps will live here later.",
@@ -46,10 +45,13 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         testsBody:
           "This space is reserved for future quiz practice. Homework remains the main learner experience for now.",
         subjectEyebrow: "Homework subject",
-        subjectBody:
-          "See the discussions you already saved for this subject, then jump back in from a calmer starting point.",
         noSubjectChats: "No discussion has been saved for this subject yet.",
         needsAttention: "Open learner settings",
+        subjectSourcesTitle: "Sources",
+        subjectSourcesBody:
+          "Add PDFs, photos, and screenshots once the discussion opens.",
+        subjectCount: (count: number) =>
+          `${count} ${count === 1 ? "saved chat" : "saved chats"}`,
       };
     case "zh":
       return {
@@ -62,7 +64,6 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
           "先開始第一段對話，之後側邊欄就會依照你實際使用的科目慢慢長出來。",
         firstHomework: "開始第一份作業",
         recentTitle: "最近作業對話",
-        subjectTitle: "目前在進行的科目",
         open: "打開",
         active: "續接",
         mapsTitle: "地圖工具之後會在這裡。",
@@ -72,10 +73,11 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         testsBody:
           "這裡會保留給未來的測驗練習功能。目前學生的主要體驗仍以作業為主。",
         subjectEyebrow: "作業科目",
-        subjectBody:
-          "先查看這個科目已保存的討論，再從更安靜的起點重新開始。",
         noSubjectChats: "這個科目目前還沒有已儲存的對話。",
         needsAttention: "打開設定",
+        subjectSourcesTitle: "來源",
+        subjectSourcesBody: "聊天打開後，就可以加入 PDF、照片與截圖。",
+        subjectCount: (count: number) => `已儲存 ${count} 段對話`,
       };
     default:
       return {
@@ -88,7 +90,6 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
           "Lance la première discussion et la barre latérale se structurera ensuite autour des matières réellement utilisées.",
         firstHomework: "Commencer le premier devoir",
         recentTitle: "Discussions récentes",
-        subjectTitle: "Matières en cours",
         open: "Ouvrir",
         active: "Reprendre",
         mapsTitle: "Les cartes viendront ici plus tard.",
@@ -98,10 +99,13 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         testsBody:
           "Cet espace est réservé aux futurs quiz. Pour l'instant, l'expérience élève reste centrée sur les devoirs.",
         subjectEyebrow: "Matière",
-        subjectBody:
-          "Retrouve ici les discussions déjà enregistrées pour cette matière, puis repars depuis un point d'entrée plus simple.",
         noSubjectChats: "Aucune discussion enregistrée pour cette matière.",
         needsAttention: "Ouvrir les réglages",
+        subjectSourcesTitle: "Sources",
+        subjectSourcesBody:
+          "Ajoute les PDF, photos et captures une fois la discussion ouverte.",
+        subjectCount: (count: number) =>
+          `${count} ${count === 1 ? "discussion enregistrée" : "discussions enregistrées"}`,
       };
   }
 }
@@ -237,49 +241,68 @@ export async function StudentDashboard({
           </p>
         </section>
       ) : selectedGroup ? (
-        <section className="mx-auto grid w-full max-w-5xl gap-6 py-2">
-          <div className="space-y-3">
-            <p className="text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-              {copy.subjectEyebrow}
-            </p>
-            <h1 className="font-[family-name:var(--font-heading)] text-4xl leading-tight">
-              {selectedGroup.subjectTag}
-            </h1>
-            <p className="max-w-3xl text-sm leading-7 text-[color:var(--ink-soft)]">
-              {copy.subjectBody}
-            </p>
-          </div>
-
-          <StudentSubjectQuickStart
-            languageCode={languageCode}
-            subjectTag={selectedGroup.subjectTag}
-          />
-
-          <section className="grid gap-4">
-            <div className="flex items-center justify-between gap-3">
-              <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
-                {copy.recentTitle}
-              </h2>
-              <Link
-                className="text-sm font-medium text-[color:var(--accent)]"
-                href={`/app/history?subject=${encodeURIComponent(selectedGroup.subjectTag)}`}
-              >
-                {copy.open}
-              </Link>
+        <section className="mx-auto grid w-full max-w-6xl gap-6 py-2 xl:grid-cols-[minmax(0,1fr)_19rem]">
+          <div className="grid gap-6">
+            <div className="space-y-3">
+              <p className="text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
+                {copy.subjectEyebrow}
+              </p>
+              <h1 className="font-[family-name:var(--font-heading)] text-4xl leading-tight">
+                {selectedGroup.subjectTag}
+              </h1>
             </div>
 
-            {selectedGroup.conversations.length === 0 ? (
-              <p className="text-sm leading-7 text-[color:var(--ink-soft)]">
-                {copy.noSubjectChats}
+            <StudentSubjectQuickStart
+              languageCode={languageCode}
+              subjectTag={selectedGroup.subjectTag}
+            />
+
+            <section className="grid gap-4">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
+                  {copy.recentTitle}
+                </h2>
+                <Link
+                  className="text-sm font-medium text-[color:var(--accent)]"
+                  href={`/app/history?subject=${encodeURIComponent(selectedGroup.subjectTag)}`}
+                >
+                  {copy.open}
+                </Link>
+              </div>
+
+              {selectedGroup.conversations.length === 0 ? (
+                <p className="text-sm leading-7 text-[color:var(--ink-soft)]">
+                  {copy.noSubjectChats}
+                </p>
+              ) : (
+                renderConversationRows({
+                  conversations: selectedGroup.conversations,
+                  ctaLabel: copy.active,
+                  languageCode,
+                })
+              )}
+            </section>
+          </div>
+
+          <aside className="grid gap-4 xl:sticky xl:top-24 xl:self-start">
+            <section className="grid gap-3 rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-[var(--shadow)]">
+              <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
+                {copy.subjectSourcesTitle}
               </p>
-            ) : (
-              renderConversationRows({
-                conversations: selectedGroup.conversations,
-                ctaLabel: copy.active,
-                languageCode,
-              })
-            )}
-          </section>
+              <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
+                {copy.subjectSourcesBody}
+              </p>
+            </section>
+
+            <section className="grid gap-3 rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-[var(--shadow)]">
+              <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
+                {selectedGroup.subjectTag}
+              </p>
+              <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
+                {copy.subjectCount(selectedGroup.conversations.length)}
+              </p>
+            </section>
+          </aside>
         </section>
       ) : (
         <section className="mx-auto grid w-full max-w-5xl gap-8 py-2">

@@ -70,8 +70,8 @@ Current shell behavior:
 - left rail owns activity switching and subject-filter navigation
 - `Homework` is the only real student activity today
 - `Maps` and `Tests` are placeholder modes held in the shell so future learning tools can grow without another shell rewrite
-- the bottom profile dock shows placeholder avatar, learner name, plan label, settings entry, and sign out
-- the top bar is intentionally quiet and keeps only page title plus language/theme utility controls
+- the bottom profile dock shows placeholder avatar, learner name, and plan label by default; the settings/sign-out actions now open from a hover or focus menu instead of staying permanently visible
+- the top bar is intentionally quiet and keeps only a simple eyebrow-and-title pair plus the language/theme utility controls
 
 Current boundary:
 
@@ -121,6 +121,7 @@ Why:
 - under-13 blocking still depends on the existing parent-approval flow documented in [Invitation flows V1](invitation_flows_v1.md)
 - tutor-facing derived insights still belong to the tutor oversight surface; tutors do not receive raw student memory
 - the current student-shell subject folders are not canonical entities; they are the existing conversation tags presented as filters
+- the subject rail itself no longer expands recent chat lists inline; subject-level recent discussions now stay in the main homework canvas, where the student also sees the lightweight right-side meta rail
 
 ## Next Extension Points
 

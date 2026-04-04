@@ -32,7 +32,6 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
     case "en":
       return {
         brand: "banban",
-        sidebarTitle: "Learner workspace",
         homework: "Homework",
         maps: "Maps",
         tests: "Tests",
@@ -40,8 +39,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
         testsHint: "Quiz mode coming soon",
         addSubject: "Add subject",
         noSubjects: "No subject yet",
-        recentChats: "Recent chats",
-        openSettings: "Profile & settings",
+        profileSettings: "Profile & settings",
         signOut: "Sign out",
         signOutPending: "Signing out...",
         trialPlan: "Starter plan",
@@ -55,12 +53,10 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
           settings: "Profile",
           fallback: "Learner workspace",
         },
-        stealthBar: "Calm learner view",
       };
     case "zh":
       return {
         brand: "banban",
-        sidebarTitle: "學習者工作區",
         homework: "作業",
         maps: "地圖",
         tests: "測驗",
@@ -68,8 +64,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
         testsHint: "測驗模式即將推出",
         addSubject: "新增科目",
         noSubjects: "還沒有科目",
-        recentChats: "最近對話",
-        openSettings: "個人檔案與設定",
+        profileSettings: "個人檔案與設定",
         signOut: "登出",
         signOutPending: "登出中...",
         trialPlan: "入門方案",
@@ -83,12 +78,10 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
           settings: "個人檔案",
           fallback: "學習者工作區",
         },
-        stealthBar: "專注學習視圖",
       };
     default:
       return {
         brand: "banban",
-        sidebarTitle: "Espace élève",
         homework: "Devoirs",
         maps: "Cartes",
         tests: "Tests",
@@ -96,8 +89,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
         testsHint: "Mode quiz à venir",
         addSubject: "Ajouter une matière",
         noSubjects: "Aucune matière pour l'instant",
-        recentChats: "Discussions récentes",
-        openSettings: "Profil et réglages",
+        profileSettings: "Profil et réglages",
         signOut: "Déconnexion",
         signOutPending: "Déconnexion...",
         trialPlan: "Accès Starter",
@@ -111,7 +103,6 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
           settings: "Profil",
           fallback: "Espace élève",
         },
-        stealthBar: "Vue élève épurée",
       };
   }
 }
@@ -151,41 +142,65 @@ function buildSubjectGroups(
     });
 }
 
-function buildPageTitle(input: {
+function buildHeaderContent(input: {
   pathname: string;
   view: StudentView;
   selectedSubject: string | null;
   copy: ReturnType<typeof getStudentShellCopy>;
 }) {
-  if (input.pathname.startsWith("/app/conversations/")) {
-    return input.selectedSubject ?? input.copy.pageTitles.conversation;
+  if (input.pathname.startsWith("/app/settings")) {
+    return {
+      eyebrow: input.copy.pageTitles.settings,
+      title: input.copy.pageTitles.settings,
+    };
   }
 
   if (input.pathname.startsWith("/app/history")) {
-    return input.copy.pageTitles.history;
+    return {
+      eyebrow: input.copy.pageTitles.homework,
+      title: input.copy.pageTitles.history,
+    };
   }
 
-  if (input.pathname.startsWith("/app/settings")) {
-    return input.copy.pageTitles.settings;
+  if (input.pathname.startsWith("/app/conversations/")) {
+    return {
+      eyebrow: input.copy.pageTitles.homework,
+      title: input.selectedSubject ?? input.copy.pageTitles.conversation,
+    };
   }
 
   if (input.selectedSubject) {
-    return input.selectedSubject;
+    return {
+      eyebrow: input.copy.pageTitles.homework,
+      title: input.selectedSubject,
+    };
   }
 
   if (input.view === "maps") {
-    return input.copy.pageTitles.maps;
+    return {
+      eyebrow: input.copy.pageTitles.maps,
+      title: input.copy.pageTitles.maps,
+    };
   }
 
   if (input.view === "tests") {
-    return input.copy.pageTitles.tests;
+    return {
+      eyebrow: input.copy.pageTitles.tests,
+      title: input.copy.pageTitles.tests,
+    };
   }
 
   if (input.pathname.startsWith("/app/new")) {
-    return input.copy.pageTitles.homework;
+    return {
+      eyebrow: input.copy.pageTitles.homework,
+      title: input.copy.pageTitles.homework,
+    };
   }
 
-  return input.copy.pageTitles.fallback;
+  return {
+    eyebrow: input.copy.pageTitles.homework,
+    title: input.copy.pageTitles.fallback,
+  };
 }
 
 function HomeIcon() {
@@ -275,6 +290,7 @@ export function StudentAppShell({
   const searchParams = useSearchParams();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const languageCode = appUser.preferred_ui_language;
   const copy = getStudentShellCopy(languageCode);
   const activeView = readActiveView(searchParams.get("view"));
@@ -283,7 +299,7 @@ export function StudentAppShell({
     () => buildSubjectGroups(conversations),
     [conversations],
   );
-  const pageTitle = buildPageTitle({
+  const headerContent = buildHeaderContent({
     pathname,
     view: activeView,
     selectedSubject,
@@ -305,9 +321,6 @@ export function StudentAppShell({
             <div className="min-w-0">
               <p className="brand-wordmark text-sm text-[color:var(--foreground)]">
                 {copy.brand}
-              </p>
-              <p className="text-xs text-[color:var(--ink-soft)]">
-                {copy.sidebarTitle}
               </p>
             </div>
           ) : null}
@@ -364,44 +377,21 @@ export function StudentAppShell({
                     const isActive = selectedSubject === group.subjectTag;
 
                     return (
-                      <div className="grid gap-1" key={group.subjectTag}>
-                        <Link
-                          className={`flex items-center justify-between rounded-[1rem] px-3 py-2 text-sm transition ${
-                            isActive
-                              ? "bg-[color:var(--surface-raised)] text-[color:var(--foreground)]"
-                              : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface)] hover:text-[color:var(--foreground)]"
-                          }`}
-                          href={`/app?view=homework&subject=${encodeURIComponent(group.subjectTag)}`}
-                          onClick={() => setSidebarOpen(false)}
-                        >
-                          <span className="truncate">{group.subjectTag}</span>
-                          <span className="text-xs text-[color:var(--ink-muted)]">
-                            {group.count}
-                          </span>
-                        </Link>
-
-                        {isActive && group.conversations.length > 0 ? (
-                          <div className="ml-3 grid gap-1 border-l border-[color:var(--line)] pl-3">
-                            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--ink-muted)]">
-                              {copy.recentChats}
-                            </p>
-                            {group.conversations.slice(0, 6).map((conversation) => (
-                              <Link
-                                className={`truncate rounded-[0.95rem] px-2 py-2 text-sm transition ${
-                                  pathname === `/app/conversations/${conversation.id}`
-                                    ? "bg-[color:var(--surface)] text-[color:var(--foreground)]"
-                                    : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface)] hover:text-[color:var(--foreground)]"
-                                }`}
-                                href={`/app/conversations/${conversation.id}?subject=${encodeURIComponent(group.subjectTag)}`}
-                                key={conversation.id}
-                                onClick={() => setSidebarOpen(false)}
-                              >
-                                {conversation.title}
-                              </Link>
-                            ))}
-                          </div>
-                        ) : null}
-                      </div>
+                      <Link
+                        className={`flex items-center justify-between rounded-[1rem] px-3 py-2 text-sm transition ${
+                          isActive
+                            ? "bg-[color:var(--surface-raised)] text-[color:var(--foreground)]"
+                            : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface)] hover:text-[color:var(--foreground)]"
+                        }`}
+                        href={`/app?view=homework&subject=${encodeURIComponent(group.subjectTag)}`}
+                        key={group.subjectTag}
+                        onClick={() => setSidebarOpen(false)}
+                      >
+                        <span className="truncate">{group.subjectTag}</span>
+                        <span className="text-xs text-[color:var(--ink-muted)]">
+                          {group.count}
+                        </span>
+                      </Link>
                     );
                   })}
                 </div>
@@ -452,8 +442,45 @@ export function StudentAppShell({
       </nav>
 
       <div className="border-t border-[color:var(--line)] px-3 py-4">
-        <div className="grid gap-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-3">
-          <div className="flex items-center gap-3">
+        <div
+          className="relative"
+          onMouseEnter={() => setProfileMenuOpen(true)}
+          onMouseLeave={() => setProfileMenuOpen(false)}
+        >
+          {!sidebarCollapsed ? (
+            <div
+              className={`pointer-events-none absolute bottom-full left-0 right-0 mb-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-3 shadow-[var(--shadow)] transition ${
+                profileMenuOpen
+                  ? "translate-y-0 opacity-100 pointer-events-auto"
+                  : "translate-y-2 opacity-0"
+              }`}
+            >
+              <div className="grid gap-2">
+                <Link
+                  className="inline-flex min-h-11 items-center rounded-[1rem] px-4 py-2 text-sm font-medium text-[color:var(--foreground)] transition hover:bg-[color:var(--surface-strong)]"
+                  href="/app/settings"
+                  onClick={() => {
+                    setProfileMenuOpen(false);
+                    setSidebarOpen(false);
+                  }}
+                >
+                  {copy.profileSettings}
+                </Link>
+                <SignOutButton
+                  className="inline-flex min-h-11 items-center rounded-[1rem] px-4 py-2 text-sm font-medium text-[color:var(--foreground)] transition hover:bg-[color:var(--surface-strong)]"
+                  label={copy.signOut}
+                  pendingLabel={copy.signOutPending}
+                  redirectHref={withUiLanguage("/auth", languageCode)}
+                />
+              </div>
+            </div>
+          ) : null}
+
+          <button
+            className="flex w-full items-center gap-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-3 text-left transition hover:border-[color:var(--line-strong)]"
+            onClick={() => setProfileMenuOpen((value) => !value)}
+            type="button"
+          >
             <ProfileAvatar name={appUser.display_name} />
             {!sidebarCollapsed ? (
               <div className="min-w-0">
@@ -463,24 +490,7 @@ export function StudentAppShell({
                 </p>
               </div>
             ) : null}
-          </div>
-
-          {!sidebarCollapsed ? (
-            <>
-              <Link
-                className="inline-flex min-h-11 items-center justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5"
-                href="/app/settings"
-                onClick={() => setSidebarOpen(false)}
-              >
-                {copy.openSettings}
-              </Link>
-              <SignOutButton
-                label={copy.signOut}
-                pendingLabel={copy.signOutPending}
-                redirectHref={withUiLanguage("/auth", languageCode)}
-              />
-            </>
-          ) : null}
+          </button>
         </div>
       </div>
     </div>
@@ -521,9 +531,11 @@ export function StudentAppShell({
                   <MenuIcon />
                 </button>
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium">{pageTitle}</p>
-                  <p className="truncate text-xs text-[color:var(--ink-muted)]">
-                    {copy.stealthBar}
+                  <p className="truncate text-xs uppercase tracking-[0.18em] text-[color:var(--ink-muted)]">
+                    {headerContent.eyebrow}
+                  </p>
+                  <p className="truncate text-sm font-medium">
+                    {headerContent.title}
                   </p>
                 </div>
               </div>

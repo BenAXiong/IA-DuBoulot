@@ -82,6 +82,7 @@ Current UX compromise:
 
 - the student now sees an "open chat" flow instead of an explicit session-creation ritual
 - under the hood, the route still persists the conversation before the chat opens
+- the route itself is now intentionally minimal on the surface: a simple back-to-homework link plus the real intake form, with no extra hero container
 
 That split is intentional for now because it improves the learner-facing tone without forcing a larger backend rewrite in the same slice.
 

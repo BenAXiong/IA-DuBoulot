@@ -8,12 +8,14 @@ type SignOutButtonProps = {
   label: string;
   pendingLabel: string;
   redirectHref: string;
+  className?: string;
 };
 
 export function SignOutButton({
   label,
   pendingLabel,
   redirectHref,
+  className,
 }: SignOutButtonProps) {
   const router = useRouter();
   const supabase = createSupabaseBrowserClient();
@@ -21,7 +23,7 @@ export function SignOutButton({
 
   return (
     <button
-      className="button-base button-secondary"
+      className={className ?? "button-base button-secondary"}
       disabled={isPending}
       onClick={() => {
         startTransition(async () => {
