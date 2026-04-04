@@ -29,10 +29,10 @@ export function StudentConversationComposer({
   const copy = getStudentConversationComposerCopy(languageCode);
 
   return (
-    <div className="grid gap-4 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4">
-      <div className="flex flex-wrap gap-3">
+    <div className="grid gap-4 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-4 shadow-[0_18px_40px_rgba(15,23,42,0.08)]">
+      <div className="flex flex-wrap gap-2">
         <button
-          className="inline-flex min-h-11 items-center justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
+          className="inline-flex min-h-10 items-center justify-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
           disabled={disabled || isSending}
           onClick={onUploadAttachments}
           type="button"
@@ -40,7 +40,7 @@ export function StudentConversationComposer({
           {copy.addAttachment}
         </button>
         <button
-          className="inline-flex min-h-11 items-center justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
+          className="inline-flex min-h-10 items-center justify-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
           disabled={disabled || isSending}
           onClick={onRequestHint}
           type="button"
@@ -48,7 +48,7 @@ export function StudentConversationComposer({
           {copy.hint}
         </button>
         <button
-          className="inline-flex min-h-11 items-center justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
+          className="inline-flex min-h-10 items-center justify-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
           disabled={disabled || isSending}
           onClick={onRequestSummary}
           type="button"
@@ -58,7 +58,7 @@ export function StudentConversationComposer({
       </div>
 
       <textarea
-        className="min-h-32 rounded-[1.5rem] border border-[color:var(--line)] bg-white px-4 py-3 text-sm leading-7 outline-none transition focus:border-[color:var(--accent)]"
+        className="min-h-36 rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-4 text-sm leading-7 outline-none transition focus:border-[color:var(--accent)]"
         disabled={disabled || isSending}
         onChange={(event) => onComposerTextChange(event.target.value)}
         placeholder={copy.placeholder}
@@ -66,7 +66,7 @@ export function StudentConversationComposer({
       />
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-[color:var(--ink-soft)]">
+        <p className="max-w-2xl text-sm text-[color:var(--ink-soft)]">
           {copy.body}
         </p>
         <button

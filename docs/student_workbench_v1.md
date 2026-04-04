@@ -11,6 +11,7 @@ Describe the first real student session workbench so future sessions can extend 
 This document covers `A3.4.1` to `A3.4.4`:
 
 - real transcript rendering on `/app/conversations/[conversationId]`
+- chat-first layout with a secondary sources/notes rail
 - workspace editing and saving during the session
 - hint, summarize, and attachment controls
 - iPad-width layout validation for the conversation workbench
@@ -39,12 +40,12 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 
 1. loads the persisted conversation, messages, and workspace state
 2. loads the persisted attachments and visible summaries
-3. renders the transcript as a real thread instead of a static detail card
+3. renders the transcript as a real thread instead of a static detail card, and now flattens it into a chat-first conversation surface rather than one bordered message card per turn
 4. lets the student send a freeform message, ask for a hint, or request a summary
 5. sends message turns through the Gemini-backed coach flow plus moderation checks before persisting assistant output, and falls back to the older deterministic draft coach if the provider call fails
-6. saves workspace edits through a dedicated server route
+6. saves workspace edits through a dedicated server route, but now demotes most of that workspace to a secondary notes rail instead of a primary split-screen panel
 7. uploads attachments through signed upload targets, confirms them, shows their extraction state, lets the student retry failed extraction, and keeps the file plus warning if extraction fails
-8. renders the summary/closure panel that now drives `A3.5`
+8. renders the summary/closure panel that now drives `A3.5`, but with lighter learner-facing wording and a quieter presence in the right rail
 9. localizes the workbench shell, composer, attachment list, workspace panel, and completion panel through `lib/i18n/student-flow-copy.ts`
 
 ## Interaction Rules
@@ -62,6 +63,8 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 - once the session is marked complete, the workbench becomes read-only for student writes
 - adult review surfaces now live separately under [Oversight surfaces V1](oversight_surfaces_v1.md); the student workbench remains a student-only mutation surface
 - the core student workbench path now localizes its server-side validation messages, upload warnings, moderation-safe fallback reply, and deterministic coach fallback through `lib/i18n/student-flow-copy.ts`; the remaining language risk near this surface is now mostly the broader accented-French or Unicode audit and any residual generic provider or service fallback strings
+- this redesign still keeps explicit completion as the current backend contract; it does not yet auto-generate summaries on an implicit chat-close event
+- the workbench still uses the persisted workspace fields under the hood, even though the student now sees them as lighter notes rather than a full separate workspace product
 
 ## Validation Record
 
@@ -76,3 +79,4 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 - [Student history and summary V1](student_history_summary_v1.md): the workbench now feeds explicit completion and multi-audience summary behavior
 - improve provider reliability or add a secondary fallback so the workbench does not need the deterministic coach path as often
 - tighten upload guardrails and attachment metadata capture to match the storage contract exactly
+- decide later whether completion should become optional and whether summaries should auto-generate when the learner simply leaves or closes the chat

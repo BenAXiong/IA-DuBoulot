@@ -251,16 +251,16 @@ export function getNewHomeworkEntryCopy(languageCode: UiLanguageCode) {
           zh: "個最近科目",
         }),
       eyebrow: "Nouveau devoir",
-      title: "Prépare le devoir avant d'ouvrir la conversation guidée.",
+      title: "Décris le devoir, ajoute des sources si besoin, puis entre dans le chat.",
       backToDashboard: "Retour au tableau de bord",
-      liveFormBadge: "Le formulaire détaillé est prêt juste en dessous",
+      liveFormBadge: "Le chat s'ouvrira dès que le contexte de départ sera prêt",
       sequenceEyebrow: "Parcours",
       sequenceTitle:
-        "Commence par cadrer le devoir, puis vérifie le texte avant le chat.",
+        "Décrire le devoir, joindre les sources utiles, puis reprendre la discussion.",
       steps: [
-        "1. Donner un titre clair et choisir la matière.",
-        "2. Ajouter un PDF, une capture, ou du texte déjà lisible.",
-        "3. Relire l'extraction puis entrer dans la conversation de travail.",
+        "1. Expliquer le devoir avec ses propres mots.",
+        "2. Ajouter un PDF, une capture ou un extrait lisible si nécessaire.",
+        "3. Relire le texte transmis puis ouvrir le chat.",
       ],
     },
     en: {
@@ -271,16 +271,16 @@ export function getNewHomeworkEntryCopy(languageCode: UiLanguageCode) {
           zh: "個最近科目",
         }),
       eyebrow: "New homework",
-      title: "Prepare the homework before opening the guided conversation.",
+      title: "Describe the homework, add sources if needed, then step into the chat.",
       backToDashboard: "Back to dashboard",
-      liveFormBadge: "The detailed intake form is ready just below",
+      liveFormBadge: "The chat opens as soon as the starting context is ready",
       sequenceEyebrow: "Flow",
       sequenceTitle:
-        "Frame the homework first, then review the text before the chat starts.",
+        "Describe the homework, attach the useful sources, then continue in the chat.",
       steps: [
-        "1. Add a clear title and choose the subject.",
-        "2. Add a PDF, a screenshot, or text that is already readable.",
-        "3. Review the extracted text, then enter the working conversation.",
+        "1. Explain the homework in your own words.",
+        "2. Add a PDF, screenshot, or any readable source if needed.",
+        "3. Review the source text, then open the chat.",
       ],
     },
     zh: {
@@ -291,15 +291,15 @@ export function getNewHomeworkEntryCopy(languageCode: UiLanguageCode) {
           zh: "個最近科目",
         }),
       eyebrow: "新作業",
-      title: "先整理作業內容，再開啟引導式對話。",
+      title: "先描述作業、補上需要的來源，再進入聊天。",
       backToDashboard: "回到儀表板",
-      liveFormBadge: "詳細 intake 表單就在下方",
+      liveFormBadge: "起始內容準備好後就會直接進入聊天",
       sequenceEyebrow: "流程",
-      sequenceTitle: "先框定作業，再確認文字內容，最後進入對話。",
+      sequenceTitle: "先描述作業、加入來源，再把整理好的內容帶進對話。",
       steps: [
-        "1. 先填寫清楚的作業標題並選擇科目。",
-        "2. 加入 PDF、截圖，或是已經可讀的文字。",
-        "3. 重讀擷取文字，再進入正式的作業對話。",
+        "1. 用自己的話說明這份作業。",
+        "2. 視需要加入 PDF、截圖或可讀文字。",
+        "3. 重新檢查來源文字後再進入聊天。",
       ],
     },
   });
@@ -311,7 +311,6 @@ export function getNewHomeworkIntakeCopy(languageCode: UiLanguageCode) {
       errors: {
         cannotStart:
           "Le compte ne peut pas encore lancer un nouveau devoir depuis cette route.",
-        missingTitle: "Ajoute un titre de devoir avant de continuer.",
         missingSubject: "Choisis ou saisis une matière.",
         missingSource:
           "Ajoute au moins un fichier, un texte collé, ou un brouillon d'extraction.",
@@ -329,7 +328,7 @@ export function getNewHomeworkIntakeCopy(languageCode: UiLanguageCode) {
       sections: {
         brief: {
           eyebrow: "Brief du devoir",
-          title: "Capture le titre et la matière avant toute extraction.",
+          title: "Pose le contexte du devoir comme tu le raconterais à banban.",
           titleLabel: "Titre du devoir",
           titlePlaceholder: "Ex. : Fractions - exercice 4",
           subjectLabel: "Matière",
@@ -338,27 +337,28 @@ export function getNewHomeworkIntakeCopy(languageCode: UiLanguageCode) {
         },
         sources: {
           eyebrow: "Sources du devoir",
-          title: "Ajoute les pièces du devoir puis le texte déjà lisible.",
+          title: "Ajoute les pièces utiles et le texte déjà lisible.",
           allowedFilesTitle: "Fichiers autorisés",
           allowedFilesBody:
-            "Images, captures d'écran et PDF sont vérifiés ici puis transférés et analysés pendant la création de session.",
+            "Images, captures d'écran et PDF peuvent être ajoutés ici. Ils seront transmis au chat une fois la session ouverte.",
           addFiles: "Ajouter des fichiers",
-          pastedTextLabel: "Texte collé ou recopie utile",
+          pastedTextLabel: "Que veux-tu travailler ?",
           pastedTextPlaceholder:
-            "Colle ici l'énoncé, la correction, ou les passages déjà lisibles...",
+            "Explique le devoir, colle l'énoncé, ou décris l'endroit où tu bloques...",
           gradedHomework: "Devoir noté",
         },
         review: {
-          eyebrow: "Texte extrait relu",
-          title: "Relis, corrige, puis laisse un texte propre à transmettre au chat.",
+          eyebrow: "Texte source relu",
+          title: "Relire le texte qui servira de base au chat",
           body:
-            "Le brouillon peut venir du texte collé, d'une correction manuelle, ou des pièces qui seront analysées à la création.",
+            "La zone principale peut être libre et simple. Si tu ajoutes des fichiers ou corriges une extraction, vérifie ici le texte que le chat récupérera derrière.",
           resetDraft: "Régénérer le brouillon",
           draftPlaceholder: "Le texte relu du devoir apparaîtra ici.",
-          createSession: "Créer la session",
-          creating: "Création...",
+          draftBadge: "Optionnel mais utile",
+          createSession: "Ouvrir le chat",
+          creating: "Ouverture...",
           persistenceBadge:
-            "La session sera persistée puis les pièces seront uploadées et extraites",
+            "Cette base sera persistée avant l'ouverture du chat",
         },
       },
     },
@@ -366,7 +366,6 @@ export function getNewHomeworkIntakeCopy(languageCode: UiLanguageCode) {
       errors: {
         cannotStart:
           "This account cannot start a new homework flow from this route yet.",
-        missingTitle: "Add a homework title before continuing.",
         missingSubject: "Choose or enter a subject.",
         missingSource:
           "Add at least one file, some pasted text, or an extraction draft.",
@@ -384,7 +383,7 @@ export function getNewHomeworkIntakeCopy(languageCode: UiLanguageCode) {
       sections: {
         brief: {
           eyebrow: "Homework brief",
-          title: "Capture the title and subject before any extraction runs.",
+          title: "Set the homework context the way you would explain it to banban.",
           titleLabel: "Homework title",
           titlePlaceholder: "Ex: Fractions - exercise 4",
           subjectLabel: "Subject",
@@ -393,34 +392,34 @@ export function getNewHomeworkIntakeCopy(languageCode: UiLanguageCode) {
         },
         sources: {
           eyebrow: "Homework sources",
-          title: "Add the homework files, then any text that is already readable.",
+          title: "Add the useful files and any text that is already readable.",
           allowedFilesTitle: "Allowed files",
           allowedFilesBody:
-            "Images, screenshots, and PDFs are checked here, then transferred and analyzed while the session is created.",
+            "Images, screenshots, and PDFs can be attached here. They will join the chat once the session opens.",
           addFiles: "Add files",
-          pastedTextLabel: "Pasted text or useful transcription",
+          pastedTextLabel: "What do you want to work on?",
           pastedTextPlaceholder:
-            "Paste the prompt, the correction, or any parts that are already readable...",
+            "Explain the homework, paste the prompt, or describe the exact place where you're stuck...",
           gradedHomework: "Graded homework",
         },
         review: {
-          eyebrow: "Reviewed extracted text",
-          title: "Review and clean the text before sending it into the chat.",
+          eyebrow: "Reviewed source text",
+          title: "Review the text that will quietly feed the chat",
           body:
-            "The draft can come from pasted text, a manual correction, or the files that will be analyzed during creation.",
+            "The main box can stay freeform and simple. If files or manual corrections are involved, this is the quiet place to verify the source text that sits behind the conversation.",
           resetDraft: "Regenerate draft",
           draftPlaceholder: "The reviewed homework text will appear here.",
-          createSession: "Create session",
-          creating: "Creating...",
+          draftBadge: "Optional but useful",
+          createSession: "Open chat",
+          creating: "Opening...",
           persistenceBadge:
-            "The session will be saved first, then the attachments will be uploaded and extracted",
+            "This context is saved first, then the chat opens",
         },
       },
     },
     zh: {
       errors: {
         cannotStart: "這個帳號目前還不能從這個路由開始新的作業。",
-        missingTitle: "請先補上作業標題。",
         missingSubject: "請選擇或輸入科目。",
         missingSource:
           "至少要加入一個檔案、貼上一段文字，或先寫好擷取草稿。",
@@ -436,7 +435,7 @@ export function getNewHomeworkIntakeCopy(languageCode: UiLanguageCode) {
       sections: {
         brief: {
           eyebrow: "作業摘要",
-          title: "先記下標題與科目，再開始做文字擷取。",
+          title: "先用你會對 banban 說的方式描述這份作業。",
           titleLabel: "作業標題",
           titlePlaceholder: "例：分數 - 第 4 題",
           subjectLabel: "科目",
@@ -445,26 +444,27 @@ export function getNewHomeworkIntakeCopy(languageCode: UiLanguageCode) {
         },
         sources: {
           eyebrow: "作業來源",
-          title: "先加入作業檔案，再補上已經可讀的文字。",
+          title: "加入需要的檔案，並補上已經可讀的內容。",
           allowedFilesTitle: "允許的檔案",
           allowedFilesBody:
-            "圖片、截圖與 PDF 會先在這裡檢查，再於建立課程時傳送並分析。",
+            "圖片、截圖與 PDF 都可以先放在這裡。開啟聊天後，它們會一起成為聊天的背景來源。",
           addFiles: "加入檔案",
-          pastedTextLabel: "貼上的文字或有用的手動轉寫",
+          pastedTextLabel: "你想處理什麼？",
           pastedTextPlaceholder:
-            "把題目、訂正，或是已經讀得清楚的段落貼在這裡...",
+            "描述這份作業、貼上題目，或直接說明你卡住的地方...",
           gradedHomework: "有評分的作業",
         },
         review: {
-          eyebrow: "重讀後的擷取文字",
-          title: "先重讀、修正，再把整理好的文字送進對話。",
+          eyebrow: "重讀後的來源文字",
+          title: "重新確認會在背後送進聊天的文字",
           body:
-            "這份草稿可以來自貼上文字、手動修正，或建立時會分析的附件。",
+            "主輸入框可以保持簡單自由。如果你加入檔案或做了手動修正，就在這裡確認聊天背後使用的來源文字。",
           resetDraft: "重新產生草稿",
           draftPlaceholder: "重讀後的作業文字會顯示在這裡。",
-          createSession: "建立課程",
-          creating: "建立中...",
-          persistenceBadge: "課程會先儲存，之後再上傳並擷取附件內容",
+          draftBadge: "選填但很有幫助",
+          createSession: "打開聊天",
+          creating: "開啟中...",
+          persistenceBadge: "這份起始內容會先儲存，之後再進入聊天",
         },
       },
     },
@@ -498,101 +498,6 @@ export function getIntakeFileListCopy(languageCode: UiLanguageCode) {
         pdf: "PDF",
         image: "圖片 / 截圖",
       },
-    },
-  });
-}
-
-export function getIntakeReadinessCardCopy(languageCode: UiLanguageCode) {
-  return pickLocalizedValue(languageCode, {
-    fr: {
-      readinessLabel: (isReady: boolean) => (isReady ? "prêt" : "à faire"),
-      eyebrow: "Contrôle rapide",
-      title: "Cette carte vérifie le brouillon juste avant sa persistance.",
-      cards: {
-        state: "État",
-        title: "Titre",
-        subject: "Matière",
-        sources: "Sources",
-        reviewedText: "Texte relu",
-        limits: "Limites",
-      },
-      stateReady: "Départ autorisé",
-      stateBlocked: "Départ bloqué par le statut du compte",
-      sourcesLine: (filesCount: number, pastedTextLength: number) =>
-        `${formatCount(languageCode, filesCount, {
-          fr: { singular: "fichier", plural: "fichiers" },
-          en: { singular: "file", plural: "files" },
-          zh: "個檔案",
-        })} | ${pastedTextLength} caractères collés`,
-      reviewedTextLine: (length: number) =>
-        `${length} caractères dans le panneau d'édition`,
-      limitsLine: (
-        filesCount: number,
-        filesLimit: number,
-        totalBytesLabel: string,
-        totalLimitLabel: string,
-      ) =>
-        `${filesCount}/${filesLimit} fichiers | ${totalBytesLabel} / ${totalLimitLabel}`,
-    },
-    en: {
-      readinessLabel: (isReady: boolean) => (isReady ? "ready" : "to do"),
-      eyebrow: "Quick check",
-      title: "This card checks the draft just before it is saved.",
-      cards: {
-        state: "State",
-        title: "Title",
-        subject: "Subject",
-        sources: "Sources",
-        reviewedText: "Reviewed text",
-        limits: "Limits",
-      },
-      stateReady: "Start allowed",
-      stateBlocked: "Start blocked by account status",
-      sourcesLine: (filesCount: number, pastedTextLength: number) =>
-        `${formatCount(languageCode, filesCount, {
-          fr: { singular: "fichier", plural: "fichiers" },
-          en: { singular: "file", plural: "files" },
-          zh: "個檔案",
-        })} | ${pastedTextLength} pasted characters`,
-      reviewedTextLine: (length: number) =>
-        `${length} characters in the review editor`,
-      limitsLine: (
-        filesCount: number,
-        filesLimit: number,
-        totalBytesLabel: string,
-        totalLimitLabel: string,
-      ) =>
-        `${filesCount}/${filesLimit} files | ${totalBytesLabel} / ${totalLimitLabel}`,
-    },
-    zh: {
-      readinessLabel: (isReady: boolean) => (isReady ? "已就緒" : "待完成"),
-      eyebrow: "快速檢查",
-      title: "這張卡片會在儲存前再次檢查草稿。",
-      cards: {
-        state: "狀態",
-        title: "標題",
-        subject: "科目",
-        sources: "來源",
-        reviewedText: "重讀文字",
-        limits: "限制",
-      },
-      stateReady: "可以開始",
-      stateBlocked: "帳號狀態目前阻擋開始",
-      sourcesLine: (filesCount: number, pastedTextLength: number) =>
-        `${formatCount(languageCode, filesCount, {
-          fr: { singular: "fichier", plural: "fichiers" },
-          en: { singular: "file", plural: "files" },
-          zh: "個檔案",
-        })} | 已貼上 ${pastedTextLength} 個字元`,
-      reviewedTextLine: (length: number) =>
-        `編輯區內有 ${length} 個字元`,
-      limitsLine: (
-        filesCount: number,
-        filesLimit: number,
-        totalBytesLabel: string,
-        totalLimitLabel: string,
-      ) =>
-        `${filesCount}/${filesLimit} 個檔案 | ${totalBytesLabel} / ${totalLimitLabel}`,
     },
   });
 }
@@ -752,7 +657,7 @@ export function getStudentConversationComposerCopy(languageCode: UiLanguageCode)
       placeholder:
         "Explique où tu bloques, ce que tu as déjà essayé, ou l'étape que tu veux clarifier.",
       body:
-        "banban s'appuie sur le devoir confirmé et les pièces jointes pour guider l'élève sans perdre le contexte.",
+        "banban garde le contexte du devoir en arrière-plan, donc le chat peut rester simple : dire ce qui bloque, tester une idée, puis avancer pas à pas.",
       sending: "Envoi...",
       send: "Envoyer",
     },
@@ -763,7 +668,7 @@ export function getStudentConversationComposerCopy(languageCode: UiLanguageCode)
       placeholder:
         "Explain where you're stuck, what you've already tried, or the step you want to clarify.",
       body:
-        "banban uses the confirmed assignment text and attachments to keep the guidance anchored in the real homework.",
+        "banban keeps the homework context in the background, so the chat can stay simple: say what is blocking you, test an idea, then move step by step.",
       sending: "Sending...",
       send: "Send",
     },
@@ -772,7 +677,7 @@ export function getStudentConversationComposerCopy(languageCode: UiLanguageCode)
       hint: "提示",
       summarize: "摘要",
       placeholder: "說明你卡住的地方、已經試過什麼，或你想釐清的步驟。",
-      body: "banban 會根據已確認的作業文字與附件來提供引導，讓回應始終貼近真正的題目。",
+      body: "banban 會在背景保留作業脈絡，所以聊天可以保持簡單：直接說你卡住的地方、試一個想法，然後一步一步往前走。",
       sending: "傳送中...",
       send: "送出",
     },
@@ -809,9 +714,9 @@ export function getStudentAttachmentListCopy(languageCode: UiLanguageCode) {
 export function getStudentWorkspacePanelCopy(languageCode: UiLanguageCode) {
   return pickLocalizedValue(languageCode, {
     fr: {
-      eyebrow: "Espace de travail",
+      eyebrow: "Notes de travail",
       title:
-        "Texte, plan, et brouillon restent modifiables pendant la session.",
+        "Garde ici le brouillon et les notes que tu veux retrouver pendant la discussion.",
       labels: {
         assignmentText: "Texte du devoir",
         reviewedText: "Texte relu",
@@ -831,8 +736,9 @@ export function getStudentWorkspacePanelCopy(languageCode: UiLanguageCode) {
       save: "Sauvegarder",
     },
     en: {
-      eyebrow: "Workspace",
-      title: "Text, plan, and draft stay editable throughout the session.",
+      eyebrow: "Work notes",
+      title:
+        "Keep your draft and the notes you want to revisit while the conversation continues.",
       labels: {
         assignmentText: "Homework text",
         reviewedText: "Reviewed text",
@@ -851,8 +757,8 @@ export function getStudentWorkspacePanelCopy(languageCode: UiLanguageCode) {
       save: "Save",
     },
     zh: {
-      eyebrow: "工作區",
-      title: "在課程進行時，文字、計畫與草稿都還可以繼續修改。",
+      eyebrow: "工作筆記",
+      title: "把草稿與你想在對話中反覆查看的內容放在這裡。",
       labels: {
         assignmentText: "作業文字",
         reviewedText: "重讀文字",
@@ -876,17 +782,17 @@ export function getStudentSessionSummaryCopy(languageCode: UiLanguageCode) {
   return pickLocalizedValue(languageCode, {
     fr: {
       summaryBadge: (language: string) => `Résumé ${language.toUpperCase()}`,
-      eyebrow: "Clôture et résumé",
-      titleCompleted: "La session est figée et son résumé reste consultable.",
+      eyebrow: "Résumé de session",
+      titleCompleted: "La discussion est terminée, mais le résumé reste ici.",
       titleActive:
-        "Termine la session quand le plan et le brouillon sont assez stables.",
+        "Tu peux finir pour aujourd'hui quand la discussion te semble suffisante.",
       stateTitle: "État courant",
       createdOn: (dateLabel: string | null) => `Créée le ${dateLabel}`,
       completedOn: (dateLabel: string | null) => `Terminée le ${dateLabel}`,
       activeBody:
-        "Tant que la session est active, le chat et l'espace de travail restent modifiables.",
+        "Le chat reste ouvert tant que tu ne choisis pas de terminer cette session.",
       completing: "Clôture...",
-      completeSession: "Terminer la session",
+      completeSession: "Finir pour aujourd'hui",
       summaryTitle: "Résumé élève",
       nextStep: (text: string) => `Prochaine étape : ${text}`,
       pendingAfterComplete:
@@ -896,17 +802,17 @@ export function getStudentSessionSummaryCopy(languageCode: UiLanguageCode) {
     },
     en: {
       summaryBadge: (language: string) => `Summary ${language.toUpperCase()}`,
-      eyebrow: "Closure and summary",
-      titleCompleted: "The session is frozen and its summary stays available.",
+      eyebrow: "Session summary",
+      titleCompleted: "The conversation is closed, but its summary stays here.",
       titleActive:
-        "Complete the session when the plan and draft feel stable enough.",
+        "You can finish for today once the conversation has taken you far enough.",
       stateTitle: "Current state",
       createdOn: (dateLabel: string | null) => `Created on ${dateLabel}`,
       completedOn: (dateLabel: string | null) => `Completed on ${dateLabel}`,
       activeBody:
-        "While the session is active, the chat and workspace remain editable.",
+        "The chat stays open until you decide to wrap up this session.",
       completing: "Completing...",
-      completeSession: "Complete session",
+      completeSession: "Finish for today",
       summaryTitle: "Student summary",
       nextStep: (text: string) => `Next step: ${text}`,
       pendingAfterComplete:
@@ -916,15 +822,15 @@ export function getStudentSessionSummaryCopy(languageCode: UiLanguageCode) {
     },
     zh: {
       summaryBadge: (language: string) => `摘要 ${language.toUpperCase()}`,
-      eyebrow: "結束與摘要",
-      titleCompleted: "這個課程已固定，摘要會持續保留在這裡。",
-      titleActive: "當計畫與草稿夠穩定時，再把課程正式結束。",
+      eyebrow: "課程摘要",
+      titleCompleted: "這段對話已結束，但摘要會留在這裡。",
+      titleActive: "當你覺得今天的討論已經足夠時，就可以先結束。",
       stateTitle: "目前狀態",
       createdOn: (dateLabel: string | null) => `建立於 ${dateLabel}`,
       completedOn: (dateLabel: string | null) => `完成於 ${dateLabel}`,
-      activeBody: "只要課程仍在進行中，聊天與工作區都還可以修改。",
+      activeBody: "只要你還沒選擇結束，聊天就會保持開放。",
       completing: "結束中...",
-      completeSession: "結束課程",
+      completeSession: "今天先到這裡",
       summaryTitle: "學生摘要",
       nextStep: (text: string) => `下一步：${text}`,
       pendingAfterComplete:
@@ -955,10 +861,10 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       },
       graded: "Notée",
       practice: "Exercice libre",
-      eyebrow: "Chat et espace de travail",
+      eyebrow: "Discussion de devoir",
       body:
-        "La session garde maintenant un transcript réel, des pièces jointes durables, un texte extrait relu, et un coaching IA centré sur la démarche.",
-      resumeTitle: "Reprise",
+        "Le devoir vit maintenant comme une discussion continue avec quelques repères latéraux, au lieu d'un empilement de cartes séparées.",
+      resumeTitle: "Repères",
       createdOn: (dateLabel: string | null) => `Créée le ${dateLabel}`,
       lastActivity: (dateLabel: string | null) =>
         `Dernière activité le ${dateLabel}`,
@@ -969,8 +875,8 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       uploadInProgress: "Upload et extraction en cours...",
       readOnly:
         "Cette session est terminée. Le transcript reste lisible, mais les nouvelles écritures passent maintenant par une nouvelle session.",
-      attachmentsEyebrow: "Pièces jointes",
-      attachmentsTitle: "Fichiers privés et statut d'extraction",
+      attachmentsEyebrow: "Sources",
+      attachmentsTitle: "Pièces privées et texte récupéré",
     },
     en: {
       errors: {
@@ -990,10 +896,10 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       },
       graded: "Graded",
       practice: "Open exercise",
-      eyebrow: "Chat and workspace",
+      eyebrow: "Homework conversation",
       body:
-        "This session now keeps a real transcript, durable attachments, reviewed extracted text, and AI coaching centered on the student's process.",
-      resumeTitle: "Resume",
+        "The homework now lives as one continuous discussion with a few side notes and private sources, instead of several competing panels.",
+      resumeTitle: "Markers",
       createdOn: (dateLabel: string | null) => `Created on ${dateLabel}`,
       lastActivity: (dateLabel: string | null) =>
         `Last activity on ${dateLabel}`,
@@ -1004,8 +910,8 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       uploadInProgress: "Upload and extraction in progress...",
       readOnly:
         "This session is completed. The transcript stays readable, but new writing now belongs in a new session.",
-      attachmentsEyebrow: "Attachments",
-      attachmentsTitle: "Private files and extraction status",
+      attachmentsEyebrow: "Sources",
+      attachmentsTitle: "Private files and recovered text",
     },
     zh: {
       errors: {
@@ -1022,10 +928,10 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       },
       graded: "已評分",
       practice: "自由練習",
-      eyebrow: "對話與工作區",
+      eyebrow: "作業對話",
       body:
-        "這個課程現在會保留真正的對話紀錄、可持續使用的附件、重讀後的擷取文字，以及聚焦在解題過程的 AI 教練。",
-      resumeTitle: "續接資訊",
+        "這份作業現在是一段連續對話，旁邊只保留少量工作筆記與私密來源，而不是好幾塊彼此競爭的面板。",
+      resumeTitle: "重點資訊",
       createdOn: (dateLabel: string | null) => `建立於 ${dateLabel}`,
       lastActivity: (dateLabel: string | null) => `最近活動於 ${dateLabel}`,
       viewHistory: "查看歷程",
@@ -1035,8 +941,8 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       uploadInProgress: "正在上傳並擷取...",
       readOnly:
         "這個課程已完成。對話紀錄仍可閱讀，但新的書寫內容需要放到新的課程中。",
-      attachmentsEyebrow: "附件",
-      attachmentsTitle: "私人檔案與擷取狀態",
+      attachmentsEyebrow: "來源",
+      attachmentsTitle: "私人檔案與擷取文字",
     },
   });
 }

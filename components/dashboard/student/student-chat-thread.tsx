@@ -1,4 +1,3 @@
-import { StudentStatusPill } from "@/components/dashboard/student/student-status-pill";
 import { formatDateLabel } from "@/components/dashboard/student/student-dashboard-presenters";
 import {
   getConversationRoleLabel,
@@ -12,18 +11,6 @@ type StudentChatThreadProps = {
   messages: ConversationMessageRecord[];
 };
 
-function getCardTone(role: ConversationMessageRecord["role"]) {
-  if (role === "assistant") {
-    return "border-[rgba(203,95,44,0.2)] bg-[rgba(203,95,44,0.08)]";
-  }
-
-  if (role === "system") {
-    return "border-[rgba(20,33,61,0.16)] bg-[rgba(20,33,61,0.05)]";
-  }
-
-  return "border-[color:var(--line)] bg-[color:var(--surface-strong)]";
-}
-
 export function StudentChatThread({
   languageCode,
   messages,
@@ -31,30 +18,43 @@ export function StudentChatThread({
   const copy = getStudentChatThreadCopy(languageCode);
 
   return (
-    <div className="grid gap-4">
-      {messages.map((message) => (
-        <article
-          className={`grid gap-3 rounded-[1.5rem] border p-5 ${getCardTone(message.role)}`}
-          key={message.id}
-        >
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap gap-2">
-              <StudentStatusPill
-                label={getConversationRoleLabel(message.role, languageCode)}
-              />
-              <StudentStatusPill
-                label={
-                  formatDateLabel(message.created_at, languageCode) ??
-                  copy.noDate
-                }
-              />
+    <div className="grid gap-6">
+      {messages.map((message) => {
+        const isStudent = message.role === "student";
+        const isSystem = message.role === "system";
+
+        return (
+          <article
+            className={`grid gap-2 ${isStudent ? "justify-items-end" : "justify-items-start"}`}
+            key={message.id}
+          >
+            <div
+              className={`flex max-w-3xl flex-wrap items-center gap-2 text-xs text-[color:var(--ink-muted)] ${
+                isStudent ? "justify-end" : "justify-start"
+              }`}
+            >
+              <span className="font-medium text-[color:var(--ink-soft)]">
+                {getConversationRoleLabel(message.role, languageCode)}
+              </span>
+              <span>
+                {formatDateLabel(message.created_at, languageCode) ?? copy.noDate}
+              </span>
             </div>
-          </div>
-          <p className="whitespace-pre-wrap text-sm leading-7 text-[color:var(--foreground)]">
-            {message.content_text}
-          </p>
-        </article>
-      ))}
+
+            <div
+              className={`w-full max-w-3xl text-sm leading-7 text-[color:var(--foreground)] ${
+                isStudent
+                  ? "rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-5 py-4 shadow-[0_10px_30px_rgba(15,23,42,0.06)]"
+                  : isSystem
+                    ? "rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-5 py-4 text-[color:var(--ink-soft)]"
+                    : "px-1 py-1"
+              } ${isStudent ? "ml-auto" : ""}`}
+            >
+              <p className="whitespace-pre-wrap">{message.content_text}</p>
+            </div>
+          </article>
+        );
+      })}
     </div>
   );
 }

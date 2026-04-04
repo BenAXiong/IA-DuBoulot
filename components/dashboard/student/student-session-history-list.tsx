@@ -11,6 +11,7 @@ import type { ListConversationSummary } from "@/lib/server/conversations/types";
 type StudentSessionHistoryListProps = {
   conversations: ListConversationSummary[];
   languageCode: UiLanguageCode;
+  selectedSubject?: string | null;
 };
 
 function buildGroups(
@@ -63,59 +64,71 @@ function getPrimaryDate(
 export function StudentSessionHistoryList({
   conversations,
   languageCode,
+  selectedSubject = null,
 }: StudentSessionHistoryListProps) {
   const copy = getStudentHistoryCopy(languageCode);
-  const groups = buildGroups(conversations, languageCode);
+  const filteredConversations = selectedSubject
+    ? conversations.filter(
+        (conversation) => conversation.subject_tag === selectedSubject,
+      )
+    : conversations;
+  const groups = buildGroups(filteredConversations, languageCode);
 
   return (
     <div className="grid gap-6" id="sessions">
-      <section className="grid gap-6 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] lg:grid-cols-[1.15fr_0.85fr]">
-        <article className="space-y-3">
-          <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-            {copy.eyebrow}
-          </p>
-          <h1 className="font-[family-name:var(--font-heading)] text-4xl leading-tight sm:text-5xl">
-            {copy.title}
-          </h1>
-          <p className="text-sm leading-7 text-[color:var(--ink-soft)]">
-            {copy.body}
-          </p>
-        </article>
+      <section className="grid gap-4 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <article className="space-y-3">
+            <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
+              {selectedSubject ? selectedSubject : copy.eyebrow}
+            </p>
+            <h1 className="font-[family-name:var(--font-heading)] text-4xl leading-tight sm:text-5xl">
+              {copy.title}
+            </h1>
+            <p className="max-w-3xl text-sm leading-7 text-[color:var(--ink-soft)]">
+              {copy.body}
+            </p>
+          </article>
 
-        <article className="grid gap-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5 text-sm">
-          <p className="font-medium">{copy.volumeTitle}</p>
-          <p className="text-[color:var(--ink-soft)]">
-            {copy.totalVisibleSessions(conversations.length)}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            <StudentStatusPill
-              label={copy.activeCount(groups[0]?.conversations.length ?? 0)}
-              tone="accent"
-            />
-            <StudentStatusPill label={copy.completedCount(groups[1]?.conversations.length ?? 0)} />
-            <StudentStatusPill
-              label={copy.archivedCount(groups[2]?.conversations.length ?? 0)}
-              tone="warning"
-            />
+          <div className="grid gap-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5 text-sm">
+            <p className="font-medium">{copy.volumeTitle}</p>
+            <p className="text-[color:var(--ink-soft)]">
+              {copy.totalVisibleSessions(filteredConversations.length)}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <StudentStatusPill
+                label={copy.activeCount(groups[0]?.conversations.length ?? 0)}
+                tone="accent"
+              />
+              <StudentStatusPill label={copy.completedCount(groups[1]?.conversations.length ?? 0)} />
+              <StudentStatusPill
+                label={copy.archivedCount(groups[2]?.conversations.length ?? 0)}
+                tone="warning"
+              />
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                className="inline-flex justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 font-medium transition hover:-translate-y-0.5"
+                href="/app"
+              >
+                {copy.backToDashboard}
+              </Link>
+              <Link
+                className="inline-flex justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 font-medium transition hover:-translate-y-0.5"
+                href={
+                  selectedSubject
+                    ? `/app/new?subject=${encodeURIComponent(selectedSubject)}`
+                    : "/app/new"
+                }
+              >
+                {copy.newHomework}
+              </Link>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              className="inline-flex justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 font-medium transition hover:-translate-y-0.5"
-              href="/app"
-            >
-              {copy.backToDashboard}
-            </Link>
-            <Link
-              className="inline-flex justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 font-medium transition hover:-translate-y-0.5"
-              href="/app/new"
-            >
-              {copy.newHomework}
-            </Link>
-          </div>
-        </article>
+        </div>
       </section>
 
-      {conversations.length === 0 ? (
+      {filteredConversations.length === 0 ? (
         <section className="rounded-[2rem] border border-dashed border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]">
           <p className="font-medium">{copy.emptyTitle}</p>
           <p className="mt-2 text-sm leading-6 text-[color:var(--ink-soft)]">

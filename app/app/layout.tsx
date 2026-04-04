@@ -9,7 +9,7 @@ export default async function AppLayout({
   const { context, appUser } = await requireAppPageContext();
 
   return (
-    <AppShell appUser={appUser} email={context.email}>
+    <AppShell appUser={appUser} context={context}>
       {children}
     </AppShell>
   );

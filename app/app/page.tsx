@@ -9,7 +9,10 @@ import {
   redirectDeletionRequestedAppUser,
   requireAppPageContext,
 } from "@/lib/server/auth/page-guards";
-import type { AppUserRecord } from "@/lib/server/auth/types";
+import type {
+  AppUserRecord,
+  AuthenticatedUserContext,
+} from "@/lib/server/auth/types";
 import { loadAdminAccessAuditSnapshot } from "@/lib/server/oversight/admin-service";
 import { loadParentDashboardSnapshot } from "@/lib/server/oversight/parent-service";
 import { loadTutorDashboardSnapshot } from "@/lib/server/oversight/tutor-service";
@@ -17,10 +20,20 @@ import { loadTutorDashboardSnapshot } from "@/lib/server/oversight/tutor-service
 async function renderRoleDashboard(
   appUser: AppUserRecord,
   email: string | null,
+  context: AuthenticatedUserContext,
+  studentView: "homework" | "maps" | "tests",
+  selectedSubject: string | null,
 ) {
   switch (appUser.role) {
     case "student":
-      return <StudentDashboard appUser={appUser} />;
+      return (
+        <StudentDashboard
+          appUser={appUser}
+          context={context}
+          selectedSubject={selectedSubject}
+          view={studentView}
+        />
+      );
     case "parent": {
       const snapshot = await loadParentDashboardSnapshot(appUser, email);
       return (
@@ -55,15 +68,45 @@ async function renderRoleDashboard(
   }
 }
 
-export default async function AppHomePage() {
+type SearchParams =
+  | Promise<Record<string, string | string[] | undefined>>
+  | Record<string, string | string[] | undefined>;
+
+function getSearchParam(
+  searchParams: Record<string, string | string[] | undefined>,
+  key: string,
+) {
+  const value = searchParams[key];
+  return typeof value === "string" ? value : null;
+}
+
+export default async function AppHomePage({
+  searchParams,
+}: {
+  searchParams?: SearchParams;
+}) {
   const { context, appUser } = await requireAppPageContext();
   redirectDeletionRequestedAppUser(appUser);
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const selectedSubject = getSearchParam(resolvedSearchParams, "subject");
+  const studentViewParam = getSearchParam(resolvedSearchParams, "view");
+  const studentView =
+    studentViewParam === "maps" || studentViewParam === "tests"
+      ? studentViewParam
+      : "homework";
   const copy = getAppHomeCopy(appUser.preferred_ui_language);
-  const showAccountSettingsBlock = appUser.role !== "parent";
+  const showAccountSettingsBlock =
+    appUser.role !== "parent" && appUser.role !== "student";
 
   return (
     <div className="grid gap-6">
-      {await renderRoleDashboard(appUser, context.email)}
+      {await renderRoleDashboard(
+        appUser,
+        context.email,
+        context,
+        studentView,
+        selectedSubject,
+      )}
 
       {showAccountSettingsBlock ? (
         <section

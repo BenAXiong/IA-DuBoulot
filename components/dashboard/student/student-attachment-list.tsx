@@ -1,5 +1,4 @@
 import type { ConversationAttachmentRecord } from "@/lib/server/ai/types";
-import { StudentStatusPill } from "@/components/dashboard/student/student-status-pill";
 import {
   getAttachmentKindLabel,
   getAttachmentStatusLabel,
@@ -24,7 +23,7 @@ export function StudentAttachmentList({
 
   if (attachments.length === 0) {
     return (
-      <div className="rounded-[1.5rem] border border-dashed border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4 text-sm leading-6 text-[color:var(--ink-soft)]">
+      <div className="rounded-[1.25rem] border border-dashed border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4 text-sm leading-6 text-[color:var(--ink-soft)]">
         {copy.empty}
       </div>
     );
@@ -37,26 +36,25 @@ export function StudentAttachmentList({
           className="grid gap-3 rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4"
           key={attachment.id}
         >
-          <div className="flex flex-wrap gap-2">
-            <StudentStatusPill
-              label={getAttachmentKindLabel(
+          <div className="flex flex-wrap items-center gap-2 text-xs text-[color:var(--ink-muted)]">
+            <span className="font-medium text-[color:var(--ink-soft)]">
+              {getAttachmentKindLabel(
                 attachment.attachment_kind,
                 languageCode,
               )}
-              tone="accent"
-            />
-            <StudentStatusPill
-              label={getAttachmentStatusLabel(
+            </span>
+            <span>
+              {getAttachmentStatusLabel(
                 attachment.extraction_status,
                 languageCode,
               )}
-            />
+            </span>
           </div>
 
           <div className="space-y-2">
             <p className="font-medium">{attachment.original_filename}</p>
             {attachment.raw_extracted_text ? (
-              <p className="line-clamp-4 text-sm leading-6 text-[color:var(--ink-soft)]">
+              <p className="line-clamp-3 text-sm leading-6 text-[color:var(--ink-soft)]">
                 {attachment.raw_extracted_text}
               </p>
             ) : (
@@ -68,7 +66,7 @@ export function StudentAttachmentList({
 
           <div className="flex flex-wrap gap-3">
             <a
-              className="inline-flex min-h-11 items-center justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5"
+              className="inline-flex min-h-10 items-center justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5"
               href={`/api/attachments/${attachment.id}/access`}
               rel="noreferrer"
               target="_blank"
@@ -77,7 +75,7 @@ export function StudentAttachmentList({
             </a>
             {attachment.extraction_status === "failed" ? (
               <button
-                className="inline-flex min-h-11 items-center justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
+                className="inline-flex min-h-10 items-center justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
                 disabled={disabled}
                 onClick={() => onRetryExtraction(attachment.id)}
                 type="button"

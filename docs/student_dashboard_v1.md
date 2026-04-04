@@ -8,29 +8,29 @@ Capture the first real student home screen so future sessions can extend it with
 
 ## Scope
 
-This document started with `A3.1.1` to `A3.1.3` and now also records the `A6.1` memory-panel extension:
+This document started with `A3.1.1` to `A3.1.3` and now also records the later student-shell redesign:
 
-- main `New homework` CTA on the student dashboard
-- recent session list with subject tags
-- linked-adult status
-- usage status from `usage_counters`
+- student-owned `/app` shell with a collapsible subject rail
+- homework-focused home view with recent conversations grouped by subject-tag filters
+- placeholder `Maps` and `Tests` activity slots
 - canonical intake entry route at `/app/new`
-- student-owned pedagogical memory review and cleanup
+- learner-owned profile, adult-link actions, and memory review moved to `/app/settings`
 
 ## Source Files
 
 - Page shell entry: `app/app/page.tsx`
+- Student shell: `components/layout/student-app-shell.tsx`
 - Student dashboard container: `components/dashboard/student-dashboard.tsx`
-- Start panel: `components/dashboard/student/student-dashboard-start-panel.tsx`
-- Recent sessions panel: `components/dashboard/student/student-dashboard-recent-sessions.tsx`
-- Support and usage panel: `components/dashboard/student/student-dashboard-support-grid.tsx`
-- Memory panel: `components/dashboard/memory/memory-panel.tsx`
+- Subject quick start: `components/dashboard/student/student-subject-quick-start.tsx`
+- Student settings support sections: `components/dashboard/student/student-settings-support-sections.tsx`
 - Canonical intake entry route: `app/app/new/page.tsx`
 - Intake entry component: `components/dashboard/student/new-homework-entry.tsx`
 - Server snapshot service: `lib/server/student-dashboard/student-dashboard-service.ts`
+- Conversation list service: `lib/server/conversations/conversation-service.ts`
 - Memory service: `lib/server/memory/service.ts`
 - Dashboard types: `lib/server/student-dashboard/types.ts`
 - Dashboard localization copy: `lib/i18n/dashboard-copy.ts`
+- Student flow localization copy: `lib/i18n/student-flow-copy.ts`
 
 ## Data Contract
 
@@ -38,13 +38,9 @@ The student dashboard reads one server-side snapshot object:
 
 - app-user identity basics
 - `startState` and `canStartHomework`
-- recent conversations
-- subject-tag rollup derived from recent conversations
-- parent/tutor link counts
-- parent-approval status from `student_profiles`
-- latest usage period from `usage_counters`
 - quota and trial snapshot resolved through the server-owned usage service
-- a separate student-memory snapshot resolved through the memory service
+
+In the current student-shell pass, the visible homework folders and subject views also read the full visible conversation list. Those subject folders are still derived from each conversation's existing `subject_tag`; they are not backed by a canonical subject table yet.
 
 The page does not query Supabase directly. The service owns that logic.
 
@@ -65,11 +61,23 @@ Current rule:
 - suspended and deletion-requested accounts cannot start new homework
 - everyone else is `ready`
 
-## Why Link Status Uses Counts Instead Of Adult Names
+## Student Shell Model
 
-The current RLS model lets students read their `parent_student_links` and `tutor_student_links`, but it does not broadly expose linked adult `public.users` rows back to the student. Because of that, V1 shows linked-adult counts and states, not adult display names.
+The student role no longer inherits the generic authenticated-shell rhythm used by adults.
 
-If named adult chips become necessary later, add a narrowly-authorized server-side read path instead of weakening the base `users` RLS.
+Current shell behavior:
+
+- left rail owns activity switching and subject-filter navigation
+- `Homework` is the only real student activity today
+- `Maps` and `Tests` are placeholder modes held in the shell so future learning tools can grow without another shell rewrite
+- the bottom profile dock shows placeholder avatar, learner name, plan label, settings entry, and sign out
+- the top bar is intentionally quiet and keeps only page title plus language/theme utility controls
+
+Current boundary:
+
+- subject folders are just UI filters over `subject_tag`
+- there is still no canonical learner avatar upload
+- the shell does not yet expose a subject-creation model independent of creating or reopening homework
 
 ## Canonical Entry Route
 
@@ -80,41 +88,42 @@ Current role:
 - receives the student from the dashboard CTA
 - repeats the current start-state gate
 - hosts the real intake form from [Student intake V1](student_intake_v1.md)
-- hands off into the persisted student workbench once the intake draft is validated
+- hands off into the persisted student workbench once the intake context is validated
 
 What it does not do yet:
 
 - billing and privacy controls now live on `/app/settings` instead of expanding the student dashboard itself
-- no parent/tutor management actions on the student side
+- learner-owned adult-link actions and memory now also live on `/app/settings`
+- the route still creates the persisted conversation before the student enters the chat, even though the visible copy now reads more like "open chat" than "create session"
 
 Those belong to later business and privacy phases rather than the dashboard shell itself.
 
-## Memory Panel Extension
+## Settings Split
 
-The student dashboard now includes the canonical pedagogical memory panel.
+The student home no longer owns the heavier learner profile controls.
 
-Current behavior:
+Current `/app/settings` student additions:
 
-- loads the current `StudentMemorySnapshot` beside the existing dashboard snapshot
-- shows profile summaries for strengths, weaknesses, and preferences
-- groups active items by category
-- allows the student to add, edit, and delete durable pedagogical items through `PATCH /api/students/[studentId]/memory`
-- reminds the user that sensitive or speculative labels are rejected
+- profile editing still lives in the shared privacy/settings view
+- parent-approval and tutor-invite forms now live there for the student role
+- the memory panel now lives there for the student role
 
-Current boundary:
+Why:
 
-- raw session content still lives in the session detail and workbench surfaces
-- the dashboard memory panel is only for durable learning context that can help the next homework
-- the shared student-dashboard copy now respects `preferred_ui_language` through localized presenters and `lib/i18n/dashboard-copy.ts`, and the adjacent `/app/new`, `/app/history`, and `/app/conversations/[conversationId]` surfaces now localize through `lib/i18n/student-flow-copy.ts`
+- `/app` should feel like a homework workspace, not a control center
+- durable memory and adult-link actions are real product features, but they do not belong in the student's first visual scan every time they open the app
 
 ## Known Boundaries
 
-- recent sessions on `/app` are intentionally short; the canonical long-form list now lives at `/app/history`
-- the student dashboard now shows the same quota state the mutation routes enforce, but billing remains a parent-owned workflow surfaced on `/app/settings`
+- recent sessions on `/app` are intentionally short and subject-filtered; the canonical long-form list now lives at `/app/history`
+- the student dashboard no longer foregrounds quota or adult-link cards on the home surface, but the same server-owned start-state gate still controls `/app` and `/app/new`
+- billing remains a parent-owned workflow surfaced on `/app/settings`
 - under-13 blocking still depends on the existing parent-approval flow documented in [Invitation flows V1](invitation_flows_v1.md)
 - tutor-facing derived insights still belong to the tutor oversight surface; tutors do not receive raw student memory
+- the current student-shell subject folders are not canonical entities; they are the existing conversation tags presented as filters
 
 ## Next Extension Points
 
-- extend recent-session cards and counts only when they still complement, rather than duplicate, `/app/history`
-- keep the dashboard focused on start-state and short status signals while summaries stay in the dedicated session surfaces
+- decide whether subject filters stay lightweight or become canonical subject entities with alias normalization
+- decide whether the first learner message should implicitly create the conversation instead of routing through `/app/new`
+- replace the placeholder learner avatar with a real pilot-level profile media flow if pilot usage justifies it

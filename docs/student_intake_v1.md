@@ -10,12 +10,12 @@ Describe the first real `/app/new` intake surface so future sessions know what i
 
 This document covers `A3.2.1` to `A3.2.4`:
 
-- assignment title entry
 - subject entry
 - image, screenshot, and PDF staging from the browser
 - pasted-text input
 - graded-homework toggle
 - extracted-text review and manual edit panel
+- student-facing "open chat" entry copy over the existing persisted-session bootstrap
 
 ## Source Files
 
@@ -23,25 +23,24 @@ This document covers `A3.2.1` to `A3.2.4`:
 - Entry wrapper: `components/dashboard/student/new-homework-entry.tsx`
 - Intake form: `components/dashboard/student/new-homework-intake-form.tsx`
 - File list: `components/dashboard/student/intake-file-list.tsx`
-- Readiness card: `components/dashboard/student/intake-readiness-card.tsx`
 - Client-side intake config: `lib/intake/intake-config.ts`
 - Student flow localization copy: `lib/i18n/student-flow-copy.ts`
 
 ## Current Behavior
 
-The route is real, protected, and now creates a persisted session draft when validated.
+The route is real, protected, and still creates a persisted session draft when validated, but the learner-facing UI now treats it as a quiet "open the chat with this homework" surface instead of a wizard.
 
 What works now:
 
 - the route checks student access and start-state gating through the existing dashboard snapshot
-- the student can enter a title and subject
+- the student can enter or reuse a subject, including a subject prefilled from the student shell quick-start
 - the student can stage allowed files in the browser
-- the student can paste readable homework text
+- the student can paste readable homework text in one main freeform box
 - the student can toggle whether the homework is graded
-- the student can review and edit the text that will later feed the chat
+- the student can review and edit the text that will later feed the chat through a quieter collapsible source-text panel
 - the validated intake now creates a conversation draft, uploads the selected files through the signed upload flow, confirms them, runs extraction, syncs extracted text back into the workspace, and then redirects into the persisted session page
 - if provider extraction fails during confirmation, the attachment is kept, marked `failed`, and returned with a manual-review warning instead of breaking the student flow
-- the intake route copy, subject labels, staged-file labels, readiness card, client upload fallbacks, and provisional extraction draft now localize through `lib/i18n/student-flow-copy.ts` plus the localized helpers inside `lib/intake/intake-config.ts`
+- the intake route copy, subject labels, staged-file labels, client upload fallbacks, and provisional extraction draft now localize through `lib/i18n/student-flow-copy.ts` plus the localized helpers inside `lib/intake/intake-config.ts`
 - the server-owned intake validations, upload validation errors, extraction warnings, and extracted-text source labels now also localize from the student's `preferred_ui_language`, so the route no longer drops back to mixed English or French when the server rejects or repairs part of the flow
 
 What does not happen yet:
@@ -64,7 +63,7 @@ The UI treats screenshots as the same browser file path as images for now. The l
 
 ## Extraction Review Rule
 
-The extracted-text panel is intentionally decoupled from the future OCR pipeline.
+The extracted-text panel is intentionally decoupled from the future OCR pipeline and now sits behind a calmer "review source text" step instead of a separate readiness card.
 
 Current seed logic:
 
@@ -76,18 +75,19 @@ This means the review/edit surface can already be designed and tested before the
 
 ## Relationship To A3.3
 
-`A3.2` defines the intake surface.
-`A3.3` defines how that intake becomes a reusable session.
+`A3.2` still defines the entry surface.
+`A3.3` still defines how that entry becomes a reusable session.
 
-That split is intentional:
+Current UX compromise:
 
-- intake defines what the student prepares
-- persistence defines how that preparation becomes a reusable conversation
+- the student now sees an "open chat" flow instead of an explicit session-creation ritual
+- under the hood, the route still persists the conversation before the chat opens
 
-Keeping them separate avoids binding the form to unfinished upload and conversation APIs too early.
+That split is intentional for now because it improves the learner-facing tone without forcing a larger backend rewrite in the same slice.
 
 ## Next Extension Points
 
 - tighten the upload limits and metadata capture to match [Storage and attachment rules](storage_attachment_rules.md)
 - add a local non-provider extraction fallback or retry path if provider extraction failures stay common
 - move long-running extraction or retry work into a queued path if synchronous confirmation becomes too slow
+- decide later whether the first learner message should implicitly create the conversation instead of routing through this entry page

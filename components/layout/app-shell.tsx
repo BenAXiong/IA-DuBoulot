@@ -2,25 +2,49 @@ import Link from "next/link";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { DocumentLanguageSync } from "@/components/i18n/document-language-sync";
 import { AppToolbarControls } from "@/components/layout/app-toolbar-controls";
+import { StudentAppShell } from "@/components/layout/student-app-shell";
 import {
   getAppShellCopy,
   getLanguageLabel,
 } from "@/lib/i18n/ui-copy";
 import { withUiLanguage } from "@/lib/i18n/ui-language";
-import type { AppUserRecord } from "@/lib/server/auth/types";
+import type {
+  AppUserRecord,
+  AuthenticatedUserContext,
+} from "@/lib/server/auth/types";
+import { loadStudentDashboardSnapshot } from "@/lib/server/student-dashboard/student-dashboard-service";
+import { listVisibleConversations } from "@/lib/server/conversations/conversation-service";
 
 type AppShellProps = {
   children: React.ReactNode;
-  email: string | null;
+  context: AuthenticatedUserContext;
   appUser: AppUserRecord;
 };
 
-export function AppShell({ children, email, appUser }: AppShellProps) {
+export async function AppShell({ children, context, appUser }: AppShellProps) {
+  if (appUser.role === "student") {
+    const [snapshot, conversations] = await Promise.all([
+      loadStudentDashboardSnapshot(appUser),
+      listVisibleConversations({ context }),
+    ]);
+
+    return (
+      <StudentAppShell
+        appUser={appUser}
+        conversations={conversations}
+        snapshot={snapshot}
+      >
+        {children}
+      </StudentAppShell>
+    );
+  }
+
   const languageCode = appUser.preferred_ui_language;
   const copy = getAppShellCopy(languageCode);
   const navItems = copy.navigation[appUser.role];
   const roleMeta = copy.roles[appUser.role];
   const showsDesktopSidebar = appUser.role !== "parent";
+  const email = context.email;
 
   return (
     <main className="px-5 py-6 sm:px-8 lg:px-12" lang={languageCode}>

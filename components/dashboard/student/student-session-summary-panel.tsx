@@ -34,7 +34,7 @@ export function StudentSessionSummaryPanel({
   const copy = getStudentSessionSummaryCopy(languageCode);
 
   return (
-    <aside className="grid gap-4 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]">
+    <aside className="grid gap-4 rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-[var(--shadow)]">
       <div className="space-y-3">
         <div className="flex flex-wrap gap-2">
           <StudentStatusPill
@@ -52,7 +52,7 @@ export function StudentSessionSummaryPanel({
           <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
             {copy.eyebrow}
           </p>
-          <h2 className="mt-2 font-[family-name:var(--font-heading)] text-3xl leading-tight">
+          <h2 className="mt-2 font-[family-name:var(--font-heading)] text-2xl leading-tight">
             {isCompleted
               ? copy.titleCompleted
               : copy.titleActive}

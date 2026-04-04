@@ -53,6 +53,7 @@ Code:
 
 - `app/app/layout.tsx`
 - `components/layout/app-shell.tsx`
+- `components/layout/student-app-shell.tsx`
 
 Current routes using it:
 
@@ -77,6 +78,7 @@ Rules:
 - the authenticated language control must update the saved app profile language, not just rewrite the URL query string used on public routes
 - authenticated app routes may honor the short-lived `ia_ui_lang` cookie as an immediate UI-language override during the refresh triggered by the authenticated language menu, so the visible server-rendered copy can switch before the slower profile write fully completes
 - the authenticated shell should not surface pilot badges, literal route hints, or other implementation-facing framing on the main role dashboards
+- the student role now owns its own chat-first shell rhythm through `components/layout/student-app-shell.tsx`: collapsible left subject rail, minimal top bar, profile dock, and a quieter page canvas than the original generic `/app` chrome
 - the parent role now suppresses the generic desktop shell sidebar and instead lets the dashboard own a parent-specific information architecture: account and billing dock, pending parent-approval requests, a learner-creation panel, and linked-learners rail on the left, with grouped weekly and recent activity on the right
 
 ## Role Dashboard Variants
@@ -95,6 +97,7 @@ Shared building block:
 Rule:
 
 - each role gets its own dashboard module to avoid a god `/app/page.tsx`
+- the student role now also gets its own shell treatment instead of only a role-specific dashboard module; the dashboard content is still role-specific, but the chrome and navigation rhythm are no longer shared with adult roles
 - the parent dashboard is now further split into dedicated parent-owned building blocks instead of one placeholder surface: `parent-account-dock.tsx`, `parent-learners-rail.tsx`, `parent-activity-hub.tsx`, and `parent-dashboard-presenters.ts`
 - the parent dashboard now also includes `parent-pending-approvals-panel.tsx`, which surfaces parent-targeted pending invitations addressed to the signed-in email and lets the parent accept them directly from `/app` without reopening the original invite URL
 - the parent dashboard now also includes `parent-create-learner-panel.tsx`, which adds the additive parent-created learner bootstrap path while leaving the original learner-created onboarding flow intact
@@ -121,6 +124,7 @@ Why:
 - the student workflow, settings/privacy controls, and adult review flow now all have enough depth to deserve stable URLs
 - the shell still avoids exploding into route sprawl for every small metric or summary card that can remain dashboard-local
 - `#account` remains relevant for the shared settings block used by non-parent roles, while parent account and billing controls now live inside the parent dashboard rail instead of a separate bottom section on `/app`
+- the student shell now treats subjects as filter views over existing `subject_tag` values and sends learner-owned support settings to `/app/settings`, so the main `/app` page can behave more like a chat workspace than a control center
 
 ## iPad Validation
 
@@ -150,3 +154,4 @@ Scope boundary:
 - validate the shell on actual iPad Safari during `A7.1`
 - add role-specific empty states that consume real data rather than static MVP guidance copy
 - validate the new parent-specific shell rhythm in real walkthroughs so the learner rail, billing dock, and grouped activity panels stay calmer than the generic shared-sidebar pattern they replaced
+- decide later whether the student shell should keep subject filters only, or graduate to real subject entities and implicit first-message conversation creation

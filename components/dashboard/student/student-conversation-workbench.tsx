@@ -397,8 +397,8 @@ export function StudentConversationWorkbench({
         type="file"
       />
 
-      <section className="grid gap-6 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] lg:grid-cols-[1.15fr_0.85fr]">
-        <article className="space-y-4">
+      <section className="grid gap-4 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-[var(--shadow)]">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="flex flex-wrap gap-2">
             <StudentStatusPill label={conversation.subject_tag} tone="accent" />
             <StudentStatusPill
@@ -411,35 +411,16 @@ export function StudentConversationWorkbench({
             />
           </div>
 
-          <div className="space-y-3">
-            <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-              {copy.eyebrow}
-            </p>
-            <h1 className="font-[family-name:var(--font-heading)] text-4xl leading-tight sm:text-5xl">
-              {conversation.title}
-            </h1>
-            <p className="text-sm leading-7 text-[color:var(--ink-soft)]">
+          <div className="space-y-2">
+            <p className="text-sm text-[color:var(--ink-soft)]">
               {copy.body}
             </p>
+            <h1 className="font-[family-name:var(--font-heading)] text-3xl leading-tight sm:text-4xl">
+              {conversation.title}
+            </h1>
           </div>
-        </article>
 
-        <article className="grid gap-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5 text-sm">
-          <p className="font-medium">{copy.resumeTitle}</p>
-          <p className="text-[color:var(--ink-soft)]">
-            {copy.createdOn(formatDateLabel(conversation.created_at, languageCode))}
-          </p>
-          <p className="text-[color:var(--ink-soft)]">
-            {copy.lastActivity(
-              formatDateLabel(
-                messages.at(-1)?.created_at ??
-                  conversation.last_message_at ??
-                  conversation.created_at,
-                languageCode,
-              ),
-            )}
-          </p>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 lg:justify-end">
             <Link
               className="inline-flex min-h-11 items-center justify-center rounded-full border border-[color:var(--line)] bg-white px-4 py-2 font-medium transition hover:-translate-y-0.5"
               href="/app/history"
@@ -453,22 +434,36 @@ export function StudentConversationWorkbench({
               {copy.newHomework}
             </Link>
           </div>
-        </article>
+        </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(22rem,0.92fr)]">
-        <article className="grid gap-4 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] lg:min-h-[calc(100vh-10rem)]">
-          <div className="space-y-3">
-            <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-              {copy.conversationEyebrow}
-            </p>
-            <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
-              {copy.conversationTitle}
-            </h2>
-          </div>
-
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
+        <article className="grid gap-4 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] xl:min-h-[calc(100vh-10rem)]">
           <div className="grid gap-4 lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
-            <div className="lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+            <div className="grid gap-3">
+              <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--ink-muted)]">
+                {copy.resumeTitle}
+              </p>
+              <div className="flex flex-wrap gap-3 text-sm text-[color:var(--ink-soft)]">
+                <span>
+                  {copy.createdOn(
+                    formatDateLabel(conversation.created_at, languageCode),
+                  )}
+                </span>
+                <span>
+                  {copy.lastActivity(
+                    formatDateLabel(
+                      messages.at(-1)?.created_at ??
+                        conversation.last_message_at ??
+                        conversation.created_at,
+                      languageCode,
+                    ),
+                  )}
+                </span>
+              </div>
+            </div>
+
+            <div className="xl:min-h-0 xl:flex-1 xl:overflow-y-auto">
               <StudentChatThread languageCode={languageCode} messages={messages} />
             </div>
 
@@ -504,7 +499,7 @@ export function StudentConversationWorkbench({
           </div>
         </article>
 
-        <div className="grid gap-6">
+        <div className="grid gap-4 xl:sticky xl:top-24 xl:self-start">
           <StudentSessionSummaryPanel
             conversation={conversation}
             feedbackMessage={completionError ?? completionMessage}
@@ -514,12 +509,12 @@ export function StudentConversationWorkbench({
             summary={studentSummary}
           />
 
-          <aside className="grid gap-4 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]">
+          <aside className="grid gap-4 rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-[var(--shadow)]">
             <div className="space-y-3">
               <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
                 {copy.attachmentsEyebrow}
               </p>
-              <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
+              <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
                 {copy.attachmentsTitle}
               </h2>
             </div>

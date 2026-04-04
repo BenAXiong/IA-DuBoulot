@@ -43,48 +43,15 @@ export function StudentWorkspacePanel({
   }
 
   return (
-    <aside className="grid gap-4 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] lg:sticky lg:top-6 lg:max-h-[calc(100vh-10rem)] lg:overflow-y-auto">
+    <aside className="grid gap-4 rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-[var(--shadow)]">
       <div className="space-y-3">
         <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
           {copy.eyebrow}
         </p>
-        <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
+        <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
           {copy.title}
         </h2>
       </div>
-
-      <label className="grid gap-2 text-sm">
-        <span className="font-medium">{copy.labels.assignmentText}</span>
-        <textarea
-          className="min-h-32 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
-          disabled={disabled || isSaving}
-          onChange={(event) => updateField("assignmentText", event.target.value)}
-          value={workspace.assignmentText}
-        />
-      </label>
-
-      <label className="grid gap-2 text-sm">
-        <span className="font-medium">{copy.labels.reviewedText}</span>
-        <textarea
-          className="min-h-40 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
-          disabled={disabled || isSaving}
-          onChange={(event) =>
-            updateField("editedExtractedText", event.target.value)
-          }
-          value={workspace.editedExtractedText}
-        />
-      </label>
-
-      <label className="grid gap-2 text-sm">
-        <span className="font-medium">{copy.labels.planText}</span>
-        <textarea
-          className="min-h-28 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
-          disabled={disabled || isSaving}
-          onChange={(event) => updateField("planText", event.target.value)}
-          placeholder={copy.placeholders.planText}
-          value={workspace.planText}
-        />
-      </label>
 
       <label className="grid gap-2 text-sm">
         <span className="font-medium">{copy.labels.draftAnswerText}</span>
@@ -107,6 +74,45 @@ export function StudentWorkspacePanel({
           value={workspace.studentNotes}
         />
       </label>
+
+      <details className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4">
+        <summary className="cursor-pointer list-none text-sm font-medium">
+          {copy.labels.reviewedText}
+        </summary>
+        <textarea
+          className="mt-4 min-h-40 w-full rounded-[1.25rem] border border-[color:var(--line)] bg-white px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
+          disabled={disabled || isSaving}
+          onChange={(event) =>
+            updateField("editedExtractedText", event.target.value)
+          }
+          value={workspace.editedExtractedText}
+        />
+      </details>
+
+      <details className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4">
+        <summary className="cursor-pointer list-none text-sm font-medium">
+          {copy.labels.assignmentText}
+        </summary>
+        <div className="mt-4 grid gap-4">
+          <textarea
+            className="min-h-32 rounded-[1.25rem] border border-[color:var(--line)] bg-white px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
+            disabled={disabled || isSaving}
+            onChange={(event) => updateField("assignmentText", event.target.value)}
+            value={workspace.assignmentText}
+          />
+
+          <label className="grid gap-2 text-sm">
+            <span className="font-medium">{copy.labels.planText}</span>
+            <textarea
+              className="min-h-28 rounded-[1.25rem] border border-[color:var(--line)] bg-white px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
+              disabled={disabled || isSaving}
+              onChange={(event) => updateField("planText", event.target.value)}
+              placeholder={copy.placeholders.planText}
+              value={workspace.planText}
+            />
+          </label>
+        </div>
+      </details>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-[color:var(--ink-soft)]">

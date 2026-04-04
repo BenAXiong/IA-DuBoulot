@@ -12,36 +12,40 @@ import type { StudentDashboardSnapshot } from "@/lib/server/student-dashboard/ty
 type NewHomeworkEntryProps = {
   snapshot: StudentDashboardSnapshot;
   languageCode: UiLanguageCode;
+  initialSubjectTag?: string | null;
+  initialDraft?: string | null;
 };
 
 export function NewHomeworkEntry({
   snapshot,
   languageCode,
+  initialSubjectTag = null,
+  initialDraft = null,
 }: NewHomeworkEntryProps) {
   const copy = getNewHomeworkEntryCopy(languageCode);
 
   return (
     <section className="grid gap-6">
-      <article className="grid gap-6 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] lg:grid-cols-[1.1fr_0.9fr]">
+      <article className="grid gap-5 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]">
+        <div className="flex flex-wrap gap-2">
+          <StudentStatusPill
+            label={getStartStateLabel(snapshot.startState, languageCode)}
+            tone={snapshot.canStartHomework ? "accent" : "warning"}
+          />
+          <StudentStatusPill
+            label={copy.recentSubjects(snapshot.subjectRollup.length)}
+          />
+        </div>
+
         <div className="space-y-4">
           <div className="flex flex-wrap gap-2">
-            <StudentStatusPill
-              label={getStartStateLabel(snapshot.startState, languageCode)}
-              tone={snapshot.canStartHomework ? "accent" : "warning"}
-            />
-            <StudentStatusPill
-              label={copy.recentSubjects(snapshot.subjectRollup.length)}
-            />
-          </div>
-
-          <div className="space-y-3">
             <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
               {copy.eyebrow}
             </p>
-            <h1 className="font-[family-name:var(--font-heading)] text-4xl leading-tight sm:text-5xl">
+            <h1 className="max-w-4xl font-[family-name:var(--font-heading)] text-4xl leading-tight sm:text-5xl">
               {copy.title}
             </h1>
-            <p className="max-w-2xl text-sm leading-7 text-[color:var(--ink-soft)]">
+            <p className="max-w-3xl text-sm leading-7 text-[color:var(--ink-soft)]">
               {getStartStateBody(snapshot.startState, languageCode)}
             </p>
           </div>
@@ -58,31 +62,14 @@ export function NewHomeworkEntry({
             </span>
           </div>
         </div>
-
-        <div className="grid gap-4 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5">
-          <div>
-            <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-              {copy.sequenceEyebrow}
-            </p>
-            <h2 className="mt-2 font-[family-name:var(--font-heading)] text-2xl leading-tight">
-              {copy.sequenceTitle}
-            </h2>
-          </div>
-
-          <ol className="grid gap-3 text-sm leading-6 text-[color:var(--ink-soft)]">
-            {copy.steps.map((step) => (
-              <li
-                className="rounded-[1.25rem] border border-[color:var(--line)] bg-white/70 px-4 py-3"
-                key={step}
-              >
-                {step}
-              </li>
-            ))}
-          </ol>
-        </div>
       </article>
 
-      <NewHomeworkIntakeForm languageCode={languageCode} snapshot={snapshot} />
+      <NewHomeworkIntakeForm
+        initialDraft={initialDraft}
+        initialSubjectTag={initialSubjectTag}
+        languageCode={languageCode}
+        snapshot={snapshot}
+      />
     </section>
   );
 }

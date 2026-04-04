@@ -3,7 +3,6 @@
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { IntakeFileList } from "@/components/dashboard/student/intake-file-list";
-import { IntakeReadinessCard } from "@/components/dashboard/student/intake-readiness-card";
 import {
   buildExtractionDraftSeed,
   INTAKE_ACCEPT_ATTR,
@@ -22,6 +21,8 @@ import { uploadConversationFiles } from "@/lib/uploads/client-upload";
 type NewHomeworkIntakeFormProps = {
   snapshot: StudentDashboardSnapshot;
   languageCode: UiLanguageCode;
+  initialSubjectTag?: string | null;
+  initialDraft?: string | null;
 };
 
 type CreateConversationResponse =
@@ -64,6 +65,39 @@ function getWorkspaceRouteErrorMessage(payload: WorkspaceRouteResponse | null) {
   return payload.error?.message ?? null;
 }
 
+function resolveInitialSubjectState(
+  initialSubjectTag: string | null | undefined,
+  availableValues: string[],
+) {
+  if (!initialSubjectTag) {
+    return {
+      subjectChoice: "mathematiques",
+      customSubject: "",
+    };
+  }
+
+  const normalized = initialSubjectTag.trim();
+
+  if (normalized.length === 0) {
+    return {
+      subjectChoice: "mathematiques",
+      customSubject: "",
+    };
+  }
+
+  if (availableValues.includes(normalized)) {
+    return {
+      subjectChoice: normalized,
+      customSubject: "",
+    };
+  }
+
+  return {
+    subjectChoice: "autre",
+    customSubject: normalized,
+  };
+}
+
 function getResolvedSubjectTag(subjectChoice: string, customSubject: string) {
   if (subjectChoice === "autre") {
     return customSubject.trim();
@@ -74,42 +108,87 @@ function getResolvedSubjectTag(subjectChoice: string, customSubject: string) {
 
 function hasAnySource(input: {
   files: StagedIntakeFile[];
-  pastedText: string;
+  homeworkPrompt: string;
   extractionDraft: string;
 }) {
   return (
     input.files.length > 0 ||
-    input.pastedText.trim().length > 0 ||
+    input.homeworkPrompt.trim().length > 0 ||
     input.extractionDraft.trim().length > 0
   );
+}
+
+function buildConversationTitle(input: {
+  resolvedSubjectTag: string;
+  homeworkPrompt: string;
+  files: StagedIntakeFile[];
+  languageCode: UiLanguageCode;
+}) {
+  const firstPromptLine = input.homeworkPrompt
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .find(Boolean);
+  const firstFilename = input.files[0]?.file.name.replace(/\.[^.]+$/, "");
+
+  const fallback =
+    input.languageCode === "zh"
+      ? "新的作業"
+      : input.languageCode === "en"
+        ? "New homework"
+        : "Nouveau devoir";
+
+  const rawTitle =
+    firstPromptLine ?? firstFilename ?? input.resolvedSubjectTag ?? fallback;
+  const trimmed = rawTitle.trim();
+
+  if (trimmed.length <= 80) {
+    return trimmed;
+  }
+
+  return `${trimmed.slice(0, 77).trimEnd()}...`;
 }
 
 export function NewHomeworkIntakeForm({
   snapshot,
   languageCode,
+  initialSubjectTag = null,
+  initialDraft = null,
 }: NewHomeworkIntakeFormProps) {
   const router = useRouter();
   const copy = getNewHomeworkIntakeCopy(languageCode);
   const subjectOptions = getIntakeSubjectOptions(languageCode);
-  const [assignmentTitle, setAssignmentTitle] = useState("");
-  const [subjectChoice, setSubjectChoice] = useState("mathematiques");
-  const [customSubject, setCustomSubject] = useState("");
+  const availableValues = subjectOptions
+    .map((option) => option.value)
+    .filter((value) => value !== "autre");
+  const initialSubjectState = resolveInitialSubjectState(
+    initialSubjectTag,
+    availableValues,
+  );
+  const initialPrompt = initialDraft?.trim() ?? "";
+  const [subjectChoice, setSubjectChoice] = useState(
+    initialSubjectState.subjectChoice,
+  );
+  const [customSubject, setCustomSubject] = useState(
+    initialSubjectState.customSubject,
+  );
   const [gradedHomework, setGradedHomework] = useState(true);
-  const [pastedText, setPastedText] = useState("");
+  const [homeworkPrompt, setHomeworkPrompt] = useState(initialPrompt);
   const [files, setFiles] = useState<StagedIntakeFile[]>([]);
-  const [extractionDraft, setExtractionDraft] = useState("");
-  const [hasEditedExtractionDraft, setHasEditedExtractionDraft] = useState(false);
+  const [extractionDraft, setExtractionDraft] = useState(initialPrompt);
+  const [hasEditedExtractionDraft, setHasEditedExtractionDraft] = useState(
+    initialPrompt.length > 0,
+  );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [reviewMessage, setReviewMessage] = useState<string | null>(null);
   const [isSubmitting, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const totalBytes = files.reduce((sum, file) => sum + file.file.size, 0);
   const resolvedSubjectTag = getResolvedSubjectTag(subjectChoice, customSubject);
-  const titleReady = assignmentTitle.trim().length > 0;
-  const subjectReady = resolvedSubjectTag.length > 0;
 
-  function maybeRefreshExtractionDraft(nextFiles: StagedIntakeFile[], nextPastedText: string) {
+  function maybeRefreshExtractionDraft(
+    nextFiles: StagedIntakeFile[],
+    nextHomeworkPrompt: string,
+  ) {
     if (hasEditedExtractionDraft && extractionDraft.trim().length > 0) {
       return;
     }
@@ -117,7 +196,7 @@ export function NewHomeworkIntakeForm({
     setExtractionDraft(
       buildExtractionDraftSeed({
         files: nextFiles,
-        pastedText: nextPastedText,
+        pastedText: nextHomeworkPrompt,
         languageCode,
       }),
     );
@@ -137,7 +216,7 @@ export function NewHomeworkIntakeForm({
     });
 
     setFiles(staged.acceptedFiles);
-    maybeRefreshExtractionDraft(staged.acceptedFiles, pastedText);
+    maybeRefreshExtractionDraft(staged.acceptedFiles, homeworkPrompt);
     setErrorMessage(staged.errors.length > 0 ? staged.errors.join(" ") : null);
     setReviewMessage(null);
     event.target.value = "";
@@ -146,12 +225,12 @@ export function NewHomeworkIntakeForm({
   function handleRemoveFile(fileId: string) {
     const nextFiles = files.filter((file) => file.id !== fileId);
     setFiles(nextFiles);
-    maybeRefreshExtractionDraft(nextFiles, pastedText);
+    maybeRefreshExtractionDraft(nextFiles, homeworkPrompt);
     setReviewMessage(null);
   }
 
-  function handlePastedTextChange(value: string) {
-    setPastedText(value);
+  function handlePromptChange(value: string) {
+    setHomeworkPrompt(value);
     maybeRefreshExtractionDraft(files, value);
     setReviewMessage(null);
   }
@@ -160,7 +239,7 @@ export function NewHomeworkIntakeForm({
     setExtractionDraft(
       buildExtractionDraftSeed({
         files,
-        pastedText,
+        pastedText: homeworkPrompt,
         languageCode,
       }),
     );
@@ -178,11 +257,6 @@ export function NewHomeworkIntakeForm({
       return;
     }
 
-    if (!assignmentTitle.trim()) {
-      setErrorMessage(copy.errors.missingTitle);
-      return;
-    }
-
     if (!resolvedSubjectTag) {
       setErrorMessage(copy.errors.missingSubject);
       return;
@@ -191,7 +265,7 @@ export function NewHomeworkIntakeForm({
     if (
       !hasAnySource({
         files,
-        pastedText,
+        homeworkPrompt,
         extractionDraft,
       })
     ) {
@@ -200,16 +274,23 @@ export function NewHomeworkIntakeForm({
     }
 
     startTransition(async () => {
+      const title = buildConversationTitle({
+        resolvedSubjectTag,
+        homeworkPrompt,
+        files,
+        languageCode,
+      });
+
       const response = await fetch("/api/conversations", {
         method: "POST",
         headers: {
           "content-type": "application/json",
         },
         body: JSON.stringify({
-          title: assignmentTitle.trim(),
+          title,
           subjectTag: resolvedSubjectTag,
           gradedHomework,
-          pastedText,
+          pastedText: homeworkPrompt,
           editedExtractedText: extractionDraft,
           attachmentReferences: [],
         }),
@@ -258,7 +339,7 @@ export function NewHomeworkIntakeForm({
                 "content-type": "application/json",
               },
               body: JSON.stringify({
-                assignmentText: pastedText,
+                assignmentText: homeworkPrompt,
                 editedExtractedText: mergedExtractionDraft,
                 planText: "",
                 draftAnswerText: "",
@@ -284,58 +365,126 @@ export function NewHomeworkIntakeForm({
             : copy.errors.uploadFallback;
         setErrorMessage(message);
         setReviewMessage(copy.messages.fallbackResume);
-        router.push(`/app/conversations/${payload.data.conversationId}`);
+        router.push(
+          `/app/conversations/${payload.data.conversationId}?subject=${encodeURIComponent(resolvedSubjectTag)}`,
+        );
         router.refresh();
         return;
       }
 
       setReviewMessage(copy.messages.readyRedirect);
-      router.push(`/app/conversations/${payload.data.conversationId}`);
+      router.push(
+        `/app/conversations/${payload.data.conversationId}?subject=${encodeURIComponent(resolvedSubjectTag)}`,
+      );
       router.refresh();
     });
   }
 
   return (
-    <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-      <form className="grid gap-6" onSubmit={handleReview}>
+    <section className="grid gap-6 xl:grid-cols-[minmax(0,1.14fr)_22rem]">
+      <form className="contents" onSubmit={handleReview}>
         <article className="grid gap-5 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]">
           <div className="space-y-3">
             <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
               {copy.sections.brief.eyebrow}
             </p>
-            <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
+            <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight sm:text-4xl">
               {copy.sections.brief.title}
             </h2>
+            <p className="max-w-3xl text-sm leading-7 text-[color:var(--ink-soft)]">
+              {copy.sections.review.body}
+            </p>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <label className="grid gap-2 text-sm">
-              <span className="font-medium">{copy.sections.brief.titleLabel}</span>
-              <input
-                className="rounded-2xl border border-[color:var(--line)] bg-white px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
-                maxLength={120}
-                onChange={(event) => setAssignmentTitle(event.target.value)}
-                placeholder={copy.sections.brief.titlePlaceholder}
-                type="text"
-                value={assignmentTitle}
+          <label className="grid gap-3 text-sm">
+            <span className="font-medium">{copy.sections.sources.pastedTextLabel}</span>
+            <textarea
+              className="min-h-[22rem] rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-5 py-4 text-sm leading-7 outline-none transition focus:border-[color:var(--accent)]"
+              onChange={(event) => handlePromptChange(event.target.value)}
+              placeholder={copy.sections.sources.pastedTextPlaceholder}
+              value={homeworkPrompt}
+            />
+          </label>
+
+          <details className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5">
+            <summary className="cursor-pointer list-none">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="space-y-1">
+                  <p className="font-medium">{copy.sections.review.title}</p>
+                  <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
+                    {copy.sections.review.body}
+                  </p>
+                </div>
+                <span className="rounded-full border border-[color:var(--line)] bg-white px-3 py-1 text-xs text-[color:var(--ink-soft)]">
+                  {copy.sections.review.draftBadge}
+                </span>
+              </div>
+            </summary>
+
+            <div className="mt-4 grid gap-4">
+              <textarea
+                className="min-h-56 rounded-[1.5rem] border border-[color:var(--line)] bg-white px-4 py-4 text-sm leading-7 outline-none transition focus:border-[color:var(--accent)]"
+                onChange={(event) => {
+                  setExtractionDraft(event.target.value);
+                  setHasEditedExtractionDraft(true);
+                  setReviewMessage(null);
+                }}
+                placeholder={copy.sections.review.draftPlaceholder}
+                value={extractionDraft}
               />
-            </label>
 
-            <label className="grid gap-2 text-sm">
-              <span className="font-medium">{copy.sections.brief.subjectLabel}</span>
-              <select
-                className="rounded-2xl border border-[color:var(--line)] bg-white px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
-                onChange={(event) => setSubjectChoice(event.target.value)}
-                value={subjectChoice}
-              >
-                {subjectOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  className="rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5"
+                  onClick={handleExtractionReset}
+                  type="button"
+                >
+                  {copy.sections.review.resetDraft}
+                </button>
+                <span className="inline-flex items-center rounded-full border border-[color:var(--line)] bg-white px-3 py-2 text-sm text-[color:var(--ink-soft)]">
+                  {copy.sections.review.persistenceBadge}
+                </span>
+              </div>
+            </div>
+          </details>
+
+          {errorMessage ? (
+            <p className="rounded-[1.25rem] border border-[#d07c5b] bg-[#fff0ea] px-4 py-3 text-sm leading-6 text-[#8d3b1f]">
+              {errorMessage}
+            </p>
+          ) : null}
+
+          {reviewMessage ? (
+            <p className="rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-3 text-sm leading-6 text-[color:var(--ink-soft)]">
+              {reviewMessage}
+            </p>
+          ) : null}
+        </article>
+
+        <aside className="grid gap-5 self-start rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-[var(--shadow)] xl:sticky xl:top-24">
+          <div className="space-y-3">
+            <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
+              {copy.sections.sources.eyebrow}
+            </p>
+            <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
+              {copy.sections.sources.allowedFilesBody}
+            </p>
           </div>
+
+          <label className="grid gap-2 text-sm">
+            <span className="font-medium">{copy.sections.brief.subjectLabel}</span>
+            <select
+              className="rounded-2xl border border-[color:var(--line)] bg-white px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
+              onChange={(event) => setSubjectChoice(event.target.value)}
+              value={subjectChoice}
+            >
+              {subjectOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
 
           {subjectChoice === "autre" ? (
             <label className="grid gap-2 text-sm">
@@ -352,29 +501,10 @@ export function NewHomeworkIntakeForm({
               />
             </label>
           ) : null}
-        </article>
 
-        <article className="grid gap-5 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]">
-          <div className="space-y-3">
-            <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-              {copy.sections.sources.eyebrow}
-            </p>
-            <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
-              {copy.sections.sources.title}
-            </h2>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
-            <div className="space-y-2">
-              <p className="text-sm font-medium">
-                {copy.sections.sources.allowedFilesTitle}
-              </p>
-              <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-                {copy.sections.sources.allowedFilesBody}
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-3">
+          <div className="grid gap-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4">
+            <div className="flex items-center justify-between gap-3">
+              <p className="font-medium">{copy.sections.sources.allowedFilesTitle}</p>
               <input
                 accept={INTAKE_ACCEPT_ATTR}
                 className="hidden"
@@ -384,113 +514,47 @@ export function NewHomeworkIntakeForm({
                 type="file"
               />
               <button
-                className="rounded-full bg-[color:var(--foreground)] px-5 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5"
+                className="rounded-full bg-[color:var(--foreground)] px-4 py-2 text-sm font-medium text-white transition hover:-translate-y-0.5"
                 onClick={() => fileInputRef.current?.click()}
                 type="button"
               >
                 {copy.sections.sources.addFiles}
               </button>
             </div>
+
+            <IntakeFileList
+              files={files}
+              languageCode={languageCode}
+              onRemove={handleRemoveFile}
+            />
           </div>
 
-          <IntakeFileList
-            files={files}
-            languageCode={languageCode}
-            onRemove={handleRemoveFile}
-          />
+          <label className="flex items-center gap-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-3 text-sm font-medium">
+            <input
+              checked={gradedHomework}
+              onChange={(event) => setGradedHomework(event.target.checked)}
+              type="checkbox"
+            />
+            {copy.sections.sources.gradedHomework}
+          </label>
 
-          <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-start">
-            <label className="grid gap-2 text-sm">
-              <span className="font-medium">
-                {copy.sections.sources.pastedTextLabel}
-              </span>
-              <textarea
-                className="min-h-40 rounded-[1.5rem] border border-[color:var(--line)] bg-white px-4 py-3 outline-none transition focus:border-[color:var(--accent)]"
-                onChange={(event) => handlePastedTextChange(event.target.value)}
-                placeholder={copy.sections.sources.pastedTextPlaceholder}
-                value={pastedText}
-              />
-            </label>
-
-            <label className="flex items-center gap-3 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-3 text-sm font-medium">
-              <input
-                checked={gradedHomework}
-                onChange={(event) => setGradedHomework(event.target.checked)}
-                type="checkbox"
-              />
-              {copy.sections.sources.gradedHomework}
-            </label>
-          </div>
-        </article>
-
-        <article className="grid gap-5 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]">
-          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div className="space-y-3">
-              <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-                {copy.sections.review.eyebrow}
-              </p>
-              <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
-                {copy.sections.review.title}
-              </h2>
-              <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-                {copy.sections.review.body}
-              </p>
+          {!snapshot.canStartHomework ? (
+            <div className="rounded-[1.5rem] border border-[#d6c48d] bg-[#fff8e5] px-4 py-4 text-sm leading-6 text-[#6b5320]">
+              {copy.errors.cannotStart}
             </div>
-
-            <button
-              className="rounded-full border border-[color:var(--line)] bg-white px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5"
-              onClick={handleExtractionReset}
-              type="button"
-            >
-              {copy.sections.review.resetDraft}
-            </button>
-          </div>
-
-          <textarea
-            className="min-h-64 rounded-[1.5rem] border border-[color:var(--line)] bg-white px-4 py-4 text-sm leading-7 outline-none transition focus:border-[color:var(--accent)]"
-            onChange={(event) => {
-              setExtractionDraft(event.target.value);
-              setHasEditedExtractionDraft(true);
-              setReviewMessage(null);
-            }}
-            placeholder={copy.sections.review.draftPlaceholder}
-            value={extractionDraft}
-          />
-
-          <div className="flex flex-wrap gap-3">
-            <button
-              className="rounded-full bg-[color:var(--accent)] px-5 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
-              disabled={!snapshot.canStartHomework || isSubmitting}
-              type="submit"
-            >
-              {isSubmitting
-                ? copy.sections.review.creating
-                : copy.sections.review.createSession}
-            </button>
-            <span className="inline-flex items-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-2 text-sm text-[color:var(--ink-soft)]">
-              {copy.sections.review.persistenceBadge}
-            </span>
-          </div>
-
-          {errorMessage ? (
-            <p className="rounded-[1.25rem] border border-[#d07c5b] bg-[#fff0ea] px-4 py-3 text-sm leading-6 text-[#8d3b1f]">
-              {errorMessage}
-            </p>
           ) : null}
-        </article>
-      </form>
 
-      <IntakeReadinessCard
-        canStartHomework={snapshot.canStartHomework}
-        extractionDraftLength={extractionDraft.trim().length}
-        filesCount={files.length}
-        languageCode={languageCode}
-        pastedTextLength={pastedText.trim().length}
-        reviewMessage={reviewMessage}
-        subjectReady={subjectReady}
-        titleReady={titleReady}
-        totalBytes={totalBytes}
-      />
+          <button
+            className="rounded-full bg-[color:var(--accent)] px-5 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
+            disabled={!snapshot.canStartHomework || isSubmitting}
+            type="submit"
+          >
+            {isSubmitting
+              ? copy.sections.review.creating
+              : copy.sections.review.createSession}
+          </button>
+        </aside>
+      </form>
     </section>
   );
 }
