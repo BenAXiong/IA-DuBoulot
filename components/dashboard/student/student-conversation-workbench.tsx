@@ -384,7 +384,7 @@ export function StudentConversationWorkbench({
         </article>
 
         <aside className="border-l border-[color:var(--line)] bg-[color:var(--surface)] px-5 py-4 xl:min-h-[calc(100vh-3.25rem)]">
-          <div className="grid gap-4 xl:sticky xl:top-24 xl:self-start">
+          <div className="flex h-full min-h-[calc(100vh-8rem)] flex-col xl:sticky xl:top-24 xl:self-start xl:min-h-[calc(100vh-8rem)]">
             <StudentConversationSideRail
               attachments={attachments}
               disabled={isUploading || isReadOnly}

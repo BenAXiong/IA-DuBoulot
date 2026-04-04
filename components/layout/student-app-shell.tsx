@@ -290,6 +290,19 @@ function PanelIcon() {
   );
 }
 
+function PlusIcon() {
+  return (
+    <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
+      <path
+        d="M12 5v14M5 12h14"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
 export function StudentAppShell({
   children,
   appUser,
@@ -386,11 +399,20 @@ export function StudentAppShell({
           </Link>
 
           {!sidebarCollapsed ? (
-            <div className="grid gap-2 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-3 py-3">
-              <div className="flex items-center gap-3">
+            <div className="group grid gap-2 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-3 py-3">
+              <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--ink-muted)]">
                   {copy.homework}
                 </p>
+                <Link
+                  aria-label={copy.addSubject}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] opacity-0 transition hover:bg-[color:var(--surface)] hover:text-[color:var(--foreground)] group-hover:opacity-100 focus-visible:opacity-100"
+                  href="/app?view=homework&create=1"
+                  onClick={() => setSidebarOpen(false)}
+                  title={copy.addSubject}
+                >
+                  <PlusIcon />
+                </Link>
               </div>
 
               {subjectGroups.length === 0 ? (

@@ -56,7 +56,7 @@ export function StudentConversationSideRail({
   }
 
   return (
-    <aside className="flex h-full min-h-[18rem] flex-col justify-between gap-6">
+    <aside className="flex min-h-full flex-1 flex-col">
       <div className="space-y-3">
         {attachments.length === 0 ? (
           <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
@@ -91,7 +91,7 @@ export function StudentConversationSideRail({
         )}
       </div>
 
-      <div className="pt-4">
+      <div className="mt-auto pt-4">
         <button
           className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[color:var(--foreground)] px-5 py-3 text-sm font-medium text-[color:var(--background)] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
           disabled={disabled || isCompleting}

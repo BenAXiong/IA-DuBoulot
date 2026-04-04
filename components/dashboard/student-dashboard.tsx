@@ -18,6 +18,7 @@ import type { ListConversationSummary } from "@/lib/server/conversations/types";
 
 type StudentDashboardProps = {
   appUser: AppUserRecord;
+  createSubjectMode: boolean;
   context: AuthenticatedUserContext;
   initialDraft: string | null;
   selectedSubject: string | null;
@@ -35,6 +36,7 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         noSubjectTitle: "No homework yet",
         noSubjectBody:
           "Choose the subject here and ask banban for advices. Don't forget to upload any class content or practice material that banban will need to help you!",
+        createSubjectTitle: "Start a new subject",
         recentTitle: "Recent homework chats",
         open: "Open",
         active: "Continue",
@@ -59,6 +61,7 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         noSubjectTitle: "還沒有作業",
         noSubjectBody:
           "先在這裡選擇科目，再向 banban 詢問建議。別忘了上傳 banban 需要的課堂內容或練習資料，才能更好地幫助你！",
+        createSubjectTitle: "開始新的科目",
         recentTitle: "最近作業對話",
         open: "打開",
         active: "續接",
@@ -83,6 +86,7 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         noSubjectTitle: "Aucun devoir pour l'instant",
         noSubjectBody:
           "Choisis la matière ici et demande conseil à banban. N'oublie pas d'ajouter les supports de cours ou les exercices dont banban aura besoin pour t'aider !",
+        createSubjectTitle: "Commencer une nouvelle matière",
         recentTitle: "Discussions récentes",
         open: "Ouvrir",
         active: "Reprendre",
@@ -128,12 +132,12 @@ function renderConversationRows(input: {
     <div className="divide-y divide-[color:var(--line)]">
       {input.conversations.map((conversation) => (
         <Link
-          className="flex items-start justify-between gap-4 py-4 transition hover:bg-[color:var(--surface-strong)]"
+          className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 py-4 transition hover:bg-[color:var(--surface-strong)]"
           href={`/app/conversations/${conversation.id}?subject=${encodeURIComponent(conversation.subject_tag)}`}
           key={conversation.id}
         >
           <div className="min-w-0 space-y-1">
-            <h3 className="truncate font-[family-name:var(--font-heading)] text-xl leading-tight">
+            <h3 className="overflow-hidden text-ellipsis whitespace-nowrap font-[family-name:var(--font-heading)] text-xl leading-tight">
               {conversation.title}
             </h3>
             <div className="flex flex-wrap items-center gap-2 text-sm text-[color:var(--ink-soft)]">
@@ -193,6 +197,7 @@ function renderSubjectCards(input: {
 
 export async function StudentDashboard({
   appUser,
+  createSubjectMode,
   context,
   initialDraft,
   selectedSubject,
@@ -341,6 +346,18 @@ export async function StudentDashboard({
             </article>
           ) : (
             <>
+              {createSubjectMode ? (
+                <article className="grid gap-4 rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-6 py-6">
+                  <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
+                    {copy.createSubjectTitle}
+                  </h2>
+                  <StudentFirstHomeworkLauncher
+                    initialDraft={initialDraft}
+                    languageCode={languageCode}
+                  />
+                </article>
+              ) : null}
+
               {renderSubjectCards({
                 groups: subjectGroups,
                 emptyFallback: copy.noSubjectChats,
