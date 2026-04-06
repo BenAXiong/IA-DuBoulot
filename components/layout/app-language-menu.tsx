@@ -193,7 +193,7 @@ export function AppLanguageMenu({
         <GlobeIcon
           className={
             variant === "minimal"
-              ? "h-4 w-4 shrink-0 overflow-visible"
+              ? "h-5 w-5 shrink-0 overflow-visible"
               : "h-[1.1rem] w-[1.1rem] shrink-0 overflow-visible"
           }
         />

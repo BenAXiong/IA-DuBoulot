@@ -626,12 +626,35 @@ code {
 }
 
 .theme-toggle--minimal {
-  min-height: 1.95rem;
-  min-width: 1.95rem;
-  border-color: transparent;
-  background: transparent;
-  box-shadow: none;
-}
+    min-height: 2.25rem;
+    min-width: 2.25rem;
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .student-pending-shimmer {
+    background-image: linear-gradient(
+      100deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.18) 35%,
+      rgba(255, 255, 255, 0.42) 50%,
+      rgba(255, 255, 255, 0.18) 65%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    background-size: 220% 100%;
+    animation: studentPendingSweep 1.5s linear infinite;
+  }
+
+  @keyframes studentPendingSweep {
+    0% {
+      background-position: 200% 0;
+    }
+
+    100% {
+      background-position: -40% 0;
+    }
+  }
 
 .theme-toggle--minimal:hover {
   border-color: transparent;

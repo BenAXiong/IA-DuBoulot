@@ -103,8 +103,17 @@ export function StudentConversationWorkbench({
   const [railWidth, setRailWidth] = useState(296);
   const [isResizingRail, setIsResizingRail] = useState(false);
   const [showJumpToLatest, setShowJumpToLatest] = useState(false);
+  const [pendingStudentMessage, setPendingStudentMessage] =
+    useState<ConversationMessageRecord | null>(null);
+  const [pendingAssistantMessage, setPendingAssistantMessage] =
+    useState<ConversationMessageRecord | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const isReadOnly = conversation.status !== "active";
+  const displayMessages = [
+    ...messages,
+    ...(pendingStudentMessage ? [pendingStudentMessage] : []),
+    ...(pendingAssistantMessage ? [pendingAssistantMessage] : []),
+  ];
 
   useEffect(() => {
     if (!isResizingRail) {
@@ -181,7 +190,8 @@ export function StudentConversationWorkbench({
 
   useEffect(() => {
     updateTranscriptPositionState();
-  }, [messages]);
+    scrollTranscriptToBottom("auto");
+  }, [messages, pendingStudentMessage, pendingAssistantMessage]);
 
   async function sendMessage(intent: "student_message" | "hint" | "summarize") {
     setChatError(null);
@@ -189,6 +199,31 @@ export function StudentConversationWorkbench({
     if (intent === "student_message" && composerText.trim().length === 0) {
       setChatError(copy.errors.emptyMessage);
       return;
+    }
+
+    const pendingDraft = composerText.trim();
+    const pendingTimestamp = new Date().toISOString();
+
+    if (intent === "student_message") {
+      setPendingStudentMessage({
+        id: `pending-student-${pendingTimestamp}`,
+        conversation_id: conversation.id,
+        author_user_id: conversation.student_user_id,
+        role: "student",
+        content_text: pendingDraft,
+        content_language: languageCode,
+        created_at: pendingTimestamp,
+      });
+      setPendingAssistantMessage({
+        id: `pending-assistant-${pendingTimestamp}`,
+        conversation_id: conversation.id,
+        author_user_id: null,
+        role: "assistant",
+        content_text: copy.pendingAssistant,
+        content_language: languageCode,
+        created_at: pendingTimestamp,
+      });
+      setComposerText("");
     }
 
     startSending(async () => {
@@ -201,7 +236,7 @@ export function StudentConversationWorkbench({
           },
           body: JSON.stringify({
             intent,
-            contentText: composerText,
+            contentText: pendingDraft,
           }),
         },
       );
@@ -218,16 +253,22 @@ export function StudentConversationWorkbench({
         !payload.data?.studentMessage ||
         !payload.data?.assistantMessage
       ) {
+        setPendingStudentMessage(null);
+        setPendingAssistantMessage(null);
+        if (intent === "student_message") {
+          setComposerText(pendingDraft);
+        }
         setChatError(routeErrorMessage ?? copy.errors.addConversationTurn);
         return;
       }
 
+      setPendingStudentMessage(null);
+      setPendingAssistantMessage(null);
       setMessages((currentMessages) => [
         ...currentMessages,
         payload.data.studentMessage,
         payload.data.assistantMessage,
       ]);
-      setComposerText("");
     });
   }
 
@@ -442,7 +483,7 @@ export function StudentConversationWorkbench({
                 </div>
               </div>
 
-              <StudentChatThread languageCode={languageCode} messages={messages} />
+              <StudentChatThread languageCode={languageCode} messages={displayMessages} />
             </div>
           </div>
 

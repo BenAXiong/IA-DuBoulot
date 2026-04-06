@@ -132,6 +132,10 @@ function formatSubjectDisplay(subject: string | null) {
   return `${trimmed.charAt(0).toUpperCase()}${trimmed.slice(1)}`;
 }
 
+function capitalizeSubjectLabel(subject: string) {
+  return formatSubjectDisplay(subject) ?? subject;
+}
+
 function readActiveView(value: string | null): StudentView {
   if (value === "maps" || value === "tests" || value === "forward") {
     return value;
@@ -414,7 +418,10 @@ export function StudentAppShell({
       <div className="flex h-full flex-col">
       <div className="flex min-h-[3.25rem] items-center justify-between px-3">
         <div className="flex min-w-0 items-center gap-3">
-          <div className="brand-mark inline-flex h-8 w-8 items-center justify-center rounded-2xl font-[family-name:var(--font-heading)] text-xs font-semibold text-white">
+          <div
+            className="brand-mark inline-flex items-center justify-center rounded-[0.8rem] font-[family-name:var(--font-heading)] text-xs font-semibold text-white"
+            style={{ height: "2.28rem", width: "2.28rem" }}
+          >
             bb
           </div>
         </div>
@@ -447,13 +454,17 @@ export function StudentAppShell({
           {!sidebarCollapsed ? (
             <div className="group grid gap-1">
               <div className="flex items-center justify-between gap-3 px-3 py-2.5">
-              <div className="flex items-center gap-1.5 text-sm font-medium text-[color:var(--foreground)]">
+                <Link
+                  className="flex min-w-0 flex-1 items-center gap-1.5 text-sm font-medium text-[color:var(--foreground)]"
+                  href="/app?view=homework"
+                  onClick={() => setSidebarOpen(false)}
+                >
                   <HomeworkIcon />
                   <span>{copy.homework}</span>
                   <span className="text-[color:var(--ink-muted)]">
                     <ChevronIcon />
                   </span>
-                </div>
+                </Link>
                 <Link
                   aria-label={copy.addSubject}
                   className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] opacity-0 transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)] group-hover:opacity-100 focus-visible:opacity-100"
@@ -485,7 +496,9 @@ export function StudentAppShell({
                         key={group.subjectTag}
                         onClick={() => setSidebarOpen(false)}
                       >
-                        <span className="truncate">{group.subjectTag}</span>
+                        <span className="truncate">
+                          {capitalizeSubjectLabel(group.subjectTag)}
+                        </span>
                         <span className="text-xs text-[color:var(--ink-muted)]">
                           {group.count}
                         </span>
@@ -641,7 +654,7 @@ export function StudentAppShell({
       ) : null}
 
       <div className="flex min-h-screen">
-        <aside className="hidden border-r border-[color:var(--line)] bg-[color:var(--surface)] md:flex md:w-[18.5rem] md:flex-col">
+        <aside className="hidden border-r border-[color:var(--line)] bg-[color:var(--surface)] md:sticky md:top-0 md:flex md:h-screen md:w-[18.5rem] md:flex-col md:self-start">
           {content}
         </aside>
 

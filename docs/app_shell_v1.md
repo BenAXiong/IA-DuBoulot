@@ -133,11 +133,12 @@ Why:
 - `#account` remains relevant for the shared settings block used by non-parent roles, while parent account and billing controls now live inside the parent dashboard rail instead of a separate bottom section on `/app`
 - the student shell now treats subjects as filter views over existing `subject_tag` values and sends learner-owned support settings to `/app/settings`, so the main `/app` page can behave more like a chat workspace than a control center
 - the subject rail now keeps only subject filters and counters; recent conversation lists stay in the main content area instead of expanding inside the sidebar
-- the homework block in the student rail now keeps a hover `+` entry point for creating or selecting a subject directly from the same root homework view, instead of routing learners into a separate launcher mode
+- the homework block in the student rail now keeps a hover `+` entry point for creating or selecting a subject directly from the same root homework view, and the Homework heading itself returns the learner to that root view instead of exposing a second subject-creation mode
 - the profile dock now defaults to a minimal identity row with no outline, while settings and sign-out live in a hover/focus menu above it
 - the subject quick-start now creates a bare conversation shell, uploads any staged files, sends the learner's first real message, and only then routes into `/app/conversations/[conversationId]`, so the main student view behaves more like a chat launcher than a wizard entry
 - the student subject view and live conversation surface now both use a true right-side panel treatment instead of floating cards, so the workspace reads like a split main pane rather than a dashboard grid
 - only the live conversation route keeps that right-side panel; the subject-selection view returns to a single main column until a real chat exists
+- on desktop, the student sidebar now keeps a viewport-height column independent from main-pane scroll, so the left rail behaves like a true app navigation pane instead of stretching with the homework content
 
 ## iPad Validation
 

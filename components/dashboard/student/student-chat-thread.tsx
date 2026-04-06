@@ -6,10 +6,28 @@ import { getStudentWorkbenchCopy } from "@/lib/i18n/student-flow-copy";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type { ConversationMessageRecord } from "@/lib/server/conversations/types";
 
+type DisplayConversationMessage = ConversationMessageRecord & {
+  isPending?: boolean;
+};
+
 type StudentChatThreadProps = {
   languageCode: UiLanguageCode;
-  messages: ConversationMessageRecord[];
+  messages: DisplayConversationMessage[];
 };
+
+function StudentAvatarIcon() {
+  return (
+    <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
+      <circle cx="12" cy="8" r="3.25" stroke="currentColor" strokeWidth="1.7" />
+      <path
+        d="M6 18.25c1.2-2.45 3.4-3.75 6-3.75s4.8 1.3 6 3.75"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.7"
+      />
+    </svg>
+  );
+}
 
 export function StudentChatThread({
   languageCode,
@@ -51,19 +69,45 @@ export function StudentChatThread({
             key={message.id}
           >
             <div
-              className={`w-full max-w-3xl text-sm leading-7 text-[color:var(--foreground)] ${
-                isStudent
-                  ? "rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-3.5 shadow-[0_10px_30px_rgba(15,23,42,0.06)]"
-                  : isSystem
-                    ? "rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-[color:var(--ink-soft)]"
-                    : "px-1 py-1.5"
-              } ${isStudent ? "ml-auto" : ""}`}
+              className={`flex w-full max-w-3xl items-start gap-3 ${
+                isStudent ? "justify-end" : "justify-start"
+              }`}
             >
-              {isAssistant ? (
-                <StudentMessageContent content={message.content_text} />
-              ) : (
-                <p className="whitespace-pre-wrap">{message.content_text}</p>
-              )}
+              {!isStudent ? (
+                <div
+                  className={`mt-1 shrink-0 ${
+                    isAssistant
+                      ? "brand-mark brand-mark--mini inline-flex items-center justify-center font-[family-name:var(--font-heading)] text-[0.65rem] font-semibold text-white"
+                      : "inline-flex h-[2.1rem] w-[2.1rem] items-center justify-center rounded-[0.8rem] border border-[color:var(--line)] bg-[color:var(--surface)] text-[color:var(--ink-soft)]"
+                  }`}
+                >
+                  {isAssistant ? "bb" : <StudentAvatarIcon />}
+                </div>
+              ) : null}
+
+              <div
+                className={`w-full min-w-0 text-sm leading-7 text-[color:var(--foreground)] ${
+                  isStudent
+                    ? "rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-3.5 shadow-[0_10px_30px_rgba(15,23,42,0.06)]"
+                    : isSystem
+                      ? "rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-[color:var(--ink-soft)]"
+                      : message.isPending
+                        ? "student-pending-shimmer rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-[color:var(--ink-soft)]"
+                        : "px-1 py-1.5"
+                } ${isStudent ? "ml-auto" : ""}`}
+              >
+                {isAssistant && !message.isPending ? (
+                  <StudentMessageContent content={message.content_text} />
+                ) : (
+                  <p className="whitespace-pre-wrap">{message.content_text}</p>
+                )}
+              </div>
+
+              {isStudent ? (
+                <div className="mt-1 inline-flex h-[2.1rem] w-[2.1rem] shrink-0 items-center justify-center rounded-[0.8rem] border border-[color:var(--line)] bg-[color:var(--surface)] text-[color:var(--ink-soft)]">
+                  <StudentAvatarIcon />
+                </div>
+              ) : null}
             </div>
             <div
               className={`mt-2 flex w-full max-w-3xl ${

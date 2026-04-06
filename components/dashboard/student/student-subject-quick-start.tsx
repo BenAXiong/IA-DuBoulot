@@ -261,7 +261,7 @@ export function StudentSubjectQuickStart({
     }
 
     setErrorMessage(null);
-
+    setDraft("");
     setIsStarting(true);
 
     try {
@@ -295,6 +295,7 @@ export function StudentSubjectQuickStart({
           : null;
 
       if (!createResponse.ok || !conversationId) {
+        setDraft(trimmedDraft);
         setErrorMessage(
           getRouteErrorMessage(createPayload) ?? copy.startError,
         );
@@ -327,18 +328,19 @@ export function StudentSubjectQuickStart({
         .catch(() => null)) as SendMessageRouteResponse | null;
 
       if (!sendResponse.ok || !sendPayload?.ok) {
+        setDraft(trimmedDraft);
         setErrorMessage(
           getRouteErrorMessage(sendPayload) ?? copy.startError,
         );
         return;
       }
 
-      setDraft("");
       setStagedFiles([]);
       router.push(
         `/app/conversations/${conversationId}?subject=${encodeURIComponent(subjectTag)}`,
       );
     } catch (error) {
+      setDraft(trimmedDraft);
       setErrorMessage(
         error instanceof Error ? error.message : copy.startError,
       );

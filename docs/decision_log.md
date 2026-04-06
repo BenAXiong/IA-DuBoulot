@@ -1087,3 +1087,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Remove the separate new-subject mode from the real student flow. The root homework view now always owns subject selection and subject creation directly through subject pills plus the quick-start launcher, whether the learner already has existing subject tags or not. The left-rail `+` remains as a discoverability affordance, but it now just returns to the same root homework view instead of switching the product into a second launcher state.
 - Why: This makes the student flow honest and easier to learn. There is now one root homework surface, one selected-subject quick-start surface, and one live conversation surface, instead of two root variants that differed only by hidden URL state.
 - Follow-up: If subjects later become canonical entities instead of `subject_tag` filters, keep the same user-facing rule: subject creation should still feel like part of the homework home, not like a separate hidden mode.
+
+### D-20260406-108 - Student Chat Now Uses Optimistic Learner Turns And A Lightweight Pending Banban Placeholder
+
+- Date: 2026-04-06
+- Status: accepted
+- Related tasks: `P1.3`, `P2.1`
+- Context: Even after the chat-first redesign, sending a learner message still felt unresponsive. The textarea kept the full prompt while the network round trip ran, so it looked like nothing had happened yet. The thread also had no avatar treatment, which made the conversation feel flatter than the messaging-app reference the learner UI is now aiming toward.
+- Decision: Keep the server-owned persistence model, but make the student conversation feel immediate on the client. The live workbench now clears the textarea right away, appends the learner's message optimistically, and shows a lightweight pending assistant placeholder with a scanning shimmer until the real banban reply comes back. At the same time, both learner and assistant turns now carry simple avatar treatments in the thread, and the runtime no longer keeps any separate `newSubject` URL mode for the homework home.
+- Why: This preserves the real backend contract while making the chat feel responsive and legible. The learner immediately sees that their message has been accepted, and the assistant side now reads more like a normal conversation instead of a raw transcript dump.
+- Follow-up: If the subject quick-start itself still feels too inert before the route transition completes, consider passing a one-shot pending turn state into the first opened conversation page rather than leaving the learner on the launcher until the first round trip finishes.

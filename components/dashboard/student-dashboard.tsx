@@ -116,6 +116,15 @@ function buildSubjectGroups(conversations: ListConversationSummary[]) {
     .sort((left, right) => right.conversations.length - left.conversations.length);
 }
 
+function formatSubjectDisplay(subjectTag: string) {
+  const trimmed = subjectTag.trim();
+  if (!trimmed) {
+    return subjectTag;
+  }
+
+  return `${trimmed.charAt(0).toUpperCase()}${trimmed.slice(1)}`;
+}
+
 function renderConversationRows(input: {
   conversations: ListConversationSummary[];
   languageCode: UiLanguageCode;
@@ -134,7 +143,9 @@ function renderConversationRows(input: {
               {conversation.title}
             </h3>
             <div className="flex flex-wrap items-center gap-2 text-sm text-[color:var(--ink-soft)]">
-              {input.showSubject ? <span>{conversation.subject_tag}</span> : null}
+              {input.showSubject ? (
+                <span>{formatSubjectDisplay(conversation.subject_tag)}</span>
+              ) : null}
               <span>
                 {getConversationStatusLabel(
                   conversation.status,
@@ -243,7 +254,7 @@ export async function StudentDashboard({
           <div className="grid gap-3">
             <div className="min-w-0 space-y-1">
               <h1 className="max-w-full break-words font-[family-name:var(--font-heading)] text-4xl leading-tight">
-                {selectedGroup.subjectTag}
+                {formatSubjectDisplay(selectedGroup.subjectTag)}
               </h1>
             </div>
 
@@ -309,7 +320,7 @@ export async function StudentDashboard({
             </article>
           ) : (
             <>
-              <article className="grid gap-4 rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-6 py-6">
+              <article className="grid gap-4">
                 <StudentFirstHomeworkLauncher
                   initialDraft={initialDraft}
                   knownSubjects={subjectGroups.map((group) => group.subjectTag)}

@@ -33,6 +33,15 @@ function getFirstHomeworkCopy(languageCode: UiLanguageCode) {
   }
 }
 
+function formatSubjectDisplay(subject: string) {
+  const trimmed = subject.trim();
+  if (!trimmed) {
+    return subject;
+  }
+
+  return `${trimmed.charAt(0).toUpperCase()}${trimmed.slice(1)}`;
+}
+
 export function StudentFirstHomeworkLauncher({
   initialDraft = null,
   knownSubjects = [],
@@ -58,7 +67,7 @@ export function StudentFirstHomeworkLauncher({
       )
       .map((subject) => ({
         value: subject,
-        label: subject,
+        label: formatSubjectDisplay(subject),
       }));
 
     return [...knownOptions, ...standardOptions, ...(otherOption ? [otherOption] : [])];
@@ -79,7 +88,7 @@ export function StudentFirstHomeworkLauncher({
       : resolvedSelectedSubject;
 
   return (
-    <div className="grid gap-4 rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-6 py-6">
+    <div className="grid gap-4">
       <div className="flex flex-wrap gap-2">
         {subjectOptions.map((option) => {
           const isActive = resolvedSelectedSubject === option.value;
