@@ -1,3 +1,8 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { StudentMessageContent } from "@/components/dashboard/student/student-message-content";
+import { getStudentWorkbenchCopy } from "@/lib/i18n/student-flow-copy";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type { ConversationMessageRecord } from "@/lib/server/conversations/types";
 
@@ -10,17 +15,38 @@ export function StudentChatThread({
   languageCode,
   messages,
 }: StudentChatThreadProps) {
-  void languageCode;
+  const copy = getStudentWorkbenchCopy(languageCode);
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!copiedMessageId) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => setCopiedMessageId(null), 1400);
+    return () => window.clearTimeout(timeout);
+  }, [copiedMessageId]);
+
+  async function handleCopy(messageId: string, contentText: string) {
+    try {
+      await navigator.clipboard.writeText(contentText);
+      setCopiedMessageId(messageId);
+    } catch {
+      setCopiedMessageId(null);
+    }
+  }
 
   return (
     <div className="grid gap-5">
       {messages.map((message) => {
         const isStudent = message.role === "student";
         const isSystem = message.role === "system";
+        const isAssistant = message.role === "assistant";
+        const isCopied = copiedMessageId === message.id;
 
         return (
           <article
-            className={`grid ${isStudent ? "justify-items-end" : "justify-items-start"}`}
+            className={`group grid ${isStudent ? "justify-items-end" : "justify-items-start"}`}
             key={message.id}
           >
             <div
@@ -32,7 +58,45 @@ export function StudentChatThread({
                     : "px-1 py-1.5"
               } ${isStudent ? "ml-auto" : ""}`}
             >
-              <p className="whitespace-pre-wrap">{message.content_text}</p>
+              {isAssistant ? (
+                <StudentMessageContent content={message.content_text} />
+              ) : (
+                <p className="whitespace-pre-wrap">{message.content_text}</p>
+              )}
+            </div>
+            <div
+              className={`mt-2 flex w-full max-w-3xl ${
+                isStudent ? "justify-end" : "justify-start"
+              }`}
+            >
+              <button
+                className="inline-flex items-center rounded-full px-2 py-1 text-xs text-[color:var(--ink-soft)] opacity-0 transition hover:text-[color:var(--foreground)] group-hover:opacity-100 focus-visible:opacity-100"
+                onClick={() => handleCopy(message.id, message.content_text)}
+                type="button"
+              >
+                <svg
+                  aria-hidden="true"
+                  className="mr-1.5 h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M9 9.75A2.25 2.25 0 0 1 11.25 7.5h6A2.25 2.25 0 0 1 19.5 9.75v7.5a2.25 2.25 0 0 1-2.25 2.25h-6A2.25 2.25 0 0 1 9 17.25v-7.5Z"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.7"
+                  />
+                  <path
+                    d="M15 7.5V6.75A2.25 2.25 0 0 0 12.75 4.5h-6A2.25 2.25 0 0 0 4.5 6.75v7.5a2.25 2.25 0 0 0 2.25 2.25H9"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.7"
+                  />
+                </svg>
+                {isCopied ? copy.copiedMessage : copy.copyMessage}
+              </button>
             </div>
           </article>
         );

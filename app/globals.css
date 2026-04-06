@@ -821,3 +821,14 @@ html[data-theme="custom"] .bg-\[\#cb5d3c\] {
     background-position: 50% 50%;
   }
 }
+
+.student-markdown {
+  overflow-wrap: anywhere;
+}
+
+.student-markdown .katex-display {
+  margin: 1rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.2rem;
+}

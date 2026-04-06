@@ -1,5 +1,6 @@
 import { execSync } from "node:child_process";
 import type { Metadata } from "next";
+import "katex/dist/katex.min.css";
 import { IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
 import { Suspense } from "react";
 import { RouteViewTracker } from "@/components/telemetry/route-view-tracker";

@@ -784,6 +784,8 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       removeAttachment: "Retirer",
       removeAttachmentConfirm:
         "Retirer ce fichier de cette discussion ?",
+      copyMessage: "Copier",
+      copiedMessage: "Copié",
       previewImage: "Aperçu de l'image",
       closePreview: "Fermer l'aperçu",
       completeTooltip:
@@ -827,6 +829,8 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       removeAttachment: "Remove",
       removeAttachmentConfirm:
         "Remove this file from this conversation?",
+      copyMessage: "Copy",
+      copiedMessage: "Copied",
       previewImage: "Image preview",
       closePreview: "Close preview",
       completeTooltip:
@@ -866,6 +870,8 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       removeAttachment: "移除",
       removeAttachmentConfirm:
         "要把這個檔案從這段對話中移除嗎？",
+      copyMessage: "複製",
+      copiedMessage: "已複製",
       previewImage: "圖片預覽",
       closePreview: "關閉預覽",
       completeTooltip:

@@ -47,8 +47,10 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 7. uploads attachments through signed upload targets, confirms them, keeps the current file list in a minimal right-side rail, and now accepts pasted clipboard images in both the homework quick-start and the live conversation composer
 8. lets the student remove an uploaded file directly from that rail, with a confirmation step before the server-owned delete, and now opens uploaded images in an overlay preview when their file pill is clicked
 9. keeps the right rail pinned under the student header as a true split pane instead of letting it stretch alongside the full transcript length
-10. renders only one explicit completion control at the bottom of the right rail, keeping completion available without the older session-summary card dominating the active chat
-11. localizes the workbench shell, composer, and side rail through `lib/i18n/student-flow-copy.ts`
+10. adds hover copy controls under each learner-visible turn, so either side of the conversation can be copied back out without cluttering the thread at rest
+11. renders assistant turns through a markdown-plus-math path, so simple LaTeX like `$v = d/t$` can display as formatted math instead of raw markup
+12. renders only one explicit completion control at the bottom of the right rail, keeping completion available without the older session-summary card dominating the active chat
+13. localizes the workbench shell, composer, and side rail through `lib/i18n/student-flow-copy.ts`
 
 ## Interaction Rules
 
