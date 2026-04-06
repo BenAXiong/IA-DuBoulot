@@ -1,16 +1,20 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { StudentReplyModeSwitch } from "@/components/dashboard/student/student-reply-mode-switch";
 import { extractClipboardFiles } from "@/lib/intake/intake-config";
 import { getStudentConversationComposerCopy } from "@/lib/i18n/student-flow-copy";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
+import type { StudentReplyMode } from "@/lib/server/conversations/types";
 
 type StudentConversationComposerProps = {
   composerText: string;
   languageCode: UiLanguageCode;
+  replyMode: StudentReplyMode;
   disabled?: boolean;
   isSending?: boolean;
   onComposerTextChange: (value: string) => void;
+  onReplyModeChange: (mode: StudentReplyMode) => void;
   onPasteAttachments: (files: File[]) => void;
   onSendMessage: () => void;
   onUploadAttachments: () => void;
@@ -64,9 +68,11 @@ function SendIcon() {
 export function StudentConversationComposer({
   composerText,
   languageCode,
+  replyMode,
   disabled = false,
   isSending = false,
   onComposerTextChange,
+  onReplyModeChange,
   onPasteAttachments,
   onSendMessage,
   onUploadAttachments,
@@ -140,6 +146,12 @@ export function StudentConversationComposer({
           >
             <PlusIcon />
           </button>
+          <StudentReplyModeSwitch
+            disabled={disabled || isSending}
+            languageCode={languageCode}
+            mode={replyMode}
+            onModeChange={onReplyModeChange}
+          />
           <button
             aria-label={copy.voice}
             className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] focus:shadow-none focus-visible:shadow-none"

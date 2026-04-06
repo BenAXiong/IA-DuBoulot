@@ -309,6 +309,12 @@ export async function parseAppendConversationMessageInput(
       : "student_message";
   const contentText =
     typeof payload.contentText === "string" ? payload.contentText : "";
+  const replyMode =
+    payload.replyMode === "fast" ||
+    payload.replyMode === "interactive" ||
+    payload.replyMode === "thinking"
+      ? payload.replyMode
+      : "thinking";
 
   if (intent === "student_message" && contentText.trim().length === 0) {
     throw new AppError({
@@ -335,6 +341,7 @@ export async function parseAppendConversationMessageInput(
   return {
     contentText,
     intent,
+    replyMode,
   };
 }
 
@@ -982,6 +989,7 @@ export async function appendConversationTurn(input: {
         attachments: (attachments ?? []) as ConversationAttachmentRecord[],
         studentMessageText,
         intent: input.payload.intent,
+        replyMode: input.payload.replyMode,
         languageCode: appUser.ai_help_language,
         requestContext: {
           requestId: input.requestId,

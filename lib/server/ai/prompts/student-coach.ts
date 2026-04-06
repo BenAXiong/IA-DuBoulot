@@ -7,6 +7,30 @@ import {
 } from "@/lib/server/ai/prompts/shared";
 import type { GenerateCoachReplyInput } from "@/lib/server/ai/types";
 
+function buildReplyModeInstructions(input: GenerateCoachReplyInput) {
+  if (input.replyMode === "fast") {
+    return [
+      "Mode de réponse: fast.",
+      "Va droit au point avec une réponse brève, claire, et immédiatement utile.",
+      "Garde au maximum une micro-étape ou une question de vérification, sans développer inutilement.",
+    ].join("\n");
+  }
+
+  if (input.replyMode === "interactive") {
+    return [
+      "Mode de réponse: interactive.",
+      "Privilégie une dynamique guidée: pose une question utile ou propose une micro-étape avant d'enchaîner sur une longue explication.",
+      "Révèle moins d'un coup et garde la conversation active, comme un adulte qui accompagne l'élève pas à pas.",
+    ].join("\n");
+  }
+
+  return [
+    "Mode de réponse: thinking.",
+    "Rends la structure un peu plus explicite: vérifie les hypothèses, découpe mieux les étapes, et fais apparaître les points de contrôle importants.",
+    "Si le sujet est quantitatif, sois particulièrement rigoureux sur les unités, les relations entre grandeurs, et l'écriture des équations.",
+  ].join("\n");
+}
+
 export function buildStudentCoachSystemPrompt(input: GenerateCoachReplyInput) {
   const languageLabel = getLanguageLabel(input.languageCode);
 
@@ -23,6 +47,7 @@ export function buildStudentCoachSystemPrompt(input: GenerateCoachReplyInput) {
       "Ne mentionne jamais des politiques internes, des scores de modération, ou des détails de fournisseur.",
       "Retourne un JSON valide avec les champs replyText, coachingMode et asksForAttempt.",
       "coachingMode doit être l'une des valeurs suivantes: attempt_probe, hint_scaffold, feedback_refinement, summary_reflection, boundary_redirect.",
+      buildReplyModeInstructions(input),
       "",
       "Contexte courant",
       buildConversationCoreContext({

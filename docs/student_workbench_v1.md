@@ -51,8 +51,9 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 11. renders assistant turns through a markdown-plus-math path, so simple LaTeX like `$v = d/t$` can display as formatted math instead of raw markup
 12. keeps the live composer pinned at the bottom of the conversation view, now shows a chevron jump-to-latest control above it when the transcript is scrolled upward, and appends the learner's message optimistically with a lightweight pending banban placeholder so the prompt no longer looks stuck in the textarea during the round trip
 13. reuses the same learner avatar style as the profile dock for student turns, so the thread feels like one consistent messaging surface instead of mixing unrelated identity treatments
-14. renders only one explicit completion control at the bottom of the right rail, keeping completion available without the older session-summary card dominating the active chat
-15. localizes the workbench shell, composer, and side rail through `lib/i18n/student-flow-copy.ts`
+14. exposes a small reply-mode switch directly in the chat tools, and now routes `fast`, `thinking`, and `interactive` as real prompt-level coaching variants instead of leaving them as a purely hypothetical Pilot note
+15. renders only one explicit completion control at the bottom of the right rail, keeping completion available without the older session-summary card dominating the active chat
+16. localizes the workbench shell, composer, the reply-mode switch, and the side rail through `lib/i18n/student-flow-copy.ts`
 
 ## Interaction Rules
 
@@ -63,6 +64,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 - only the student owner or an admin can mutate the conversation state
 - moderation outcomes are recorded before blocked or flagged content leaves the server boundary
 - the student-facing shell now assumes the conversation already exists before the live workbench opens; the newer subject quick-start creates that shell and first turn before routing here
+- reply modes are not separate models; they are prompt-policy variants on the same student coach path, selected per message through the live composer or subject quick-start
 
 ## Important Boundaries
 

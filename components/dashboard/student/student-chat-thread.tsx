@@ -24,7 +24,6 @@ export function StudentChatThread({
 }: StudentChatThreadProps) {
   const copy = getStudentWorkbenchCopy(languageCode);
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
-  const [showCopiedToast, setShowCopiedToast] = useState(false);
 
   useEffect(() => {
     if (!copiedMessageId) {
@@ -35,33 +34,17 @@ export function StudentChatThread({
     return () => window.clearTimeout(timeout);
   }, [copiedMessageId]);
 
-  useEffect(() => {
-    if (!showCopiedToast) {
-      return;
-    }
-
-    const timeout = window.setTimeout(() => setShowCopiedToast(false), 1400);
-    return () => window.clearTimeout(timeout);
-  }, [showCopiedToast]);
-
   async function handleCopy(messageId: string, contentText: string) {
     try {
       await navigator.clipboard.writeText(contentText);
       setCopiedMessageId(messageId);
-      setShowCopiedToast(true);
     } catch {
       setCopiedMessageId(null);
-      setShowCopiedToast(false);
     }
   }
 
   return (
     <div className="relative grid gap-5">
-      {showCopiedToast ? (
-        <div className="pointer-events-none fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full border border-[color:var(--line)] bg-[color:var(--surface-raised)] px-3 py-1.5 text-sm text-[color:var(--foreground)] shadow-[var(--shadow)]">
-          {copy.copiedToast}
-        </div>
-      ) : null}
       {messages.map((message) => {
         const isStudent = message.role === "student";
         const isSystem = message.role === "system";
@@ -120,10 +103,14 @@ export function StudentChatThread({
                   )}
                 </div>
 
-                <div className={`mt-1 flex ${isStudent ? "justify-end" : "justify-start"}`}>
+                <div
+                  className={`mt-1 flex ${isStudent ? "justify-end" : "justify-start"}`}
+                >
                   <button
                     aria-label={copyLabel}
-                    className="inline-flex items-center rounded-full px-2 py-1 text-xs text-[color:var(--ink-soft)] opacity-0 transition hover:text-[color:var(--foreground)] group-hover:opacity-100 focus-visible:opacity-100"
+                    className={`relative inline-flex items-center rounded-full px-2 py-1 text-xs text-[color:var(--ink-soft)] transition hover:text-[color:var(--foreground)] group-hover:opacity-100 focus-visible:opacity-100 ${
+                      isCopied ? "opacity-100" : "opacity-0"
+                    }`}
                     onClick={() => handleCopy(message.id, message.content_text)}
                     title={copyLabel}
                     type="button"
@@ -149,6 +136,17 @@ export function StudentChatThread({
                         strokeWidth="1.7"
                       />
                     </svg>
+                    {isCopied ? (
+                      <span
+                        className={`pointer-events-none absolute top-1/2 rounded-full border border-[color:var(--line)] bg-[color:var(--surface-raised)] px-2 py-0.5 text-[11px] text-[color:var(--foreground)] shadow-[var(--shadow)] ${
+                          isStudent
+                            ? "right-full mr-2 -translate-y-1/2"
+                            : "left-full ml-2 -translate-y-1/2"
+                        }`}
+                      >
+                        {copy.copiedToast}
+                      </span>
+                    ) : null}
                   </button>
                 </div>
               </div>

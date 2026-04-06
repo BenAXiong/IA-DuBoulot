@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { StudentReplyModeSwitch } from "@/components/dashboard/student/student-reply-mode-switch";
 import {
   extractClipboardFiles,
   INTAKE_ACCEPT_ATTR,
@@ -10,6 +11,7 @@ import {
 } from "@/lib/intake/intake-config";
 import { uploadConversationFiles } from "@/lib/uploads/client-upload";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
+import type { StudentReplyMode } from "@/lib/server/conversations/types";
 
 type StudentSubjectQuickStartProps = {
   initialDraft?: string | null;
@@ -190,6 +192,7 @@ export function StudentSubjectQuickStart({
   const [stagedFiles, setStagedFiles] = useState<StagedIntakeFile[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isStarting, setIsStarting] = useState(false);
+  const [replyMode, setReplyMode] = useState<StudentReplyMode>("thinking");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -320,6 +323,7 @@ export function StudentSubjectQuickStart({
           body: JSON.stringify({
             intent: "student_message",
             contentText: trimmedDraft,
+            replyMode,
           }),
         },
       );
@@ -384,6 +388,12 @@ export function StudentSubjectQuickStart({
           >
             <PlusIcon />
           </button>
+          <StudentReplyModeSwitch
+            disabled={isStarting}
+            languageCode={languageCode}
+            mode={replyMode}
+            onModeChange={setReplyMode}
+          />
           <button
             aria-label={copy.voice}
             className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] focus:shadow-none focus-visible:shadow-none"

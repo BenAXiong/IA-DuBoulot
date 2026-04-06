@@ -15,6 +15,7 @@ import type {
   ConversationDetail,
   ConversationMessageRecord,
   ConversationRecord,
+  StudentReplyMode,
 } from "@/lib/server/conversations/types";
 import { uploadConversationFiles } from "@/lib/uploads/client-upload";
 
@@ -105,6 +106,7 @@ export function StudentConversationWorkbench({
   const [railWidth, setRailWidth] = useState(296);
   const [isResizingRail, setIsResizingRail] = useState(false);
   const [showJumpToLatest, setShowJumpToLatest] = useState(false);
+  const [replyMode, setReplyMode] = useState<StudentReplyMode>("thinking");
   const [pendingStudentMessage, setPendingStudentMessage] =
     useState<ConversationMessageRecord | null>(null);
   const [pendingAssistantMessage, setPendingAssistantMessage] =
@@ -239,6 +241,7 @@ export function StudentConversationWorkbench({
           body: JSON.stringify({
             intent,
             contentText: pendingDraft,
+            replyMode,
           }),
         },
       );
@@ -528,9 +531,11 @@ export function StudentConversationWorkbench({
                 isSending={isSending || isUploading}
                 languageCode={languageCode}
                 onComposerTextChange={setComposerText}
+                onReplyModeChange={setReplyMode}
                 onPasteAttachments={(files) => void uploadFiles(files, "paste")}
                 onSendMessage={() => sendMessage("student_message")}
                 onUploadAttachments={() => fileInputRef.current?.click()}
+                replyMode={replyMode}
               />
 
               {chatError ? (

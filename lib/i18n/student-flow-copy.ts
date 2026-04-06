@@ -1,6 +1,9 @@
 import type { ConversationAttachmentRecord } from "@/lib/server/ai/types";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
-import type { ConversationMessageRecord } from "@/lib/server/conversations/types";
+import type {
+  ConversationMessageRecord,
+  StudentReplyMode,
+} from "@/lib/server/conversations/types";
 
 type LocalizedValue<T> = Record<UiLanguageCode, T>;
 
@@ -674,6 +677,64 @@ export function getStudentConversationComposerCopy(languageCode: UiLanguageCode)
         send: "送出",
     },
   });
+}
+
+export function getStudentReplyModeCopy(languageCode: UiLanguageCode) {
+  const labels = pickLocalizedValue(languageCode, {
+    fr: {
+      fast: "Rapide",
+      thinking: "Réflexion",
+      interactive: "Interactif",
+      switchLabel: "Mode de réponse",
+      switchTooltip: "Choisis la manière dont banban te répond pour ce message.",
+      chevronTooltip: "Ouvrir les modes",
+      fastTooltip: "Réponse courte et directe.",
+      thinkingTooltip: "Réponse plus structurée et vérifiée.",
+      interactiveTooltip: "Réponse plus guidée, avec davantage d'échanges.",
+    },
+    en: {
+      fast: "Fast",
+      thinking: "Thinking",
+      interactive: "Interactive",
+      switchLabel: "Reply mode",
+      switchTooltip: "Choose how banban should answer this message.",
+      chevronTooltip: "Open modes",
+      fastTooltip: "Short and direct reply.",
+      thinkingTooltip: "More structured and checked reply.",
+      interactiveTooltip: "More guided back-and-forth reply.",
+    },
+    zh: {
+      fast: "快速",
+      thinking: "思考",
+      interactive: "互動",
+      switchLabel: "回答模式",
+      switchTooltip: "選擇 banban 這則訊息的回答方式。",
+      chevronTooltip: "打開模式選單",
+      fastTooltip: "簡短直接的回答。",
+      thinkingTooltip: "結構更清楚、檢查更多的回答。",
+      interactiveTooltip: "更多引導與來回互動的回答。",
+    },
+  });
+
+  const descriptions: Record<StudentReplyMode, string> = {
+    fast: labels.fastTooltip,
+    thinking: labels.thinkingTooltip,
+    interactive: labels.interactiveTooltip,
+  };
+
+  const names: Record<StudentReplyMode, string> = {
+    fast: labels.fast,
+    thinking: labels.thinking,
+    interactive: labels.interactive,
+  };
+
+  return {
+    switchLabel: labels.switchLabel,
+    switchTooltip: labels.switchTooltip,
+    chevronTooltip: labels.chevronTooltip,
+    names,
+    descriptions,
+  };
 }
 
 export function getStudentWorkspacePanelCopy(languageCode: UiLanguageCode) {

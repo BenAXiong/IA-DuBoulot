@@ -9,6 +9,8 @@ export type ConversationActionIntent =
   | "hint"
   | "summarize";
 
+export type StudentReplyMode = "fast" | "thinking" | "interactive";
+
 export type SummaryAudience = "student" | "parent" | "tutor";
 
 export type DraftAttachmentReferenceInput = {
@@ -86,6 +88,7 @@ export type SessionSummaryRecord = {
 export type AppendConversationMessageInput = {
   contentText: string;
   intent: ConversationActionIntent;
+  replyMode: StudentReplyMode;
 };
 
 export type AppendConversationMessageResult = {

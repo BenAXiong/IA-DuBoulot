@@ -5,6 +5,7 @@ import type {
   ConversationMessageRecord,
   ConversationRecord,
   SessionSummaryRecord,
+  StudentReplyMode,
   SummaryAudience,
   WorkspaceStateRecord,
 } from "@/lib/server/conversations/types";
@@ -56,6 +57,7 @@ export type GenerateCoachReplyInput = {
   attachments: ConversationAttachmentRecord[];
   studentMessageText: string;
   intent: ConversationActionIntent;
+  replyMode: StudentReplyMode;
   languageCode: AiLanguageCode;
   requestContext: AiProviderLogContext;
 };

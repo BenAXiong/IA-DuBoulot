@@ -363,6 +363,7 @@ export function StudentAppShell({
   const searchParams = useSearchParams();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [homeworkExpanded, setHomeworkExpanded] = useState(true);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const profileMenuCloseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
@@ -454,17 +455,29 @@ export function StudentAppShell({
           {!sidebarCollapsed ? (
             <div className="group grid gap-1">
               <div className="flex items-center justify-between gap-3 px-3 py-2.5">
-                <Link
-                  className="flex min-w-0 flex-1 items-center gap-1.5 text-sm font-medium text-[color:var(--foreground)]"
-                  href="/app?view=homework"
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  <HomeworkIcon />
-                  <span>{copy.homework}</span>
-                  <span className="text-[color:var(--ink-muted)]">
-                    <ChevronIcon />
-                  </span>
-                </Link>
+                <div className="flex min-w-0 flex-1 items-center gap-1.5">
+                  <Link
+                    className="flex min-w-0 flex-1 items-center gap-1.5 text-sm font-medium text-[color:var(--foreground)]"
+                    href="/app?view=homework"
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    <HomeworkIcon />
+                    <span>{copy.homework}</span>
+                  </Link>
+                  <button
+                    aria-expanded={homeworkExpanded}
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-full text-[color:var(--ink-muted)] transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
+                    onClick={() => setHomeworkExpanded((value) => !value)}
+                    title={copy.homework}
+                    type="button"
+                  >
+                    <span
+                      className={`transition ${homeworkExpanded ? "rotate-90" : ""}`}
+                    >
+                      <ChevronIcon />
+                    </span>
+                  </button>
+                </div>
                 <Link
                   aria-label={copy.addSubject}
                   className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] opacity-0 transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)] group-hover:opacity-100 focus-visible:opacity-100"
@@ -476,37 +489,39 @@ export function StudentAppShell({
                 </Link>
               </div>
 
-              {subjectGroups.length === 0 ? (
-                <p className="px-3 text-sm leading-6 text-[color:var(--ink-soft)]">
-                  {copy.noSubjects}
-                </p>
-              ) : (
-                <div className="grid gap-1 pl-7">
-                  {subjectGroups.map((group) => {
-                    const isActive = selectedSubject === group.subjectTag;
+              {homeworkExpanded ? (
+                subjectGroups.length === 0 ? (
+                  <p className="px-3 text-sm leading-6 text-[color:var(--ink-soft)]">
+                    {copy.noSubjects}
+                  </p>
+                ) : (
+                  <div className="grid gap-1 pl-7">
+                    {subjectGroups.map((group) => {
+                      const isActive = selectedSubject === group.subjectTag;
 
-                    return (
-                      <Link
-                        className={`flex items-center justify-between rounded-[1rem] px-3 py-1.5 text-sm transition ${
-                          isActive
-                            ? "text-[color:var(--foreground)]"
-                            : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
-                        }`}
-                        href={`/app?view=homework&subject=${encodeURIComponent(group.subjectTag)}`}
-                        key={group.subjectTag}
-                        onClick={() => setSidebarOpen(false)}
-                      >
-                        <span className="truncate">
-                          {capitalizeSubjectLabel(group.subjectTag)}
-                        </span>
-                        <span className="text-xs text-[color:var(--ink-muted)]">
-                          {group.count}
-                        </span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
+                      return (
+                        <Link
+                          className={`flex items-center justify-between rounded-[1rem] px-3 py-1.5 text-sm transition ${
+                            isActive
+                              ? "text-[color:var(--foreground)]"
+                              : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
+                          }`}
+                          href={`/app?view=homework&subject=${encodeURIComponent(group.subjectTag)}`}
+                          key={group.subjectTag}
+                          onClick={() => setSidebarOpen(false)}
+                        >
+                          <span className="truncate">
+                            {capitalizeSubjectLabel(group.subjectTag)}
+                          </span>
+                          <span className="text-xs text-[color:var(--ink-muted)]">
+                            {group.count}
+                          </span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )
+              ) : null}
             </div>
           ) : null}
 
