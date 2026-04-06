@@ -328,7 +328,7 @@ export function StudentConversationWorkbench({
         type="file"
       />
 
-      <section className="grid gap-0 xl:-my-4 xl:-mr-8 xl:min-h-[calc(100vh-3.25rem)] xl:grid-cols-[minmax(0,1fr)_18.5rem]">
+      <section className="grid gap-0 xl:-my-4 xl:-mr-8 xl:grid-cols-[minmax(0,1fr)_18.5rem] xl:items-start">
         <article className="flex min-h-0 flex-col gap-3 py-1 xl:py-4 xl:pr-8">
           <div className="border-b border-[color:var(--line)] pb-3">
             <div className="min-w-0 space-y-1.5">
@@ -391,8 +391,8 @@ export function StudentConversationWorkbench({
           ) : null}
         </article>
 
-        <aside className="border-l border-[color:var(--line)] bg-[color:var(--surface)] px-5 py-4 xl:min-h-[calc(100vh-3.25rem)]">
-          <div className="flex h-full min-h-[calc(100vh-8rem)] flex-col xl:sticky xl:top-24 xl:self-start xl:min-h-[calc(100vh-8rem)]">
+        <aside className="border-l border-[color:var(--line)] bg-[color:var(--surface)] px-5 py-4 xl:sticky xl:top-[3.25rem] xl:h-[calc(100vh-3.25rem)] xl:self-start">
+          <div className="flex h-full min-h-0 flex-col">
             <StudentConversationSideRail
               attachments={attachments}
               disabled={isUploading || isReadOnly}

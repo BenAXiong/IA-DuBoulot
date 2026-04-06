@@ -784,6 +784,8 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       removeAttachment: "Retirer",
       removeAttachmentConfirm:
         "Retirer ce fichier de cette discussion ?",
+      previewImage: "Aperçu de l'image",
+      closePreview: "Fermer l'aperçu",
       completeTooltip:
         "Le chat reste ouvert tant que tu ne choisis pas de terminer cette session.",
       completeButton: "Devoir terminé !",
@@ -825,6 +827,8 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       removeAttachment: "Remove",
       removeAttachmentConfirm:
         "Remove this file from this conversation?",
+      previewImage: "Image preview",
+      closePreview: "Close preview",
       completeTooltip:
         "The chat stays open until you decide to wrap up this session.",
       completeButton: "Homework done!",
@@ -862,6 +866,8 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       removeAttachment: "移除",
       removeAttachmentConfirm:
         "要把這個檔案從這段對話中移除嗎？",
+      previewImage: "圖片預覽",
+      closePreview: "關閉預覽",
       completeTooltip:
         "只要你還沒選擇結束，聊天就會保持開放。",
       completeButton: "作業完成！",

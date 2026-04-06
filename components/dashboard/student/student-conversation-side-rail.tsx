@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import { getStudentWorkbenchCopy } from "@/lib/i18n/student-flow-copy";
 import type { ConversationAttachmentRecord } from "@/lib/server/ai/types";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
@@ -27,6 +28,14 @@ function CloseIcon() {
   );
 }
 
+function isPreviewableAttachment(attachment: ConversationAttachmentRecord) {
+  return (
+    attachment.mime_type.startsWith("image/") ||
+    attachment.attachment_kind === "image" ||
+    attachment.attachment_kind === "screenshot"
+  );
+}
+
 export function StudentConversationSideRail({
   attachments,
   languageCode,
@@ -39,6 +48,37 @@ export function StudentConversationSideRail({
   const [pendingAttachmentId, setPendingAttachmentId] = useState<string | null>(
     null,
   );
+  const [previewAttachment, setPreviewAttachment] =
+    useState<ConversationAttachmentRecord | null>(null);
+
+  useEffect(() => {
+    if (!previewAttachment) {
+      return;
+    }
+
+    const stillExists = attachments.some(
+      (attachment) => attachment.id === previewAttachment.id,
+    );
+
+    if (!stillExists) {
+      setPreviewAttachment(null);
+    }
+  }, [attachments, previewAttachment]);
+
+  useEffect(() => {
+    if (!previewAttachment) {
+      return;
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setPreviewAttachment(null);
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [previewAttachment]);
 
   async function handleRemoveAttachment(attachmentId: string) {
     const confirmed = window.confirm(copy.removeAttachmentConfirm);
@@ -57,41 +97,60 @@ export function StudentConversationSideRail({
 
   return (
     <aside className="flex min-h-full flex-1 flex-col">
-      <div className="space-y-3">
-        {attachments.length === 0 ? (
-          <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-            {copy.noFilesUploaded}
-          </p>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {attachments.map((attachment) => {
-              const isPending = pendingAttachmentId === attachment.id;
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="space-y-3 pr-1">
+          {attachments.length === 0 ? (
+            <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
+              {copy.noFilesUploaded}
+            </p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {attachments.map((attachment) => {
+                const isPending = pendingAttachmentId === attachment.id;
+                const isPreviewable = isPreviewableAttachment(attachment);
 
-              return (
-                <span
-                  className="group inline-flex items-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-3 py-1.5 text-xs text-[color:var(--foreground)]"
-                  key={attachment.id}
-                >
-                  <span className="max-w-[11rem] truncate">
-                    {attachment.original_filename}
-                  </span>
-                  <button
-                    aria-label={copy.removeAttachment}
-                    className="inline-flex h-4 w-4 items-center justify-center rounded-full text-[color:var(--ink-soft)] opacity-0 transition hover:text-[#c95f44] group-hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
-                    disabled={disabled || isPending}
-                    onClick={() => handleRemoveAttachment(attachment.id)}
-                    type="button"
+                return (
+                  <div
+                    className="group relative inline-flex max-w-full items-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] pr-8 text-xs text-[color:var(--foreground)]"
+                    key={attachment.id}
                   >
-                    <CloseIcon />
-                  </button>
-                </span>
-              );
-            })}
-          </div>
-        )}
+                    {isPreviewable ? (
+                      <button
+                        className="min-w-0 rounded-full px-3 py-1.5 text-left transition hover:text-[color:var(--foreground)]"
+                        onClick={() => setPreviewAttachment(attachment)}
+                        title={copy.previewImage}
+                        type="button"
+                      >
+                        <span className="block max-w-[11rem] truncate">
+                          {attachment.original_filename}
+                        </span>
+                      </button>
+                    ) : (
+                      <span className="block max-w-[11rem] truncate px-3 py-1.5">
+                        {attachment.original_filename}
+                      </span>
+                    )}
+                    <button
+                      aria-label={copy.removeAttachment}
+                      className="absolute right-2 inline-flex h-4 w-4 items-center justify-center rounded-full text-[color:var(--ink-soft)] opacity-0 transition hover:text-[#c95f44] group-hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
+                      disabled={disabled || isPending}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        void handleRemoveAttachment(attachment.id);
+                      }}
+                      type="button"
+                    >
+                      <CloseIcon />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="mt-auto pt-4">
+      <div className="mt-4 pt-4">
         <button
           className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[color:var(--foreground)] px-5 py-3 text-sm font-medium text-[color:var(--background)] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
           disabled={disabled || isCompleting}
@@ -102,6 +161,38 @@ export function StudentConversationSideRail({
           {copy.completeButton}
         </button>
       </div>
+
+      {previewAttachment ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-6"
+          onClick={() => setPreviewAttachment(null)}
+          role="presentation"
+        >
+          <div
+            className="relative max-h-full max-w-[min(90vw,72rem)]"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              aria-label={copy.closePreview}
+              className="absolute right-3 top-3 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/55 text-white transition hover:bg-black/70"
+              onClick={() => setPreviewAttachment(null)}
+              type="button"
+            >
+              <CloseIcon />
+            </button>
+            <div className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/35 p-3 shadow-[0_24px_80px_rgba(0,0,0,0.42)]">
+              <Image
+                alt={previewAttachment.original_filename}
+                className="max-h-[82vh] w-auto max-w-[min(88vw,68rem)] rounded-[1rem] object-contain"
+                height={1200}
+                src={`/api/attachments/${previewAttachment.id}/access`}
+                unoptimized
+                width={1600}
+              />
+            </div>
+          </div>
+        </div>
+      ) : null}
     </aside>
   );
 }

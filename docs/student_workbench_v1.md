@@ -45,15 +45,17 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 5. sends message turns through the Gemini-backed coach flow plus moderation checks before persisting assistant output, and now falls back to a learner-facing retry reply if the provider call fails instead of leaking the older internal draft-coach text
 6. still keeps the persisted workspace fields and save route under the hood, but no longer foregrounds the old workspace panel in the learner UI
 7. uploads attachments through signed upload targets, confirms them, keeps the current file list in a minimal right-side rail, and now accepts pasted clipboard images in both the homework quick-start and the live conversation composer
-8. lets the student remove an uploaded file directly from that rail, with a confirmation step before the server-owned delete
-9. renders only one explicit completion control at the bottom of the right rail, keeping completion available without the older session-summary card dominating the active chat
-10. localizes the workbench shell, composer, and side rail through `lib/i18n/student-flow-copy.ts`
+8. lets the student remove an uploaded file directly from that rail, with a confirmation step before the server-owned delete, and now opens uploaded images in an overlay preview when their file pill is clicked
+9. keeps the right rail pinned under the student header as a true split pane instead of letting it stretch alongside the full transcript length
+10. renders only one explicit completion control at the bottom of the right rail, keeping completion available without the older session-summary card dominating the active chat
+11. localizes the workbench shell, composer, and side rail through `lib/i18n/student-flow-copy.ts`
 
 ## Interaction Rules
 
 - message appends stay server-owned through `POST /api/conversations/[conversationId]/messages`
 - workspace saves stay server-owned through `PATCH /api/conversations/[conversationId]/workspace`
 - attachment upload/confirm/extract stays server-owned through `/api/uploads/...`, private attachment access stays behind `/api/attachments/[attachmentId]/access`, and attachment removal now stays server-owned through `DELETE /api/attachments/[attachmentId]`
+- image preview in the right rail reuses the same server-owned private attachment access route, so learner-visible previews still stay behind the signed attachment boundary
 - only the student owner or an admin can mutate the conversation state
 - moderation outcomes are recorded before blocked or flagged content leaves the server boundary
 - the student-facing shell now assumes the conversation already exists before the live workbench opens; the newer subject quick-start creates that shell and first turn before routing here
