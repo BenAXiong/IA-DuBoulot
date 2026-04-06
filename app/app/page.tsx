@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { AdminDashboard } from "@/components/dashboard/admin-dashboard";
 import { AccountSettingsForm } from "@/components/auth/account-settings-form";
 import { ParentDashboard } from "@/components/dashboard/parent-dashboard";
@@ -92,6 +93,7 @@ export default async function AppHomePage({
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const initialDraft = getSearchParam(resolvedSearchParams, "draft");
   const selectedSubject = getSearchParam(resolvedSearchParams, "subject");
+  const legacyNewSubjectMode = getSearchParam(resolvedSearchParams, "newSubject");
   const studentViewParam = getSearchParam(resolvedSearchParams, "view");
   const studentView =
     studentViewParam === "maps" ||
@@ -99,6 +101,21 @@ export default async function AppHomePage({
     studentViewParam === "forward"
       ? studentViewParam
       : "homework";
+
+  if (legacyNewSubjectMode) {
+    const nextSearchParams = new URLSearchParams();
+    nextSearchParams.set("view", studentView);
+
+    if (selectedSubject) {
+      nextSearchParams.set("subject", selectedSubject);
+    }
+
+    if (initialDraft) {
+      nextSearchParams.set("draft", initialDraft);
+    }
+
+    redirect(`/app?${nextSearchParams.toString()}`);
+  }
   const copy = getAppHomeCopy(appUser.preferred_ui_language);
   const showAccountSettingsBlock =
     appUser.role !== "parent" && appUser.role !== "student";

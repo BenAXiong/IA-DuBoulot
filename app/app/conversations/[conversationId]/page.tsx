@@ -30,6 +30,7 @@ export default async function ConversationDetailPage({
     <StudentConversationWorkbench
       detail={detail}
       languageCode={appUser.preferred_ui_language}
+      studentDisplayName={appUser.display_name}
     />
   );
 }

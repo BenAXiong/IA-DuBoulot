@@ -21,6 +21,7 @@ import { uploadConversationFiles } from "@/lib/uploads/client-upload";
 type StudentConversationWorkbenchProps = {
   detail: ConversationDetail;
   languageCode: UiLanguageCode;
+  studentDisplayName: string;
 };
 
 type MessageRouteResponse =
@@ -84,6 +85,7 @@ function buildInitialWorkspace(detail: ConversationDetail): WorkspaceDraftState 
 export function StudentConversationWorkbench({
   detail,
   languageCode,
+  studentDisplayName,
 }: StudentConversationWorkbenchProps) {
   const copy = getStudentWorkbenchCopy(languageCode);
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -483,7 +485,11 @@ export function StudentConversationWorkbench({
                 </div>
               </div>
 
-              <StudentChatThread languageCode={languageCode} messages={displayMessages} />
+              <StudentChatThread
+                languageCode={languageCode}
+                messages={displayMessages}
+                studentDisplayName={studentDisplayName}
+              />
             </div>
           </div>
 

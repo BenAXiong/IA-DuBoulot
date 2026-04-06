@@ -293,9 +293,6 @@ export async function StudentDashboard({
       ) : (
         <section className="mx-auto grid w-full max-w-5xl gap-8 py-1">
           <div className="space-y-3">
-            <p className="text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
-              {copy.homeworkEyebrow}
-            </p>
             <h1 className="font-[family-name:var(--font-heading)] text-4xl leading-tight sm:text-5xl">
               {copy.homeworkTitle}
             </h1>

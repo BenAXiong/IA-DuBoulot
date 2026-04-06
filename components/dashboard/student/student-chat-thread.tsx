@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ProfileAvatar } from "@/components/dashboard/parent/profile-avatar";
 import { StudentMessageContent } from "@/components/dashboard/student/student-message-content";
 import { getStudentWorkbenchCopy } from "@/lib/i18n/student-flow-copy";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
@@ -13,28 +14,17 @@ type DisplayConversationMessage = ConversationMessageRecord & {
 type StudentChatThreadProps = {
   languageCode: UiLanguageCode;
   messages: DisplayConversationMessage[];
+  studentDisplayName: string;
 };
-
-function StudentAvatarIcon() {
-  return (
-    <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
-      <circle cx="12" cy="8" r="3.25" stroke="currentColor" strokeWidth="1.7" />
-      <path
-        d="M6 18.25c1.2-2.45 3.4-3.75 6-3.75s4.8 1.3 6 3.75"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="1.7"
-      />
-    </svg>
-  );
-}
 
 export function StudentChatThread({
   languageCode,
   messages,
+  studentDisplayName,
 }: StudentChatThreadProps) {
   const copy = getStudentWorkbenchCopy(languageCode);
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
+  const [showCopiedToast, setShowCopiedToast] = useState(false);
 
   useEffect(() => {
     if (!copiedMessageId) {
@@ -45,17 +35,33 @@ export function StudentChatThread({
     return () => window.clearTimeout(timeout);
   }, [copiedMessageId]);
 
+  useEffect(() => {
+    if (!showCopiedToast) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => setShowCopiedToast(false), 1400);
+    return () => window.clearTimeout(timeout);
+  }, [showCopiedToast]);
+
   async function handleCopy(messageId: string, contentText: string) {
     try {
       await navigator.clipboard.writeText(contentText);
       setCopiedMessageId(messageId);
+      setShowCopiedToast(true);
     } catch {
       setCopiedMessageId(null);
+      setShowCopiedToast(false);
     }
   }
 
   return (
-    <div className="grid gap-5">
+    <div className="relative grid gap-5">
+      {showCopiedToast ? (
+        <div className="pointer-events-none fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full border border-[color:var(--line)] bg-[color:var(--surface-raised)] px-3 py-1.5 text-sm text-[color:var(--foreground)] shadow-[var(--shadow)]">
+          {copy.copiedToast}
+        </div>
+      ) : null}
       {messages.map((message) => {
         const isStudent = message.role === "student";
         const isSystem = message.role === "system";
@@ -78,71 +84,78 @@ export function StudentChatThread({
                   className={`mt-1 shrink-0 ${
                     isAssistant
                       ? "brand-mark brand-mark--mini inline-flex items-center justify-center font-[family-name:var(--font-heading)] text-[0.65rem] font-semibold text-white"
-                      : "inline-flex h-[2.1rem] w-[2.1rem] items-center justify-center rounded-[0.8rem] border border-[color:var(--line)] bg-[color:var(--surface)] text-[color:var(--ink-soft)]"
+                      : ""
                   }`}
                 >
-                  {isAssistant ? "bb" : <StudentAvatarIcon />}
+                  {isAssistant ? (
+                    "bb"
+                  ) : (
+                    <ProfileAvatar name={studentDisplayName} size="sm" />
+                  )}
                 </div>
               ) : null}
 
               <div
-                className={`w-full min-w-0 text-sm leading-7 text-[color:var(--foreground)] ${
-                  isStudent
-                    ? "rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-3.5 shadow-[0_10px_30px_rgba(15,23,42,0.06)]"
-                    : isSystem
-                      ? "rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-[color:var(--ink-soft)]"
-                      : message.isPending
-                        ? "student-pending-shimmer rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-[color:var(--ink-soft)]"
-                        : "px-1 py-1.5"
-                } ${isStudent ? "ml-auto" : ""}`}
+                className={`flex min-w-0 flex-col ${
+                  isStudent ? "items-end" : "items-start"
+                }`}
               >
-                {isAssistant && !message.isPending ? (
-                  <StudentMessageContent content={message.content_text} />
-                ) : (
-                  <p className="whitespace-pre-wrap">{message.content_text}</p>
-                )}
+                <div
+                  className={`min-w-0 text-sm leading-7 text-[color:var(--foreground)] ${
+                    isStudent
+                      ? "ml-auto w-fit max-w-[min(100%,42rem)] rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-3.5 text-right shadow-[0_10px_30px_rgba(15,23,42,0.06)]"
+                      : isSystem
+                        ? "max-w-[min(100%,42rem)] rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-[color:var(--ink-soft)]"
+                        : message.isPending
+                          ? "student-pending-shimmer max-w-[min(100%,42rem)] rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-[color:var(--ink-soft)]"
+                          : "max-w-[min(100%,42rem)] px-1 py-1.5"
+                  }`}
+                >
+                  {isAssistant && !message.isPending ? (
+                    <StudentMessageContent content={message.content_text} />
+                  ) : (
+                    <p className={`whitespace-pre-wrap ${isStudent ? "text-right" : ""}`}>
+                      {message.content_text}
+                    </p>
+                  )}
+                </div>
+
+                <div className={`mt-1 flex ${isStudent ? "justify-end" : "justify-start"}`}>
+                  <button
+                    aria-label={copyLabel}
+                    className="inline-flex items-center rounded-full px-2 py-1 text-xs text-[color:var(--ink-soft)] opacity-0 transition hover:text-[color:var(--foreground)] group-hover:opacity-100 focus-visible:opacity-100"
+                    onClick={() => handleCopy(message.id, message.content_text)}
+                    title={copyLabel}
+                    type="button"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M9 9.75A2.25 2.25 0 0 1 11.25 7.5h6A2.25 2.25 0 0 1 19.5 9.75v7.5a2.25 2.25 0 0 1-2.25 2.25h-6A2.25 2.25 0 0 1 9 17.25v-7.5Z"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="1.7"
+                      />
+                      <path
+                        d="M15 7.5V6.75A2.25 2.25 0 0 0 12.75 4.5h-6A2.25 2.25 0 0 0 4.5 6.75v7.5a2.25 2.25 0 0 0 2.25 2.25H9"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="1.7"
+                      />
+                    </svg>
+                  </button>
+                </div>
               </div>
 
               {isStudent ? (
-                <div className="mt-1 inline-flex h-[2.1rem] w-[2.1rem] shrink-0 items-center justify-center rounded-[0.8rem] border border-[color:var(--line)] bg-[color:var(--surface)] text-[color:var(--ink-soft)]">
-                  <StudentAvatarIcon />
-                </div>
+                <ProfileAvatar name={studentDisplayName} size="sm" />
               ) : null}
-            </div>
-            <div
-              className={`mt-2 flex w-full max-w-3xl ${
-                isStudent ? "justify-end" : "justify-start"
-              }`}
-            >
-              <button
-                aria-label={copyLabel}
-                className="inline-flex items-center rounded-full px-2 py-1 text-xs text-[color:var(--ink-soft)] opacity-0 transition hover:text-[color:var(--foreground)] group-hover:opacity-100 focus-visible:opacity-100"
-                onClick={() => handleCopy(message.id, message.content_text)}
-                title={copyLabel}
-                type="button"
-              >
-                <svg
-                  aria-hidden="true"
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M9 9.75A2.25 2.25 0 0 1 11.25 7.5h6A2.25 2.25 0 0 1 19.5 9.75v7.5a2.25 2.25 0 0 1-2.25 2.25h-6A2.25 2.25 0 0 1 9 17.25v-7.5Z"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="1.7"
-                  />
-                  <path
-                    d="M15 7.5V6.75A2.25 2.25 0 0 0 12.75 4.5h-6A2.25 2.25 0 0 0 4.5 6.75v7.5a2.25 2.25 0 0 0 2.25 2.25H9"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="1.7"
-                  />
-                </svg>
-              </button>
             </div>
           </article>
         );

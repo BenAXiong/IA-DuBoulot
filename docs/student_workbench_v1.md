@@ -47,11 +47,12 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 7. uploads attachments through signed upload targets, confirms them, keeps the current file list in a minimal right-side rail, and now accepts pasted clipboard images in both the homework quick-start and the live conversation composer
 8. lets the student remove an uploaded file directly from that rail, with a confirmation step before the server-owned delete, and now opens uploaded images directly inside the right rail first
 9. keeps the right rail pinned under the student header as a true split pane instead of letting it stretch alongside the full transcript length, and now lets desktop users resize that rail manually
-10. adds hover copy controls under each learner-visible turn, so either side of the conversation can be copied back out without cluttering the thread at rest
+10. adds hover copy controls under each learner-visible turn, keeps those controls aligned to the message body rather than the avatar column, and now shows a lightweight copied toast when a turn is copied
 11. renders assistant turns through a markdown-plus-math path, so simple LaTeX like `$v = d/t$` can display as formatted math instead of raw markup
 12. keeps the live composer pinned at the bottom of the conversation view, now shows a chevron jump-to-latest control above it when the transcript is scrolled upward, and appends the learner's message optimistically with a lightweight pending banban placeholder so the prompt no longer looks stuck in the textarea during the round trip
-13. renders only one explicit completion control at the bottom of the right rail, keeping completion available without the older session-summary card dominating the active chat
-14. localizes the workbench shell, composer, and side rail through `lib/i18n/student-flow-copy.ts`
+13. reuses the same learner avatar style as the profile dock for student turns, so the thread feels like one consistent messaging surface instead of mixing unrelated identity treatments
+14. renders only one explicit completion control at the bottom of the right rail, keeping completion available without the older session-summary card dominating the active chat
+15. localizes the workbench shell, composer, and side rail through `lib/i18n/student-flow-copy.ts`
 
 ## Interaction Rules
 

@@ -311,7 +311,7 @@ function ForwardIcon() {
 
 function PanelIcon() {
   return (
-    <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
+    <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24">
       <rect
         height="14.5"
         rx="2"
