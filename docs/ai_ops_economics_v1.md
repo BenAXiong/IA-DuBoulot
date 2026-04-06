@@ -43,6 +43,7 @@ Current repo implication:
 - treat the current free-tier Gemini setup as a development-only path
 - do not reuse the same Google project for both local iteration and the first real pilot
 - before live pilot traffic, provision a dedicated billed Gemini project and mirror that project's key into Vercel plus the local production-like env
+- the runtime should log enough provider failure detail to distinguish a project-level `429` or `RESOURCE_EXHAUSTED` limit from a generic upstream provider failure when learner chat falls back to the retry message
 
 Operational recommendation:
 

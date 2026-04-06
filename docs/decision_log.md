@@ -1117,3 +1117,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Add a prompt-governance layer with three parts: a small source manifest at `lib/server/ai/prompt-registry.json`, a generated human-review document at `docs/ai_prompt_registry_v1.md`, and a sync or check script at `scripts/sync-prompt-registry.mjs` exposed through `npm run sync:prompt-registry` and `npm run verify:prompt-registry`. The generated document now inventories each prompt family, its current version, builder file, route ownership, aim, expected outcome, and primary docs.
 - Why: This keeps the code as the place where prompts actually live, but gives humans a compact review and editing map. It also gives the repo a low-friction way to detect or correct doc drift around prompts without inventing a second hidden prompt system.
 - Follow-up: Decide later whether `verify:prompt-registry` should be added to broader regression or CI paths, and whether subject-family mode variants deserve their own explicit sub-registry once the prompt surface grows further.
+
+### D-20260406-111 - Gemini Provider Failures Now Preserve Rate-Limit Diagnostics In Runtime Logs
+
+- Date: 2026-04-06
+- Status: accepted
+- Related tasks: `A0.2.1`, `A7.3.4`
+- Context: The learner-facing retry reply is intentionally generic, but the live production investigation showed that repeated coach failures were being flattened into a generic `provider_error` log line with no safe indication of whether Gemini had returned a `429`, a `RESOURCE_EXHAUSTED` project-limit response, or a different upstream failure. That made it hard to tell whether the app was blocked by its own quota rules or by the current Gemini project.
+- Decision: Keep the learner fallback copy generic, but enrich the provider adapter and fallback runtime logs with a small safe diagnostic subset from the Gemini SDK when available. Gemini failures now preserve normalized internal classification (`rate_limited` vs `provider_error`), upstream HTTP status, provider error name, provider status string, and provider body message in runtime logs, while still hiding raw provider payloads from the client.
+- Why: This gives production debugging enough signal to distinguish app-level quota behavior from upstream Gemini saturation without leaking SDK internals or secrets into learner responses.
+- Follow-up: If production confirms repeated `rate_limited` failures on the current project, prioritize the billed pilot Gemini project and consider a slightly more explicit learner-facing retry branch only after observing real failure frequency.

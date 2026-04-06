@@ -86,6 +86,7 @@ Optional validation detail:
 - Use `403` when the caller is already expected to know the resource exists but cannot perform the requested action.
 - Use `409` for state conflicts, not validation failures.
 - Wrap upstream provider failures into `provider_error` or `service_unavailable`, never raw provider messages.
+- When a provider adapter can positively detect an upstream `429` or equivalent project-limit exhaustion signal, normalize it to `rate_limited` internally even if the learner-facing fallback copy stays generic.
 
 ## Request IDs And Runtime Logs
 
@@ -103,6 +104,15 @@ Minimum runtime log fields:
 - `errorCode`
 - `provider`
 - `targetStudentUserId`
+
+For provider failures, also prefer logging a small safe diagnostic subset when the SDK exposes it:
+
+- upstream HTTP status
+- provider error name
+- provider error status string such as `RESOURCE_EXHAUSTED`
+- provider body message
+
+Do not log raw headers, secrets, or full request bodies.
 
 ## Audit Log Boundaries
 

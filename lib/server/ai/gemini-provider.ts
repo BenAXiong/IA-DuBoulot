@@ -85,11 +85,98 @@ function normalizeUiLanguage(value: unknown) {
   return value === "fr" || value === "en" || value === "zh" ? value : null;
 }
 
-function toProviderError(message: string, cause: unknown) {
+function safeJson(value: unknown) {
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return null;
+  }
+}
+
+function extractProviderFailureDetails(error: unknown) {
+  const details: Record<string, unknown> = {};
+  const record =
+    error && typeof error === "object" ? (error as Record<string, unknown>) : null;
+  const httpStatus =
+    typeof record?.status === "number"
+      ? record.status
+      : typeof record?.statusCode === "number"
+        ? record.statusCode
+        : null;
+  const message =
+    error instanceof Error
+      ? error.message
+      : typeof record?.message === "string"
+        ? record.message
+        : null;
+  const name =
+    error instanceof Error
+      ? error.name
+      : typeof record?.name === "string"
+        ? record.name
+        : null;
+  const providerBody =
+    record?.error && typeof record.error === "object"
+      ? (record.error as Record<string, unknown>)
+      : null;
+  const providerStatus =
+    typeof providerBody?.status === "string" ? providerBody.status : null;
+  const providerCode =
+    typeof providerBody?.code === "number" ? providerBody.code : null;
+  const providerMessage =
+    typeof providerBody?.message === "string" ? providerBody.message : null;
+  const providerDetailsJson = safeJson(providerBody?.details);
+  const isRateLimited =
+    httpStatus === 429 ||
+    providerCode === 429 ||
+    providerStatus === "RESOURCE_EXHAUSTED" ||
+    name === "RateLimitError";
+
+  if (name) {
+    details.provider_error_name = name;
+  }
+
+  if (httpStatus !== null) {
+    details.provider_http_status = httpStatus;
+  }
+
+  if (message) {
+    details.provider_error_message = message;
+  }
+
+  if (providerStatus) {
+    details.provider_status = providerStatus;
+  }
+
+  if (providerCode !== null) {
+    details.provider_code = providerCode;
+  }
+
+  if (providerMessage) {
+    details.provider_body_message = providerMessage;
+  }
+
+  if (providerDetailsJson) {
+    details.provider_details = providerDetailsJson;
+  }
+
+  return {
+    appErrorCode: isRateLimited ? "rate_limited" : "provider_error",
+    appErrorStatus: isRateLimited ? 429 : 502,
+    appErrorMessage: isRateLimited
+      ? "The AI provider is temporarily rate limited."
+      : "The AI provider request failed.",
+    logDetails: details,
+  } as const;
+}
+
+function toProviderError(cause: unknown) {
+  const failure = extractProviderFailureDetails(cause);
+
   return new AppError({
-    code: "provider_error",
-    message,
-    status: 502,
+    code: failure.appErrorCode,
+    message: failure.appErrorMessage,
+    status: failure.appErrorStatus,
     retryable: true,
     cause,
   });
@@ -296,13 +383,18 @@ export class GeminiAiProvider implements AiProvider {
         usage,
       };
     } catch (error) {
+      const failure = extractProviderFailureDetails(error);
       this.logFailure({
         context: input.requestContext,
         operation: input.operation,
         modelName: input.model,
-        errorCode: "provider_error",
+        errorCode: failure.appErrorCode,
+        extra: {
+          ...input.extraLogDetails,
+          ...failure.logDetails,
+        },
       });
-      throw toProviderError("The AI provider request failed.", error);
+      throw toProviderError(error);
     }
   }
 
@@ -477,17 +569,19 @@ export class GeminiAiProvider implements AiProvider {
         usage: response.usage,
       };
     } catch (error) {
+      const failure = extractProviderFailureDetails(error);
       this.logFailure({
         context: input.requestContext,
         operation: "attachment_extraction",
         modelName: GEMINI_EXTRACTION_MODEL,
-        errorCode: "provider_error",
+        errorCode: failure.appErrorCode,
         extra: {
           mime_type: input.mimeType,
           attachment_id: input.attachmentId,
+          ...failure.logDetails,
         },
       });
-      throw toProviderError("Unable to extract text from the uploaded attachment.", error);
+      throw toProviderError(error);
     } finally {
       if (uploadedFileName) {
         try {
@@ -691,13 +785,15 @@ export class GeminiAiProvider implements AiProvider {
         usage,
       };
     } catch (error) {
+      const failure = extractProviderFailureDetails(error);
       this.logFailure({
         context: input.requestContext,
         operation: "translation",
         modelName: GEMINI_TRANSLATION_MODEL,
-        errorCode: "provider_error",
+        errorCode: failure.appErrorCode,
+        extra: failure.logDetails,
       });
-      throw toProviderError("Unable to translate the summary text.", error);
+      throw toProviderError(error);
     }
   }
 }

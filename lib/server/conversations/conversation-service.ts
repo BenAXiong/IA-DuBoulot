@@ -4,7 +4,7 @@ import {
   getStudentConversationServerCopy,
   getStudentDraftCoachCopy,
 } from "@/lib/i18n/student-flow-copy";
-import { AppError } from "@/lib/server/errors/app-error";
+import { AppError, isAppError } from "@/lib/server/errors/app-error";
 import { logRuntimeError, logRuntimeInfo } from "@/lib/server/audit/runtime-logger";
 import { recordAuditEvent } from "@/lib/server/audit/audit-service";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -1026,6 +1026,7 @@ export async function appendConversationTurn(input: {
           : aiReply.replyText;
     } catch (error) {
       assistantMessageText = copy.appendMessage.providerFallback;
+      const fallbackError = isAppError(error) ? error : null;
 
       logRuntimeInfo({
         message: "Fell back to learner-facing provider retry reply",
@@ -1038,6 +1039,8 @@ export async function appendConversationTurn(input: {
         details: {
           conversationId: input.conversationId,
           intent: input.payload.intent,
+          error_code: fallbackError?.code ?? null,
+          error_status: fallbackError?.status ?? null,
           reason:
             error instanceof Error
               ? error.message
