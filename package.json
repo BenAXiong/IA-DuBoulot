@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "sync:prompt-registry": "node scripts/sync-prompt-registry.mjs",
+    "verify:prompt-registry": "node scripts/sync-prompt-registry.mjs --check",
     "seed:rls-fixtures": "node --env-file=.env.local scripts/seed-rls-fixtures.mjs",
     "verify:rls-fixtures": "node --env-file=.env.local scripts/verify-rls-fixtures.mjs",
     "smoke:student-flow": "node --env-file=.env.local scripts/smoke-student-flow.mjs",

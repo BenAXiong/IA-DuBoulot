@@ -415,32 +415,50 @@ export function StudentAppShell({
     }, 400);
   }
 
-  const desktopSidebarWidth = sidebarCollapsed ? "5.5rem" : "18.5rem";
+  const desktopSidebarWidth = sidebarCollapsed ? "4.5rem" : "18.5rem";
   const desktopSidebarPadding = sidebarCollapsed ? "px-2" : "px-3";
 
   const content = (
       <div className="flex h-full flex-col">
-      <div
-        className={`flex min-h-[3.25rem] items-center justify-between ${desktopSidebarPadding}`}
-      >
-        <div className="flex min-w-0 items-center gap-3">
-          <div
-            className="brand-mark inline-flex items-center justify-center rounded-[0.8rem] font-[family-name:var(--font-heading)] text-xs font-semibold text-white"
-            style={{ height: "2.28rem", width: "2.28rem" }}
+      {sidebarCollapsed ? (
+        <div className={`flex min-h-[3.25rem] items-center justify-center ${desktopSidebarPadding}`}>
+          <button
+            className="group relative inline-flex h-[2.28rem] w-[2.28rem] items-center justify-center rounded-[0.8rem]"
+            onClick={() => setSidebarCollapsed(false)}
+            type="button"
           >
-            bb
-          </div>
+            <span className="sr-only">Expand sidebar</span>
+            <span className="brand-mark inline-flex h-full w-full items-center justify-center rounded-[0.8rem] font-[family-name:var(--font-heading)] text-xs font-semibold text-white transition group-hover:opacity-0">
+              bb
+            </span>
+            <span className="absolute inset-0 inline-flex items-center justify-center text-[color:var(--foreground)] opacity-0 transition group-hover:opacity-100">
+              <PanelIcon />
+            </span>
+          </button>
         </div>
-
-        <button
-          className="theme-toggle theme-toggle--minimal"
-          onClick={() => setSidebarCollapsed((value) => !value)}
-          type="button"
+      ) : (
+        <div
+          className={`flex min-h-[3.25rem] items-center justify-between ${desktopSidebarPadding}`}
         >
-          <span className="sr-only">Toggle sidebar</span>
-          <PanelIcon />
-        </button>
-      </div>
+          <div className="flex min-w-0 items-center gap-3">
+            <div
+              className="brand-mark inline-flex items-center justify-center rounded-[0.8rem] font-[family-name:var(--font-heading)] text-xs font-semibold text-white"
+              style={{ height: "2.28rem", width: "2.28rem" }}
+            >
+              bb
+            </div>
+          </div>
+
+          <button
+            className="theme-toggle theme-toggle--minimal"
+            onClick={() => setSidebarCollapsed(true)}
+            type="button"
+          >
+            <span className="sr-only">Collapse sidebar</span>
+            <PanelIcon />
+          </button>
+        </div>
+      )}
 
       <nav className={`flex-1 overflow-y-auto py-4 ${desktopSidebarPadding}`}>
         <div className="grid gap-2">
@@ -457,7 +475,20 @@ export function StudentAppShell({
             {!sidebarCollapsed ? <span>{copy.dashboard}</span> : null}
           </Link>
 
-          {!sidebarCollapsed ? (
+          {sidebarCollapsed ? (
+            <Link
+              className={`flex items-center justify-center rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
+                activeView === "homework"
+                  ? "bg-[color:var(--surface-strong)] text-[color:var(--foreground)]"
+                  : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
+              }`}
+              href="/app?view=homework"
+              onClick={() => setSidebarOpen(false)}
+              title={copy.homework}
+            >
+              <HomeworkIcon />
+            </Link>
+          ) : (
             <div className="group grid gap-1">
               <div className="flex items-center justify-between gap-3 px-3 py-2.5">
                 <div className="flex min-w-0 flex-1 items-center gap-1.5">
@@ -528,7 +559,7 @@ export function StudentAppShell({
                 )
               ) : null}
             </div>
-          ) : null}
+          )}
 
           <Link
             className={`flex items-center ${sidebarCollapsed ? "justify-center" : "gap-3"} rounded-2xl px-3 py-2.5 text-sm font-medium transition ${

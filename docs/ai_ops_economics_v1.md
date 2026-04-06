@@ -1,6 +1,6 @@
 # AI Ops And Economics V1
 
-Related: [README](../README.md) | [Service interfaces](service_interfaces.md) | [Student workbench V1](student_workbench_v1.md) | [Student history and summary V1](student_history_summary_v1.md) | [Student memory profile V1](student_memory_profile_v1.md) | [Storage and attachment rules](storage_attachment_rules.md) | [Environment matrix](environment_matrix.md) | [Launch checklist V1](launch_checklist_v1.md) | [MVP to-do list](mvp_todo.md)
+Related: [README](../README.md) | [AI prompt registry V1](ai_prompt_registry_v1.md) | [Service interfaces](service_interfaces.md) | [Student workbench V1](student_workbench_v1.md) | [Student history and summary V1](student_history_summary_v1.md) | [Student memory profile V1](student_memory_profile_v1.md) | [Storage and attachment rules](storage_attachment_rules.md) | [Environment matrix](environment_matrix.md) | [Launch checklist V1](launch_checklist_v1.md) | [MVP to-do list](mvp_todo.md)
 
 ## Purpose
 

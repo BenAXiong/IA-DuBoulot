@@ -1,0 +1,129 @@
+{
+  "families": [
+    {
+      "id": "student-coach",
+      "title": "Student coach reply",
+      "builderFile": "lib/server/ai/prompts/student-coach.ts",
+      "builderFunction": "buildStudentCoachSystemPrompt",
+      "versionConst": "STUDENT_COACH_PROMPT_VERSION",
+      "routes": [
+        "POST /api/conversations/[conversationId]/messages"
+      ],
+      "serviceMethod": "AiProvider.generateCoachReply",
+      "aim": "Generate the live banban coaching reply for learner messages, hints, and summary requests.",
+      "outcome": "Returns JSON with replyText, coachingMode, and asksForAttempt.",
+      "docs": [
+        "docs/student_workbench_v1.md",
+        "docs/ai_ops_economics_v1.md",
+        "docs/service_interfaces.md"
+      ]
+    },
+    {
+      "id": "attachment-extraction",
+      "title": "Attachment extraction",
+      "builderFile": "lib/server/ai/prompts/attachment-extraction.ts",
+      "builderFunction": "buildAttachmentExtractionPrompt",
+      "versionConst": "ATTACHMENT_EXTRACTION_PROMPT_VERSION",
+      "routes": [
+        "POST /api/uploads/confirm"
+      ],
+      "serviceMethod": "AiProvider.extractAttachmentText",
+      "aim": "Extract readable homework text and basic metadata from uploaded images or PDFs.",
+      "outcome": "Returns JSON with extractedText, detectedLanguage, confidenceScore, needsManualReview, pageCountEstimate, and sourceSummary.",
+      "docs": [
+        "docs/student_intake_v1.md",
+        "docs/storage_attachment_rules.md",
+        "docs/ai_ops_economics_v1.md"
+      ]
+    },
+    {
+      "id": "student-summary",
+      "title": "Student summary",
+      "builderFile": "lib/server/ai/prompts/summary-prompts.ts",
+      "builderFunction": "buildSummaryPrompt",
+      "versionConst": "STUDENT_SUMMARY_PROMPT_VERSION",
+      "routes": [
+        "POST /api/conversations/[conversationId]/complete"
+      ],
+      "serviceMethod": "AiProvider.generateSummary",
+      "aim": "Produce the learner-facing end-of-session summary and next-step recommendation.",
+      "outcome": "Returns JSON with summaryText, weaknessTags, and nextStepRecommendation for the student audience.",
+      "docs": [
+        "docs/student_history_summary_v1.md",
+        "docs/ai_ops_economics_v1.md"
+      ]
+    },
+    {
+      "id": "parent-summary",
+      "title": "Parent summary",
+      "builderFile": "lib/server/ai/prompts/summary-prompts.ts",
+      "builderFunction": "buildSummaryPrompt",
+      "versionConst": "PARENT_SUMMARY_PROMPT_VERSION",
+      "routes": [
+        "POST /api/conversations/[conversationId]/complete"
+      ],
+      "serviceMethod": "AiProvider.generateSummary",
+      "aim": "Produce the parent-facing oversight summary after session completion.",
+      "outcome": "Returns JSON with summaryText, weaknessTags, and nextStepRecommendation for the parent audience.",
+      "docs": [
+        "docs/oversight_surfaces_v1.md",
+        "docs/student_history_summary_v1.md",
+        "docs/ai_ops_economics_v1.md"
+      ]
+    },
+    {
+      "id": "tutor-summary",
+      "title": "Tutor summary",
+      "builderFile": "lib/server/ai/prompts/summary-prompts.ts",
+      "builderFunction": "buildSummaryPrompt",
+      "versionConst": "TUTOR_SUMMARY_PROMPT_VERSION",
+      "routes": [
+        "POST /api/conversations/[conversationId]/complete"
+      ],
+      "serviceMethod": "AiProvider.generateSummary",
+      "aim": "Produce the tutor-facing operational summary after session completion.",
+      "outcome": "Returns JSON with summaryText, weaknessTags, and nextStepRecommendation for the tutor audience.",
+      "docs": [
+        "docs/oversight_surfaces_v1.md",
+        "docs/student_history_summary_v1.md",
+        "docs/ai_ops_economics_v1.md"
+      ]
+    },
+    {
+      "id": "memory-profile",
+      "title": "Memory refresh",
+      "builderFile": "lib/server/ai/prompts/memory-profile.ts",
+      "builderFunction": "buildMemoryProfilePrompt",
+      "versionConst": "MEMORY_PROFILE_PROMPT_VERSION",
+      "routes": [
+        "POST /api/conversations/[conversationId]/complete"
+      ],
+      "serviceMethod": "AiProvider.generateMemoryProfile",
+      "aim": "Refresh durable pedagogical memory after a completed session.",
+      "outcome": "Returns JSON with 0 to 6 educational memory items, each with category, title, detail, and confidence.",
+      "docs": [
+        "docs/student_memory_profile_v1.md",
+        "docs/ai_ops_economics_v1.md",
+        "docs/service_interfaces.md"
+      ]
+    },
+    {
+      "id": "translation",
+      "title": "Summary translation",
+      "builderFile": "lib/server/ai/prompts/translation.ts",
+      "builderFunction": "buildTranslationPrompt",
+      "versionConst": "TRANSLATION_PROMPT_VERSION",
+      "routes": [
+        "POST /api/conversations/[conversationId]/complete (best-effort follow-up)"
+      ],
+      "serviceMethod": "AiProvider.translateText",
+      "aim": "Translate generated summary text for additional oversight languages without changing meaning.",
+      "outcome": "Returns only the translated text.",
+      "docs": [
+        "docs/student_history_summary_v1.md",
+        "docs/ai_ops_economics_v1.md",
+        "docs/service_interfaces.md"
+      ]
+    }
+  ]
+}

@@ -34,6 +34,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Oversight surfaces V1](docs/oversight_surfaces_v1.md)
 - [Privacy controls V1](docs/privacy_controls_v1.md)
 - [AI ops and economics V1](docs/ai_ops_economics_v1.md)
+- [AI prompt registry V1](docs/ai_prompt_registry_v1.md)
 - [Telemetry and feature controls V1](docs/telemetry_feature_controls_v1.md)
 - [Service interfaces](docs/service_interfaces.md)
 - [Error and audit conventions](docs/error_audit_conventions.md)
