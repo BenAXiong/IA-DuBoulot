@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { INTAKE_ACCEPT_ATTR, stageIntakeFiles } from "@/lib/intake/intake-config";
 import {
   formatDateLabel,
@@ -86,6 +86,7 @@ export function StudentConversationWorkbench({
   languageCode,
 }: StudentConversationWorkbenchProps) {
   const copy = getStudentWorkbenchCopy(languageCode);
+  const sectionRef = useRef<HTMLElement | null>(null);
   const [conversation, setConversation] = useState(detail.conversation);
   const [messages, setMessages] = useState(detail.messages);
   const [attachments, setAttachments] = useState(detail.attachments);
@@ -98,8 +99,47 @@ export function StudentConversationWorkbench({
   const [isSending, startSending] = useTransition();
   const [isUploading, startUploading] = useTransition();
   const [isCompleting, startCompleting] = useTransition();
+  const [railWidth, setRailWidth] = useState(296);
+  const [isResizingRail, setIsResizingRail] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const isReadOnly = conversation.status !== "active";
+
+  useEffect(() => {
+    if (!isResizingRail) {
+      return;
+    }
+
+    function clampRailWidth(nextWidth: number) {
+      const sectionWidth = sectionRef.current?.offsetWidth ?? 0;
+      const minWidth = 260;
+      const maxWidth = sectionWidth > 0 ? Math.floor(sectionWidth * 0.6) : 720;
+      return Math.max(minWidth, Math.min(nextWidth, maxWidth));
+    }
+
+    function handlePointerMove(event: PointerEvent) {
+      const rect = sectionRef.current?.getBoundingClientRect();
+      if (!rect) {
+        return;
+      }
+
+      const nextWidth = rect.right - event.clientX;
+      setRailWidth(clampRailWidth(nextWidth));
+    }
+
+    function stopResizing() {
+      setIsResizingRail(false);
+    }
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", stopResizing);
+    window.addEventListener("pointercancel", stopResizing);
+
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", stopResizing);
+      window.removeEventListener("pointercancel", stopResizing);
+    };
+  }, [isResizingRail]);
 
   async function sendMessage(intent: "student_message" | "hint" | "summarize") {
     setChatError(null);
@@ -328,7 +368,13 @@ export function StudentConversationWorkbench({
         type="file"
       />
 
-      <section className="grid gap-0 xl:-my-4 xl:-mr-8 xl:grid-cols-[minmax(0,1fr)_18.5rem] xl:items-start">
+      <section
+        className="grid gap-0 xl:-my-4 xl:-mr-8 xl:items-start xl:[grid-template-columns:minmax(0,1fr)_var(--student-rail-width)]"
+        ref={sectionRef}
+        style={{
+          ["--student-rail-width" as string]: `${railWidth}px`,
+        }}
+      >
         <article className="flex min-h-0 flex-col gap-3 py-1 xl:py-4 xl:pr-8">
           <div className="border-b border-[color:var(--line)] pb-3">
             <div className="min-w-0 space-y-1.5">
@@ -391,7 +437,16 @@ export function StudentConversationWorkbench({
           ) : null}
         </article>
 
-        <aside className="border-l border-[color:var(--line)] bg-[color:var(--surface)] px-5 py-4 xl:sticky xl:top-[3.25rem] xl:h-[calc(100vh-3.25rem)] xl:self-start">
+        <aside className="relative border-l border-[color:var(--line)] bg-[color:var(--surface)] px-5 py-4 xl:sticky xl:top-[3.25rem] xl:h-[calc(100vh-3.25rem)] xl:self-start">
+          <button
+            aria-label="Resize side rail"
+            className="absolute bottom-0 left-[-4px] top-0 hidden w-2 cursor-col-resize xl:block"
+            onPointerDown={(event) => {
+              event.preventDefault();
+              setIsResizingRail(true);
+            }}
+            type="button"
+          />
           <div className="flex h-full min-h-0 flex-col">
             <StudentConversationSideRail
               attachments={attachments}

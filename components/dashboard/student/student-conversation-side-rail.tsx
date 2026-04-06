@@ -50,6 +50,8 @@ export function StudentConversationSideRail({
   );
   const [previewAttachment, setPreviewAttachment] =
     useState<ConversationAttachmentRecord | null>(null);
+  const [expandedPreviewAttachment, setExpandedPreviewAttachment] =
+    useState<ConversationAttachmentRecord | null>(null);
 
   useEffect(() => {
     if (!previewAttachment) {
@@ -62,23 +64,24 @@ export function StudentConversationSideRail({
 
     if (!stillExists) {
       setPreviewAttachment(null);
+      setExpandedPreviewAttachment(null);
     }
   }, [attachments, previewAttachment]);
 
   useEffect(() => {
-    if (!previewAttachment) {
+    if (!expandedPreviewAttachment) {
       return;
     }
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
-        setPreviewAttachment(null);
+        setExpandedPreviewAttachment(null);
       }
     }
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [previewAttachment]);
+  }, [expandedPreviewAttachment]);
 
   async function handleRemoveAttachment(attachmentId: string) {
     const confirmed = window.confirm(copy.removeAttachmentConfirm);
@@ -147,6 +150,29 @@ export function StudentConversationSideRail({
               })}
             </div>
           )}
+
+          {previewAttachment ? (
+            <div className="group relative overflow-hidden rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)]">
+              <button
+                aria-label={copy.expandPreview}
+                className="absolute right-3 top-3 z-10 inline-flex min-h-9 items-center rounded-full border border-white/15 bg-black/55 px-3 py-1 text-xs font-medium text-white opacity-0 transition group-hover:opacity-100 hover:bg-black/70 focus-visible:opacity-100"
+                onClick={() => setExpandedPreviewAttachment(previewAttachment)}
+                type="button"
+              >
+                {copy.expandPreview}
+              </button>
+              <div className="relative aspect-[4/3] w-full bg-black/25">
+                <Image
+                  alt={previewAttachment.original_filename}
+                  className="object-contain"
+                  fill
+                  sizes="(min-width: 1280px) 30vw, 100vw"
+                  src={`/api/attachments/${previewAttachment.id}/access`}
+                  unoptimized
+                />
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
 
@@ -162,10 +188,10 @@ export function StudentConversationSideRail({
         </button>
       </div>
 
-      {previewAttachment ? (
+      {expandedPreviewAttachment ? (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-6"
-          onClick={() => setPreviewAttachment(null)}
+          onClick={() => setExpandedPreviewAttachment(null)}
           role="presentation"
         >
           <div
@@ -175,17 +201,17 @@ export function StudentConversationSideRail({
             <button
               aria-label={copy.closePreview}
               className="absolute right-3 top-3 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/55 text-white transition hover:bg-black/70"
-              onClick={() => setPreviewAttachment(null)}
+              onClick={() => setExpandedPreviewAttachment(null)}
               type="button"
             >
               <CloseIcon />
             </button>
             <div className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/35 shadow-[0_24px_80px_rgba(0,0,0,0.42)]">
               <Image
-                alt={previewAttachment.original_filename}
+                alt={expandedPreviewAttachment.original_filename}
                 className="block max-h-[82vh] w-auto max-w-[min(88vw,68rem)] object-contain"
                 height={1200}
-                src={`/api/attachments/${previewAttachment.id}/access`}
+                src={`/api/attachments/${expandedPreviewAttachment.id}/access`}
                 unoptimized
                 width={1600}
               />

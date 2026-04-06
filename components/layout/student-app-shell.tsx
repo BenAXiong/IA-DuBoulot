@@ -226,6 +226,20 @@ function HomeIcon() {
   );
 }
 
+function HomeworkIcon() {
+  return (
+    <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
+      <path
+        d="M4.75 7.75a2 2 0 0 1 2-2h3.1l1.35 1.5h6.05a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2H6.75a2 2 0 0 1-2-2v-9Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.7"
+      />
+    </svg>
+  );
+}
+
 function MapIcon() {
   return (
     <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
@@ -416,6 +430,7 @@ export function StudentAppShell({
             <div className="group grid gap-1">
               <div className="flex items-center justify-between gap-3 px-3 py-2.5">
                 <div className="flex items-center gap-1.5 text-sm font-medium text-[color:var(--foreground)]">
+                  <HomeworkIcon />
                   <span>{copy.homework}</span>
                   <span className="text-[color:var(--ink-muted)]">
                     <ChevronIcon />
