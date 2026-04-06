@@ -180,10 +180,10 @@ export function StudentConversationSideRail({
             >
               <CloseIcon />
             </button>
-            <div className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/35 p-3 shadow-[0_24px_80px_rgba(0,0,0,0.42)]">
+            <div className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/35 shadow-[0_24px_80px_rgba(0,0,0,0.42)]">
               <Image
                 alt={previewAttachment.original_filename}
-                className="max-h-[82vh] w-auto max-w-[min(88vw,68rem)] rounded-[1rem] object-contain"
+                className="block max-h-[82vh] w-auto max-w-[min(88vw,68rem)] object-contain"
                 height={1200}
                 src={`/api/attachments/${previewAttachment.id}/access`}
                 unoptimized

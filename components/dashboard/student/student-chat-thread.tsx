@@ -43,6 +43,7 @@ export function StudentChatThread({
         const isSystem = message.role === "system";
         const isAssistant = message.role === "assistant";
         const isCopied = copiedMessageId === message.id;
+        const copyLabel = isCopied ? copy.copiedMessage : copy.copyMessage;
 
         return (
           <article
@@ -70,13 +71,15 @@ export function StudentChatThread({
               }`}
             >
               <button
+                aria-label={copyLabel}
                 className="inline-flex items-center rounded-full px-2 py-1 text-xs text-[color:var(--ink-soft)] opacity-0 transition hover:text-[color:var(--foreground)] group-hover:opacity-100 focus-visible:opacity-100"
                 onClick={() => handleCopy(message.id, message.content_text)}
+                title={copyLabel}
                 type="button"
               >
                 <svg
                   aria-hidden="true"
-                  className="mr-1.5 h-4 w-4"
+                  className="h-4 w-4"
                   fill="none"
                   viewBox="0 0 24 24"
                 >
@@ -95,7 +98,6 @@ export function StudentChatThread({
                     strokeWidth="1.7"
                   />
                 </svg>
-                {isCopied ? copy.copiedMessage : copy.copyMessage}
               </button>
             </div>
           </article>
