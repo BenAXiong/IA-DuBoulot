@@ -28,6 +28,20 @@ function CloseIcon() {
   );
 }
 
+function ExpandIcon() {
+  return (
+    <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
+      <path
+        d="M14.5 4.75h4.75V9.5M19.25 4.75l-6 6M9.5 19.25H4.75V14.5M4.75 19.25l6-6"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
 function isPreviewableAttachment(attachment: ConversationAttachmentRecord) {
   return (
     attachment.mime_type.startsWith("image/") ||
@@ -155,16 +169,17 @@ export function StudentConversationSideRail({
             <div className="group relative overflow-hidden rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)]">
               <button
                 aria-label={copy.expandPreview}
-                className="absolute right-3 top-3 z-10 inline-flex min-h-9 items-center rounded-full border border-white/15 bg-black/55 px-3 py-1 text-xs font-medium text-white opacity-0 transition group-hover:opacity-100 hover:bg-black/70 focus-visible:opacity-100"
+                className="absolute right-3 top-3 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/55 text-white opacity-0 transition group-hover:opacity-100 hover:bg-black/70 focus-visible:opacity-100"
                 onClick={() => setExpandedPreviewAttachment(previewAttachment)}
+                title={copy.expandPreview}
                 type="button"
               >
-                {copy.expandPreview}
+                <ExpandIcon />
               </button>
-              <div className="relative aspect-[4/3] w-full bg-black/25">
+              <div className="relative aspect-[4/3] w-full">
                 <Image
                   alt={previewAttachment.original_filename}
-                  className="object-contain"
+                  className="object-cover"
                   fill
                   sizes="(min-width: 1280px) 30vw, 100vw"
                   src={`/api/attachments/${previewAttachment.id}/access`}

@@ -126,3 +126,4 @@ then close it as:
 | 2026-04-06 | 14:30 -> 14:34 | 0h04 | P1.3 P2.1 A7.4.6 | add hover copy controls under each student and assistant turn, clarify the Gemini API key mismatch, and upgrade assistant-message rendering so simple LaTeX like `$v = d/t$` displays properly if the dependency path stays clean | | 
 | 2026-04-06 | 14:36 -> 14:46 | 0h10 | P1.3 | tighten the uploaded-image preview so the image fills its frame and reduce the turn-level copy affordance to icon-only controls | | 
 | 2026-04-06 | 14:49 -> 14:53 | 0h04 | P1.3 P2.1 | add a matching icon to the Homework rail entry, move image preview into the student right rail with hover-only expand-to-overlay behavior, and make the live conversation rail resizable on desktop while clarifying why preview loads currently feel slow | | 
+| 2026-04-06 | 14:55 -> 15:00 | 0h05 | P1.3 | replace the inline preview expand label with an icon-only control and make the in-rail image preview sit flush inside its frame | | 
