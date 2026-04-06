@@ -49,8 +49,9 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 9. keeps the right rail pinned under the student header as a true split pane instead of letting it stretch alongside the full transcript length, and now lets desktop users resize that rail manually
 10. adds hover copy controls under each learner-visible turn, so either side of the conversation can be copied back out without cluttering the thread at rest
 11. renders assistant turns through a markdown-plus-math path, so simple LaTeX like `$v = d/t$` can display as formatted math instead of raw markup
-12. renders only one explicit completion control at the bottom of the right rail, keeping completion available without the older session-summary card dominating the active chat
-13. localizes the workbench shell, composer, and side rail through `lib/i18n/student-flow-copy.ts`
+12. keeps the live composer pinned at the bottom of the conversation view and now shows a chevron jump-to-latest control above it when the transcript is scrolled upward
+13. renders only one explicit completion control at the bottom of the right rail, keeping completion available without the older session-summary card dominating the active chat
+14. localizes the workbench shell, composer, and side rail through `lib/i18n/student-flow-copy.ts`
 
 ## Interaction Rules
 

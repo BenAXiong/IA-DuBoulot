@@ -127,3 +127,4 @@ then close it as:
 | 2026-04-06 | 14:36 -> 14:46 | 0h10 | P1.3 | tighten the uploaded-image preview so the image fills its frame and reduce the turn-level copy affordance to icon-only controls | | 
 | 2026-04-06 | 14:49 -> 14:53 | 0h04 | P1.3 P2.1 | add a matching icon to the Homework rail entry, move image preview into the student right rail with hover-only expand-to-overlay behavior, and make the live conversation rail resizable on desktop while clarifying why preview loads currently feel slow | | 
 | 2026-04-06 | 14:55 -> 15:00 | 0h05 | P1.3 | replace the inline preview expand label with an icon-only control and make the in-rail image preview sit flush inside its frame | | 
+| 2026-04-06 | 15:03 -> 15:05 | 0h02 | P1.3 P2.1 | keep the live conversation composer pinned at the bottom of the conversation view and add a chevron-in-circle jump-to-latest control above it when the transcript is scrolled away from the bottom | | 

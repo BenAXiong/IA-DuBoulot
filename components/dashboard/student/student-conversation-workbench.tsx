@@ -87,6 +87,7 @@ export function StudentConversationWorkbench({
 }: StudentConversationWorkbenchProps) {
   const copy = getStudentWorkbenchCopy(languageCode);
   const sectionRef = useRef<HTMLElement | null>(null);
+  const transcriptRef = useRef<HTMLDivElement | null>(null);
   const [conversation, setConversation] = useState(detail.conversation);
   const [messages, setMessages] = useState(detail.messages);
   const [attachments, setAttachments] = useState(detail.attachments);
@@ -101,6 +102,7 @@ export function StudentConversationWorkbench({
   const [isCompleting, startCompleting] = useTransition();
   const [railWidth, setRailWidth] = useState(296);
   const [isResizingRail, setIsResizingRail] = useState(false);
+  const [showJumpToLatest, setShowJumpToLatest] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const isReadOnly = conversation.status !== "active";
 
@@ -140,6 +142,46 @@ export function StudentConversationWorkbench({
       window.removeEventListener("pointercancel", stopResizing);
     };
   }, [isResizingRail]);
+
+  function updateTranscriptPositionState() {
+    const node = transcriptRef.current;
+    if (!node) {
+      return;
+    }
+
+    const distanceFromBottom =
+      node.scrollHeight - node.scrollTop - node.clientHeight;
+    setShowJumpToLatest(distanceFromBottom > 96);
+  }
+
+  function scrollTranscriptToBottom(behavior: ScrollBehavior = "smooth") {
+    const node = transcriptRef.current;
+    if (!node) {
+      return;
+    }
+
+    node.scrollTo({
+      top: node.scrollHeight,
+      behavior,
+    });
+  }
+
+  useEffect(() => {
+    const node = transcriptRef.current;
+    if (!node) {
+      return;
+    }
+
+    node.scrollTo({
+      top: node.scrollHeight,
+      behavior: "auto",
+    });
+    updateTranscriptPositionState();
+  }, []);
+
+  useEffect(() => {
+    updateTranscriptPositionState();
+  }, [messages]);
 
   async function sendMessage(intent: "student_message" | "hint" | "summarize") {
     setChatError(null);
@@ -375,7 +417,7 @@ export function StudentConversationWorkbench({
           ["--student-rail-width" as string]: `${railWidth}px`,
         }}
       >
-        <article className="flex min-h-0 flex-col gap-3 py-1 xl:py-4 xl:pr-8">
+        <article className="flex min-h-0 flex-col gap-3 py-1 md:min-h-[calc(100vh-7.25rem)] xl:h-[calc(100vh-3.25rem)] xl:py-4 xl:pr-8">
           <div className="border-b border-[color:var(--line)] pb-3">
             <div className="min-w-0 space-y-1.5">
               <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--ink-muted)]">
@@ -397,44 +439,79 @@ export function StudentConversationWorkbench({
             </div>
           </div>
 
-          <div className="min-h-0 flex-1 overflow-y-auto pt-1">
+          <div
+            className="min-h-0 flex-1 overflow-y-auto pt-1"
+            onScroll={updateTranscriptPositionState}
+            ref={transcriptRef}
+          >
             <StudentChatThread languageCode={languageCode} messages={messages} />
           </div>
 
-          <StudentConversationComposer
-            composerText={composerText}
-            disabled={isReadOnly}
-            isSending={isSending || isUploading}
-            languageCode={languageCode}
-            onComposerTextChange={setComposerText}
-            onPasteAttachments={(files) => void uploadFiles(files, "paste")}
-            onSendMessage={() => sendMessage("student_message")}
-            onUploadAttachments={() => fileInputRef.current?.click()}
-          />
+          <div className="sticky bottom-0 z-10 -mx-1 bg-[linear-gradient(to_top,var(--background)_78%,rgba(0,0,0,0))] px-1 pb-1 pt-6">
+            <div className="grid gap-3">
+              {showJumpToLatest ? (
+                <div className="flex justify-center">
+                  <button
+                    aria-label={copy.jumpToLatest}
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface)] text-[color:var(--foreground)] shadow-[0_10px_28px_rgba(15,23,42,0.12)] transition hover:-translate-y-0.5"
+                    onClick={() => scrollTranscriptToBottom()}
+                    title={copy.jumpToLatest}
+                    type="button"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="m7 10 5 5 5-5"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="1.8"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              ) : null}
 
-          {chatError ? (
-            <p className="rounded-[1.25rem] border border-[#d07c5b] bg-[#fff0ea] px-4 py-3 text-sm leading-6 text-[#8d3b1f]">
-              {chatError}
-            </p>
-          ) : null}
+              <StudentConversationComposer
+                composerText={composerText}
+                disabled={isReadOnly}
+                isSending={isSending || isUploading}
+                languageCode={languageCode}
+                onComposerTextChange={setComposerText}
+                onPasteAttachments={(files) => void uploadFiles(files, "paste")}
+                onSendMessage={() => sendMessage("student_message")}
+                onUploadAttachments={() => fileInputRef.current?.click()}
+              />
 
-          {workspaceError ? (
-            <p className="rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-sm leading-6 text-[color:var(--ink-soft)]">
-              {workspaceError}
-            </p>
-          ) : null}
+              {chatError ? (
+                <p className="rounded-[1.25rem] border border-[#d07c5b] bg-[#fff0ea] px-4 py-3 text-sm leading-6 text-[#8d3b1f]">
+                  {chatError}
+                </p>
+              ) : null}
 
-          {isUploading ? (
-            <p className="rounded-[1.25rem] border border-[color:var(--line)] bg-white px-4 py-3 text-sm leading-6 text-[color:var(--ink-soft)]">
-              {copy.uploadInProgress}
-            </p>
-          ) : null}
+              {workspaceError ? (
+                <p className="rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-sm leading-6 text-[color:var(--ink-soft)]">
+                  {workspaceError}
+                </p>
+              ) : null}
 
-          {isReadOnly ? (
-            <p className="rounded-[1.25rem] border border-[#cbbf8d] bg-[#fff8df] px-4 py-3 text-sm leading-6 text-[#69551b]">
-              {copy.readOnly}
-            </p>
-          ) : null}
+              {isUploading ? (
+                <p className="rounded-[1.25rem] border border-[color:var(--line)] bg-white px-4 py-3 text-sm leading-6 text-[color:var(--ink-soft)]">
+                  {copy.uploadInProgress}
+                </p>
+              ) : null}
+
+              {isReadOnly ? (
+                <p className="rounded-[1.25rem] border border-[#cbbf8d] bg-[#fff8df] px-4 py-3 text-sm leading-6 text-[#69551b]">
+                  {copy.readOnly}
+                </p>
+              ) : null}
+            </div>
+          </div>
         </article>
 
         <aside className="relative border-l border-[color:var(--line)] bg-[color:var(--surface)] px-5 py-4 xl:sticky xl:top-[3.25rem] xl:h-[calc(100vh-3.25rem)] xl:self-start">

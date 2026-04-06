@@ -788,6 +788,7 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       copiedMessage: "Copié",
       previewImage: "Aperçu de l'image",
       expandPreview: "Agrandir",
+      jumpToLatest: "Revenir en bas",
       closePreview: "Fermer l'aperçu",
       completeTooltip:
         "Le chat reste ouvert tant que tu ne choisis pas de terminer cette session.",
@@ -834,6 +835,7 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       copiedMessage: "Copied",
       previewImage: "Image preview",
       expandPreview: "Expand",
+      jumpToLatest: "Jump to latest",
       closePreview: "Close preview",
       completeTooltip:
         "The chat stays open until you decide to wrap up this session.",
@@ -876,6 +878,7 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       copiedMessage: "已複製",
       previewImage: "圖片預覽",
       expandPreview: "放大",
+      jumpToLatest: "回到最新訊息",
       closePreview: "關閉預覽",
       completeTooltip:
         "只要你還沒選擇結束，聊天就會保持開放。",
