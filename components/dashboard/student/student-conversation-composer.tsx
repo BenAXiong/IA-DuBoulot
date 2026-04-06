@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { extractClipboardFiles } from "@/lib/intake/intake-config";
 import { getStudentConversationComposerCopy } from "@/lib/i18n/student-flow-copy";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
@@ -71,6 +72,18 @@ export function StudentConversationComposer({
   onUploadAttachments,
 }: StudentConversationComposerProps) {
   const copy = getStudentConversationComposerCopy(languageCode);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) {
+      return;
+    }
+
+    textarea.style.height = "0px";
+    const nextHeight = Math.min(textarea.scrollHeight, 224);
+    textarea.style.height = `${Math.max(nextHeight, 24)}px`;
+  }, [composerText]);
 
   function handleComposerKeyDown(
     event: React.KeyboardEvent<HTMLTextAreaElement>,
@@ -102,18 +115,20 @@ export function StudentConversationComposer({
   }
 
   return (
-    <div className="rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-2.5">
+    <div className="rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-2.5 py-2">
       <textarea
-        className="student-chat-textarea min-h-8 w-full resize-none bg-transparent px-1 py-0.5 text-sm leading-5 placeholder:text-[color:var(--ink-soft)]"
+        className="student-chat-textarea min-h-6 w-full resize-none overflow-y-hidden bg-transparent px-1 py-0 text-sm leading-6 placeholder:text-[color:var(--ink-soft)]"
         disabled={disabled || isSending}
         onChange={(event) => onComposerTextChange(event.target.value)}
         onKeyDown={handleComposerKeyDown}
         onPaste={handleComposerPaste}
         placeholder={copy.placeholder}
+        ref={textareaRef}
+        rows={1}
         value={composerText}
       />
 
-      <div className="flex items-center justify-between gap-3 px-0.5 py-0">
+      <div className="flex items-center justify-between gap-3 px-0.5 pt-1">
         <div className="flex items-center gap-2">
           <button
             aria-label={copy.addAttachment}

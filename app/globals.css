@@ -832,3 +832,11 @@ html[data-theme="custom"] .bg-\[\#cb5d3c\] {
   overflow-y: hidden;
   padding-bottom: 0.2rem;
 }
+
+.student-scrollbar-hidden {
+  scrollbar-width: none;
+}
+
+.student-scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}

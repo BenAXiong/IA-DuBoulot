@@ -440,7 +440,7 @@ export function StudentConversationWorkbench({
           </div>
 
           <div
-            className="min-h-0 flex-1 overflow-y-auto pt-1"
+            className="student-scrollbar-hidden min-h-0 flex-1 overflow-y-auto pt-1"
             onScroll={updateTranscriptPositionState}
             ref={transcriptRef}
           >
