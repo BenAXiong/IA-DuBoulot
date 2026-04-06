@@ -1057,3 +1057,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Collapse the live student right rail into two things only: a minimal file area at the top and one explicit completion control at the bottom. The file area now shows a grey empty state when nothing is uploaded and shows uploaded files as removable pills when attachments exist. The old learner-facing attachment detail list and session-summary card are retired from the live workbench, and a new `DELETE /api/attachments/[attachmentId]` route now owns student attachment removal.
 - Why: This keeps the conversation route closer to a chat tool instead of a structured pilot dashboard, while still preserving the current backend contract that completion is explicit and attachment storage stays private plus server-owned.
 - Follow-up: If the product later keeps attachment deletion long-term, revisit whether extracted text already copied into the hidden workspace should also be scrubbed when its source attachment is removed.
+
+### D-20260406-105 - Learner-Facing Chat Failures Must Not Leak Internal Draft-Coach Copy
+
+- Date: 2026-04-06
+- Status: accepted
+- Related tasks: `P1.3`, `P2.1`, `A7.4.6`
+- Context: The refreshed chat-first student flow still let one internal failure path leak through to learners. When the Gemini coach call failed inside `appendConversationMessage`, the service caught the provider error and wrote the old deterministic `Coach brouillon` fallback into the transcript. That was acceptable as an internal scaffolding path earlier in MVP, but it now reads like debug or draft tooling in a learner-facing product.
+- Decision: Keep the provider error catch, but replace the learner-visible fallback text with a normal localized retry-style assistant reply. The transcript should never surface the old internal draft-coach wording to learners. At the same time, extend the student chat inputs to accept pasted clipboard images through the same private upload path already used by the file picker, so the simplified chat surface still supports common screenshot-first workflows without reopening the older intake ritual.
+- Why: This keeps the student chat honest. If the provider fails, the learner sees a calm product reply instead of internal scaffolding, and the new chat-first UI still supports a practical "paste screenshot, then ask" workflow.
+- Follow-up: Improve provider reliability and runtime visibility so the learner-facing retry fallback becomes genuinely rare, and later decide whether richer pre-send file staging belongs directly in the subject quick-start.

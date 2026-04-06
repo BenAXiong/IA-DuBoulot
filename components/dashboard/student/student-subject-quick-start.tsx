@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  extractClipboardFiles,
   INTAKE_ACCEPT_ATTR,
   stageIntakeFiles,
   type StagedIntakeFile,
@@ -220,6 +221,14 @@ export function StudentSubjectQuickStart({
       return;
     }
 
+    addStagedFiles(files);
+  }
+
+  function addStagedFiles(files: File[]) {
+    if (files.length === 0) {
+      return;
+    }
+
     const staged = stageIntakeFiles({
       existingFiles: stagedFiles,
       incomingFiles: files,
@@ -228,6 +237,19 @@ export function StudentSubjectQuickStart({
 
     setStagedFiles(staged.acceptedFiles);
     setErrorMessage(staged.errors[0] ?? null);
+  }
+
+  function handleComposerPaste(
+    event: React.ClipboardEvent<HTMLTextAreaElement>,
+  ) {
+    const files = extractClipboardFiles(event.clipboardData);
+
+    if (files.length === 0) {
+      return;
+    }
+
+    event.preventDefault();
+    addStagedFiles(files);
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -340,9 +362,10 @@ export function StudentSubjectQuickStart({
       />
 
       <textarea
-        className="min-h-6 resize-none appearance-none border-0 bg-transparent px-1 py-0 text-sm leading-5 outline-none ring-0 shadow-none placeholder:text-[color:var(--ink-soft)] focus:border-0 focus:outline-none focus:ring-0 focus:shadow-none focus-visible:border-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:shadow-none"
+        className="student-chat-textarea min-h-6 resize-none appearance-none border-0 bg-transparent px-1 py-0 text-sm leading-5 placeholder:text-[color:var(--ink-soft)]"
         onChange={(event) => setDraft(event.target.value)}
         onKeyDown={handleComposerKeyDown}
+        onPaste={handleComposerPaste}
         placeholder={copy.placeholder}
         value={draft}
       />

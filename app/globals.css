@@ -315,6 +315,16 @@ textarea::placeholder {
   box-shadow: 0 0 0 4px var(--focus-ring);
 }
 
+.student-chat-textarea,
+.student-chat-textarea:focus,
+.student-chat-textarea:focus-visible {
+  outline: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 code {
   border-radius: 0.95rem;
   background: var(--code-bg);

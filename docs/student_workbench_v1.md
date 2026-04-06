@@ -42,9 +42,9 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 2. loads the persisted attachments and visible summaries
 3. renders the transcript as a real thread instead of a static detail card, and now keeps it closer to a minimal chat surface by removing the old role or timestamp line above every learner-visible turn
 4. lets the student send a freeform message, ask for a hint, or request a summary
-5. sends message turns through the Gemini-backed coach flow plus moderation checks before persisting assistant output, and falls back to the older deterministic draft coach if the provider call fails
+5. sends message turns through the Gemini-backed coach flow plus moderation checks before persisting assistant output, and now falls back to a learner-facing retry reply if the provider call fails instead of leaking the older internal draft-coach text
 6. still keeps the persisted workspace fields and save route under the hood, but no longer foregrounds the old workspace panel in the learner UI
-7. uploads attachments through signed upload targets, confirms them, and keeps the current file list in a minimal right-side rail
+7. uploads attachments through signed upload targets, confirms them, keeps the current file list in a minimal right-side rail, and now accepts pasted clipboard images in both the homework quick-start and the live conversation composer
 8. lets the student remove an uploaded file directly from that rail, with a confirmation step before the server-owned delete
 9. renders only one explicit completion control at the bottom of the right rail, keeping completion available without the older session-summary card dominating the active chat
 10. localizes the workbench shell, composer, and side rail through `lib/i18n/student-flow-copy.ts`
@@ -64,7 +64,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 - moderation is currently local-rule based, not yet provider-assisted or admin-tunable
 - once the session is marked complete, the workbench becomes read-only for student writes
 - adult review surfaces now live separately under [Oversight surfaces V1](oversight_surfaces_v1.md); the student workbench remains a student-only mutation surface
-- the core student workbench path now localizes its server-side validation messages, upload warnings, moderation-safe fallback reply, and deterministic coach fallback through `lib/i18n/student-flow-copy.ts`; the remaining language risk near this surface is now mostly the broader accented-French or Unicode audit and any residual generic provider or service fallback strings
+- the core student workbench path now localizes its server-side validation messages, upload warnings, moderation-safe fallback reply, and learner-facing provider-retry fallback through `lib/i18n/student-flow-copy.ts`; the remaining language risk near this surface is now mostly the broader accented-French or Unicode audit and any residual generic provider or service fallback strings
 - this redesign still keeps explicit completion as the current backend contract; it does not yet auto-generate summaries on an implicit chat-close event
 - the workbench still uses the persisted workspace fields under the hood, even though the learner no longer sees that workspace as a full separate product surface
 - attachment removal currently deletes the file record plus private storage object, but it does not yet scrub extracted text that may already have been copied into the hidden workspace
@@ -80,6 +80,6 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 ## Next Extension Points
 
 - [Student history and summary V1](student_history_summary_v1.md): the workbench now feeds explicit completion and multi-audience summary behavior
-- improve provider reliability or add a secondary fallback so the workbench does not need the deterministic coach path as often
+- improve provider reliability so the workbench hits the learner-facing retry fallback less often
 - tighten upload guardrails and attachment metadata capture to match the storage contract exactly
 - decide later whether completion should become optional and whether summaries should auto-generate when the learner simply leaves or closes the chat

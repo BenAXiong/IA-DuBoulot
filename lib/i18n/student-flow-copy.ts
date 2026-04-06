@@ -909,6 +909,8 @@ export function getStudentConversationServerCopy(languageCode: UiLanguageCode) {
         messageRequired: "Le message est requis.",
         messageTooLong: "Le message doit rester sous 4000 caractères.",
         maskedStudentMessage: "[message masqué par la modération]",
+        providerFallback:
+          "Je n'arrive pas à répondre correctement pour l'instant. Réessaie dans un instant, ou ajoute une photo ou un extrait du cours si cela peut aider.",
       },
       workspace: {
         sourceTextTooLong:
@@ -956,6 +958,8 @@ export function getStudentConversationServerCopy(languageCode: UiLanguageCode) {
         messageRequired: "Message text is required.",
         messageTooLong: "Message text must be 4000 characters or fewer.",
         maskedStudentMessage: "[message hidden by moderation]",
+        providerFallback:
+          "I’m having trouble answering clearly right now. Try again in a moment, or add a photo or class excerpt if that would help.",
       },
       workspace: {
         sourceTextTooLong:
@@ -997,6 +1001,8 @@ export function getStudentConversationServerCopy(languageCode: UiLanguageCode) {
         messageRequired: "訊息內容為必填。",
         messageTooLong: "訊息內容必須在 4000 個字元以內。",
         maskedStudentMessage: "[訊息已因審核而隱藏]",
+        providerFallback:
+          "我現在沒辦法好好回答這個問題。請稍後再試一次，或加入照片、課堂內容摘錄，這樣可能會更有幫助。",
       },
       workspace: {
         sourceTextTooLong: "作業題目與擷取文字都必須在 12000 個字元以內。",

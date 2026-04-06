@@ -1,5 +1,6 @@
 "use client";
 
+import { extractClipboardFiles } from "@/lib/intake/intake-config";
 import { getStudentConversationComposerCopy } from "@/lib/i18n/student-flow-copy";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 
@@ -9,6 +10,7 @@ type StudentConversationComposerProps = {
   disabled?: boolean;
   isSending?: boolean;
   onComposerTextChange: (value: string) => void;
+  onPasteAttachments: (files: File[]) => void;
   onSendMessage: () => void;
   onUploadAttachments: () => void;
 };
@@ -64,6 +66,7 @@ export function StudentConversationComposer({
   disabled = false,
   isSending = false,
   onComposerTextChange,
+  onPasteAttachments,
   onSendMessage,
   onUploadAttachments,
 }: StudentConversationComposerProps) {
@@ -85,13 +88,27 @@ export function StudentConversationComposer({
     onSendMessage();
   }
 
+  function handleComposerPaste(
+    event: React.ClipboardEvent<HTMLTextAreaElement>,
+  ) {
+    const files = extractClipboardFiles(event.clipboardData);
+
+    if (files.length === 0 || disabled || isSending) {
+      return;
+    }
+
+    event.preventDefault();
+    onPasteAttachments(files);
+  }
+
   return (
     <div className="rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-2.5">
       <textarea
-        className="min-h-8 w-full resize-none bg-transparent px-1 py-0.5 text-sm leading-5 outline-none placeholder:text-[color:var(--ink-soft)] focus:shadow-none focus-visible:shadow-none"
+        className="student-chat-textarea min-h-8 w-full resize-none bg-transparent px-1 py-0.5 text-sm leading-5 placeholder:text-[color:var(--ink-soft)]"
         disabled={disabled || isSending}
         onChange={(event) => onComposerTextChange(event.target.value)}
         onKeyDown={handleComposerKeyDown}
+        onPaste={handleComposerPaste}
         placeholder={copy.placeholder}
         value={composerText}
       />

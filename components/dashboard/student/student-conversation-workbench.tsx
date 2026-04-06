@@ -183,7 +183,13 @@ export function StudentConversationWorkbench({
   function handleUploadReferencePick(event: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files ?? []);
     event.target.value = "";
+    void uploadFiles(files, "file_picker");
+  }
 
+  async function uploadFiles(
+    files: File[],
+    uploadSource: "file_picker" | "paste",
+  ) {
     if (files.length === 0) {
       return;
     }
@@ -208,6 +214,7 @@ export function StudentConversationWorkbench({
           conversationId: conversation.id,
           files: staged.acceptedFiles.map((file) => file.file),
           languageCode,
+          uploadSource,
         });
         const nextAttachments = [...attachments];
 
@@ -354,6 +361,7 @@ export function StudentConversationWorkbench({
             isSending={isSending || isUploading}
             languageCode={languageCode}
             onComposerTextChange={setComposerText}
+            onPasteAttachments={(files) => void uploadFiles(files, "paste")}
             onSendMessage={() => sendMessage("student_message")}
             onUploadAttachments={() => fileInputRef.current?.click()}
           />

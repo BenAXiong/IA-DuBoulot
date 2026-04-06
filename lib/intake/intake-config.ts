@@ -42,6 +42,27 @@ export function resolveIntakeCategory(
   return resolveAttachmentPolicy(file.type)?.category ?? null;
 }
 
+export function extractClipboardFiles(input: DataTransfer | null) {
+  if (!input) {
+    return [];
+  }
+
+  const files: File[] = [];
+
+  for (const item of Array.from(input.items ?? [])) {
+    if (!item.type.startsWith("image/")) {
+      continue;
+    }
+
+    const file = item.getAsFile();
+    if (file) {
+      files.push(file);
+    }
+  }
+
+  return files;
+}
+
 export function stageIntakeFiles(input: {
   existingFiles: StagedIntakeFile[];
   incomingFiles: File[];

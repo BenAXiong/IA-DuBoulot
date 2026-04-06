@@ -19,7 +19,6 @@ import {
   requireAppUserRole,
 } from "@/lib/server/auth/authorization";
 import {
-  buildDraftAssistantReply,
   buildInitialWorkspaceFromDraft,
   buildStudentIntentMessage,
 } from "@/lib/server/conversations/draft-coach";
@@ -883,9 +882,9 @@ export async function appendConversationTurn(input: {
       context: input.context,
       conversationId: input.conversationId,
     });
+  const copy = getStudentConversationServerCopy(appUser.preferred_ui_language);
 
   if (conversation.status !== "active") {
-    const copy = getStudentConversationServerCopy(appUser.preferred_ui_language);
     throw new AppError({
       code: "conflict",
       message: copy.access.sessionReadOnly,
@@ -1018,16 +1017,10 @@ export async function appendConversationTurn(input: {
           ? buildModerationSafeReply(appUser.ai_help_language)
           : aiReply.replyText;
     } catch (error) {
-      assistantMessageText = buildDraftAssistantReply({
-        conversation,
-        workspace: workspace ?? null,
-        intent: input.payload.intent,
-        studentMessageText,
-        languageCode: appUser.ai_help_language,
-      });
+      assistantMessageText = copy.appendMessage.providerFallback;
 
       logRuntimeInfo({
-        message: "Fell back to deterministic coach reply",
+        message: "Fell back to learner-facing provider retry reply",
         requestId: input.requestId,
         route: input.route,
         method: "POST",
