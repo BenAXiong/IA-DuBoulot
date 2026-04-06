@@ -415,9 +415,14 @@ export function StudentAppShell({
     }, 400);
   }
 
+  const desktopSidebarWidth = sidebarCollapsed ? "5.5rem" : "18.5rem";
+  const desktopSidebarPadding = sidebarCollapsed ? "px-2" : "px-3";
+
   const content = (
       <div className="flex h-full flex-col">
-      <div className="flex min-h-[3.25rem] items-center justify-between px-3">
+      <div
+        className={`flex min-h-[3.25rem] items-center justify-between ${desktopSidebarPadding}`}
+      >
         <div className="flex min-w-0 items-center gap-3">
           <div
             className="brand-mark inline-flex items-center justify-center rounded-[0.8rem] font-[family-name:var(--font-heading)] text-xs font-semibold text-white"
@@ -437,10 +442,10 @@ export function StudentAppShell({
         </button>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-3 py-4">
+      <nav className={`flex-1 overflow-y-auto py-4 ${desktopSidebarPadding}`}>
         <div className="grid gap-2">
           <Link
-            className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
+            className={`flex items-center ${sidebarCollapsed ? "justify-center" : "gap-3"} rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
               activeView === "homework"
                 ? "bg-[color:var(--surface-strong)] text-[color:var(--foreground)]"
                 : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
@@ -526,7 +531,7 @@ export function StudentAppShell({
           ) : null}
 
           <Link
-            className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
+            className={`flex items-center ${sidebarCollapsed ? "justify-center" : "gap-3"} rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
               activeView === "forward"
                 ? "bg-[color:var(--surface-strong)] text-[color:var(--foreground)]"
                 : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
@@ -546,7 +551,7 @@ export function StudentAppShell({
           </Link>
 
           <Link
-            className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
+            className={`flex items-center ${sidebarCollapsed ? "justify-center" : "gap-3"} rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
               activeView === "maps"
                 ? "bg-[color:var(--surface-strong)] text-[color:var(--foreground)]"
                 : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
@@ -566,7 +571,7 @@ export function StudentAppShell({
           </Link>
 
           <Link
-            className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
+            className={`flex items-center ${sidebarCollapsed ? "justify-center" : "gap-3"} rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
               activeView === "tests"
                 ? "bg-[color:var(--surface-strong)] text-[color:var(--foreground)]"
                 : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
@@ -587,7 +592,7 @@ export function StudentAppShell({
         </div>
       </nav>
 
-      <div className="px-3 py-3">
+      <div className={`${desktopSidebarPadding} py-3`}>
         <div
           className="relative"
           onMouseEnter={openProfileMenu}
@@ -625,7 +630,9 @@ export function StudentAppShell({
           ) : null}
 
           <button
-            className="flex w-full items-center gap-3 rounded-[1.5rem] px-2.5 py-2 text-left transition hover:bg-[color:var(--surface-strong)]"
+            className={`flex w-full items-center rounded-[1.5rem] px-2.5 py-2 text-left transition hover:bg-[color:var(--surface-strong)] ${
+              sidebarCollapsed ? "justify-center" : "gap-3"
+            }`}
             onClick={() => {
               if (profileMenuOpen) {
                 closeProfileMenuWithDelay();
@@ -669,7 +676,10 @@ export function StudentAppShell({
       ) : null}
 
       <div className="flex min-h-screen">
-        <aside className="hidden border-r border-[color:var(--line)] bg-[color:var(--surface)] md:sticky md:top-0 md:flex md:h-screen md:w-[18.5rem] md:flex-col md:self-start">
+        <aside
+          className="hidden border-r border-[color:var(--line)] bg-[color:var(--surface)] transition-[width] duration-200 md:sticky md:top-0 md:flex md:h-screen md:flex-col md:self-start"
+          style={{ width: desktopSidebarWidth }}
+        >
           {content}
         </aside>
 

@@ -50,7 +50,11 @@ export function StudentChatThread({
         const isSystem = message.role === "system";
         const isAssistant = message.role === "assistant";
         const isCopied = copiedMessageId === message.id;
-        const copyLabel = isCopied ? copy.copiedMessage : copy.copyMessage;
+        const copyLabel = isStudent
+          ? copy.copyPrompt
+          : isAssistant
+            ? copy.copyReply
+            : copy.copyMessage;
 
         return (
           <article
@@ -107,12 +111,11 @@ export function StudentChatThread({
                   className={`mt-1 flex ${isStudent ? "justify-end" : "justify-start"}`}
                 >
                   <button
-                    aria-label={copyLabel}
-                    className={`relative inline-flex items-center rounded-full px-2 py-1 text-xs text-[color:var(--ink-soft)] transition hover:text-[color:var(--foreground)] group-hover:opacity-100 focus-visible:opacity-100 ${
+                    aria-label={isCopied ? copy.copiedMessage : copyLabel}
+                    className={`group/copy relative inline-flex items-center rounded-full px-2 py-1 text-xs text-[color:var(--ink-soft)] transition hover:text-[color:var(--foreground)] group-hover:opacity-100 focus-visible:opacity-100 ${
                       isCopied ? "opacity-100" : "opacity-0"
                     }`}
                     onClick={() => handleCopy(message.id, message.content_text)}
-                    title={copyLabel}
                     type="button"
                   >
                     <svg
@@ -138,7 +141,7 @@ export function StudentChatThread({
                     </svg>
                     {isCopied ? (
                       <span
-                        className={`pointer-events-none absolute top-1/2 rounded-full border border-[color:var(--line)] bg-[color:var(--surface-raised)] px-2 py-0.5 text-[11px] text-[color:var(--foreground)] shadow-[var(--shadow)] ${
+                        className={`pointer-events-none absolute top-1/2 whitespace-nowrap rounded-full bg-[color:var(--surface-raised)] px-2 py-0.5 text-[11px] text-[color:var(--foreground)] shadow-[var(--shadow)] ${
                           isStudent
                             ? "right-full mr-2 -translate-y-1/2"
                             : "left-full ml-2 -translate-y-1/2"
@@ -146,7 +149,17 @@ export function StudentChatThread({
                       >
                         {copy.copiedToast}
                       </span>
-                    ) : null}
+                    ) : (
+                      <span
+                        className={`pointer-events-none absolute top-1/2 whitespace-nowrap rounded-full bg-[color:var(--surface-raised)] px-2 py-0.5 text-[11px] text-[color:var(--foreground)] opacity-0 shadow-[var(--shadow)] transition group-hover/copy:opacity-100 ${
+                          isStudent
+                            ? "right-full mr-2 -translate-y-1/2"
+                            : "left-full ml-2 -translate-y-1/2"
+                        }`}
+                      >
+                        {copyLabel}
+                      </span>
+                    )}
                   </button>
                 </div>
               </div>
