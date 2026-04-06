@@ -30,12 +30,12 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
     case "en":
       return {
         homeworkEyebrow: "Homework",
-        homeworkTitle: "Start where your homework already lives.",
+        homeworkTitle: "Need a hand? Tell me what's bugging you!",
         homeworkBody:
-          "Pick a subject and jump back into the discussion that helps right now.",
+          "Pick a subject and describe what you need advice on.",
         noSubjectTitle: "No homework yet",
         noSubjectBody:
-          "Choose the subject here and ask banban for advices. Don't forget to upload any class content or practice material that banban will need to help you!",
+          "Choose the subject here and ask banban for advices.\nDon't forget to upload any class content or practice material that banban will need to help you!",
         createSubjectTitle: "Start a new subject",
         recentTitle: "Recent homework chats",
         open: "Open",
@@ -60,7 +60,7 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
           "選一個科目，直接回到現在最需要的那段討論。",
         noSubjectTitle: "還沒有作業",
         noSubjectBody:
-          "先在這裡選擇科目，再向 banban 詢問建議。別忘了上傳 banban 需要的課堂內容或練習資料，才能更好地幫助你！",
+          "先在這裡選擇科目，再向 banban 詢問建議。\n別忘了上傳 banban 需要的課堂內容或練習資料，才能更好地幫助你！",
         createSubjectTitle: "開始新的科目",
         recentTitle: "最近作業對話",
         open: "打開",
@@ -80,12 +80,12 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
     default:
       return {
         homeworkEyebrow: "Devoirs",
-        homeworkTitle: "Commence là où vivent déjà tes devoirs.",
+        homeworkTitle: "Besoin d'un coup de pouce ? Dis-moi tout !",
         homeworkBody:
-          "Choisis une matière et replonge directement dans la discussion utile du moment.",
+          "Choisis une matière et décris-moi ce que tu veux éclaircir.",
         noSubjectTitle: "Aucun devoir pour l'instant",
         noSubjectBody:
-          "Choisis la matière ici et demande conseil à banban. N'oublie pas d'ajouter les supports de cours ou les exercices dont banban aura besoin pour t'aider !",
+          "Choisis la matière ici et demande conseil à banban.\nN'oublie pas d'ajouter les supports de cours ou les exercices dont banban aura besoin pour t'aider !",
         createSubjectTitle: "Commencer une nouvelle matière",
         recentTitle: "Discussions récentes",
         open: "Ouvrir",
@@ -336,7 +336,7 @@ export async function StudentDashboard({
               <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
                 {copy.noSubjectTitle}
               </h2>
-              <p className="max-w-2xl text-sm leading-7 text-[color:var(--ink-soft)]">
+              <p className="w-full max-w-none whitespace-pre-line text-sm leading-7 text-[color:var(--ink-soft)]">
                 {copy.noSubjectBody}
               </p>
               <StudentFirstHomeworkLauncher

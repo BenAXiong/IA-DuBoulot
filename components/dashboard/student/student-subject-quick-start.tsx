@@ -340,7 +340,7 @@ export function StudentSubjectQuickStart({
       />
 
       <textarea
-        className="min-h-6 resize-none bg-transparent px-1 py-0 text-sm leading-5 outline-none placeholder:text-[color:var(--ink-soft)] focus:shadow-none focus-visible:shadow-none"
+        className="min-h-6 resize-none appearance-none border-0 bg-transparent px-1 py-0 text-sm leading-5 outline-none ring-0 shadow-none placeholder:text-[color:var(--ink-soft)] focus:border-0 focus:outline-none focus:ring-0 focus:shadow-none focus-visible:border-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:shadow-none"
         onChange={(event) => setDraft(event.target.value)}
         onKeyDown={handleComposerKeyDown}
         placeholder={copy.placeholder}
