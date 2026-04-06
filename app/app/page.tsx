@@ -24,14 +24,12 @@ async function renderRoleDashboard(
   studentView: "homework" | "maps" | "tests" | "forward",
   selectedSubject: string | null,
   initialDraft: string | null,
-  createSubjectMode: boolean,
 ) {
   switch (appUser.role) {
     case "student":
       return (
         <StudentDashboard
           appUser={appUser}
-          createSubjectMode={createSubjectMode}
           context={context}
           initialDraft={initialDraft}
           selectedSubject={selectedSubject}
@@ -94,7 +92,6 @@ export default async function AppHomePage({
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const initialDraft = getSearchParam(resolvedSearchParams, "draft");
   const selectedSubject = getSearchParam(resolvedSearchParams, "subject");
-  const createSubjectMode = getSearchParam(resolvedSearchParams, "create") === "1";
   const studentViewParam = getSearchParam(resolvedSearchParams, "view");
   const studentView =
     studentViewParam === "maps" ||
@@ -115,7 +112,6 @@ export default async function AppHomePage({
         studentView,
         selectedSubject,
         initialDraft,
-        createSubjectMode,
       )}
 
       {showAccountSettingsBlock ? (

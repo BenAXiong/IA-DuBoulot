@@ -9,6 +9,7 @@ import type { UiLanguageCode } from "@/lib/server/auth/types";
 
 type StudentFirstHomeworkLauncherProps = {
   initialDraft?: string | null;
+  knownSubjects?: string[];
   languageCode: UiLanguageCode;
 };
 
@@ -34,26 +35,54 @@ function getFirstHomeworkCopy(languageCode: UiLanguageCode) {
 
 export function StudentFirstHomeworkLauncher({
   initialDraft = null,
+  knownSubjects = [],
   languageCode,
 }: StudentFirstHomeworkLauncherProps) {
   const copy = getFirstHomeworkCopy(languageCode);
-  const subjectOptions = useMemo(
-    () => getIntakeSubjectOptions(languageCode),
-    [languageCode],
-  );
+  const subjectOptions = useMemo(() => {
+    const baseOptions = getIntakeSubjectOptions(languageCode);
+    const otherOption = baseOptions.find((option) => option.value === "autre");
+    const standardOptions = baseOptions.filter((option) => option.value !== "autre");
+    const knownOptions = knownSubjects
+      .map((subject) => subject.trim())
+      .filter(Boolean)
+      .filter(
+        (subject, index, collection) =>
+          collection.findIndex((value) => value.toLowerCase() === subject.toLowerCase()) === index,
+      )
+      .filter(
+        (subject) =>
+          !standardOptions.some(
+            (option) => option.value.toLowerCase() === subject.toLowerCase(),
+          ),
+      )
+      .map((subject) => ({
+        value: subject,
+        label: subject,
+      }));
+
+    return [...knownOptions, ...standardOptions, ...(otherOption ? [otherOption] : [])];
+  }, [knownSubjects, languageCode]);
   const [selectedSubject, setSelectedSubject] = useState(
     subjectOptions[0]?.value ?? "",
   );
   const [customSubject, setCustomSubject] = useState("");
+  const resolvedSelectedSubject = subjectOptions.some(
+    (option) => option.value === selectedSubject,
+  )
+    ? selectedSubject
+    : subjectOptions[0]?.value ?? "";
 
   const resolvedSubjectTag =
-    selectedSubject === "autre" ? customSubject.trim() : selectedSubject;
+    resolvedSelectedSubject === "autre"
+      ? customSubject.trim()
+      : resolvedSelectedSubject;
 
   return (
     <div className="grid gap-4 rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-6 py-6">
       <div className="flex flex-wrap gap-2">
         {subjectOptions.map((option) => {
-          const isActive = selectedSubject === option.value;
+          const isActive = resolvedSelectedSubject === option.value;
 
           return (
             <button

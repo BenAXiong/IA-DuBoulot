@@ -89,7 +89,7 @@ The main learner entry now happens from the subject view itself.
 Current role:
 
 - when the learner has no existing subject tags yet, the empty homework state now renders a real first-homework launcher with subject selection instead of a self-link back to the same page
-- when the learner already has subjects, the left homework rail now restores a hover `+` affordance that reopens that same launcher on `/app?view=homework&newSubject=1`, so creating a new subject no longer depends on the no-history empty state
+- when the learner already has subjects, the root homework view now still exposes subject creation and selection directly, so the `+` affordance in the left rail simply returns to the same homework surface instead of opening a separate launcher mode
 - the subject quick-start on `/app?view=homework&subject=...` creates a bare conversation shell
 - it can stage files before the chat starts
 - it uploads those files to the new conversation

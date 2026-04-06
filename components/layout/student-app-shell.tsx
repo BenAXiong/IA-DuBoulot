@@ -48,6 +48,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
         familyPlan: "Family plan",
         pageTitles: {
           homework: "Homework",
+          selectSubject: "Select a subject",
           forward: "Forward",
           maps: "Maps",
           tests: "Tests",
@@ -76,6 +77,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
         familyPlan: "Family 方案",
         pageTitles: {
           homework: "作業",
+          selectSubject: "選擇科目",
           forward: "Forward",
           maps: "地圖",
           tests: "測驗",
@@ -104,6 +106,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
         familyPlan: "Accès Family",
         pageTitles: {
           homework: "Devoirs",
+          selectSubject: "Choisis une matière",
           forward: "Forward",
           maps: "Cartes",
           tests: "Tests",
@@ -114,6 +117,19 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
         },
       };
   }
+}
+
+function formatSubjectDisplay(subject: string | null) {
+  if (!subject) {
+    return null;
+  }
+
+  const trimmed = subject.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  return `${trimmed.charAt(0).toUpperCase()}${trimmed.slice(1)}`;
 }
 
 function readActiveView(value: string | null): StudentView {
@@ -174,14 +190,16 @@ function buildHeaderContent(input: {
   if (input.pathname.startsWith("/app/conversations/")) {
     return {
       eyebrow: input.copy.pageTitles.homework,
-      title: input.selectedSubject ?? input.copy.pageTitles.conversation,
+      title:
+        formatSubjectDisplay(input.selectedSubject) ??
+        input.copy.pageTitles.conversation,
     };
   }
 
   if (input.selectedSubject) {
     return {
       eyebrow: input.copy.pageTitles.homework,
-      title: input.selectedSubject,
+      title: formatSubjectDisplay(input.selectedSubject) ?? input.selectedSubject,
     };
   }
 
@@ -208,7 +226,7 @@ function buildHeaderContent(input: {
 
   return {
     eyebrow: input.copy.pageTitles.homework,
-    title: input.copy.pageTitles.fallback,
+    title: input.copy.pageTitles.selectSubject,
   };
 }
 
@@ -429,7 +447,7 @@ export function StudentAppShell({
           {!sidebarCollapsed ? (
             <div className="group grid gap-1">
               <div className="flex items-center justify-between gap-3 px-3 py-2.5">
-                <div className="flex items-center gap-1.5 text-sm font-medium text-[color:var(--foreground)]">
+              <div className="flex items-center gap-1.5 text-sm font-medium text-[color:var(--foreground)]">
                   <HomeworkIcon />
                   <span>{copy.homework}</span>
                   <span className="text-[color:var(--ink-muted)]">
@@ -439,7 +457,7 @@ export function StudentAppShell({
                 <Link
                   aria-label={copy.addSubject}
                   className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] opacity-0 transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)] group-hover:opacity-100 focus-visible:opacity-100"
-                  href="/app?view=homework&newSubject=1"
+                  href="/app?view=homework"
                   onClick={() => setSidebarOpen(false)}
                   title={copy.addSubject}
                 >
@@ -452,7 +470,7 @@ export function StudentAppShell({
                   {copy.noSubjects}
                 </p>
               ) : (
-                <div className="grid gap-1 pl-3">
+                <div className="grid gap-1 pl-7">
                   {subjectGroups.map((group) => {
                     const isActive = selectedSubject === group.subjectTag;
 
@@ -460,7 +478,7 @@ export function StudentAppShell({
                       <Link
                         className={`flex items-center justify-between rounded-[1rem] px-3 py-1.5 text-sm transition ${
                           isActive
-                            ? "bg-[color:var(--surface-strong)] text-[color:var(--foreground)]"
+                            ? "text-[color:var(--foreground)]"
                             : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
                         }`}
                         href={`/app?view=homework&subject=${encodeURIComponent(group.subjectTag)}`}

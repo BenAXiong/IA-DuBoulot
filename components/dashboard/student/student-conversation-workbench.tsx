@@ -418,33 +418,32 @@ export function StudentConversationWorkbench({
         }}
       >
         <article className="flex min-h-0 flex-col gap-3 py-1 md:min-h-[calc(100vh-7.25rem)] xl:h-[calc(100vh-3.25rem)] xl:py-4 xl:pr-8">
-          <div className="border-b border-[color:var(--line)] pb-3">
-            <div className="min-w-0 space-y-1.5">
-              <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--ink-muted)]">
-                {conversation.subject_tag}
-              </p>
-              <h1 className="max-w-full break-words font-[family-name:var(--font-heading)] text-3xl leading-tight sm:text-4xl">
-                {conversation.title}
-              </h1>
-              <p className="text-sm text-[color:var(--ink-soft)]">
-                {copy.lastActivity(
-                  formatDateLabel(
-                    messages.at(-1)?.created_at ??
-                      conversation.last_message_at ??
-                      conversation.created_at,
-                    languageCode,
-                  ),
-                )}
-              </p>
-            </div>
-          </div>
-
           <div
             className="student-scrollbar-hidden min-h-0 flex-1 overflow-y-auto pt-1"
             onScroll={updateTranscriptPositionState}
             ref={transcriptRef}
           >
-            <StudentChatThread languageCode={languageCode} messages={messages} />
+            <div className="grid gap-4 pb-2">
+              <div className="border-b border-[color:var(--line)] pb-3">
+                <div className="min-w-0 space-y-1.5">
+                  <h1 className="max-w-full break-words font-[family-name:var(--font-heading)] text-3xl leading-tight sm:text-4xl">
+                    {conversation.title}
+                  </h1>
+                  <p className="text-sm text-[color:var(--ink-soft)]">
+                    {copy.lastActivity(
+                      formatDateLabel(
+                        messages.at(-1)?.created_at ??
+                          conversation.last_message_at ??
+                          conversation.created_at,
+                        languageCode,
+                      ),
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              <StudentChatThread languageCode={languageCode} messages={messages} />
+            </div>
           </div>
 
           <div className="sticky bottom-0 z-10 -mx-1 bg-[linear-gradient(to_top,var(--background)_78%,rgba(0,0,0,0))] px-1 pb-1 pt-6">

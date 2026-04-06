@@ -18,7 +18,6 @@ import type { ListConversationSummary } from "@/lib/server/conversations/types";
 
 type StudentDashboardProps = {
   appUser: AppUserRecord;
-  createSubjectMode: boolean;
   context: AuthenticatedUserContext;
   initialDraft: string | null;
   selectedSubject: string | null;
@@ -30,13 +29,11 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
     case "en":
       return {
         homeworkEyebrow: "Homework",
-        homeworkTitle: "Need a hand? Tell me what's bugging you!",
-        homeworkBody:
-          "Pick a subject and describe what you need advice on.",
+        homeworkTitle: "Select a subject",
+        homeworkBody: "Pick a subject and jump straight into the chat.",
         noSubjectTitle: "No homework yet",
         noSubjectBody:
           "Choose the subject here and ask banban for advices.\nDon't forget to upload any class content or practice material that banban will need to help you!",
-        createSubjectTitle: "Start a new subject",
         recentTitle: "Recent homework chats",
         open: "Open",
         active: "Continue",
@@ -55,13 +52,11 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
     case "zh":
       return {
         homeworkEyebrow: "作業",
-        homeworkTitle: "從作業真正所在的地方開始。",
-        homeworkBody:
-          "選一個科目，直接回到現在最需要的那段討論。",
+        homeworkTitle: "選擇科目",
+        homeworkBody: "選一個科目，直接開始或回到對話。",
         noSubjectTitle: "還沒有作業",
         noSubjectBody:
           "先在這裡選擇科目，再向 banban 詢問建議。\n別忘了上傳 banban 需要的課堂內容或練習資料，才能更好地幫助你！",
-        createSubjectTitle: "開始新的科目",
         recentTitle: "最近作業對話",
         open: "打開",
         active: "續接",
@@ -80,13 +75,11 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
     default:
       return {
         homeworkEyebrow: "Devoirs",
-        homeworkTitle: "Besoin d'un coup de pouce ? Dis-moi tout !",
-        homeworkBody:
-          "Choisis une matière et décris-moi ce que tu veux éclaircir.",
+        homeworkTitle: "Choisis une matière",
+        homeworkBody: "Choisis une matière et entre directement dans la discussion.",
         noSubjectTitle: "Aucun devoir pour l'instant",
         noSubjectBody:
           "Choisis la matière ici et demande conseil à banban.\nN'oublie pas d'ajouter les supports de cours ou les exercices dont banban aura besoin pour t'aider !",
-        createSubjectTitle: "Commencer une nouvelle matière",
         recentTitle: "Discussions récentes",
         open: "Ouvrir",
         active: "Reprendre",
@@ -165,39 +158,8 @@ function renderConversationRows(input: {
   );
 }
 
-function renderSubjectCards(input: {
-  groups: ReturnType<typeof buildSubjectGroups>;
-  emptyFallback: string;
-}) {
-  return (
-    <div className="divide-y divide-[color:var(--line)]">
-      {input.groups.map((group) => (
-        <Link
-          className="flex items-center justify-between gap-4 py-4 transition hover:bg-[color:var(--surface-strong)]"
-          href={`/app?view=homework&subject=${encodeURIComponent(group.subjectTag)}`}
-          key={group.subjectTag}
-        >
-          <div className="min-w-0 space-y-1">
-            <h2 className="truncate font-[family-name:var(--font-heading)] text-xl leading-tight">
-              {group.subjectTag}
-            </h2>
-            <p className="truncate text-sm text-[color:var(--ink-soft)]">
-              {group.conversations[0]?.title ?? input.emptyFallback}
-            </p>
-          </div>
-
-          <span className="shrink-0 text-sm text-[color:var(--ink-soft)]">
-            {group.conversations.length}
-          </span>
-        </Link>
-      ))}
-    </div>
-  );
-}
-
 export async function StudentDashboard({
   appUser,
-  createSubjectMode,
   context,
   initialDraft,
   selectedSubject,
@@ -342,26 +304,18 @@ export async function StudentDashboard({
               <StudentFirstHomeworkLauncher
                 initialDraft={initialDraft}
                 languageCode={languageCode}
+                knownSubjects={subjectGroups.map((group) => group.subjectTag)}
               />
             </article>
           ) : (
             <>
-              {createSubjectMode ? (
-                <article className="grid gap-4 rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-6 py-6">
-                  <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
-                    {copy.createSubjectTitle}
-                  </h2>
-                  <StudentFirstHomeworkLauncher
-                    initialDraft={initialDraft}
-                    languageCode={languageCode}
-                  />
-                </article>
-              ) : null}
-
-              {renderSubjectCards({
-                groups: subjectGroups,
-                emptyFallback: copy.noSubjectChats,
-              })}
+              <article className="grid gap-4 rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-6 py-6">
+                <StudentFirstHomeworkLauncher
+                  initialDraft={initialDraft}
+                  knownSubjects={subjectGroups.map((group) => group.subjectTag)}
+                  languageCode={languageCode}
+                />
+              </article>
 
               <section className="grid gap-4">
                 <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
