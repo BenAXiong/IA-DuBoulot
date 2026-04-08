@@ -855,6 +855,13 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       expandPreview: "Agrandir",
       jumpToLatest: "Revenir en bas",
       closePreview: "Fermer l'aperçu",
+      subjectUploadsTitle: "Ressources de matière",
+      subjectUploadsPlaceholder:
+        "Les ressources durables de matière viendront ici plus tard.",
+      homeworkUploadsTitle: "Fichiers du devoir",
+      chatMaterialTitle: "Matériel de chat",
+      chatMaterialPlaceholder:
+        "Les rappels, notions utiles, ou futurs schémas générés apparaîtront ici.",
       completeTooltip:
         "Le chat reste ouvert tant que tu ne choisis pas de terminer cette session.",
       completeButton: "Devoir terminé !",
@@ -906,6 +913,13 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       expandPreview: "Expand",
       jumpToLatest: "Jump to latest",
       closePreview: "Close preview",
+      subjectUploadsTitle: "Subject resources",
+      subjectUploadsPlaceholder:
+        "Longer-lived subject resources will live here later.",
+      homeworkUploadsTitle: "Homework files",
+      chatMaterialTitle: "Chat material",
+      chatMaterialPlaceholder:
+        "Useful reminders, concepts, or future generated diagrams will appear here.",
       completeTooltip:
         "The chat stays open until you decide to wrap up this session.",
       completeButton: "Homework done!",
@@ -953,6 +967,13 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       expandPreview: "放大",
       jumpToLatest: "回到最新訊息",
       closePreview: "關閉預覽",
+      subjectUploadsTitle: "科目資源",
+      subjectUploadsPlaceholder:
+        "之後科目的長期參考資料會顯示在這裡。",
+      homeworkUploadsTitle: "作業檔案",
+      chatMaterialTitle: "聊天材料",
+      chatMaterialPlaceholder:
+        "有用的提醒、重點概念或未來生成的互動圖示會顯示在這裡。",
       completeTooltip:
         "只要你還沒選擇結束，聊天就會保持開放。",
       completeButton: "作業完成！",

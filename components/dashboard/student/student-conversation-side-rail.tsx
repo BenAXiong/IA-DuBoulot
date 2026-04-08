@@ -66,6 +66,9 @@ export function StudentConversationSideRail({
     useState<ConversationAttachmentRecord | null>(null);
   const [expandedPreviewAttachment, setExpandedPreviewAttachment] =
     useState<ConversationAttachmentRecord | null>(null);
+  const [subjectUploadsOpen, setSubjectUploadsOpen] = useState(false);
+  const [homeworkUploadsOpen, setHomeworkUploadsOpen] = useState(true);
+  const [chatMaterialOpen, setChatMaterialOpen] = useState(false);
 
   useEffect(() => {
     if (!previewAttachment) {
@@ -112,82 +115,147 @@ export function StudentConversationSideRail({
     }
   }
 
+  function SectionChevron(props: { open: boolean }) {
+    return (
+      <svg
+        aria-hidden="true"
+        className={`h-4 w-4 transition ${props.open ? "rotate-90" : ""}`}
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="m9 6 6 6-6 6"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.8"
+        />
+      </svg>
+    );
+  }
+
   return (
     <aside className="flex min-h-full flex-1 flex-col">
       <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="space-y-3 pr-1">
-          {attachments.length === 0 ? (
-            <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-              {copy.noFilesUploaded}
-            </p>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {attachments.map((attachment) => {
-                const isPending = pendingAttachmentId === attachment.id;
-                const isPreviewable = isPreviewableAttachment(attachment);
+        <div className="space-y-4 pr-1">
+          <section className="grid gap-2">
+            <button
+              className="flex w-full items-center justify-between gap-3 text-left text-sm font-medium text-[color:var(--foreground)]"
+              onClick={() => setSubjectUploadsOpen((value) => !value)}
+              type="button"
+            >
+              <span>{copy.subjectUploadsTitle}</span>
+              <SectionChevron open={subjectUploadsOpen} />
+            </button>
+            {subjectUploadsOpen ? (
+              <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
+                {copy.subjectUploadsPlaceholder}
+              </p>
+            ) : null}
+          </section>
 
-                return (
-                  <div
-                    className="group relative inline-flex max-w-full items-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] pr-8 text-xs text-[color:var(--foreground)]"
-                    key={attachment.id}
-                  >
-                    {isPreviewable ? (
-                      <button
-                        className="min-w-0 rounded-full px-3 py-1.5 text-left transition hover:text-[color:var(--foreground)]"
-                        onClick={() => setPreviewAttachment(attachment)}
-                        title={copy.previewImage}
-                        type="button"
-                      >
-                        <span className="block max-w-[11rem] truncate">
-                          {attachment.original_filename}
-                        </span>
-                      </button>
-                    ) : (
-                      <span className="block max-w-[11rem] truncate px-3 py-1.5">
-                        {attachment.original_filename}
-                      </span>
-                    )}
+          <section className="grid gap-2">
+            <button
+              className="flex w-full items-center justify-between gap-3 text-left text-sm font-medium text-[color:var(--foreground)]"
+              onClick={() => setHomeworkUploadsOpen((value) => !value)}
+              type="button"
+            >
+              <span>{copy.homeworkUploadsTitle}</span>
+              <SectionChevron open={homeworkUploadsOpen} />
+            </button>
+            {homeworkUploadsOpen ? (
+              <div className="space-y-3">
+                {attachments.length === 0 ? (
+                  <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
+                    {copy.noFilesUploaded}
+                  </p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {attachments.map((attachment) => {
+                      const isPending = pendingAttachmentId === attachment.id;
+                      const isPreviewable = isPreviewableAttachment(attachment);
+
+                      return (
+                        <div
+                          className="group relative inline-flex max-w-full items-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] pr-8 text-xs text-[color:var(--foreground)]"
+                          key={attachment.id}
+                        >
+                          {isPreviewable ? (
+                            <button
+                              className="min-w-0 rounded-full px-3 py-1.5 text-left transition hover:text-[color:var(--foreground)]"
+                              onClick={() => setPreviewAttachment(attachment)}
+                              title={copy.previewImage}
+                              type="button"
+                            >
+                              <span className="block max-w-[11rem] truncate">
+                                {attachment.original_filename}
+                              </span>
+                            </button>
+                          ) : (
+                            <span className="block max-w-[11rem] truncate px-3 py-1.5">
+                              {attachment.original_filename}
+                            </span>
+                          )}
+                          <button
+                            aria-label={copy.removeAttachment}
+                            className="absolute right-2 inline-flex h-4 w-4 items-center justify-center rounded-full text-[color:var(--ink-soft)] opacity-0 transition hover:text-[#c95f44] group-hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
+                            disabled={disabled || isPending}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              void handleRemoveAttachment(attachment.id);
+                            }}
+                            type="button"
+                          >
+                            <CloseIcon />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {previewAttachment ? (
+                  <div className="group relative overflow-hidden rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)]">
                     <button
-                      aria-label={copy.removeAttachment}
-                      className="absolute right-2 inline-flex h-4 w-4 items-center justify-center rounded-full text-[color:var(--ink-soft)] opacity-0 transition hover:text-[#c95f44] group-hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
-                      disabled={disabled || isPending}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        void handleRemoveAttachment(attachment.id);
-                      }}
+                      aria-label={copy.expandPreview}
+                      className="absolute right-3 top-3 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/55 text-white opacity-0 transition group-hover:opacity-100 hover:bg-black/70 focus-visible:opacity-100"
+                      onClick={() => setExpandedPreviewAttachment(previewAttachment)}
+                      title={copy.expandPreview}
                       type="button"
                     >
-                      <CloseIcon />
+                      <ExpandIcon />
                     </button>
+                    <div className="relative aspect-[4/3] w-full">
+                      <Image
+                        alt={previewAttachment.original_filename}
+                        className="object-cover"
+                        fill
+                        sizes="(min-width: 1280px) 30vw, 100vw"
+                        src={`/api/attachments/${previewAttachment.id}/access`}
+                        unoptimized
+                      />
+                    </div>
                   </div>
-                );
-              })}
-            </div>
-          )}
-
-          {previewAttachment ? (
-            <div className="group relative overflow-hidden rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)]">
-              <button
-                aria-label={copy.expandPreview}
-                className="absolute right-3 top-3 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/55 text-white opacity-0 transition group-hover:opacity-100 hover:bg-black/70 focus-visible:opacity-100"
-                onClick={() => setExpandedPreviewAttachment(previewAttachment)}
-                title={copy.expandPreview}
-                type="button"
-              >
-                <ExpandIcon />
-              </button>
-              <div className="relative aspect-[4/3] w-full">
-                <Image
-                  alt={previewAttachment.original_filename}
-                  className="object-cover"
-                  fill
-                  sizes="(min-width: 1280px) 30vw, 100vw"
-                  src={`/api/attachments/${previewAttachment.id}/access`}
-                  unoptimized
-                />
+                ) : null}
               </div>
-            </div>
-          ) : null}
+            ) : null}
+          </section>
+
+          <section className="grid gap-2">
+            <button
+              className="flex w-full items-center justify-between gap-3 text-left text-sm font-medium text-[color:var(--foreground)]"
+              onClick={() => setChatMaterialOpen((value) => !value)}
+              type="button"
+            >
+              <span>{copy.chatMaterialTitle}</span>
+              <SectionChevron open={chatMaterialOpen} />
+            </button>
+            {chatMaterialOpen ? (
+              <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
+                {copy.chatMaterialPlaceholder}
+              </p>
+            ) : null}
+          </section>
         </div>
       </div>
 

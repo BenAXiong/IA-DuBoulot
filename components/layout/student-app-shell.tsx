@@ -536,23 +536,36 @@ export function StudentAppShell({
                       const isActive = selectedSubject === group.subjectTag;
 
                       return (
-                        <Link
-                          className={`flex items-center justify-between rounded-[1rem] px-3 py-1.5 text-sm transition ${
+                        <div
+                          className={`group/item flex items-center gap-1 rounded-[1rem] px-1 transition ${
                             isActive
                               ? "text-[color:var(--foreground)]"
                               : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
                           }`}
-                          href={`/app?view=homework&subject=${encodeURIComponent(group.subjectTag)}`}
                           key={group.subjectTag}
-                          onClick={() => setSidebarOpen(false)}
                         >
-                          <span className="truncate">
-                            {capitalizeSubjectLabel(group.subjectTag)}
-                          </span>
-                          <span className="text-xs text-[color:var(--ink-muted)]">
-                            {group.count}
-                          </span>
-                        </Link>
+                          <Link
+                            className="flex min-w-0 flex-1 items-center justify-between rounded-[1rem] px-2 py-1.5 text-sm"
+                            href={`/app?view=homework&subject=${encodeURIComponent(group.subjectTag)}`}
+                            onClick={() => setSidebarOpen(false)}
+                          >
+                            <span className="truncate">
+                              {capitalizeSubjectLabel(group.subjectTag)}
+                            </span>
+                            <span className="text-xs text-[color:var(--ink-muted)]">
+                              {group.count}
+                            </span>
+                          </Link>
+                          <Link
+                            aria-label={`${copy.addSubject}: ${capitalizeSubjectLabel(group.subjectTag)}`}
+                            className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[color:var(--ink-muted)] opacity-0 transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)] group-hover/item:opacity-100 focus-visible:opacity-100"
+                            href={`/app?view=homework&subject=${encodeURIComponent(group.subjectTag)}`}
+                            onClick={() => setSidebarOpen(false)}
+                            title={copy.addSubject}
+                          >
+                            <PlusIcon />
+                          </Link>
+                        </div>
                       );
                     })}
                   </div>

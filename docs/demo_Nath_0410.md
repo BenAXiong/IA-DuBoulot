@@ -55,6 +55,8 @@ That means:
 - verify file upload and pasted-image behavior
 - verify the right rail behaves acceptably on a real student chat
 - verify `Homework done!` produces the short learner-facing recap expected for the demo
+- monitor response speed and reliability for `Fast` versus `Thinking` mode on the deployed app
+- review whether the current output modes are good enough for the demo, and disable `Interactive` if the future diagram or richer guidance path is still too immature
 
 ### 3. iPad-First Polish
 
@@ -109,6 +111,15 @@ It should not feel like:
 - an operator summary
 - a raw internal trace
 - a pedagogy/debug dump
+
+### Prompting Tips
+
+Consider a small optional section in banban's answers that gives concise prompting feedback only when it is genuinely useful, for example:
+
+- one message asks too many things at once
+- the learner is pushing for the direct answer too early
+- the uploaded pictures are too unclear
+- the learner should say what they already tried before asking for help
 
 ## If Time Allows
 

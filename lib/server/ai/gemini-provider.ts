@@ -176,6 +176,30 @@ function extractProviderFailureDetails(error: unknown) {
   } as const;
 }
 
+function shouldRetryProviderFailure(error: unknown) {
+  const record =
+    error && typeof error === "object" ? (error as Record<string, unknown>) : null;
+  const httpStatus =
+    typeof record?.status === "number"
+      ? record.status
+      : typeof record?.statusCode === "number"
+        ? record.statusCode
+        : null;
+  const providerBody =
+    record?.error && typeof record.error === "object"
+      ? (record.error as Record<string, unknown>)
+      : null;
+  const providerStatus =
+    typeof providerBody?.status === "string" ? providerBody.status : null;
+
+  return (
+    httpStatus === 429 ||
+    httpStatus === 503 ||
+    providerStatus === "RESOURCE_EXHAUSTED" ||
+    providerStatus === "UNAVAILABLE"
+  );
+}
+
 function toProviderError(cause: unknown) {
   const failure = extractProviderFailureDetails(cause);
 
@@ -415,57 +439,74 @@ export class GeminiAiProvider implements AiProvider {
   }): Promise<GeneratedTextResult> {
     const inputTokens = await this.countContentTokens(input.model, input.contents);
 
-    try {
-      const response = await this.client.models.generateContent({
-        model: input.model,
-        contents: input.contents,
-        config: {
-          temperature: 0.2,
-          safetySettings: GEMINI_DEFAULT_SAFETY_SETTINGS,
-          systemInstruction: input.systemInstruction,
-          maxOutputTokens: input.maxOutputTokens,
-        },
-      });
-      const responseText = response.text?.trim();
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      try {
+        const response = await this.client.models.generateContent({
+          model: input.model,
+          contents: input.contents,
+          config: {
+            temperature: 0.2,
+            safetySettings: GEMINI_DEFAULT_SAFETY_SETTINGS,
+            systemInstruction: input.systemInstruction,
+            maxOutputTokens: input.maxOutputTokens,
+          },
+        });
+        const responseText = response.text?.trim();
 
-      if (!responseText) {
-        throw new Error("Gemini returned an empty text payload.");
+        if (!responseText) {
+          throw new Error("Gemini returned an empty text payload.");
+        }
+
+        const outputTokens = await this.countTextTokens(input.model, responseText);
+        const usage = buildUsageSnapshot({
+          modelName: response.modelVersion ?? input.model,
+          inputTokens,
+          outputTokens,
+        });
+
+        this.logSuccess({
+          context: input.requestContext,
+          operation: input.operation,
+          modelName: response.modelVersion ?? input.model,
+          usage,
+          extra: input.extraLogDetails,
+        });
+
+        return {
+          responseText,
+          modelName: response.modelVersion ?? input.model,
+          usage,
+        };
+      } catch (error) {
+        const canRetry = attempt < 2 && shouldRetryProviderFailure(error);
+
+        if (canRetry) {
+          await sleep(450 * (attempt + 1));
+          continue;
+        }
+
+        const failure = extractProviderFailureDetails(error);
+        this.logFailure({
+          context: input.requestContext,
+          operation: input.operation,
+          modelName: input.model,
+          errorCode: failure.appErrorCode,
+          extra: {
+            ...input.extraLogDetails,
+            retry_attempts: attempt,
+            ...failure.logDetails,
+          },
+        });
+        throw toProviderError(error);
       }
-
-      const outputTokens = await this.countTextTokens(input.model, responseText);
-      const usage = buildUsageSnapshot({
-        modelName: response.modelVersion ?? input.model,
-        inputTokens,
-        outputTokens,
-      });
-
-      this.logSuccess({
-        context: input.requestContext,
-        operation: input.operation,
-        modelName: response.modelVersion ?? input.model,
-        usage,
-        extra: input.extraLogDetails,
-      });
-
-      return {
-        responseText,
-        modelName: response.modelVersion ?? input.model,
-        usage,
-      };
-    } catch (error) {
-      const failure = extractProviderFailureDetails(error);
-      this.logFailure({
-        context: input.requestContext,
-        operation: input.operation,
-        modelName: input.model,
-        errorCode: failure.appErrorCode,
-        extra: {
-          ...input.extraLogDetails,
-          ...failure.logDetails,
-        },
-      });
-      throw toProviderError(error);
     }
+
+    throw new AppError({
+      code: "provider_error",
+      message: "The AI provider request failed.",
+      status: 502,
+      retryable: true,
+    });
   }
 
   private async uploadFileToGemini(input: {
