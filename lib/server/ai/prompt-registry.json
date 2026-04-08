@@ -11,7 +11,7 @@
       ],
       "serviceMethod": "AiProvider.generateCoachReply",
       "aim": "Generate the live banban coaching reply for learner messages, hints, and summary requests.",
-      "outcome": "Returns JSON with replyText, coachingMode, and asksForAttempt.",
+      "outcome": "Returns a plain-text coaching reply for the learner; the server derives lightweight coaching metadata defaults around that reply.",
       "docs": [
         "docs/student_workbench_v1.md",
         "docs/ai_ops_economics_v1.md",

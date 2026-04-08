@@ -63,6 +63,12 @@ type GeneratedUsageResult = {
   usage: AiUsageSnapshot;
 };
 
+type GeneratedTextResult = {
+  responseText: string;
+  modelName: string;
+  usage: AiUsageSnapshot;
+};
+
 function sleep(delayMs: number) {
   return new Promise((resolve) => setTimeout(resolve, delayMs));
 }
@@ -398,6 +404,70 @@ export class GeminiAiProvider implements AiProvider {
     }
   }
 
+  private async generateTextResponse(input: {
+    model: string;
+    systemInstruction: string;
+    contents: ContentListUnion;
+    requestContext: AiProviderLogContext;
+    operation: string;
+    extraLogDetails?: Record<string, unknown>;
+    maxOutputTokens?: number;
+  }): Promise<GeneratedTextResult> {
+    const inputTokens = await this.countContentTokens(input.model, input.contents);
+
+    try {
+      const response = await this.client.models.generateContent({
+        model: input.model,
+        contents: input.contents,
+        config: {
+          temperature: 0.2,
+          safetySettings: GEMINI_DEFAULT_SAFETY_SETTINGS,
+          systemInstruction: input.systemInstruction,
+          maxOutputTokens: input.maxOutputTokens,
+        },
+      });
+      const responseText = response.text?.trim();
+
+      if (!responseText) {
+        throw new Error("Gemini returned an empty text payload.");
+      }
+
+      const outputTokens = await this.countTextTokens(input.model, responseText);
+      const usage = buildUsageSnapshot({
+        modelName: response.modelVersion ?? input.model,
+        inputTokens,
+        outputTokens,
+      });
+
+      this.logSuccess({
+        context: input.requestContext,
+        operation: input.operation,
+        modelName: response.modelVersion ?? input.model,
+        usage,
+        extra: input.extraLogDetails,
+      });
+
+      return {
+        responseText,
+        modelName: response.modelVersion ?? input.model,
+        usage,
+      };
+    } catch (error) {
+      const failure = extractProviderFailureDetails(error);
+      this.logFailure({
+        context: input.requestContext,
+        operation: input.operation,
+        modelName: input.model,
+        errorCode: failure.appErrorCode,
+        extra: {
+          ...input.extraLogDetails,
+          ...failure.logDetails,
+        },
+      });
+      throw toProviderError(error);
+    }
+  }
+
   private async uploadFileToGemini(input: {
     mimeType: string;
     originalFilename: string;
@@ -439,11 +509,7 @@ export class GeminiAiProvider implements AiProvider {
   ): Promise<GenerateCoachReplyResult> {
     const prompt = buildStudentCoachSystemPrompt(input);
     const attachmentParts = buildAttachmentParts(input.attachments);
-    const response = await this.generateJsonResponse<{
-      replyText?: string;
-      coachingMode?: GenerateCoachReplyResult["coachingMode"];
-      asksForAttempt?: boolean;
-    }>({
+    const response = await this.generateTextResponse({
       model: GEMINI_COACH_MODEL,
       systemInstruction: prompt.instruction,
       contents: createUserContent([
@@ -451,33 +517,16 @@ export class GeminiAiProvider implements AiProvider {
         `Intent: ${input.intent}`,
         ...attachmentParts,
       ]),
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          replyText: { type: Type.STRING },
-          coachingMode: {
-            type: Type.STRING,
-            enum: [
-              "attempt_probe",
-              "hint_scaffold",
-              "feedback_refinement",
-              "summary_reflection",
-              "boundary_redirect",
-            ],
-          },
-          asksForAttempt: { type: Type.BOOLEAN },
-        },
-        required: ["replyText", "coachingMode", "asksForAttempt"],
-      },
       requestContext: input.requestContext,
       operation: "coach_reply",
       maxOutputTokens: AI_OUTPUT_TOKEN_LIMITS.coachReply,
       extraLogDetails: {
         intent: input.intent,
+        reply_mode: input.replyMode,
       },
     });
 
-    const replyText = asString(response.replyText);
+    const replyText = asString(response.responseText);
 
     if (!replyText) {
       throw new AppError({
@@ -490,8 +539,14 @@ export class GeminiAiProvider implements AiProvider {
 
     return {
       replyText,
-      coachingMode: response.coachingMode ?? "feedback_refinement",
-      asksForAttempt: response.asksForAttempt ?? false,
+      coachingMode:
+        input.replyMode === "interactive"
+          ? "attempt_probe"
+          : input.replyMode === "fast"
+            ? "feedback_refinement"
+            : "hint_scaffold",
+      asksForAttempt:
+        input.replyMode === "interactive" || input.intent !== "summarize",
       generatedModelName: response.modelName,
       promptVersion: prompt.version,
       usage: response.usage,
