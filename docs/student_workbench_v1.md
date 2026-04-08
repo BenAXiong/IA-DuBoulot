@@ -28,6 +28,7 @@ This document covers `A3.4.1` to `A3.4.4`:
 - Hidden workspace UI: `components/dashboard/student/student-workspace-panel.tsx`
 - Conversation service: `lib/server/conversations/conversation-service.ts`
 - Upload client helper: `lib/uploads/client-upload.ts`
+- Pending bootstrap store: `lib/conversations/pending-bootstrap-store.ts`
 - Upload service: `lib/server/uploads/service.ts`
 - Student flow localization copy: `lib/i18n/student-flow-copy.ts`
 - Gemini provider: `lib/server/ai/gemini-provider.ts`
@@ -40,20 +41,21 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 
 1. loads the persisted conversation, messages, and workspace state
 2. loads the persisted attachments and visible summaries
-3. renders the transcript as a real thread instead of a static detail card, and now keeps it closer to a minimal chat surface by removing the old role or timestamp line above every learner-visible turn
-4. lets the student send a freeform message, ask for a hint, or request a summary
-5. sends message turns through the Gemini-backed coach flow plus moderation checks before persisting assistant output, and now falls back to a learner-facing retry reply if the provider call fails instead of leaking the older internal draft-coach text
-6. still keeps the persisted workspace fields and save route under the hood, but no longer foregrounds the old workspace panel in the learner UI
-7. uploads attachments through signed upload targets, confirms them, keeps the current file list in a minimal right-side rail, and now accepts pasted clipboard images in both the homework quick-start and the live conversation composer
-8. lets the student remove an uploaded file directly from that rail, with a confirmation step before the server-owned delete, and now opens uploaded images directly inside the right rail first
-9. keeps the right rail pinned under the student header as a true split pane instead of letting it stretch alongside the full transcript length, and now lets desktop users resize that rail manually
-10. adds hover copy controls under each learner-visible turn, keeps those controls aligned to the message body rather than the avatar column, and now shows a lightweight copied toast when a turn is copied
-11. renders assistant turns through a markdown-plus-math path, so simple LaTeX like `$v = d/t$` can display as formatted math instead of raw markup
-12. keeps the live composer pinned at the bottom of the conversation view, now shows a chevron jump-to-latest control above it when the transcript is scrolled upward, and appends the learner's message optimistically with a lightweight pending banban placeholder so the prompt no longer looks stuck in the textarea during the round trip
-13. reuses the same learner avatar style as the profile dock for student turns, so the thread feels like one consistent messaging surface instead of mixing unrelated identity treatments
-14. exposes a small reply-mode switch directly in the chat tools, and now routes `fast`, `thinking`, and `interactive` as real prompt-level coaching variants instead of leaving them as a purely hypothetical Pilot note
-15. renders only one explicit completion control at the bottom of the right rail, keeping completion available without the older session-summary card dominating the active chat
-16. localizes the workbench shell, composer, the reply-mode switch, and the side rail through `lib/i18n/student-flow-copy.ts`
+3. if the conversation was just created from the subject launcher, the workbench can now consume a client bootstrap payload so the real conversation route itself owns the pending first learner turn, pending banban placeholder, staged upload work, and first-turn send
+4. renders the transcript as a real thread instead of a static detail card, and now keeps it closer to a minimal chat surface by removing the old role or timestamp line above every learner-visible turn
+5. lets the student send a freeform message, ask for a hint, or request a summary
+6. sends message turns through the Gemini-backed coach flow plus moderation checks before persisting assistant output, now falls back to a learner-facing retry reply if the provider call fails instead of leaking the older internal draft-coach text, and on the first successful learner turn now also asks Gemini for a shorter conversation title
+7. still keeps the persisted workspace fields and save route under the hood, but no longer foregrounds the old workspace panel in the learner UI
+8. uploads attachments through signed upload targets, confirms them, keeps the current file list in a minimal right-side rail, and now accepts pasted clipboard images in both the homework quick-start and the live conversation composer
+9. lets the student remove an uploaded file directly from that rail, with a confirmation step before the server-owned delete, and now opens uploaded images directly inside the right rail first
+10. keeps the right rail pinned under the student header as a true split pane instead of letting it stretch alongside the full transcript length, and now lets desktop users resize that rail manually
+11. adds hover copy controls under each learner-visible turn, keeps those controls aligned to the message body rather than the avatar column, and now shows a lightweight copied toast when a turn is copied
+12. renders assistant turns through a markdown-plus-math path, so simple LaTeX like `$v = d/t$` can display as formatted math instead of raw markup
+13. keeps the live composer pinned at the bottom of the conversation view, now shows a chevron jump-to-latest control above it when the transcript is scrolled upward, and appends the learner's message optimistically with a lightweight pending banban placeholder so the prompt no longer looks stuck in the textarea during the round trip
+14. reuses the same learner avatar style as the profile dock for student turns, so the thread feels like one consistent messaging surface instead of mixing unrelated identity treatments
+15. exposes a small reply-mode switch directly in the chat tools, and now routes `fast`, `thinking`, and `interactive` as real prompt-level coaching variants instead of leaving them as a purely hypothetical Pilot note
+16. renders only one explicit completion control at the bottom of the right rail, keeping completion available without the older session-summary card dominating the active chat
+17. localizes the workbench shell, composer, the reply-mode switch, and the side rail through `lib/i18n/student-flow-copy.ts`
 
 ## Interaction Rules
 
@@ -63,7 +65,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 - image preview in the right rail reuses the same server-owned private attachment access route, so learner-visible previews still stay behind the signed attachment boundary, and the larger overlay view is now a secondary hover-triggered expansion path instead of the default click behavior
 - only the student owner or an admin can mutate the conversation state
 - moderation outcomes are recorded before blocked or flagged content leaves the server boundary
-- the student-facing shell now assumes the conversation already exists before the live workbench opens; the newer subject quick-start creates that shell and first turn before routing here
+- the student-facing shell still assumes the conversation shell already exists before the live workbench opens, but it can now receive a one-time client bootstrap payload from the homework launcher so the workbench itself owns the optimistic first-turn handoff
 - reply modes are not separate models; they are prompt-policy variants on the same student coach path, selected per message through the live composer or subject quick-start
 
 ## Important Boundaries
@@ -77,6 +79,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 - the workbench still uses the persisted workspace fields under the hood, even though the learner no longer sees that workspace as a full separate product surface
 - attachment removal currently deletes the file record plus private storage object, but it does not yet scrub extracted text that may already have been copied into the hidden workspace
 - image preview can still feel slower than a public image gallery because the rail currently fetches the original private file through the authenticated attachment-access route plus signed redirect; there is no dedicated thumbnail generation layer yet
+- the first-turn bootstrap payload is currently in-memory only; if the learner hard-refreshes immediately after the route change and before the first send finishes, the shell conversation still exists but the optimistic bootstrap payload is gone and the student would need to resend manually
 
 ## Validation Record
 

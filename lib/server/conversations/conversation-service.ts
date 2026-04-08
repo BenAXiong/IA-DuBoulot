@@ -90,6 +90,19 @@ function normalizeText(value: string) {
   return normalized.length > 0 ? normalized : null;
 }
 
+function normalizeConversationTitle(value: string | null | undefined) {
+  const normalized = value?.trim().replace(/\s+/g, " ") ?? "";
+  const withoutQuotes = normalized.replace(/^["'`“”‘’]+|["'`“”‘’]+$/g, "");
+
+  if (!withoutQuotes) {
+    return null;
+  }
+
+  return withoutQuotes.length > 120
+    ? withoutQuotes.slice(0, 117).trimEnd() + "..."
+    : withoutQuotes;
+}
+
 function buildModerationSafeReply(languageCode: UiLanguageCode) {
   return getStudentDraftCoachCopy(languageCode).moderationSafeReply;
 }
@@ -1020,7 +1033,9 @@ export async function appendConversationTurn(input: {
       : studentMessageText;
   let assistantMessageText = buildModerationSafeReply(appUser.ai_help_language);
   let providerUsage: AiUsageSnapshot | null = null;
+  let titleUsage: AiUsageSnapshot | null = null;
   let successfulAiReply: GenerateCoachReplyResult | null = null;
+  let nextConversationTitle = conversation.title;
 
   if (inputModeration.status !== "blocked") {
     try {
@@ -1067,6 +1082,39 @@ export async function appendConversationTurn(input: {
         outputModeration.status === "blocked"
           ? buildModerationSafeReply(appUser.ai_help_language)
           : aiReply.replyText;
+
+      if (
+        input.payload.intent === "student_message" &&
+        (messages ?? []).length === 0 &&
+        outputModeration.status !== "blocked"
+      ) {
+        try {
+          const titleResult = await aiProvider.generateConversationTitle({
+            conversation,
+            firstStudentMessageText: studentMessageText,
+            firstAssistantReplyText: assistantMessageText,
+            languageCode: appUser.ai_help_language,
+            requestContext: {
+              requestId: input.requestId,
+              route: input.route,
+              actorUserId: appUser.id,
+              actorRole: appUser.role,
+              conversationId: input.conversationId,
+              studentUserId: appUser.id,
+            },
+          });
+          const summarizedTitle = normalizeConversationTitle(
+            titleResult.titleText,
+          );
+
+          if (summarizedTitle) {
+            nextConversationTitle = summarizedTitle;
+            titleUsage = titleResult.usage;
+          }
+        } catch {
+          // Best-effort polish only. Provider logs already capture the failure.
+        }
+      }
     } catch (error) {
       const fallbackError = isAppError(error) ? error : null;
       assistantMessageText =
@@ -1144,6 +1192,7 @@ export async function appendConversationTurn(input: {
     .from("conversations")
     .update({
       last_message_at: assistantCreatedAt.toISOString(),
+      title: nextConversationTitle,
     })
     .eq("id", input.conversationId);
 
@@ -1178,6 +1227,10 @@ export async function appendConversationTurn(input: {
     studentUserId: appUser.id,
     usage: providerUsage,
   });
+  await recordStudentAiUsageBestEffort({
+    studentUserId: appUser.id,
+    usage: titleUsage,
+  });
 
   if (successfulAiReply) {
     await recordSuccessfulCoachReplyDebugCaptureBestEffort({
@@ -1200,6 +1253,11 @@ export async function appendConversationTurn(input: {
   }
 
   return {
+    conversation: {
+      ...conversation,
+      title: nextConversationTitle,
+      last_message_at: assistantCreatedAt.toISOString(),
+    },
     studentMessage,
     assistantMessage,
   };

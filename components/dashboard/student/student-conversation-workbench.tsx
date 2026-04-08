@@ -1,7 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useEffectEvent, useRef, useState, useTransition } from "react";
 import { INTAKE_ACCEPT_ATTR, stageIntakeFiles } from "@/lib/intake/intake-config";
+import {
+  clearPendingConversationBootstrap,
+  takePendingConversationBootstrap,
+} from "@/lib/conversations/pending-bootstrap-store";
 import {
   formatDateLabel,
 } from "@/components/dashboard/student/student-dashboard-presenters";
@@ -29,6 +33,7 @@ type MessageRouteResponse =
   | {
       ok: true;
       data: {
+        conversation: ConversationRecord;
         studentMessage: ConversationMessageRecord;
         assistantMessage: ConversationMessageRecord;
       };
@@ -103,6 +108,7 @@ export function StudentConversationWorkbench({
   const [isSending, startSending] = useTransition();
   const [isUploading, startUploading] = useTransition();
   const [isCompleting, startCompleting] = useTransition();
+  const [isBootstrapping, setIsBootstrapping] = useState(false);
   const [railWidth, setRailWidth] = useState(296);
   const [isResizingRail, setIsResizingRail] = useState(false);
   const [showJumpToLatest, setShowJumpToLatest] = useState(false);
@@ -112,12 +118,18 @@ export function StudentConversationWorkbench({
   const [pendingAssistantMessage, setPendingAssistantMessage] =
     useState<ConversationMessageRecord | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const workspaceRef = useRef(workspace);
+  const bootstrapStartedRef = useRef(false);
   const isReadOnly = conversation.status !== "active";
   const displayMessages = [
     ...messages,
     ...(pendingStudentMessage ? [pendingStudentMessage] : []),
     ...(pendingAssistantMessage ? [pendingAssistantMessage] : []),
   ];
+
+  useEffect(() => {
+    workspaceRef.current = workspace;
+  }, [workspace]);
 
   useEffect(() => {
     if (!isResizingRail) {
@@ -197,6 +209,111 @@ export function StudentConversationWorkbench({
     scrollTranscriptToBottom("auto");
   }, [messages, pendingStudentMessage, pendingAssistantMessage]);
 
+  async function performAcceptedUploadFiles(
+    files: File[],
+    uploadSource: "file_picker" | "paste",
+  ) {
+    if (files.length === 0) {
+      return;
+    }
+
+    try {
+      const results = await uploadConversationFiles({
+        conversationId: conversation.id,
+        files,
+        languageCode,
+        uploadSource,
+      });
+
+      setAttachments((currentAttachments) => [
+        ...currentAttachments,
+        ...results.map((result) => result.attachment),
+      ]);
+
+      const extractedBlocks = results
+        .map((result) => result.extractedTextBlock)
+        .filter((value): value is string => Boolean(value));
+      const warningMessages = results
+        .map((result) => result.warningMessage)
+        .filter((value): value is string => Boolean(value));
+      const currentWorkspace = workspaceRef.current;
+      const nextWorkspace: WorkspaceDraftState = {
+        ...currentWorkspace,
+        editedExtractedText:
+          extractedBlocks.length > 0
+            ? [currentWorkspace.editedExtractedText.trim(), ...extractedBlocks]
+                .filter(Boolean)
+                .join("\n\n")
+            : currentWorkspace.editedExtractedText,
+        studentNotes:
+          warningMessages.length > 0
+            ? [currentWorkspace.studentNotes.trim(), ...warningMessages]
+                .filter(Boolean)
+                .join("\n")
+            : currentWorkspace.studentNotes,
+      };
+
+      await persistWorkspace(nextWorkspace);
+      setWorkspaceError(null);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : copy.errors.addAttachment;
+      setWorkspaceError(message);
+      throw error;
+    }
+  }
+
+  async function performSendTurnRequest(input: {
+    pendingDraft: string;
+    intent: "student_message" | "hint" | "summarize";
+    replyMode: StudentReplyMode;
+    restoreComposerOnFailure: boolean;
+  }) {
+    const response = await fetch(`/api/conversations/${conversation.id}/messages`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        intent: input.intent,
+        contentText: input.pendingDraft,
+        replyMode: input.replyMode,
+      }),
+    });
+
+    const payload = (await response.json().catch(() => null)) as
+      | MessageRouteResponse
+      | null;
+    const routeErrorMessage =
+      payload && "error" in payload ? payload.error?.message : null;
+
+    if (
+      !response.ok ||
+      !payload?.ok ||
+      !payload.data?.studentMessage ||
+      !payload.data?.assistantMessage ||
+      !payload.data?.conversation
+    ) {
+      setPendingStudentMessage(null);
+      setPendingAssistantMessage(null);
+      if (input.restoreComposerOnFailure) {
+        setComposerText(input.pendingDraft);
+      }
+      setChatError(routeErrorMessage ?? copy.errors.addConversationTurn);
+      return false;
+    }
+
+    setPendingStudentMessage(null);
+    setPendingAssistantMessage(null);
+    setConversation(payload.data.conversation);
+    setMessages((currentMessages) => [
+      ...currentMessages,
+      payload.data.studentMessage,
+      payload.data.assistantMessage,
+    ]);
+    return true;
+  }
+
   async function sendMessage(intent: "student_message" | "hint" | "summarize") {
     setChatError(null);
 
@@ -231,49 +348,12 @@ export function StudentConversationWorkbench({
     }
 
     startSending(async () => {
-      const response = await fetch(
-        `/api/conversations/${conversation.id}/messages`,
-        {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-          },
-          body: JSON.stringify({
-            intent,
-            contentText: pendingDraft,
-            replyMode,
-          }),
-        },
-      );
-
-      const payload = (await response
-        .json()
-        .catch(() => null)) as MessageRouteResponse | null;
-      const routeErrorMessage =
-        payload && "error" in payload ? payload.error?.message : null;
-
-      if (
-        !response.ok ||
-        !payload?.ok ||
-        !payload.data?.studentMessage ||
-        !payload.data?.assistantMessage
-      ) {
-        setPendingStudentMessage(null);
-        setPendingAssistantMessage(null);
-        if (intent === "student_message") {
-          setComposerText(pendingDraft);
-        }
-        setChatError(routeErrorMessage ?? copy.errors.addConversationTurn);
-        return;
-      }
-
-      setPendingStudentMessage(null);
-      setPendingAssistantMessage(null);
-      setMessages((currentMessages) => [
-        ...currentMessages,
-        payload.data.studentMessage,
-        payload.data.assistantMessage,
-      ]);
+      await performSendTurnRequest({
+        pendingDraft,
+        intent,
+        replyMode,
+        restoreComposerOnFailure: intent === "student_message",
+      });
     });
   }
 
@@ -337,54 +417,79 @@ export function StudentConversationWorkbench({
     }
 
     startUploading(async () => {
-      try {
-        const results = await uploadConversationFiles({
-          conversationId: conversation.id,
-          files: staged.acceptedFiles.map((file) => file.file),
-          languageCode,
-          uploadSource,
-        });
-        const nextAttachments = [...attachments];
-
-        for (const result of results) {
-          nextAttachments.push(result.attachment);
-        }
-
-        setAttachments(nextAttachments);
-
-        const extractedBlocks = results
-          .map((result) => result.extractedTextBlock)
-          .filter((value): value is string => Boolean(value));
-        const warningMessages = results
-          .map((result) => result.warningMessage)
-          .filter((value): value is string => Boolean(value));
-        const nextWorkspace: WorkspaceDraftState = {
-          ...workspace,
-          editedExtractedText:
-            extractedBlocks.length > 0
-              ? [workspace.editedExtractedText.trim(), ...extractedBlocks]
-                  .filter(Boolean)
-                  .join("\n\n")
-              : workspace.editedExtractedText,
-          studentNotes:
-            warningMessages.length > 0
-              ? [workspace.studentNotes.trim(), ...warningMessages]
-                  .filter(Boolean)
-                  .join("\n")
-              : workspace.studentNotes,
-        };
-
-        await persistWorkspace(nextWorkspace);
-        setWorkspaceError(null);
-      } catch (error) {
-        setWorkspaceError(
-          error instanceof Error
-            ? error.message
-            : copy.errors.addAttachment,
-        );
-      }
+      await performAcceptedUploadFiles(
+        staged.acceptedFiles.map((file) => file.file),
+        uploadSource,
+      ).catch(() => undefined);
     });
   }
+
+  const runBootstrap = useEffectEvent(async () => {
+    const bootstrap = takePendingConversationBootstrap(conversation.id);
+
+    if (!bootstrap) {
+      return;
+    }
+
+    bootstrapStartedRef.current = true;
+    setChatError(null);
+    setComposerText("");
+    setIsBootstrapping(true);
+
+    const pendingTimestamp = new Date().toISOString();
+    setPendingStudentMessage({
+      id: `pending-student-${pendingTimestamp}`,
+      conversation_id: conversation.id,
+      author_user_id: conversation.student_user_id,
+      role: "student",
+      content_text: bootstrap.promptText,
+      content_language: languageCode,
+      created_at: pendingTimestamp,
+    });
+    setPendingAssistantMessage({
+      id: `pending-assistant-${pendingTimestamp}`,
+      conversation_id: conversation.id,
+      author_user_id: null,
+      role: "assistant",
+      content_text: copy.pendingAssistant,
+      content_language: languageCode,
+      created_at: pendingTimestamp,
+    });
+
+    try {
+      await performAcceptedUploadFiles(bootstrap.stagedFiles, "file_picker");
+      const succeeded = await performSendTurnRequest({
+        pendingDraft: bootstrap.promptText,
+        intent: "student_message",
+        replyMode: bootstrap.replyMode,
+        restoreComposerOnFailure: true,
+      });
+
+      if (!succeeded) {
+        bootstrapStartedRef.current = false;
+      }
+    } catch {
+      setPendingStudentMessage(null);
+      setPendingAssistantMessage(null);
+      setComposerText(bootstrap.promptText);
+      bootstrapStartedRef.current = false;
+    } finally {
+      setIsBootstrapping(false);
+    }
+  });
+
+  useEffect(() => {
+    if (detail.messages.length > 0) {
+      clearPendingConversationBootstrap(conversation.id);
+      return;
+    }
+
+    if (bootstrapStartedRef.current) {
+      return;
+    }
+
+    void runBootstrap();
+  }, [conversation.id, detail.messages.length]);
 
   function completeSession() {
     setWorkspaceError(null);
@@ -528,7 +633,7 @@ export function StudentConversationWorkbench({
               <StudentConversationComposer
                 composerText={composerText}
                 disabled={isReadOnly}
-                isSending={isSending || isUploading}
+                isSending={isSending || isUploading || isBootstrapping}
                 languageCode={languageCode}
                 onComposerTextChange={setComposerText}
                 onReplyModeChange={setReplyMode}
@@ -550,7 +655,7 @@ export function StudentConversationWorkbench({
                 </p>
               ) : null}
 
-              {isUploading ? (
+              {isUploading || isBootstrapping ? (
                 <p className="rounded-[1.25rem] border border-[color:var(--line)] bg-white px-4 py-3 text-sm leading-6 text-[color:var(--ink-soft)]">
                   {copy.uploadInProgress}
                 </p>

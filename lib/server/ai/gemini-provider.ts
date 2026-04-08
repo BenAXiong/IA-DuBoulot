@@ -26,6 +26,7 @@ import {
   truncateForAiContext,
 } from "@/lib/server/ai/guardrails";
 import { buildAttachmentExtractionPrompt } from "@/lib/server/ai/prompts/attachment-extraction";
+import { buildConversationTitlePrompt } from "@/lib/server/ai/prompts/conversation-title";
 import { buildMemoryProfilePrompt } from "@/lib/server/ai/prompts/memory-profile";
 import { buildStudentCoachSystemPrompt } from "@/lib/server/ai/prompts/student-coach";
 import { buildSummaryPrompt } from "@/lib/server/ai/prompts/summary-prompts";
@@ -39,6 +40,8 @@ import type {
   ExtractAttachmentTextResult,
   GenerateCoachReplyInput,
   GenerateCoachReplyResult,
+  GenerateConversationTitleInput,
+  GenerateConversationTitleResult,
   MemoryGenerationItem,
   GenerateMemoryProfileInput,
   GenerateMemoryProfileResult,
@@ -590,6 +593,47 @@ export class GeminiAiProvider implements AiProvider {
             : "hint_scaffold",
       asksForAttempt:
         input.replyMode === "interactive" || input.intent !== "summarize",
+      generatedModelName: response.modelName,
+      promptVersion: prompt.version,
+      usage: response.usage,
+    };
+  }
+
+  async generateConversationTitle(
+    input: GenerateConversationTitleInput,
+  ): Promise<GenerateConversationTitleResult> {
+    const prompt = buildConversationTitlePrompt(input);
+    const response = await this.generateTextResponse({
+      model: GEMINI_COACH_MODEL,
+      systemInstruction: prompt.instruction,
+      contents: createUserContent([
+        `Matiere: ${input.conversation.subject_tag}`,
+        `Premier message eleve: ${input.firstStudentMessageText}`,
+        `Premiere reponse banban: ${input.firstAssistantReplyText}`,
+      ]),
+      requestContext: input.requestContext,
+      operation: "conversation_title",
+      maxOutputTokens: 40,
+      extraLogDetails: {
+        subject_tag: input.conversation.subject_tag,
+        conversation_id: input.conversation.id,
+      },
+    });
+
+    const titleText = asString(response.responseText);
+
+    if (!titleText) {
+      throw new AppError({
+        code: "provider_error",
+        message: "The AI provider returned an invalid conversation title.",
+        status: 502,
+        retryable: true,
+      });
+    }
+
+    return {
+      titleText,
+      rawOutputText: response.responseText,
       generatedModelName: response.modelName,
       promptVersion: prompt.version,
       usage: response.usage,

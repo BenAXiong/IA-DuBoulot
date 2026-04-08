@@ -42,7 +42,7 @@ Current local status:
 
 ### AI Provider
 
-Owns model calls for coaching, extraction, summary generation, and memory refresh.
+Owns model calls for coaching, conversation-title summarization, extraction, summary generation, and memory refresh.
 
 Primary implementation target: Gemini.
 Future fallback target: OpenAI API or another production-ready API provider.
@@ -50,6 +50,9 @@ Future fallback target: OpenAI API or another production-ready API provider.
 ```ts
 interface AiProvider {
   generateCoachReply(input: CoachReplyInput): Promise<CoachReplyResult>;
+  generateConversationTitle(
+    input: ConversationTitleInput
+  ): Promise<ConversationTitleResult>;
   generateSummary(input: SummaryGenerationInput): Promise<SummaryResult>;
   generateMemoryProfile(
     input: GenerateMemoryProfileInput

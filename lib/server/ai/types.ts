@@ -77,6 +77,22 @@ export type GenerateCoachReplyResult = {
   usage: AiUsageSnapshot;
 };
 
+export type GenerateConversationTitleInput = {
+  conversation: ConversationRecord;
+  firstStudentMessageText: string;
+  firstAssistantReplyText: string;
+  languageCode: AiLanguageCode;
+  requestContext: AiProviderLogContext;
+};
+
+export type GenerateConversationTitleResult = {
+  titleText: string;
+  rawOutputText: string;
+  generatedModelName: string;
+  promptVersion: string;
+  usage: AiUsageSnapshot;
+};
+
 export type ExtractAttachmentTextInput = {
   attachmentId: string;
   originalFilename: string;
@@ -164,6 +180,9 @@ export interface AiProvider {
   generateCoachReply(
     input: GenerateCoachReplyInput,
   ): Promise<GenerateCoachReplyResult>;
+  generateConversationTitle(
+    input: GenerateConversationTitleInput,
+  ): Promise<GenerateConversationTitleResult>;
   extractAttachmentText(
     input: ExtractAttachmentTextInput,
   ): Promise<ExtractAttachmentTextResult>;

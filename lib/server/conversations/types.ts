@@ -92,6 +92,7 @@ export type AppendConversationMessageInput = {
 };
 
 export type AppendConversationMessageResult = {
+  conversation: ConversationRecord;
   studentMessage: ConversationMessageRecord;
   assistantMessage: ConversationMessageRecord;
 };

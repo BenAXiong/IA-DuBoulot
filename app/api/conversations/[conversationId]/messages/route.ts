@@ -29,6 +29,7 @@ export const POST = withRouteErrorHandling<{ params: Params }>(
         ok: true,
         data: {
           requestId,
+          conversation: result.conversation,
           studentMessage: result.studentMessage,
           assistantMessage: result.assistantMessage,
         },

@@ -65,6 +65,14 @@ This matters because Supabase auth emails and OTP flows redirect to the configur
 7. Run the next pending SQL migration:
 - [20260311_000003_account_link_invitations.sql](../supabase/migrations/20260311_000003_account_link_invitations.sql)
 
+### Windows CLI Note
+
+- if PowerShell shows the repo path with a `\\?\` prefix or as a `Microsoft.PowerShell.Core\FileSystem::\\?\...` current directory, switch back to the normal drive path before running Supabase CLI commands
+- use:
+  - `Set-Location 'C:\Users\Ben\Documents\Projects\IA_du_boulot'`
+- reason:
+  - the Supabase CLI can fall back through `cmd.exe`, and `cmd.exe` does not support UNC-style working directories; if you stay on the `\\?\` path, commands like `supabase login` can succeed but later fail trying to create or use a `supabase/` directory from the Windows system folder instead of the repo
+
 ### 8. Next.js Auth Integration
 
 - when auth wiring starts, use the Supabase SSR path for Next.js instead of old auth helpers

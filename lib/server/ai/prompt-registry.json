@@ -19,6 +19,24 @@
       ]
     },
     {
+      "id": "conversation-title",
+      "title": "Conversation title summary",
+      "builderFile": "lib/server/ai/prompts/conversation-title.ts",
+      "builderFunction": "buildConversationTitlePrompt",
+      "versionConst": "CONVERSATION_TITLE_PROMPT_VERSION",
+      "routes": [
+        "POST /api/conversations/[conversationId]/messages (first successful learner turn only)"
+      ],
+      "serviceMethod": "AiProvider.generateConversationTitle",
+      "aim": "Shorten the first successful learner exchange into a compact conversation title that is easier to scan in history and subject views.",
+      "outcome": "Returns a short plain-text title only; the service stores it best-effort on the conversation after the first assistant reply succeeds.",
+      "docs": [
+        "docs/student_dashboard_v1.md",
+        "docs/student_workbench_v1.md",
+        "docs/ai_ops_economics_v1.md"
+      ]
+    },
+    {
       "id": "attachment-extraction",
       "title": "Attachment extraction",
       "builderFile": "lib/server/ai/prompts/attachment-extraction.ts",

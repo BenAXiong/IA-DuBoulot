@@ -87,9 +87,9 @@ These routes power the student core flow.
 | Route | Method | Caller | Purpose | Notes |
 | --- | --- | --- | --- | --- |
 | `/api/conversations` | `GET` | authenticated user | list visible conversations for the caller role | role-aware filtering required |
-| `/api/conversations` | `POST` | student | create a new conversation | creates initial conversation shell and enforces the session quota gate |
+| `/api/conversations` | `POST` | student | create a new conversation | creates the initial conversation shell, enforces the session quota gate, and is now the first step in the direct homework-launch handoff into the live conversation route |
 | `/api/conversations/[conversationId]` | `GET` | visible role | load a conversation with messages, attachments, workspace, summaries | server-side auth check now explicitly revalidates adult links and audits parent/tutor review reads |
-| `/api/conversations/[conversationId]/messages` | `POST` | student | append a student message and trigger assistant response flow | current local workspace uses the Gemini-backed provider plus moderation, with deterministic coach fallback if the provider call fails, bounded request/body sizes, a quota gate before new assistant turns, and a best-effort successful coach-output debug capture in the dedicated server-owned table |
+| `/api/conversations/[conversationId]/messages` | `POST` | student | append a student message and trigger assistant response flow | current local workspace uses the Gemini-backed provider plus moderation, with deterministic coach fallback if the provider call fails, bounded request/body sizes, a quota gate before new assistant turns, a best-effort successful coach-output debug capture in the dedicated server-owned table, and a best-effort short title refresh on the first successful learner turn |
 | `/api/conversations/[conversationId]/workspace` | `PATCH` | student | save workspace state | supports draft restoration, extracted-text sync, and attachment follow-up notes |
 | `/api/conversations/[conversationId]/complete` | `POST` | student | mark conversation complete | returns only the student-visible summary; adult variants are generated best-effort and do not block student completion; repeated completion reuses the stored student summary instead of regenerating summaries or memory |
 

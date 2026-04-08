@@ -25,6 +25,7 @@ This document started with `A3.1.1` to `A3.1.3` and now also records the later s
 - Student dashboard container: `components/dashboard/student-dashboard.tsx`
 - First-homework launcher: `components/dashboard/student/student-first-homework-launcher.tsx`
 - Subject quick start: `components/dashboard/student/student-subject-quick-start.tsx`
+- Pending bootstrap store: `lib/conversations/pending-bootstrap-store.ts`
 - Student settings support sections: `components/dashboard/student/student-settings-support-sections.tsx`
 - Compatibility redirect route: `app/app/new/page.tsx`
 - Server snapshot service: `lib/server/student-dashboard/student-dashboard-service.ts`
@@ -93,10 +94,9 @@ Current role:
 - the root homework view now always keeps the subject pills launcher visible, so adding a new subject is part of the normal homework home rather than a separate hidden URL state
 - the subject quick-start on `/app?view=homework&subject=...` creates a bare conversation shell
 - it can stage files before the chat starts
-- it uploads those files to the new conversation
-- it sends the learner's first real message through the canonical message route
-- it only opens `/app/conversations/[conversationId]` after that first turn is persisted
-- while that first-turn boot sequence is running, the launcher now clears the textarea immediately and shows a local learner-turn preview plus a pending banban placeholder so the product does not feel stuck before the route change
+- once the shell exists, it now routes immediately into `/app/conversations/[conversationId]`
+- it hands the first learner prompt, reply mode, and staged files into a small client bootstrap store
+- the live conversation view now owns the optimistic first-turn UI, the staged upload work, and the first real message send instead of faking a mini transcript on the launcher
 - both the subject quick-start and the live conversation composer now support `Ctrl+Enter` as a submit shortcut while keeping the visible send affordance icon-only
 
 `/app/new` no longer acts as a destination in the product. Old student links now redirect into `/app?view=homework`, preserving optional `subject` and `draft` query params so the learner lands on the current subject launcher instead of the retired intake page.
@@ -128,11 +128,11 @@ Why:
 - the subject view itself now keeps a single main column until a chat is actually started
 - the empty homework state no longer depends on a pre-existing subject tag to become usable; the first conversation can now establish that first subject from inside the dashboard itself
 - the live conversation route now follows the same split-pane rhythm, with the message stream on the left and a lighter summary/sources rail on the right instead of the earlier heavier dashboard stack
-- the pre-chat subject quick-start now owns real file staging, but it still creates the conversation shell first and only then uploads files plus sends the first message
+- the pre-chat subject quick-start now owns real file staging, but the real first-turn pending state lives on the conversation route after the shell is created
 
 ## Next Extension Points
 
 - decide whether subject filters stay lightweight or become canonical subject entities with alias normalization
-- decide whether the current shell-first subject quick-start is "implicit enough" or whether the first learner message should eventually create the conversation in one hidden server step
+- decide later whether the client bootstrap handoff should stay in-memory only or gain a more durable cross-refresh recovery path
 - decide later whether any richer pre-chat source-review UI should return inside the homework dashboard or remain unnecessary after the `/app/new` retirement
 - replace the placeholder learner avatar with a real pilot-level profile media flow if pilot usage justifies it

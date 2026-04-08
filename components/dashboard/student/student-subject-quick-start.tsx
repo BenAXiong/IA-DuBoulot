@@ -3,13 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { StudentReplyModeSwitch } from "@/components/dashboard/student/student-reply-mode-switch";
+import { setPendingConversationBootstrap } from "@/lib/conversations/pending-bootstrap-store";
 import {
   extractClipboardFiles,
   INTAKE_ACCEPT_ATTR,
   stageIntakeFiles,
   type StagedIntakeFile,
 } from "@/lib/intake/intake-config";
-import { uploadConversationFiles } from "@/lib/uploads/client-upload";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type { StudentReplyMode } from "@/lib/server/conversations/types";
 
@@ -19,35 +19,11 @@ type StudentSubjectQuickStartProps = {
   languageCode: UiLanguageCode;
 };
 
-type LaunchPreviewState = {
-  promptText: string;
-  attachmentsCount: number;
-} | null;
-
 type CreateConversationShellResponse =
   | {
       ok: true;
       data: {
         conversationId: string;
-      };
-    }
-  | {
-      ok?: false;
-      error?: {
-        message?: string;
-      };
-    };
-
-type SendMessageRouteResponse =
-  | {
-      ok: true;
-      data: {
-        studentMessage: {
-          id: string;
-        };
-        assistantMessage: {
-          id: string;
-        };
       };
     }
   | {
@@ -67,7 +43,6 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
           `${count} ${count === 1 ? "file ready" : "files ready"}`,
         submit: "Start chat",
         sending: "Opening chat...",
-        pendingReply: "banban is getting the chat ready...",
         voice: "Voice input coming soon!",
         startError: "Unable to open the chat right now.",
       };
@@ -78,7 +53,6 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
         attachmentsReady: (count: number) => `已準備 ${count} 個檔案`,
         submit: "開始聊天",
         sending: "正在開啟聊天...",
-        pendingReply: "banban 正在準備聊天...",
         voice: "語音輸入即將推出！",
         startError: "目前無法開啟聊天。",
       };
@@ -90,7 +64,6 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
           `${count} fichier${count > 1 ? "s" : ""} prêt${count > 1 ? "s" : ""}`,
         submit: "Lancer le chat",
         sending: "Ouverture du chat...",
-        pendingReply: "banban prépare le chat...",
         voice: "Saisie vocale bientôt !",
         startError: "Impossible d'ouvrir le chat pour l'instant.",
       };
@@ -134,9 +107,7 @@ function buildConversationTitle(input: {
   return shortenTitle(input.subjectTag);
 }
 
-function getRouteErrorMessage(
-  payload: CreateConversationShellResponse | SendMessageRouteResponse | null,
-) {
+function getRouteErrorMessage(payload: CreateConversationShellResponse | null) {
   if (!payload || payload.ok) {
     return null;
   }
@@ -200,17 +171,12 @@ export function StudentSubjectQuickStart({
   const [stagedFiles, setStagedFiles] = useState<StagedIntakeFile[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isStarting, setIsStarting] = useState(false);
-  const [launchPreview, setLaunchPreview] = useState<LaunchPreviewState>(null);
   const [replyMode, setReplyMode] = useState<StudentReplyMode>("thinking");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     setDraft(initialDraft ?? "");
   }, [initialDraft, subjectTag]);
-
-  useEffect(() => {
-    setLaunchPreview(null);
-  }, [subjectTag]);
 
   function handleComposerKeyDown(
     event: React.KeyboardEvent<HTMLTextAreaElement>,
@@ -277,11 +243,6 @@ export function StudentSubjectQuickStart({
     }
 
     setErrorMessage(null);
-    setLaunchPreview({
-      promptText: trimmedDraft,
-      attachmentsCount: stagedFiles.length,
-    });
-    setDraft("");
     setIsStarting(true);
 
     try {
@@ -315,56 +276,25 @@ export function StudentSubjectQuickStart({
           : null;
 
       if (!createResponse.ok || !conversationId) {
-        setDraft(trimmedDraft);
-        setLaunchPreview(null);
         setErrorMessage(
           getRouteErrorMessage(createPayload) ?? copy.startError,
         );
         return;
       }
 
-      if (stagedFiles.length > 0) {
-        await uploadConversationFiles({
-          conversationId,
-          files: stagedFiles.map((file) => file.file),
-          languageCode,
-        });
-      }
-
-      const sendResponse = await fetch(
-        `/api/conversations/${conversationId}/messages`,
-        {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-          },
-          body: JSON.stringify({
-            intent: "student_message",
-            contentText: trimmedDraft,
-            replyMode,
-          }),
-        },
-      );
-      const sendPayload = (await sendResponse
-        .json()
-        .catch(() => null)) as SendMessageRouteResponse | null;
-
-      if (!sendResponse.ok || !sendPayload?.ok) {
-        setDraft(trimmedDraft);
-        setLaunchPreview(null);
-        setErrorMessage(
-          getRouteErrorMessage(sendPayload) ?? copy.startError,
-        );
-        return;
-      }
-
+      setPendingConversationBootstrap(conversationId, {
+        promptText: trimmedDraft,
+        stagedFiles: stagedFiles.map((file) => file.file),
+        replyMode,
+        subjectTag,
+        createdAt: Date.now(),
+      });
       setStagedFiles([]);
+      setDraft("");
       router.push(
         `/app/conversations/${conversationId}?subject=${encodeURIComponent(subjectTag)}`,
       );
     } catch (error) {
-      setDraft(trimmedDraft);
-      setLaunchPreview(null);
       setErrorMessage(
         error instanceof Error ? error.message : copy.startError,
       );
@@ -386,31 +316,6 @@ export function StudentSubjectQuickStart({
         ref={fileInputRef}
         type="file"
       />
-
-      {launchPreview ? (
-        <div className="grid gap-3 px-1 pb-1">
-          <div className="flex justify-end">
-            <div className="max-w-[min(34rem,85%)] rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-3 text-right text-sm leading-6 text-[color:var(--foreground)]">
-              {launchPreview.promptText}
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[linear-gradient(135deg,#7bd5ff_0%,#8da2ff_50%,#ffcf69_100%)] font-[family-name:var(--font-heading)] text-sm font-semibold text-white">
-              bb
-            </div>
-            <div className="min-w-0 rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-3 text-sm leading-6 text-[color:var(--foreground)]">
-              <span className="student-pending-shimmer bg-[length:220%_100%] bg-clip-text text-transparent">
-                {copy.pendingReply}
-              </span>
-              {launchPreview.attachmentsCount > 0 ? (
-                <p className="pt-2 text-xs text-[color:var(--ink-soft)]">
-                  {copy.attachmentsReady(launchPreview.attachmentsCount)}
-                </p>
-              ) : null}
-            </div>
-          </div>
-        </div>
-      ) : null}
 
       <textarea
         className="student-chat-textarea min-h-6 resize-none appearance-none border-0 bg-transparent px-1 py-0 text-sm leading-5 placeholder:text-[color:var(--ink-soft)]"

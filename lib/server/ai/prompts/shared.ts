@@ -17,6 +17,7 @@ import {
 } from "@/lib/server/ai/guardrails";
 
 export const STUDENT_COACH_PROMPT_VERSION = "student-coach-v4";
+export const CONVERSATION_TITLE_PROMPT_VERSION = "conversation-title-v1";
 export const STUDENT_SUMMARY_PROMPT_VERSION = "student-summary-v2";
 export const PARENT_SUMMARY_PROMPT_VERSION = "parent-summary-v2";
 export const TUTOR_SUMMARY_PROMPT_VERSION = "tutor-summary-v2";

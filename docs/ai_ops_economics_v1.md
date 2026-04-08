@@ -14,7 +14,7 @@ It is intentionally explicit about the difference between:
 ## Current Provider And Pricing Baseline
 
 - provider: `Gemini`
-- current model for coaching, extraction, summaries, memory, and translation: `gemini-2.5-flash`
+- current model for coaching, conversation-title summarization, extraction, summaries, memory, and translation: `gemini-2.5-flash`
 - current token pricing snapshot in code:
   - input: `$0.30 / 1M tokens`
   - output: `$2.50 / 1M tokens`
@@ -104,7 +104,8 @@ Activity mapping:
 | create conversation draft | `sessions +1` | no | gated by quota before creation |
 | create upload target | `uploads +1` | no | gated by quota before upload reservation |
 | confirm upload with extraction | token counters only if provider usage is returned | yes | repeated confirm now reuses existing extraction result |
-| student message -> coach reply | `assistantMessages +1` plus provider tokens | yes | deterministic coach fallback keeps the flow alive |
+| first successful student message -> coach reply + best-effort title summary | `assistantMessages +1` plus provider tokens | yes | deterministic coach fallback keeps the flow alive, and the title summary is best-effort only |
+| later student message -> coach reply | `assistantMessages +1` plus provider tokens | yes | deterministic coach fallback keeps the flow alive |
 | complete conversation | provider tokens for summaries, translations, and memory when those calls succeed | yes | repeated completion now reuses the existing student summary |
 
 ## Usage Snapshot Shape
@@ -137,7 +138,7 @@ Current access model:
 ### Student Coach
 
 - route: `POST /api/conversations/[conversationId]/messages`
-- prompt version: `student-coach-v1`
+- prompt version: `student-coach-v4`
 - context inputs:
   - assignment text
   - edited extracted text
@@ -148,6 +149,17 @@ Current access model:
   - recent transcript excerpt
 - output cap: `500` tokens
 - fallback: deterministic coach reply
+
+### Conversation Title
+
+- route: `POST /api/conversations/[conversationId]/messages` (first successful learner turn only)
+- prompt version: `conversation-title-v1`
+- context inputs:
+  - subject tag
+  - first learner message
+  - first successful banban reply
+- output cap: `40` tokens
+- fallback: keep the shell title already stored on the conversation
 
 ### Attachment Extraction
 
@@ -163,9 +175,9 @@ Current access model:
 
 - route: `POST /api/conversations/[conversationId]/complete`
 - prompt versions:
-  - `student-summary-v1`
-  - `parent-summary-v1`
-  - `tutor-summary-v1`
+  - `student-summary-v2`
+  - `parent-summary-v2`
+  - `tutor-summary-v2`
 - output cap: `450` tokens per summary call
 - fallback behavior:
   - student summary is required and falls back deterministically
@@ -174,7 +186,7 @@ Current access model:
 ### Parent Summary Translation
 
 - route path: completion flow only, not a direct parent action
-- prompt version: `translation-v1`
+- prompt version: `translation-v2`
 - languages currently generated: `en`, `zh`
 - output cap: `900` tokens
 - behavior: optional and best-effort
@@ -182,7 +194,7 @@ Current access model:
 ### Memory Refresh
 
 - route path: completion flow only
-- prompt version: `memory-profile-v1`
+- prompt version: `memory-profile-v2`
 - output cap: `280` tokens
 - fallback: deterministic pedagogical memory refresh
 
