@@ -98,7 +98,7 @@ function buildMaskedStudentMessage(languageCode: UiLanguageCode) {
   return getStudentConversationServerCopy(languageCode).appendMessage.maskedStudentMessage;
 }
 
-function extractFreeTierLimitCode(error: AppError | null) {
+function buildProviderLimitFallbackCode(error: AppError | null) {
   if (!error || error.code !== "rate_limited") {
     return null;
   }
@@ -131,10 +131,10 @@ function extractFreeTierLimitCode(error: AppError | null) {
     ) &&
     /\b20\b/.test(providerText)
   ) {
-    return "rpd_20_free_tier_limit";
+    return "rpd_f7k2";
   }
 
-  return null;
+  return "rpm_v3m8";
 }
 
 function requireBodyObject(
@@ -1070,7 +1070,7 @@ export async function appendConversationTurn(input: {
     } catch (error) {
       const fallbackError = isAppError(error) ? error : null;
       assistantMessageText =
-        extractFreeTierLimitCode(fallbackError) ??
+        buildProviderLimitFallbackCode(fallbackError) ??
         copy.appendMessage.providerFallback;
 
       logRuntimeInfo({

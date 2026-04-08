@@ -1148,12 +1148,32 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Why: This is a practical demo hardening step. The retry layer smooths over transient upstream demand spikes without pretending the provider is fully stable, and the grouped right rail matches the product direction more clearly than a flat attachment area.
 - Follow-up: After the next deployed test, inspect whether the retry layer meaningfully reduces learner-facing fallback frequency. If `503 UNAVAILABLE` remains common even after retries, the paid Gemini project moves from "tomorrow's ops task" to a hard reliability blocker.
 
-### D-20260408-114 - Successful Coach Replies Now Have A Dedicated Debug Capture Table, And Hard Free-Tier Exhaustion Surfaces As A Terse Code
+### D-20260408-114 - Successful Coach Replies Now Have A Dedicated Debug Capture Table, And Hard Provider Limits Surface As Opaque Terse Codes
 
 - Date: 2026-04-08
 - Status: accepted
 - Related tasks: `A7.3.4`
 - Context: The current live demo-hardening work needs two things at once. First, once the malformed-JSON issue was removed from the learner coach path, operators still had no durable way to inspect successful raw Gemini coach outputs after a request finished. Runtime logs were only useful for failures, and the persisted conversation message stored only the final learner-visible assistant text. Second, the production investigation now confirms that the deployed free Gemini project can hit the hard `20` requests-per-day free-tier ceiling, and the generic learner retry message is too misleading in that specific case because it sounds like the learner should just keep trying random prompts.
-- Decision: Add a dedicated server-owned debug table, `public.ai_generation_debug_captures`, and write successful `coach_reply` generations there best-effort after the student and assistant messages are persisted. Each capture stores conversation and message references, request metadata, provider/model, prompt version, reply mode, raw successful provider text, final learner-visible text, usage snapshot, and lightweight coaching metadata. Keep this separate from `audit_logs`. Also refine the learner fallback path so that when the provider details clearly indicate the hard free-tier daily request ceiling, the learner sees only a terse machine-style code (`rpd_20_free_tier_limit`) instead of the softer generic retry copy. Other provider failures still keep the generic learner-facing fallback.
+- Decision: Add a dedicated server-owned debug table, `public.ai_generation_debug_captures`, and write successful `coach_reply` generations there best-effort after the student and assistant messages are persisted. Each capture stores conversation and message references, request metadata, provider/model, prompt version, reply mode, raw successful provider text, final learner-visible text, usage snapshot, and lightweight coaching metadata. Keep this separate from `audit_logs`. Also refine the learner fallback path so that when the provider details clearly indicate a hard rate window, the learner sees only an opaque machine-style code instead of the softer generic retry copy: currently `rpd_f7k2` for the known daily-request ceiling and `rpm_v3m8` for other rate-limit cases.
 - Why: This gives operators a real review surface for successful coach outputs without turning runtime logs or `audit_logs` into an unsafe transcript sink, and it makes the hard free-tier exhaustion state honest without over-explaining provider internals inside the learner UI.
 - Follow-up: Add a later retention policy and operator review path for `ai_generation_debug_captures`, and remove the free-tier code branch once production runs on a billed Gemini project where that exact public-facing state is no longer expected during the demo.
+
+### D-20260408-115 - Subject Quick Start Now Shows A Local Pending Transcript Preview Before The Live Conversation Opens
+
+- Date: 2026-04-08
+- Status: accepted
+- Related tasks: `P1.3`, `P2.1`
+- Context: The live conversation view already feels responsive because learner turns are appended optimistically and banban shows a pending placeholder while the provider call is in flight. The very first subject-level homework prompt still felt "stuck", though, because the student stayed on the launcher page until the app had created the conversation shell, uploaded any staged files, sent the first real message, and received the first assistant turn.
+- Decision: Keep the safer current backend contract, where the first turn is fully created before the route changes, but make the launcher itself show immediate acceptance. The subject quick-start now clears the textarea immediately, renders a local preview of the learner's first turn, and shows a pending banban placeholder on the launcher while conversation creation, upload staging, and first-turn submission complete in the background.
+- Why: This preserves the existing data-flow contract and avoids a riskier cross-route bootstrap protocol right before the demo, while still making the first-turn experience feel closer to the already-optimistic live conversation surface.
+- Follow-up: If the demo still reveals too much perceived delay on large-file starts, the next step is a real cross-route bootstrap handoff so the conversation page itself can own the first pending turn state during uploads.
+
+### D-20260408-116 - The Repo Now Includes A Local Supabase CLI Path, But Remote Link Or Push Still Requires Operator Credentials
+
+- Date: 2026-04-08
+- Status: accepted
+- Related tasks: `A0.2.1`, `A7.3.4`
+- Context: The repo already stores its database migrations under `supabase/migrations`, but there was no consistent local CLI path for running Supabase commands from the workspace. That made the new debug-capture migration harder to apply or inspect. At the same time, the environment still does not have a linked hosted project or direct database credentials available for remote CLI operations.
+- Decision: Add the `supabase` CLI as a dev dependency, initialize `supabase/config.toml`, and expose workspace scripts for `npm run supabase`, `npm run db:push`, and `npm run db:migrations`. Keep the current generated config aligned with the repo by disabling the unused default seed path. Make the operating docs explicit that this creates a local CLI path only; remote migration listing or push still requires a later `supabase link --project-ref ...` step with real operator credentials.
+- Why: This is enough to remove the "no CLI path configured" blocker from the repo itself without pretending the app now has the secrets needed to mutate the hosted database from every environment.
+- Follow-up: Once the operator has the needed project credentials, run `supabase link` for the hosted project and apply the pending migration that creates `public.ai_generation_debug_captures`.

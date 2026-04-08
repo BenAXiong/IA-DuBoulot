@@ -61,7 +61,8 @@ This matters because Supabase auth emails and OTP flows redirect to the configur
 3. Put them in local `.env.local`.
 4. Mirror the same values into Vercel environment variables.
 5. Keep the service-role or secret key server-only; never expose it in browser code.
-6. Run the next pending SQL migration:
+6. The repo now includes a local CLI path through `npm run supabase`; remote commands still require a one-time `supabase link --project-ref ...` with operator credentials.
+7. Run the next pending SQL migration:
 - [20260311_000003_account_link_invitations.sql](../supabase/migrations/20260311_000003_account_link_invitations.sql)
 
 ### 8. Next.js Auth Integration

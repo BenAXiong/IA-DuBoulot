@@ -96,6 +96,7 @@ Current role:
 - it uploads those files to the new conversation
 - it sends the learner's first real message through the canonical message route
 - it only opens `/app/conversations/[conversationId]` after that first turn is persisted
+- while that first-turn boot sequence is running, the launcher now clears the textarea immediately and shows a local learner-turn preview plus a pending banban placeholder so the product does not feel stuck before the route change
 - both the subject quick-start and the live conversation composer now support `Ctrl+Enter` as a submit shortcut while keeping the visible send affordance icon-only
 
 `/app/new` no longer acts as a destination in the product. Old student links now redirect into `/app?view=homework`, preserving optional `subject` and `draft` query params so the learner lands on the current subject launcher instead of the retired intake page.

@@ -11,6 +11,7 @@ Keep environment configuration explicit so local development, Vercel, and provid
 - commit `.env.example`, never real secrets
 - keep live secrets in Vercel project settings and local `.env.local`
 - add a new variable here before using it in code
+- the repo now includes a local Supabase CLI path through `npm run supabase`; hosted project operations still require an explicit later `supabase link` with real operator credentials
 
 ## Variables
 
@@ -47,6 +48,7 @@ Keep environment configuration explicit so local development, Vercel, and provid
 - confirm Vercel environment sync after Supabase integration changes
 - planned storage buckets are now created automatically by the fixture seed script, and the upload route family now exists locally, but deployed route-level verification still needs a targeted smoke pass
 - `GEMINI_API_KEY` is now present both locally and on the linked Vercel production project as of 2026-04-02, but Gemini free-tier RPM and RPD limits still apply per Google project rather than per API key; use a separate dev project for local work and provision a dedicated billed pilot project before real user traffic
+- the repo now includes `supabase/config.toml` plus `npm run supabase`, `npm run db:push`, and `npm run db:migrations`, so the local CLI path is configured; however, remote migration listing and push will still fail until the hosted project is explicitly linked with operator credentials
 - local PostHog provisioning is now present through `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`, and `NEXT_PUBLIC_ENABLE_ANALYTICS`; confirm Vercel parity and keep the sink runtime-only until the real PostHog adapter exists
 - local `RESEND_API_KEY` is now present, but sender/domain setup and `ENABLE_RESEND_EMAILS` remain off, so Resend-backed delivery is still externally blocked
 - the current repo still has no Resend mailer path; invitation flows return copy/share URLs today, so enabling `ENABLE_RESEND_EMAILS` alone will not send transactional email

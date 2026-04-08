@@ -8,6 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "supabase": "supabase",
+    "db:push": "supabase db push",
+    "db:migrations": "supabase migration list",
     "sync:prompt-registry": "node scripts/sync-prompt-registry.mjs",
     "verify:prompt-registry": "node scripts/sync-prompt-registry.mjs --check",
     "seed:rls-fixtures": "node --env-file=.env.local scripts/seed-rls-fixtures.mjs",
@@ -40,6 +43,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "playwright": "^1.58.2",
+    "supabase": "^2.88.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
