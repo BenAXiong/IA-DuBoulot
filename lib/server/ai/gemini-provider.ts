@@ -208,6 +208,7 @@ function toProviderError(cause: unknown) {
     message: failure.appErrorMessage,
     status: failure.appErrorStatus,
     retryable: true,
+    details: failure.logDetails,
     cause,
   });
 }
@@ -580,6 +581,7 @@ export class GeminiAiProvider implements AiProvider {
 
     return {
       replyText,
+      rawOutputText: response.responseText,
       coachingMode:
         input.replyMode === "interactive"
           ? "attempt_probe"

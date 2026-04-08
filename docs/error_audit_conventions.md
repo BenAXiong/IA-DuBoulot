@@ -20,6 +20,7 @@ The goal is to keep behavior predictable and avoid hidden ad hoc logging logic a
 - Sensitive product actions should create `audit_logs` rows.
 - `audit_logs` are not a generic debug sink.
 - Content safety outcomes belong in `moderation_events`, not `audit_logs`.
+- Successful raw AI outputs belong only in the dedicated `ai_generation_debug_captures` table when explicit debug capture is enabled for that path, not in `audit_logs`.
 - Large payloads, raw attachment text, and full chat bodies should stay out of logs unless there is a tightly scoped operational reason.
 
 ## Response Envelope

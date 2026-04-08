@@ -4,6 +4,7 @@ import {
   getStudentConversationServerCopy,
   getStudentDraftCoachCopy,
 } from "@/lib/i18n/student-flow-copy";
+import { recordSuccessfulCoachReplyDebugCaptureBestEffort } from "@/lib/server/ai/debug-capture-service";
 import { AppError, isAppError } from "@/lib/server/errors/app-error";
 import { logRuntimeError, logRuntimeInfo } from "@/lib/server/audit/runtime-logger";
 import { recordAuditEvent } from "@/lib/server/audit/audit-service";
@@ -25,6 +26,7 @@ import {
 import type {
   AiUsageSnapshot,
   ConversationAttachmentRecord,
+  GenerateCoachReplyResult,
 } from "@/lib/server/ai/types";
 import { getAiProvider } from "@/lib/server/ai/provider";
 import { refreshStudentMemoryFromConversationCompletion } from "@/lib/server/memory/service";
@@ -94,6 +96,45 @@ function buildModerationSafeReply(languageCode: UiLanguageCode) {
 
 function buildMaskedStudentMessage(languageCode: UiLanguageCode) {
   return getStudentConversationServerCopy(languageCode).appendMessage.maskedStudentMessage;
+}
+
+function extractFreeTierLimitCode(error: AppError | null) {
+  if (!error || error.code !== "rate_limited") {
+    return null;
+  }
+
+  const details = error.details ?? {};
+  const providerBodyMessage =
+    typeof details.provider_body_message === "string"
+      ? details.provider_body_message
+      : "";
+  const providerErrorMessage =
+    typeof details.provider_error_message === "string"
+      ? details.provider_error_message
+      : "";
+  const providerDetails =
+    typeof details.provider_details === "string" ? details.provider_details : "";
+  const providerStatus =
+    typeof details.provider_status === "string" ? details.provider_status : "";
+  const providerText = [
+    providerStatus,
+    providerBodyMessage,
+    providerErrorMessage,
+    providerDetails,
+  ]
+    .join(" ")
+    .trim();
+
+  if (
+    /GenerateRequestsPerDayPerProjectPerModel-FreeTier|generate_content_free_tier_requests/i.test(
+      providerText,
+    ) &&
+    /\b20\b/.test(providerText)
+  ) {
+    return "rpd_20_free_tier_limit";
+  }
+
+  return null;
 }
 
 function requireBodyObject(
@@ -979,6 +1020,7 @@ export async function appendConversationTurn(input: {
       : studentMessageText;
   let assistantMessageText = buildModerationSafeReply(appUser.ai_help_language);
   let providerUsage: AiUsageSnapshot | null = null;
+  let successfulAiReply: GenerateCoachReplyResult | null = null;
 
   if (inputModeration.status !== "blocked") {
     try {
@@ -1000,6 +1042,7 @@ export async function appendConversationTurn(input: {
           studentUserId: appUser.id,
         },
       });
+      successfulAiReply = aiReply;
       providerUsage = aiReply.usage;
       const outputModeration = moderateAssistantOutput(aiReply.replyText);
 
@@ -1025,8 +1068,10 @@ export async function appendConversationTurn(input: {
           ? buildModerationSafeReply(appUser.ai_help_language)
           : aiReply.replyText;
     } catch (error) {
-      assistantMessageText = copy.appendMessage.providerFallback;
       const fallbackError = isAppError(error) ? error : null;
+      assistantMessageText =
+        extractFreeTierLimitCode(fallbackError) ??
+        copy.appendMessage.providerFallback;
 
       logRuntimeInfo({
         message: "Fell back to learner-facing provider retry reply",
@@ -1041,6 +1086,7 @@ export async function appendConversationTurn(input: {
           intent: input.payload.intent,
           error_code: fallbackError?.code ?? null,
           error_status: fallbackError?.status ?? null,
+          fallback_message: assistantMessageText,
           reason:
             error instanceof Error
               ? error.message
@@ -1132,6 +1178,26 @@ export async function appendConversationTurn(input: {
     studentUserId: appUser.id,
     usage: providerUsage,
   });
+
+  if (successfulAiReply) {
+    await recordSuccessfulCoachReplyDebugCaptureBestEffort({
+      requestId: input.requestId,
+      route: input.route,
+      conversationId: input.conversationId,
+      studentUserId: appUser.id,
+      studentMessageId: studentMessage.id,
+      assistantMessageId: assistantMessage.id,
+      provider: aiProvider.name,
+      modelName: successfulAiReply.generatedModelName,
+      promptVersion: successfulAiReply.promptVersion,
+      replyMode: input.payload.replyMode,
+      rawOutputText: successfulAiReply.rawOutputText,
+      finalOutputText: assistantMessageText,
+      coachingMode: successfulAiReply.coachingMode,
+      asksForAttempt: successfulAiReply.asksForAttempt,
+      usage: successfulAiReply.usage,
+    });
+  }
 
   return {
     studentMessage,

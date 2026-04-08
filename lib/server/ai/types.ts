@@ -64,6 +64,7 @@ export type GenerateCoachReplyInput = {
 
 export type GenerateCoachReplyResult = {
   replyText: string;
+  rawOutputText: string;
   coachingMode:
     | "attempt_probe"
     | "hint_scaffold"

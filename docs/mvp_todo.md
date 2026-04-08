@@ -390,8 +390,9 @@ Status note: the latest isolated `npm run smoke:student-flow` rerun on 2026-04-0
 - [x] A7.3.3 Review storage and upload limits against trial economics.
 - [x] A7.3.4 Publish a consolidated AI ops and economics note covering quota windows, prompt pipeline, guardrails, per-activity usage estimates, and the paid-vs-trial policy for parent-facing AI value.
 
-Status note: the current Gemini-backed path now enforces bounded prompt context and output-token caps, reuses existing upload-extraction and completion artifacts instead of repeating provider calls, keeps the current upload byte limits after an explicit review against the 30-day trial quotas, and now has a consolidated operating note in `docs/ai_ops_economics_v1.md`.
-Status note: `docs/ai_ops_economics_v1.md` now also records Gemini project-level rate windows, free-tier development limits, the need for a dedicated billed pilot project, and the recommended dev-only mitigation path around project split, mock AI mode, batch work, and caching boundaries.
+  Status note: the current Gemini-backed path now enforces bounded prompt context and output-token caps, reuses existing upload-extraction and completion artifacts instead of repeating provider calls, keeps the current upload byte limits after an explicit review against the 30-day trial quotas, and now has a consolidated operating note in `docs/ai_ops_economics_v1.md`.
+  Status note: `docs/ai_ops_economics_v1.md` now also records Gemini project-level rate windows, free-tier development limits, the need for a dedicated billed pilot project, and the recommended dev-only mitigation path around project split, mock AI mode, batch work, and caching boundaries.
+  Status note: the live coach path now records successful raw provider text in the dedicated server-owned `public.ai_generation_debug_captures` table for operator debugging, while learner-facing fallback handling distinguishes true free-tier daily exhaustion from generic provider failure by showing a terse machine-style error code only for the hard free-tier limit case.
 
 ### A7.4 Launch Candidate
 

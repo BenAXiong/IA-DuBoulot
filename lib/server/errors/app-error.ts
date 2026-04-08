@@ -13,12 +13,14 @@ export type AppErrorCode =
   | "internal_error";
 
 export type AppErrorFieldErrors = Record<string, string>;
+export type AppErrorDetails = Record<string, unknown>;
 
 export class AppError extends Error {
   code: AppErrorCode;
   status: number;
   retryable: boolean;
   fieldErrors?: AppErrorFieldErrors;
+  details?: AppErrorDetails;
 
   constructor(options: {
     code: AppErrorCode;
@@ -26,6 +28,7 @@ export class AppError extends Error {
     status: number;
     retryable?: boolean;
     fieldErrors?: AppErrorFieldErrors;
+    details?: AppErrorDetails;
     cause?: unknown;
   }) {
     super(options.message, options.cause ? { cause: options.cause } : undefined);
@@ -34,6 +37,7 @@ export class AppError extends Error {
     this.status = options.status;
     this.retryable = options.retryable ?? false;
     this.fieldErrors = options.fieldErrors;
+    this.details = options.details;
   }
 }
 

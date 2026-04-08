@@ -107,6 +107,31 @@ Activity mapping:
 | student message -> coach reply | `assistantMessages +1` plus provider tokens | yes | deterministic coach fallback keeps the flow alive |
 | complete conversation | provider tokens for summaries, translations, and memory when those calls succeed | yes | repeated completion now reuses the existing student summary |
 
+## Usage Snapshot Shape
+
+The canonical per-call usage snapshot currently contains:
+
+- `inputTokens`
+- `outputTokens`
+- `totalTokens`
+- `estimatedCostUsd`
+
+This snapshot is intentionally small. It is used for quota accounting, rough cost estimation, and runtime diagnostics, not as a full provider transcript.
+
+## Successful Coach Output Debug Capture
+
+The learner-facing coach path now has one dedicated debug sink for successful replies:
+
+- table: `public.ai_generation_debug_captures`
+- scope: successful `coach_reply` generations only
+- stored fields: conversation and message references, request metadata, provider/model, prompt version, reply mode, raw successful provider text, final learner-visible text, usage snapshot, and lightweight coach metadata
+
+Current access model:
+
+- this is a server-owned debug table, not a browser feature
+- it exists so operators can inspect successful raw coach outputs without polluting `audit_logs`
+- it should be queried directly in Supabase or through later operator tooling, typically by `conversation_id` and `created_at`
+
 ## Prompt Pipeline
 
 ### Student Coach
