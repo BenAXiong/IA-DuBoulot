@@ -145,47 +145,6 @@ Best acceptable `v0`:
 5. hide or neutralize non-student surfaces
 6. only then, optional subject-library or Maps work
 
-## Paid Gemini Production Switch Workflow
-
-This is operationally straightforward because the app is already wired to Gemini only. The switch is mostly a provider-project and environment update, not a code rewrite.
-
-### Goal
-
-Move production traffic off the current free or unstable Gemini project and onto a dedicated billed Gemini project for the demo.
-
-### Steps
-
-1. Create or choose a dedicated Google project for the demo or pilot traffic.
-2. Enable billing on that Google project.
-3. In Google AI Studio, create a fresh Gemini API key for that billed project.
-4. Keep the local development Gemini project separate so local iteration does not share demo quota or billing.
-5. Update the Vercel production `GEMINI_API_KEY` to the new billed-project key.
-6. Redeploy production so the new key is active on the live app.
-7. Run a real deployed student smoke:
-   - sign in
-   - create or select a subject
-   - send a first prompt
-   - upload or paste an image
-   - confirm the OCR or extraction step works
-   - complete the homework
-8. Check Vercel runtime logs and Gemini usage for that billed project to confirm traffic is landing where expected.
-
-### What Does Not Need To Change
-
-- no provider abstraction rewrite
-- no route-contract rewrite
-- no prompt rewrite just to enable paid Gemini
-- no learner-plan logic change unless you intentionally want the demo account to look paid
-
-### Repo-Specific Notes
-
-- `GEMINI_API_KEY` is already the single server env the app uses for live Gemini traffic
-- Gemini limits matter per Google project, not per end-user account and not really as a product-plan definition
-- the right mental model is:
-  - local dev Gemini project
-  - billed demo or pilot Gemini project for production
-  - product quotas kept separate from provider-project limits
-
 ## Demo Readiness Question
 
 The build is ready for Nath only when this sentence is true:
