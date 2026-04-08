@@ -64,12 +64,25 @@ That means:
 - check portrait and landscape layouts
 - check keyboard-open behavior around the pinned composer
 
-### 4. Demo Narrative Tightening
+### 4. Student UI Polish For The Demo
+
+- polish the recent-homework-chat list so it looks credible, readable, and tap-friendly on iPad
+- keep the default avatar system playful enough for a learner demo if real avatar upload is still deferred
+- remove any remaining visual rough edges in the student shell that still read like a prototype rather than a product
+
+### 5. Demo Narrative Tightening
 
 - no developer wording
 - no internal fallback-looking phrasing
 - no confusing multi-role affordances
 - no dead-end navigation around homework start or completion
+
+### 6. Demo Commercial Posture
+
+- decide whether the demo should expose a visible free plan at all
+- decide whether the student demo account should simply run on paid access for the walkthrough
+- if the free plan remains visible, make sure the quota wording is intentional and not coupled to current Gemini free-project limits
+- enable the paid Gemini-backed production path before the walkthrough so live replies and extraction are not sitting on free-project risk
 
 ## Strongly Recommended
 
@@ -131,6 +144,47 @@ Best acceptable `v0`:
 4. completion-summary polish
 5. hide or neutralize non-student surfaces
 6. only then, optional subject-library or Maps work
+
+## Paid Gemini Production Switch Workflow
+
+This is operationally straightforward because the app is already wired to Gemini only. The switch is mostly a provider-project and environment update, not a code rewrite.
+
+### Goal
+
+Move production traffic off the current free or unstable Gemini project and onto a dedicated billed Gemini project for the demo.
+
+### Steps
+
+1. Create or choose a dedicated Google project for the demo or pilot traffic.
+2. Enable billing on that Google project.
+3. In Google AI Studio, create a fresh Gemini API key for that billed project.
+4. Keep the local development Gemini project separate so local iteration does not share demo quota or billing.
+5. Update the Vercel production `GEMINI_API_KEY` to the new billed-project key.
+6. Redeploy production so the new key is active on the live app.
+7. Run a real deployed student smoke:
+   - sign in
+   - create or select a subject
+   - send a first prompt
+   - upload or paste an image
+   - confirm the OCR or extraction step works
+   - complete the homework
+8. Check Vercel runtime logs and Gemini usage for that billed project to confirm traffic is landing where expected.
+
+### What Does Not Need To Change
+
+- no provider abstraction rewrite
+- no route-contract rewrite
+- no prompt rewrite just to enable paid Gemini
+- no learner-plan logic change unless you intentionally want the demo account to look paid
+
+### Repo-Specific Notes
+
+- `GEMINI_API_KEY` is already the single server env the app uses for live Gemini traffic
+- Gemini limits matter per Google project, not per end-user account and not really as a product-plan definition
+- the right mental model is:
+  - local dev Gemini project
+  - billed demo or pilot Gemini project for production
+  - product quotas kept separate from provider-project limits
 
 ## Demo Readiness Question
 
