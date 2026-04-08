@@ -18,6 +18,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [RLS fixture verification](docs/rls_fixture_verification.md)
 - [Smoke checklist V1](docs/smoke_checklist_v1.md)
 - [Founder walkthrough V1](docs/founder_walkthrough_v1.md)
+- [Demo Nath_0410](docs/demo_Nath_0410.md)
 - [Launch checklist V1](docs/launch_checklist_v1.md)
 - [Pilot_todo](docs/pilot_todo.md)
 - [Sample attachment corpus](docs/sample_attachment_corpus.md)
