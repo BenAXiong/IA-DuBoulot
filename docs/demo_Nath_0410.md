@@ -52,6 +52,7 @@ That means:
 - verify student sign-in and any required onboarding fields
 - verify subject creation from the homework home
 - verify first message sends immediately and receives a real reply
+- improve apparent responsiveness when the first prompt is submitted so the learner feels the chat has started immediately
 - verify file upload and pasted-image behavior
 - verify the right rail behaves acceptably on a real student chat
 - verify `Homework done!` produces the short learner-facing recap expected for the demo
