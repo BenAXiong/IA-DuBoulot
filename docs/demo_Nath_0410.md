@@ -53,6 +53,7 @@ That means:
 - verify subject creation from the homework home
 - verify first message sends immediately and receives a real reply
 - improve apparent responsiveness when the first prompt is submitted so the learner feels the chat has started immediately
+- show upload pills immediately when the chat initializes from the first prompt handoff
 - verify file upload and pasted-image behavior
 - verify the right rail behaves acceptably on a real student chat
 - verify `Homework done!` produces the short learner-facing recap expected for the demo
@@ -71,6 +72,7 @@ That means:
 
 - polish the recent-homework-chat list so it looks credible, readable, and tap-friendly on iPad
 - keep the default avatar system playful enough for a learner demo if real avatar upload is still deferred
+- localize the subject toggles so subject creation and switching do not expose mixed-language labels in the demo
 - remove any remaining visual rough edges in the student shell that still read like a prototype rather than a product
 
 ### 5. Demo Narrative Tightening
@@ -121,6 +123,14 @@ Consider a small optional section in banban's answers that gives concise prompti
 - the learner is pushing for the direct answer too early
 - the uploaded pictures are too unclear
 - the learner should say what they already tried before asking for help
+
+### French-Expression Focus
+
+If time allows within the student-only demo slice:
+
+- start keeping a lightweight log of learner French expression issues across syntax, grammar, and vocabulary
+- make that log usable later in the side rail and in asynchronous polishing or drilling flows
+- keep the demo-facing version concise enough not to distract from the main homework chat
 
 ## If Time Allows
 
