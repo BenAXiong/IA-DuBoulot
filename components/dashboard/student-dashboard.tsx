@@ -265,17 +265,9 @@ export async function StudentDashboard({
             />
 
             <section className="grid gap-4">
-              <div className="flex items-center justify-between gap-3">
-                <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
-                  {copy.recentTitle}
-                </h2>
-                <Link
-                  className="text-sm font-medium text-[color:var(--accent)]"
-                  href={`/app/history?subject=${encodeURIComponent(selectedGroup.subjectTag)}`}
-                >
-                  {copy.open}
-                </Link>
-              </div>
+              <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
+                {copy.recentTitle}
+              </h2>
 
               {selectedGroup.conversations.length === 0 ? (
                 <p className="text-sm leading-7 text-[color:var(--ink-soft)]">

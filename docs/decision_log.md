@@ -1197,3 +1197,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Keep learner-facing provider failures opaque, but distinguish them by path and class. Live chat now maps known hard rate-window failures to the existing terse rate codes, maps high-demand `503` style reply failures to `svc_u4m2`, and maps other reply-provider failures to `svc_p8n4`. Upload-analysis provider failures now surface `up_u4m2` for high-demand and `up_p8n4` for other provider failures, while normal extraction-quality warnings remain unchanged. Also, conversation-title summarization now retries on the first successful assistant reply even if one or more earlier assistant turns were only learner-facing provider fallback codes.
 - Why: This gives demo operators enough signal to distinguish the failing path quickly without leaking raw provider internals into the student UI, and it prevents a temporary first-turn provider failure from locking the conversation into a poor title for the rest of the session.
 - Follow-up: Once the paid Gemini production switch is complete and provider reliability is rechecked, decide whether these opaque codes should stay visible in the student product or move behind a quieter support/debug affordance.
+
+### D-20260409-119 - The Successful-Output Debug Table Is Live Remotely, But The Hosted Supabase Migration History Is Still Out Of Sync
+
+- Date: 2026-04-09
+- Status: accepted
+- Related tasks: `A7.3.4`
+- Context: The repo now has a linked Supabase project and a pending migration for `public.ai_generation_debug_captures`, but the hosted database already contained the older schema objects while the Supabase migration-history table still showed no applied remote versions. That made `supabase db push` unsafe because it attempted to replay the full historical migration stack and failed on already-existing enum types and tables.
+- Decision: Apply only `20260408_000004_ai_generation_debug_captures.sql` directly to the linked remote database through `supabase db query --linked -f ...`, verify that `public.ai_generation_debug_captures` now exists remotely, and explicitly document that the hosted migration history remains out of sync until a later repair step is performed. Do not silently mark historical versions as applied without a deliberate repair pass.
+- Why: This unblocks the new successful-output debug capture path for the demo-hardening work without widening the current slice into a risky migration-history repair exercise on the live database.
+- Follow-up: Run a deliberate Supabase migration-history reconciliation later so future `db:push` operations can safely apply hosted migrations again.

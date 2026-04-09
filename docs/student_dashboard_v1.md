@@ -118,7 +118,7 @@ Why:
 
 ## Known Boundaries
 
-- recent sessions on `/app` are intentionally short and subject-filtered; the canonical long-form list now lives at `/app/history`
+- recent sessions on `/app` are intentionally short and subject-filtered; the canonical long-form list now lives at `/app/history`, and the subject-view recent block no longer duplicates that route with a separate `Open` CTA
 - the student dashboard no longer foregrounds quota or adult-link cards on the home surface, but the same server-owned start-state gate still controls the homework launcher
 - billing remains a parent-owned workflow surfaced on `/app/settings`
 - under-13 blocking still depends on the existing parent-approval flow documented in [Invitation flows V1](invitation_flows_v1.md)

@@ -62,8 +62,10 @@ This matters because Supabase auth emails and OTP flows redirect to the configur
 4. Mirror the same values into Vercel environment variables.
 5. Keep the service-role or secret key server-only; never expose it in browser code.
 6. The repo now includes a local CLI path through `npm run supabase`; remote commands still require a one-time `supabase link --project-ref ...` with operator credentials.
-7. Run the next pending SQL migration:
-- [20260311_000003_account_link_invitations.sql](../supabase/migrations/20260311_000003_account_link_invitations.sql)
+7. The linked remote project currently has the schema objects from the older MVP migrations, but its Supabase migration-history table does not list those versions yet.
+8. Because of that mismatch, `npm run db:push` currently tries to replay the whole historical migration stack and fails on already-existing objects.
+9. The `20260408_000004_ai_generation_debug_captures.sql` migration has already been applied directly to the linked remote database through `supabase db query --linked -f ...`, and `public.ai_generation_debug_captures` now exists remotely.
+10. Before relying on normal `db:push` for future hosted migrations, repair or reconcile the remote migration history explicitly.
 
 ### Windows CLI Note
 
