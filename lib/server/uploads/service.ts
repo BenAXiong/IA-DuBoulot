@@ -129,6 +129,49 @@ function buildPartialExtractionWarningMessage(languageCode: UiLanguageCode) {
   return getStudentUploadServerCopy(languageCode).warnings.extractionPartial;
 }
 
+function buildUploadProviderFailureCode(
+  error: unknown,
+  languageCode: UiLanguageCode,
+) {
+  const copy = getStudentUploadServerCopy(languageCode);
+  const appError = error instanceof AppError ? error : null;
+  const details = appError?.details ?? {};
+  const providerStatus =
+    typeof details.provider_status === "string" ? details.provider_status : "";
+  const providerHttpStatus =
+    typeof details.provider_http_status === "number"
+      ? details.provider_http_status
+      : null;
+  const providerBodyMessage =
+    typeof details.provider_body_message === "string"
+      ? details.provider_body_message
+      : "";
+  const providerErrorMessage =
+    typeof details.provider_error_message === "string"
+      ? details.provider_error_message
+      : "";
+  const providerDetails =
+    typeof details.provider_details === "string" ? details.provider_details : "";
+  const providerText = [
+    providerStatus,
+    providerBodyMessage,
+    providerErrorMessage,
+    providerDetails,
+  ]
+    .join(" ")
+    .trim();
+
+  if (
+    providerHttpStatus === 503 ||
+    providerStatus === "UNAVAILABLE" ||
+    /high demand|temporar/i.test(providerText)
+  ) {
+    return copy.warnings.extractionProviderHighDemandCode;
+  }
+
+  return copy.warnings.extractionProviderGenericCode;
+}
+
 function buildStoredExtractionWarningMessage(
   attachment: ConversationAttachmentRecord,
   languageCode: UiLanguageCode,
@@ -659,7 +702,7 @@ async function runAttachmentExtraction(input: {
         studentUserId: input.appUserId,
       },
     });
-  } catch {
+  } catch (error) {
     const { data: failedAttachment, error: updateError } = await admin
       .from("attachments")
       .update({
@@ -684,7 +727,10 @@ async function runAttachmentExtraction(input: {
     return {
       attachment: failedAttachment as ConversationAttachmentRecord,
       extractedTextBlock: null,
-      warningMessage: buildExtractionWarningMessage(input.languageCode),
+      warningMessage: buildUploadProviderFailureCode(
+        error,
+        input.languageCode,
+      ),
     };
   }
 

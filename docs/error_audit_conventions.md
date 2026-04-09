@@ -88,6 +88,7 @@ Optional validation detail:
 - Use `409` for state conflicts, not validation failures.
 - Wrap upstream provider failures into `provider_error` or `service_unavailable`, never raw provider messages.
 - When a provider adapter can positively detect an upstream `429` or equivalent project-limit exhaustion signal, normalize it to `rate_limited` internally even if the learner-facing fallback copy stays generic.
+- Learner-facing fallback text may be replaced by opaque short codes when the product needs to distinguish provider failure classes without leaking raw upstream wording. Keep those codes stable enough for support triage, but avoid embedding public provider-limit details in them.
 
 ## Request IDs And Runtime Logs
 

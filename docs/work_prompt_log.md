@@ -151,3 +151,4 @@ then close it as:
 | 2026-04-08 | 17:33 -> 17:55 | 0h22 | A7.3.4 P1.3 P2.1 P5.3 | implement first-turn conversation title summarization, replace the launcher-side fake transcript with a direct handoff into the live conversation view, and document the Windows Supabase CLI path caveat so the hosted project can be linked cleanly later | | 
 | 2026-04-09 | 15:40 -> 15:41 | 0h01 | A0.3.7 | close the prior 2026-04-08 session at 17:55 and reopen a fresh execution trace for today before the next implementation slice | |
 | 2026-04-09 | 16:07 -> 16:12 | 0h05 | A7.3.4 P1.3 | inspect the latest deployed student prompt failure after the Supabase link confirmation and update the Nath demo brief with new student-demo polish tasks | |
+| 2026-04-09 | 16:19 -> 16:30 | 0h11 | A7.3.4 P1.3 | differentiate learner-facing transient provider failure messages, attempt the linked Supabase migration, and confirm plus harden title summarization after an initial failed first reply | |

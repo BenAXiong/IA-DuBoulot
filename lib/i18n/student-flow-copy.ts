@@ -1023,6 +1023,8 @@ export function getStudentConversationServerCopy(languageCode: UiLanguageCode) {
         maskedStudentMessage: "[message masqué par la modération]",
         providerFallback:
           "Je n'arrive pas à répondre correctement pour l'instant. Réessaie dans un instant, ou ajoute une photo ou un extrait du cours si cela peut aider.",
+        providerHighDemandCode: "svc_u4m2",
+        providerGenericCode: "svc_p8n4",
       },
       workspace: {
         sourceTextTooLong:
@@ -1072,6 +1074,8 @@ export function getStudentConversationServerCopy(languageCode: UiLanguageCode) {
         maskedStudentMessage: "[message hidden by moderation]",
         providerFallback:
           "I’m having trouble answering clearly right now. Try again in a moment, or add a photo or class excerpt if that would help.",
+        providerHighDemandCode: "svc_u4m2",
+        providerGenericCode: "svc_p8n4",
       },
       workspace: {
         sourceTextTooLong:
@@ -1115,6 +1119,8 @@ export function getStudentConversationServerCopy(languageCode: UiLanguageCode) {
         maskedStudentMessage: "[訊息已因審核而隱藏]",
         providerFallback:
           "我現在沒辦法好好回答這個問題。請稍後再試一次，或加入照片、課堂內容摘錄，這樣可能會更有幫助。",
+        providerHighDemandCode: "svc_u4m2",
+        providerGenericCode: "svc_p8n4",
       },
       workspace: {
         sourceTextTooLong: "作業題目與擷取文字都必須在 12000 個字元以內。",
@@ -1413,6 +1419,8 @@ export function getStudentUploadServerCopy(languageCode: UiLanguageCode) {
           "Le texte n'a pas pu être extrait proprement. Garde la pièce jointe et relis manuellement la zone utile.",
         extractionPartial:
           "Extraction partielle : relis le texte avant de t'appuyer dessus.",
+        extractionProviderHighDemandCode: "up_u4m2",
+        extractionProviderGenericCode: "up_p8n4",
         sourceLabel: (filename: string) => `[Source : ${filename}]`,
       },
     },
@@ -1452,6 +1460,8 @@ export function getStudentUploadServerCopy(languageCode: UiLanguageCode) {
           "The text could not be extracted cleanly. Keep the attachment and review the useful area manually.",
         extractionPartial:
           "Partial extraction: review the text before relying on it.",
+        extractionProviderHighDemandCode: "up_u4m2",
+        extractionProviderGenericCode: "up_p8n4",
         sourceLabel: (filename: string) => `[Source: ${filename}]`,
       },
     },
@@ -1485,6 +1495,8 @@ export function getStudentUploadServerCopy(languageCode: UiLanguageCode) {
           "系統無法乾淨地擷取文字。請保留附件，並手動重新檢查需要的區段。",
         extractionPartial:
           "擷取結果不完整：請先重新檢查文字，再依此內容繼續。",
+        extractionProviderHighDemandCode: "up_u4m2",
+        extractionProviderGenericCode: "up_p8n4",
         sourceLabel: (filename: string) => `[來源：${filename}]`,
       },
     },

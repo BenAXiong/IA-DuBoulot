@@ -150,6 +150,73 @@ function buildProviderLimitFallbackCode(error: AppError | null) {
   return "rpm_v3m8";
 }
 
+function buildProviderFailureFallbackCode(
+  error: AppError | null,
+  languageCode: UiLanguageCode,
+) {
+  const copy = getStudentConversationServerCopy(languageCode);
+
+  if (!error) {
+    return copy.appendMessage.providerGenericCode;
+  }
+
+  if (error.code === "rate_limited") {
+    return buildProviderLimitFallbackCode(error) ?? copy.appendMessage.providerGenericCode;
+  }
+
+  const details = error.details ?? {};
+  const providerStatus =
+    typeof details.provider_status === "string" ? details.provider_status : "";
+  const providerHttpStatus =
+    typeof details.provider_http_status === "number"
+      ? details.provider_http_status
+      : null;
+  const providerBodyMessage =
+    typeof details.provider_body_message === "string"
+      ? details.provider_body_message
+      : "";
+  const providerErrorMessage =
+    typeof details.provider_error_message === "string"
+      ? details.provider_error_message
+      : "";
+  const providerDetails =
+    typeof details.provider_details === "string" ? details.provider_details : "";
+  const providerText = [
+    providerStatus,
+    providerBodyMessage,
+    providerErrorMessage,
+    providerDetails,
+  ]
+    .join(" ")
+    .trim();
+
+  if (
+    providerHttpStatus === 503 ||
+    providerStatus === "UNAVAILABLE" ||
+    /high demand|temporar/i.test(providerText)
+  ) {
+    return copy.appendMessage.providerHighDemandCode;
+  }
+
+  return copy.appendMessage.providerGenericCode;
+}
+
+function isLearnerFacingProviderFallbackText(
+  value: string,
+  languageCode: UiLanguageCode,
+) {
+  const normalized = value.trim();
+  const copy = getStudentConversationServerCopy(languageCode);
+
+  return [
+    copy.appendMessage.providerFallback,
+    copy.appendMessage.providerGenericCode,
+    copy.appendMessage.providerHighDemandCode,
+    "rpd_f7k2",
+    "rpm_v3m8",
+  ].includes(normalized);
+}
+
 function requireBodyObject(
   body: unknown,
   languageCode: UiLanguageCode,
@@ -1036,6 +1103,14 @@ export async function appendConversationTurn(input: {
   let titleUsage: AiUsageSnapshot | null = null;
   let successfulAiReply: GenerateCoachReplyResult | null = null;
   let nextConversationTitle = conversation.title;
+  const hasSuccessfulAssistantReply = ((messages ?? []) as ConversationMessageRecord[]).some(
+    (message) =>
+      message.role === "assistant" &&
+      !isLearnerFacingProviderFallbackText(
+        message.content_text,
+        appUser.ai_help_language,
+      ),
+  );
 
   if (inputModeration.status !== "blocked") {
     try {
@@ -1085,7 +1160,7 @@ export async function appendConversationTurn(input: {
 
       if (
         input.payload.intent === "student_message" &&
-        (messages ?? []).length === 0 &&
+        !hasSuccessfulAssistantReply &&
         outputModeration.status !== "blocked"
       ) {
         try {
@@ -1118,8 +1193,10 @@ export async function appendConversationTurn(input: {
     } catch (error) {
       const fallbackError = isAppError(error) ? error : null;
       assistantMessageText =
-        buildProviderLimitFallbackCode(fallbackError) ??
-        copy.appendMessage.providerFallback;
+        buildProviderFailureFallbackCode(
+          fallbackError,
+          appUser.ai_help_language,
+        ) ?? copy.appendMessage.providerFallback;
 
       logRuntimeInfo({
         message: "Fell back to learner-facing provider retry reply",
