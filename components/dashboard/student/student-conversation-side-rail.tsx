@@ -11,8 +11,10 @@ type StudentConversationSideRailProps = {
   languageCode: UiLanguageCode;
   disabled?: boolean;
   isCompleting?: boolean;
+  retryingAttachmentId?: string | null;
   onComplete: () => void;
   onRemoveAttachment: (attachmentId: string) => void;
+  onRetryAttachment: (attachmentId: string) => void;
 };
 
 function CloseIcon() {
@@ -42,6 +44,20 @@ function ExpandIcon() {
   );
 }
 
+function RetryIcon() {
+  return (
+    <svg aria-hidden="true" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
+      <path
+        d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
 function isPreviewableAttachment(attachment: ConversationAttachmentRecord) {
   return (
     attachment.mime_type.startsWith("image/") ||
@@ -50,13 +66,29 @@ function isPreviewableAttachment(attachment: ConversationAttachmentRecord) {
   );
 }
 
+function isRetriableAttachmentFailure(attachment: ConversationAttachmentRecord) {
+  const metadata =
+    attachment.metadata &&
+    typeof attachment.metadata === "object" &&
+    !Array.isArray(attachment.metadata)
+      ? (attachment.metadata as Record<string, unknown>)
+      : null;
+
+  return (
+    attachment.extraction_status === "failed" &&
+    metadata?.extraction_error === "provider_failure"
+  );
+}
+
 export function StudentConversationSideRail({
   attachments,
   languageCode,
   disabled = false,
   isCompleting = false,
+  retryingAttachmentId = null,
   onComplete,
   onRemoveAttachment,
+  onRetryAttachment,
 }: StudentConversationSideRailProps) {
   const copy = getStudentWorkbenchCopy(languageCode);
   const [pendingAttachmentId, setPendingAttachmentId] = useState<string | null>(
@@ -173,7 +205,9 @@ export function StudentConversationSideRail({
                   <div className="flex flex-wrap gap-2">
                     {attachments.map((attachment) => {
                       const isPending = pendingAttachmentId === attachment.id;
+                      const isRetrying = retryingAttachmentId === attachment.id;
                       const isPreviewable = isPreviewableAttachment(attachment);
+                      const canRetry = isRetriableAttachmentFailure(attachment);
 
                       return (
                         <div
@@ -196,10 +230,25 @@ export function StudentConversationSideRail({
                               {attachment.original_filename}
                             </span>
                           )}
+                          {canRetry ? (
+                            <button
+                              aria-label={copy.retryAttachment}
+                              className="absolute right-7 inline-flex h-4 w-4 items-center justify-center rounded-full text-[color:var(--ink-soft)] opacity-0 transition hover:text-[color:var(--foreground)] group-hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
+                              disabled={disabled || isRetrying}
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                onRetryAttachment(attachment.id);
+                              }}
+                              title={copy.retryAttachment}
+                              type="button"
+                            >
+                              <RetryIcon />
+                            </button>
+                          ) : null}
                           <button
                             aria-label={copy.removeAttachment}
                             className="absolute right-2 inline-flex h-4 w-4 items-center justify-center rounded-full text-[color:var(--ink-soft)] opacity-0 transition hover:text-[#c95f44] group-hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
-                            disabled={disabled || isPending}
+                            disabled={disabled || isPending || isRetrying}
                             onClick={(event) => {
                               event.stopPropagation();
                               void handleRemoveAttachment(attachment.id);

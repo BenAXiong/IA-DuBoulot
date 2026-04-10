@@ -74,6 +74,22 @@ type CompleteRouteResponse =
       };
     };
 
+type ExtractionRouteResponse =
+  | {
+      ok: true;
+      data: {
+        attachment: ConversationDetail["attachments"][number];
+        extractedTextBlock: string | null;
+        warningMessage: string | null;
+      };
+    }
+  | {
+      ok?: false;
+      error?: {
+        message?: string;
+      };
+    };
+
 function buildInitialWorkspace(detail: ConversationDetail): WorkspaceDraftState {
   return {
     assignmentText:
@@ -113,6 +129,9 @@ export function StudentConversationWorkbench({
   const [isResizingRail, setIsResizingRail] = useState(false);
   const [showJumpToLatest, setShowJumpToLatest] = useState(false);
   const [replyMode, setReplyMode] = useState<StudentReplyMode>("thinking");
+  const [retryingAttachmentId, setRetryingAttachmentId] = useState<string | null>(
+    null,
+  );
   const [pendingStudentMessage, setPendingStudentMessage] =
     useState<ConversationMessageRecord | null>(null);
   const [pendingAssistantMessage, setPendingAssistantMessage] =
@@ -120,6 +139,7 @@ export function StudentConversationWorkbench({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const workspaceRef = useRef(workspace);
   const bootstrapStartedRef = useRef(false);
+  const autoRetriedAttachmentIdsRef = useRef<Set<string>>(new Set());
   const isReadOnly = conversation.status !== "active";
   const displayMessages = [
     ...messages,
@@ -130,6 +150,62 @@ export function StudentConversationWorkbench({
   useEffect(() => {
     workspaceRef.current = workspace;
   }, [workspace]);
+
+  function isRetriableAttachmentFailure(
+    attachment: ConversationDetail["attachments"][number],
+  ) {
+    const metadata =
+      attachment.metadata &&
+      typeof attachment.metadata === "object" &&
+      !Array.isArray(attachment.metadata)
+        ? (attachment.metadata as Record<string, unknown>)
+        : null;
+
+    return (
+      attachment.extraction_status === "failed" &&
+      metadata?.extraction_error === "provider_failure"
+    );
+  }
+
+  function mergeRetryResultIntoWorkspace(input: {
+    currentWorkspace: WorkspaceDraftState;
+    extractedTextBlock: string | null;
+    warningMessage: string | null;
+    attachment: ConversationDetail["attachments"][number];
+  }) {
+    let nextWorkspace = input.currentWorkspace;
+
+    if (
+      input.attachment.extraction_status === "ready" &&
+      input.extractedTextBlock &&
+      !input.currentWorkspace.editedExtractedText.includes(input.extractedTextBlock)
+    ) {
+      nextWorkspace = {
+        ...nextWorkspace,
+        editedExtractedText: [
+          nextWorkspace.editedExtractedText.trim(),
+          input.extractedTextBlock,
+        ]
+          .filter(Boolean)
+          .join("\n\n"),
+      };
+    }
+
+    if (
+      input.attachment.extraction_status === "ready" &&
+      input.warningMessage &&
+      !input.currentWorkspace.studentNotes.includes(input.warningMessage)
+    ) {
+      nextWorkspace = {
+        ...nextWorkspace,
+        studentNotes: [nextWorkspace.studentNotes.trim(), input.warningMessage]
+          .filter(Boolean)
+          .join("\n"),
+      };
+    }
+
+    return nextWorkspace;
+  }
 
   useEffect(() => {
     if (!isResizingRail) {
@@ -550,6 +626,98 @@ export function StudentConversationWorkbench({
     });
   }
 
+  async function retryAttachmentExtraction(
+    attachmentId: string,
+    options?: { silent?: boolean },
+  ) {
+    setWorkspaceError(null);
+    setRetryingAttachmentId(attachmentId);
+
+    try {
+      const response = await fetch("/api/uploads/extract", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          conversationId: conversation.id,
+          attachmentId,
+        }),
+      });
+
+      const payload = (await response.json().catch(() => null)) as
+        | ExtractionRouteResponse
+        | null;
+      const routeErrorMessage =
+        payload && "error" in payload ? payload.error?.message : null;
+
+      if (!response.ok || !payload?.ok || !payload.data?.attachment) {
+        if (!options?.silent) {
+          setWorkspaceError(routeErrorMessage ?? copy.errors.retryExtraction);
+        }
+        return;
+      }
+
+      setAttachments((currentAttachments) =>
+        currentAttachments.map((attachment) =>
+          attachment.id === attachmentId ? payload.data.attachment : attachment,
+        ),
+      );
+
+      const currentWorkspace = workspaceRef.current;
+      const nextWorkspace = mergeRetryResultIntoWorkspace({
+        currentWorkspace,
+        attachment: payload.data.attachment,
+        extractedTextBlock: payload.data.extractedTextBlock,
+        warningMessage: payload.data.warningMessage,
+      });
+
+      if (nextWorkspace !== currentWorkspace) {
+        try {
+          await persistWorkspace(nextWorkspace);
+        } catch (error) {
+          if (!options?.silent) {
+            const message =
+              error instanceof Error ? error.message : copy.errors.retryExtraction;
+            setWorkspaceError(message);
+          }
+          return;
+        }
+      }
+
+      if (!options?.silent && payload.data.attachment.extraction_status === "ready") {
+        setWorkspaceError(copy.errors.extractionRetried);
+      }
+    } finally {
+      setRetryingAttachmentId((current) =>
+        current === attachmentId ? null : current,
+      );
+    }
+  }
+
+  const runSilentAttachmentRetry = useEffectEvent((attachmentId: string) => {
+    void retryAttachmentExtraction(attachmentId, { silent: true });
+  });
+
+  useEffect(() => {
+    if (isUploading || isReadOnly || retryingAttachmentId) {
+      return;
+    }
+
+    const pendingRetry = attachments.find(
+      (attachment) =>
+        isRetriableAttachmentFailure(attachment) &&
+        !autoRetriedAttachmentIdsRef.current.has(attachment.id),
+    );
+
+    if (!pendingRetry) {
+      return;
+    }
+
+    autoRetriedAttachmentIdsRef.current.add(pendingRetry.id);
+    runSilentAttachmentRetry(pendingRetry.id);
+  }, [attachments, isUploading, isReadOnly, retryingAttachmentId]);
+
   return (
     <div className="grid gap-4">
       <input
@@ -688,6 +856,10 @@ export function StudentConversationWorkbench({
               languageCode={languageCode}
               onComplete={completeSession}
               onRemoveAttachment={removeAttachment}
+              onRetryAttachment={(attachmentId) => {
+                void retryAttachmentExtraction(attachmentId);
+              }}
+              retryingAttachmentId={retryingAttachmentId}
             />
           </div>
         </aside>

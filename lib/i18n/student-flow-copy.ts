@@ -843,6 +843,7 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
         "Cette session est terminée. Le transcript reste lisible, mais les nouvelles écritures passent maintenant par une nouvelle session.",
       noFilesUploaded: "Aucun fichier uploadé",
       removeAttachment: "Retirer",
+      retryAttachment: "Relancer l'analyse",
       removeAttachmentConfirm:
         "Retirer ce fichier de cette discussion ?",
         copyMessage: "Copier",
@@ -901,6 +902,7 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
         "This session is completed. The transcript stays readable, but new writing now belongs in a new session.",
       noFilesUploaded: "No files uploaded",
       removeAttachment: "Remove",
+      retryAttachment: "Retry analysis",
       removeAttachmentConfirm:
         "Remove this file from this conversation?",
         copyMessage: "Copy",
@@ -955,6 +957,7 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
         "這個課程已完成。對話紀錄仍可閱讀，但新的書寫內容需要放到新的課程中。",
       noFilesUploaded: "尚未上傳檔案",
       removeAttachment: "移除",
+      retryAttachment: "重新分析",
       removeAttachmentConfirm:
         "要把這個檔案從這段對話中移除嗎？",
         copyMessage: "複製",

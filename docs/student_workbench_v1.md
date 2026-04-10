@@ -47,7 +47,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 6. sends message turns through the Gemini-backed coach flow plus moderation checks before persisting assistant output, now falls back to a learner-facing retry reply if the provider call fails instead of leaking the older internal draft-coach text, and on the first successful learner turn now also asks Gemini for a shorter conversation title
 7. still keeps the persisted workspace fields and save route under the hood, but no longer foregrounds the old workspace panel in the learner UI
 8. uploads attachments through signed upload targets, confirms them, keeps the current file list in a minimal right-side rail, and now accepts pasted clipboard images in both the homework quick-start and the live conversation composer
-9. lets the student remove an uploaded file directly from that rail, with a confirmation step before the server-owned delete, and now opens uploaded images directly inside the right rail first
+9. lets the student remove an uploaded file directly from that rail, with a confirmation step before the server-owned delete, now opens uploaded images directly inside the right rail first, and now also retries provider-failed attachment extraction once automatically when the conversation opens
 10. keeps the right rail pinned under the student header as a true split pane instead of letting it stretch alongside the full transcript length, and now lets desktop users resize that rail manually
 11. adds hover copy controls under each learner-visible turn, keeps those controls aligned to the message body rather than the avatar column, and now shows a lightweight copied toast when a turn is copied
 12. renders assistant turns through a markdown-plus-math path, so simple LaTeX like `$v = d/t$` can display as formatted math instead of raw markup
@@ -63,6 +63,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 - message appends stay server-owned through `POST /api/conversations/[conversationId]/messages`
 - workspace saves stay server-owned through `PATCH /api/conversations/[conversationId]/workspace`
 - attachment upload/confirm/extract stays server-owned through `/api/uploads/...`, private attachment access stays behind `/api/attachments/[attachmentId]/access`, and attachment removal now stays server-owned through `DELETE /api/attachments/[attachmentId]`
+- provider-failed attachment extraction can now be retried through `POST /api/uploads/extract`; the workbench uses that same server-owned path both for its automatic one-time recovery attempt and the manual retry affordance on a failed file pill
 - image preview in the right rail reuses the same server-owned private attachment access route, so learner-visible previews still stay behind the signed attachment boundary, and the larger overlay view is now a secondary hover-triggered expansion path instead of the default click behavior
 - only the student owner or an admin can mutate the conversation state
 - moderation outcomes are recorded before blocked or flagged content leaves the server boundary
@@ -80,6 +81,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 - this redesign still keeps explicit completion as the current backend contract; it does not yet auto-generate summaries on an implicit chat-close event
 - the workbench still uses the persisted workspace fields under the hood, even though the learner no longer sees that workspace as a full separate product surface
 - attachment removal currently deletes the file record plus private storage object, but it does not yet scrub extracted text that may already have been copied into the hidden workspace
+- only provider-failure extraction states auto-retry; attachments that failed because no safe or usable text was found still stay manual so the app does not mask a genuinely unreadable source behind endless retries
 - image preview can still feel slower than a public image gallery because the rail currently fetches the original private file through the authenticated attachment-access route plus signed redirect; there is no dedicated thumbnail generation layer yet
 - the first-turn bootstrap payload is currently in-memory only; if the learner hard-refreshes immediately after the route change and before the first send finishes, the shell conversation still exists but the optimistic bootstrap payload is gone and the student would need to resend manually
 
