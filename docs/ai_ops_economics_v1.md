@@ -363,3 +363,10 @@ For MVP, the safest rule is:
 
 - finish the web MVP with the current student-first AI contract
 - monetize any new adult-triggered AI surfaces instead of widening the unpaid path first
+
+## Current Attachment-Extraction Reliability Note
+
+- Gemini `2.5 Flash` itself can parse clear JPG worksheet images in the current stack; direct operator verification against the same uploaded worksheet image produced a faithful extraction with high confidence.
+- The current reliability risk is broader provider availability, not a hard `JPG unsupported` limit. In production, attachment extraction can still fail when Gemini returns temporary `429` or `503` class errors.
+- The structured extraction path now retries temporary provider-limit and high-demand failures instead of failing immediately on the first one.
+- Learner-facing coaching must not automatically interpret missing extracted text as proof that the photo was blurry. If no reliable extracted text is present, banban should describe the extraction result as unavailable or unreliable first, then optionally ask for a clearer image or a manual copy.

@@ -19,7 +19,7 @@ The markdown below is generated from `lib/server/ai/prompt-registry.json` plus t
 
 | Family | Version | Builder | Routes | Aim | Outcome |
 | --- | --- | --- | --- | --- | --- |
-| `student-coach` | `student-coach-v5` | `buildStudentCoachSystemPrompt` in `lib/server/ai/prompts/student-coach.ts` | POST /api/conversations/[conversationId]/messages | Generate the live banban coaching reply for learner messages, hints, and summary requests. | Returns a plain-text coaching reply for the learner; the server derives lightweight coaching metadata defaults around that reply. |
+| `student-coach` | `student-coach-v6` | `buildStudentCoachSystemPrompt` in `lib/server/ai/prompts/student-coach.ts` | POST /api/conversations/[conversationId]/messages | Generate the live banban coaching reply for learner messages, hints, and summary requests. | Returns a plain-text coaching reply for the learner; the server derives lightweight coaching metadata defaults around that reply. |
 | `conversation-title` | `conversation-title-v1` | `buildConversationTitlePrompt` in `lib/server/ai/prompts/conversation-title.ts` | POST /api/conversations/[conversationId]/messages (first successful learner turn only) | Shorten the first successful learner exchange into a compact conversation title that is easier to scan in history and subject views. | Returns a short plain-text title only; the service stores it best-effort on the conversation after the first assistant reply succeeds. |
 | `attachment-extraction` | `attachment-extraction-v1` | `buildAttachmentExtractionPrompt` in `lib/server/ai/prompts/attachment-extraction.ts` | POST /api/uploads/confirm | Extract readable homework text and basic metadata from uploaded images or PDFs. | Returns JSON with extractedText, detectedLanguage, confidenceScore, needsManualReview, pageCountEstimate, and sourceSummary. |
 | `student-summary` | `student-summary-v2` | `buildSummaryPrompt` in `lib/server/ai/prompts/summary-prompts.ts` | POST /api/conversations/[conversationId]/complete | Produce the learner-facing end-of-session summary and next-step recommendation. | Returns JSON with summaryText, weaknessTags, and nextStepRecommendation for the student audience. |
@@ -33,7 +33,7 @@ The markdown below is generated from `lib/server/ai/prompt-registry.json` plus t
 ### Student coach reply
 
 - Family ID: `student-coach`
-- Current version: `student-coach-v5`
+- Current version: `student-coach-v6`
 - Version constant: `STUDENT_COACH_PROMPT_VERSION`
 - Builder: `buildStudentCoachSystemPrompt` in `lib/server/ai/prompts/student-coach.ts`
 - Service method: `AiProvider.generateCoachReply`
