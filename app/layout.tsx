@@ -58,7 +58,7 @@ export default function RootLayout({
     <html lang="fr" suppressHydrationWarning>
       <body className={`${bodyFont.variable} ${headingFont.variable} antialiased`}>
         <ThemeScript />
-        <div className="pointer-events-none fixed bottom-2 right-3 z-[70] translate-y-[12px] select-none text-[0.68rem] font-medium tracking-[0.18em] text-[color:var(--ink-muted)] opacity-55">
+        <div className="pointer-events-none fixed bottom-2 right-3 z-[70] translate-y-[10px] select-none text-[0.68rem] font-medium tracking-[0.18em] text-[color:var(--ink-muted)] opacity-55">
           {commitLabel}
         </div>
         <Suspense fallback={null}>
