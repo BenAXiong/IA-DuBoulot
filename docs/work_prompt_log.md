@@ -165,3 +165,4 @@ then close it as:
 | 2026-04-10 | 14:32 -> 14:32 | 0h00 | A0.3.7 | close the earlier 2026-04-10 session at 12:22 and reopen a fresh execution trace for the next implementation slice | |
 | 2026-04-10 | 14:35 -> 14:50 | 0h15 | P1.3 P5.3 | remove the raw default conversation title from the live conversation area and keep the student shell header on the subject until title summarization can be surfaced safely instead of echoing the learner's first prompt | |
 | 2026-04-10 | 15:04 -> 15:09 | 0h05 | P1.3 P5.3 | remove the remaining conversation-top chrome from the live chat area and replace the provisional bootstrap title with a neutral per-subject Subject_xxx counter | |
+| 2026-04-10 | 15:18 -> 15:18 | 0h00 | P5.3 A7.3.4 | assess the effort to add an OpenAI provider alongside Gemini for testing and inspect the latest truncated learner reply to determine whether the issue is model-dependent or integration-related | |
