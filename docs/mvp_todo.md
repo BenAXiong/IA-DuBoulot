@@ -96,7 +96,7 @@ Outcome: the data model, access rules, and backend boundaries are explicit befor
 - [x] A1.1.4 Model audit logs, moderation events, and memory tables.
 - [x] A1.1.5 Review the schema against the role matrix and MVP scope boundaries.
 
-Reference: [Supabase schema V1](supabase_schema_v1.md) and [initial schema SQL](../supabase/migrations/20260310_000001_initial_schema.sql)
+Reference: [Supabase schema V1](supabase_schema_v1.md) and [initial schema SQL](../supabase/migrations/20260310000100_initial_schema.sql)
 Status note: the initial schema SQL has been applied successfully in the hosted Supabase project.
 
 ### A1.2 Access Control And RLS
@@ -106,7 +106,7 @@ Status note: the initial schema SQL has been applied successfully in the hosted 
 - [x] A1.2.3 Add server-side authorization checks for all sensitive routes.
 - [x] A1.2.4 Verify student, parent, tutor, and admin visibility with seeded test accounts.
 
-Reference: [Access rules V1](access_rules_v1.md) | [RLS migration draft](../supabase/migrations/20260310_000002_access_rules_and_rls.sql) | [RLS fixture verification](rls_fixture_verification.md)
+Reference: [Access rules V1](access_rules_v1.md) | [RLS migration draft](../supabase/migrations/20260310000200_access_rules_and_rls.sql) | [RLS fixture verification](rls_fixture_verification.md)
 Status note: the RLS migration SQL has been applied successfully in the hosted Supabase project.
 Status note: shared server authorization helpers now back the first authenticated routes in `app/api/auth/...`.
 Status note: deterministic hosted fixtures now verify the current hosted Supabase RLS behavior with `17` passing checks across student, parent, tutor, and admin roles.
@@ -233,7 +233,7 @@ Status note: on 2026-03-11 the workbench was checked in a Playwright emulated ta
 - [x] A3.5.3 Support marking a session complete and triggering summary generation.
 
 Reference: [Student history and summary V1](student_history_summary_v1.md)
-Status note: `/app/history` is now the canonical long-form student session list, while `/app` keeps only recent-session shortcuts.
+Status note: the old `/app/history` surface is now retired into a compatibility redirect, while `/app` keeps the active recent-session shortcuts.
 Status note: `/app/conversations/[conversationId]` now renders the persisted student summary and a completion card in the same detail surface as the transcript and workspace.
 Status note: the original `A3` exit state used a deterministic student summary, but the current local workspace has already moved into the `A4.5` multi-audience summary path described below.
 
@@ -409,7 +409,7 @@ Status note: PWA installability is now explicitly deferred before beta, the cano
 Status note: `A2.1.6` still marks the foundation slice only, but the shared public, auth, onboarding, invite, app-shell, app-home, and settings/privacy surfaces now read from `lib/i18n/ui-copy.ts`, preserve public-route `lang` state through `lib/i18n/ui-language.ts`, and localize the shared student age-band options.
 Status note: a small `components/i18n/document-language-sync.tsx` layer now updates `document.documentElement.lang` from the live UI language on the shared shells, even though `app/layout.tsx` still renders `lang=\"fr\"` at the initial server HTML level.
 Status note: the `/app` role dashboards now also localize their main copy through `lib/i18n/dashboard-copy.ts`, including the student start/support/recent panels, the student memory panel, the student-side adult-link forms, and the parent/tutor/admin dashboard summaries.
-Status note: the deeper student and adult route family now localizes its main interface copy through `lib/i18n/student-flow-copy.ts` and `lib/i18n/oversight-copy.ts`, covering the student homework launcher on `/app`, `/app/history`, `/app/conversations/[conversationId]`, `/app/students/[studentUserId]`, and `/app/review/[conversationId]`.
+Status note: the deeper student and adult route family now localizes its main interface copy through `lib/i18n/student-flow-copy.ts` and `lib/i18n/oversight-copy.ts`, covering the student homework launcher on `/app`, the compatibility redirect from `/app/history`, `/app/conversations/[conversationId]`, `/app/students/[studentUserId]`, and `/app/review/[conversationId]`.
 Status note: the admin audit list, deletion-request feedback, and the user-facing quota block messages for conversation creation, upload, and chat now also localize by UI language, while `app/layout.tsx` adds explicit CJK fallback for the shared font variables.
 Status note: the core student APIs now also localize their user-facing validation errors, upload warnings, deterministic coach fallback, initial transcript scaffolding, deterministic student-summary fallback, and visible weakness-tag labels through `lib/i18n/student-flow-copy.ts`.
 Status note: auth/profile bootstrap and update, invitation create and accept, tutor-note mutations, memory mutations, deterministic memory fallback copy, and the small parent billing-management conflict path now also localize their user-facing server messages through the focused copy modules.

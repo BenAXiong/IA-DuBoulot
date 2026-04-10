@@ -16,7 +16,7 @@ The goal is to keep invitation state explicit, auditable, and queryable instead 
 
 Migration:
 
-- [20260311_000003_account_link_invitations.sql](../supabase/migrations/20260311_000003_account_link_invitations.sql)
+- [20260311000300_account_link_invitations.sql](../supabase/migrations/20260311000300_account_link_invitations.sql)
 
 Table:
 

@@ -58,9 +58,9 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - Billing direction is `Lemon Squeezy`.
 - Primary starter AI direction is `Google Gemini`, with the provider layer kept swappable.
 - Next.js app scaffold is now present at repo root.
-- Initial Supabase schema migration has been applied to the hosted Supabase project from `supabase/migrations/20260310_000001_initial_schema.sql`.
-- Initial RLS policy migration has been applied to the hosted Supabase project from `supabase/migrations/20260310_000002_access_rules_and_rls.sql`.
-- Account-link invitation migration has been applied to the hosted Supabase project from `supabase/migrations/20260311_000003_account_link_invitations.sql`.
+- Initial Supabase schema migration has been applied to the hosted Supabase project from `supabase/migrations/20260310000100_initial_schema.sql`.
+- Initial RLS policy migration has been applied to the hosted Supabase project from `supabase/migrations/20260310000200_access_rules_and_rls.sql`.
+- Account-link invitation migration has been applied to the hosted Supabase project from `supabase/migrations/20260311000300_account_link_invitations.sql`.
 - Backend contract docs now define the API route surface, service boundaries, error/audit rules, and storage rules.
 - Supabase SSR auth helpers, `proxy.ts`, and the first authenticated API routes are now implemented in code.
 - Deterministic hosted fixture seed and verification scripts now exist for live RLS visibility checks across student, parent, tutor, and admin roles.
@@ -77,7 +77,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - `/app/new` now hosts the real intake surface for title, subject, staged files, pasted text, graded-homework state, and editable review text.
 - validating `/app/new` now persists a conversation draft and redirects into `/app/conversations/[conversationId]`.
 - `/app/conversations/[conversationId]` now hosts the real student workbench with a persisted transcript, saveable workspace, private attachment access, upload-triggered extraction, and provider-backed coaching replies.
-- `/app/history` now provides the canonical student session list, and the conversation detail page now supports completion plus provider-backed student, parent, and tutor summary generation.
+- the retired `/app/history` route now redirects back into the homework surface for compatibility, and the conversation detail page still supports completion plus provider-backed student, parent, and tutor summary generation.
 - the current local workspace now contains a build-clean and smoke-verified `A4` slice for Gemini-backed coaching, upload/extraction, moderation event logging, and multi-audience summaries, with deterministic fallbacks preserving the student flow when Gemini fails.
 - a fixture-backed local smoke script now exists at `scripts/smoke-student-flow.mjs` and passed on 2026-03-11 against the real `/app/new` -> upload -> workspace -> chat -> complete API flow.
 - parent, tutor, and admin oversight surfaces now exist at `/app`, `/app/students/[studentUserId]`, `/app/review/[conversationId]`, and `/app/audit`, backed by explicit oversight services, tutor-note routes, and adult session-view audit logging.

@@ -10,14 +10,13 @@ Describe the first student history and closure slice so future sessions can exte
 
 This document covers `A3.5.1` to `A3.5.3`:
 
-- full student history list at `/app/history`
+- summary-aware recent-session shortcuts on `/app`
 - summary-aware session detail on `/app/conversations/[conversationId]`
 - explicit session completion that persists a student summary
 
 ## Source Files
 
-- History page: `app/app/history/page.tsx`
-- History list UI: `components/dashboard/student/student-session-history-list.tsx`
+- Compatibility redirect: `app/app/history/page.tsx`
 - Conversation page: `app/app/conversations/[conversationId]/page.tsx`
 - Summary panel UI: `components/dashboard/student/student-session-summary-panel.tsx`
 - Student flow localization copy: `lib/i18n/student-flow-copy.ts`
@@ -30,13 +29,13 @@ This document covers `A3.5.1` to `A3.5.3`:
 
 ## Current Behavior
 
-The student flow now has three session surfaces:
+The student flow now has two active session surfaces plus one compatibility redirect:
 
 1. `/app` for recent-session shortcuts
-2. `/app/history` for the long-form history list
-3. `/app/conversations/[conversationId]` for the detailed transcript, workspace, and final summary
+2. `/app/conversations/[conversationId]` for the detailed transcript, workspace, and final summary
+3. `/app/history` only as a compatibility redirect back into the homework surface
 
-The history list plus the student completion or summary panel now also localize their route copy through `lib/i18n/student-flow-copy.ts`, while the persisted summary artifacts continue to come from the provider-backed summary pipeline.
+The student completion or summary panel now also localizes its route copy through `lib/i18n/student-flow-copy.ts`, while the persisted summary artifacts continue to come from the provider-backed summary pipeline.
 
 When the student marks a session complete, the app now:
 

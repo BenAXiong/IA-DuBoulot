@@ -59,7 +59,6 @@ Code:
 Current routes using it:
 
 - `/app`
-- `/app/history`
 - `/app/new` (compatibility redirect into `/app?view=homework`)
 - `/app/conversations/[conversationId]`
 - `/app/settings`
@@ -115,7 +114,6 @@ The authenticated shell now mixes stable sub-routes with a few local anchors:
 
 - student workflow routes:
   - `/app/new` compatibility redirect
-  - `/app/history`
   - `/app/conversations/[conversationId]`
   - `/app/settings`
 - adult oversight routes:
@@ -129,6 +127,7 @@ The authenticated shell now mixes stable sub-routes with a few local anchors:
 Why:
 
 - the student workflow, settings/privacy controls, and adult review flow now all have enough depth to deserve stable URLs
+- the retired `/app/history` route now only exists as a compatibility redirect back into the homework surface; the student shell no longer treats it as a first-class destination
 - the shell still avoids exploding into route sprawl for every small metric or summary card that can remain dashboard-local
 - `#account` remains relevant for the shared settings block used by non-parent roles, while parent account and billing controls now live inside the parent dashboard rail instead of a separate bottom section on `/app`
 - the student shell now treats subjects as filter views over existing `subject_tag` values and sends learner-owned support settings to `/app/settings`, so the main `/app` page can behave more like a chat workspace than a control center

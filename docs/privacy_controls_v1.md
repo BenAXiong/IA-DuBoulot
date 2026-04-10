@@ -34,7 +34,6 @@ APIs:
 Protected-route behavior:
 
 - `/app`
-- `/app/history`
 - `/app?view=homework`
 - `/app/conversations/[conversationId]`
 - `/app/students/[studentUserId]`

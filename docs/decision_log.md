@@ -266,7 +266,7 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Context: The auth slice already supported signup, confirmation, onboarding, and protected routes, but parent approval and tutor linkage were still implicit future routes. Burying those flows in raw query params or ad hoc auth metadata would damage traceability and make access audits weak.
 - Decision: Add `public.account_link_invitations` as the canonical pre-link object for parent approval and tutor access, expose `/invite/[token]` as the shared acceptance surface, and keep raw token handling server-side with hashed persistence only. V1 invite delivery returns copyable invitation URLs instead of waiting for transactional email infrastructure.
 - Why: This keeps link state explicit, auditable, and durable across future sessions while avoiding insecure shortcuts. It also separates access-control correctness from unfinished provider-email work.
-- Follow-up: Apply `supabase/migrations/20260311_000003_account_link_invitations.sql` to the hosted project, then later add provider-backed invite delivery and cleanup jobs for expired rows.
+- Follow-up: Apply `supabase/migrations/20260311000300_account_link_invitations.sql` to the hosted project, then later add provider-backed invite delivery and cleanup jobs for expired rows.
 
 ### D-20260311-27 - Public And Protected Shells Are Split Before Student Workflow Breadth
 
@@ -1204,6 +1204,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Status: accepted
 - Related tasks: `A7.3.4`
 - Context: The repo now has a linked Supabase project and a pending migration for `public.ai_generation_debug_captures`, but the hosted database already contained the older schema objects while the Supabase migration-history table still showed no applied remote versions. That made `supabase db push` unsafe because it attempted to replay the full historical migration stack and failed on already-existing enum types and tables.
-- Decision: Apply only `20260408_000004_ai_generation_debug_captures.sql` directly to the linked remote database through `supabase db query --linked -f ...`, verify that `public.ai_generation_debug_captures` now exists remotely, and explicitly document that the hosted migration history remains out of sync until a later repair step is performed. Do not silently mark historical versions as applied without a deliberate repair pass.
+- Decision: Apply only `20260408000400_ai_generation_debug_captures.sql` directly to the linked remote database through `supabase db query --linked -f ...`, verify that `public.ai_generation_debug_captures` now exists remotely, and explicitly document that the hosted migration history remains out of sync until a later repair step is performed. Do not silently mark historical versions as applied without a deliberate repair pass.
 - Why: This unblocks the new successful-output debug capture path for the demo-hardening work without widening the current slice into a risky migration-history repair exercise on the live database.
 - Follow-up: Run a deliberate Supabase migration-history reconciliation later so future `db:push` operations can safely apply hosted migrations again.
+
+### D-20260410-120 - Supabase Migration History Is Repaired, And The Student History Surface Is Retired Into A Compatibility Redirect
+
+- Date: 2026-04-10
+- Status: accepted
+- Related tasks: `A7.3.4`, `P1.3`
+- Context: The linked Supabase project was usable for direct SQL application, but its hosted migration history was empty while the real schema already contained the older MVP objects. That made `db:push` unusable. Separately, the student product had already stopped using the subject-view `Open` CTA, yet `/app/history` still lived on as a second student surface with its own list UI even though the current homework flow now treats `/app` and `/app/conversations/[conversationId]` as the real learner destinations.
+- Decision: Rename the local migration files to valid unique Supabase version prefixes, repair the linked remote migration history so those versions are marked applied, and verify that normal hosted `db:push` is healthy again. Retire the standalone `/app/history` experience into a compatibility redirect back to the homework surface, remove the dedicated `student-session-history-list` UI, and strip the remaining current-state student navigation references to `/app/history`.
+- Why: This restores a sane hosted migration workflow without leaving silent schema drift in place, and it removes a stale secondary student page that no longer matches the intended demo-ready learner experience.
+- Follow-up: If a long-form student archive becomes product-necessary again later, redesign it from the current homework shell instead of reviving the old isolated history page unchanged.

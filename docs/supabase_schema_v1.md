@@ -1,6 +1,6 @@
 # Supabase Schema V1
 
-Related: [README](../README.md) | [Implementation plan](implementation_plan.md) | [Role and access matrix](role_access_matrix.md) | [Access rules V1](access_rules_v1.md) | [Invitation flows V1](invitation_flows_v1.md) | [Storage and attachment rules](storage_attachment_rules.md) | [Minors privacy baseline](minors_privacy_baseline.md) | [Initial schema SQL](../supabase/migrations/20260310_000001_initial_schema.sql)
+Related: [README](../README.md) | [Implementation plan](implementation_plan.md) | [Role and access matrix](role_access_matrix.md) | [Access rules V1](access_rules_v1.md) | [Invitation flows V1](invitation_flows_v1.md) | [Storage and attachment rules](storage_attachment_rules.md) | [Minors privacy baseline](minors_privacy_baseline.md) | [Initial schema SQL](../supabase/migrations/20260310000100_initial_schema.sql)
 
 ## Purpose
 
@@ -8,8 +8,8 @@ This document explains the first Supabase schema draft so future sessions do not
 
 ## File
 
-- SQL migration: [20260310_000001_initial_schema.sql](../supabase/migrations/20260310_000001_initial_schema.sql)
-- Invitation extension: [20260311_000003_account_link_invitations.sql](../supabase/migrations/20260311_000003_account_link_invitations.sql)
+- SQL migration: [20260310000100_initial_schema.sql](../supabase/migrations/20260310000100_initial_schema.sql)
+- Invitation extension: [20260311000300_account_link_invitations.sql](../supabase/migrations/20260311000300_account_link_invitations.sql)
 
 ## Main Decisions
 
@@ -54,7 +54,7 @@ This avoids a single giant session table and keeps later policy logic easier to 
 - `users.deletion_requested_at` supports queued purge flows
 - learning-content tables cascade from student-owned roots, so purge jobs can delete account content cleanly
 - `subscriptions`, `audit_logs`, `moderation_events`, and the server-owned `ai_generation_debug_captures` table are structured so limited operational/debug records can survive separately when necessary
-- the current successful-coach debug capture schema addition lives in [`supabase/migrations/20260408_000004_ai_generation_debug_captures.sql`](../supabase/migrations/20260408_000004_ai_generation_debug_captures.sql)
+- the current successful-coach debug capture schema addition lives in [`supabase/migrations/20260408000400_ai_generation_debug_captures.sql`](../supabase/migrations/20260408000400_ai_generation_debug_captures.sql)
 
 ### RLS Is Enabled Immediately
 

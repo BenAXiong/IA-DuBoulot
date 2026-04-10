@@ -1,6 +1,6 @@
 # Access Rules V1
 
-Related: [README](../README.md) | [Role and access matrix](role_access_matrix.md) | [Supabase schema V1](supabase_schema_v1.md) | [RLS migration](../supabase/migrations/20260310_000002_access_rules_and_rls.sql)
+Related: [README](../README.md) | [Role and access matrix](role_access_matrix.md) | [Supabase schema V1](supabase_schema_v1.md) | [RLS migration](../supabase/migrations/20260310000200_access_rules_and_rls.sql)
 
 ## Purpose
 
@@ -56,4 +56,4 @@ This prevents tutor-only insights from leaking to students or parents by default
 
 ## Migration
 
-- SQL migration: [20260310_000002_access_rules_and_rls.sql](../supabase/migrations/20260310_000002_access_rules_and_rls.sql)
+- SQL migration: [20260310000200_access_rules_and_rls.sql](../supabase/migrations/20260310000200_access_rules_and_rls.sql)
