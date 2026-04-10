@@ -10,6 +10,7 @@ import type { UiLanguageCode } from "@/lib/server/auth/types";
 type StudentFirstHomeworkLauncherProps = {
   initialDraft?: string | null;
   knownSubjects?: string[];
+  subjectCounts?: Record<string, number>;
   languageCode: UiLanguageCode;
 };
 
@@ -45,6 +46,7 @@ function formatSubjectDisplay(subject: string) {
 export function StudentFirstHomeworkLauncher({
   initialDraft = null,
   knownSubjects = [],
+  subjectCounts = {},
   languageCode,
 }: StudentFirstHomeworkLauncherProps) {
   const copy = getFirstHomeworkCopy(languageCode);
@@ -124,6 +126,7 @@ export function StudentFirstHomeworkLauncher({
 
       {resolvedSubjectTag ? (
         <StudentSubjectQuickStart
+          existingConversationCount={subjectCounts[resolvedSubjectTag] ?? 0}
           initialDraft={initialDraft}
           languageCode={languageCode}
           subjectTag={resolvedSubjectTag}

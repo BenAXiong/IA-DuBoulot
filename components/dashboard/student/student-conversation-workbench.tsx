@@ -7,7 +7,6 @@ import {
   takePendingConversationBootstrap,
 } from "@/lib/conversations/pending-bootstrap-store";
 import {
-  formatDateLabel,
 } from "@/components/dashboard/student/student-dashboard-presenters";
 import { StudentChatThread } from "@/components/dashboard/student/student-chat-thread";
 import { StudentConversationComposer } from "@/components/dashboard/student/student-conversation-composer";
@@ -743,21 +742,6 @@ export function StudentConversationWorkbench({
             ref={transcriptRef}
           >
             <div className="grid gap-4 pb-2">
-              <div className="border-b border-[color:var(--line)] pb-3">
-                <div className="min-w-0">
-                  <p className="text-sm text-[color:var(--ink-soft)]">
-                    {copy.lastActivity(
-                      formatDateLabel(
-                        messages.at(-1)?.created_at ??
-                          conversation.last_message_at ??
-                          conversation.created_at,
-                        languageCode,
-                      ),
-                    )}
-                  </p>
-                </div>
-              </div>
-
               <StudentChatThread
                 languageCode={languageCode}
                 messages={displayMessages}

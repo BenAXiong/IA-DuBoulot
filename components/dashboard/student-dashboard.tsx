@@ -185,6 +185,9 @@ export async function StudentDashboard({
   const languageCode = appUser.preferred_ui_language;
   const copy = getStudentHubCopy(languageCode);
   const subjectGroups = buildSubjectGroups(conversations);
+  const subjectCounts = Object.fromEntries(
+    subjectGroups.map((group) => [group.subjectTag, group.conversations.length]),
+  );
   const selectedGroup = selectedSubject
     ? subjectGroups.find((group) => group.subjectTag === selectedSubject) ?? {
         subjectTag: selectedSubject,
@@ -259,6 +262,7 @@ export async function StudentDashboard({
             </div>
 
             <StudentSubjectQuickStart
+              existingConversationCount={selectedGroup.conversations.length}
               initialDraft={initialDraft}
               languageCode={languageCode}
               subjectTag={selectedGroup.subjectTag}
@@ -305,6 +309,7 @@ export async function StudentDashboard({
                 initialDraft={initialDraft}
                 languageCode={languageCode}
                 knownSubjects={subjectGroups.map((group) => group.subjectTag)}
+                subjectCounts={subjectCounts}
               />
             </article>
           ) : (
@@ -314,6 +319,7 @@ export async function StudentDashboard({
                   initialDraft={initialDraft}
                   knownSubjects={subjectGroups.map((group) => group.subjectTag)}
                   languageCode={languageCode}
+                  subjectCounts={subjectCounts}
                 />
               </article>
 

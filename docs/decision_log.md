@@ -1257,3 +1257,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Stop rendering `conversation.title` inside the live student conversation body. Until the shell has a safe way to tell that a stored title is a polished AI summary instead of the provisional bootstrap seed, the conversation route will show only the stable subject-level header in shell chrome plus the last-activity metadata inside the workbench.
 - Why: Hiding an untrustworthy title is better than surfacing the learner's raw first prompt as if it were a finalized chat title. This keeps the learner-facing UI credible while preserving the existing backend title-summarization path for later hardening.
 - Follow-up: Revisit shell header title exposure only after the app can explicitly mark or infer that a conversation title has been successfully summarized and is no longer just the bootstrap default.
+
+### D-20260410-125 - New Student Conversations Now Start With A Neutral Per-Subject Subject_### Placeholder Instead Of A Learner-Derived Bootstrap Title
+
+- Date: 2026-04-10
+- Status: accepted
+- Related tasks: `P1.3`, `P5.3`
+- Context: Even after hiding the raw stored title from the live conversation body, the underlying bootstrap title was still derived from the learner's first prompt. That kept the system vulnerable to re-exposing a raw or truncated learner message anywhere the stored title might later surface before AI summarization succeeded.
+- Decision: Seed new student conversation shells with a deterministic placeholder title in the form `Subject_###`, where the counter is `existing conversations for that subject + 1` at creation time. Keep the shell header on the subject only, and continue treating later AI title summarization as best-effort polish that may replace the neutral placeholder once it succeeds.
+- Why: A neutral placeholder is safer than any learner-derived bootstrap title because it cannot leak raw prompt text into product chrome, yet it still gives the backend a stable non-empty title value until the summary path succeeds.
+- Follow-up: If the later AI summary path becomes reliable enough, add an explicit summarized-title signal so the shell can surface the polished title intentionally instead of relying on inference from the stored string alone.

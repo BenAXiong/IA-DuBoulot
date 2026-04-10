@@ -17,6 +17,7 @@ type StudentSubjectQuickStartProps = {
   initialDraft?: string | null;
   subjectTag: string;
   languageCode: UiLanguageCode;
+  existingConversationCount?: number;
 };
 
 type CreateConversationShellResponse =
@@ -70,41 +71,8 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
   }
 }
 
-function buildConversationTitle(input: {
-  draft: string;
-  subjectTag: string;
-  stagedFiles: StagedIntakeFile[];
-}) {
-  const compactDraft = input.draft.trim().replace(/\s+/g, " ");
-
-  function shortenTitle(source: string) {
-    const cleaned = source
-      .replace(/^[\s"'`“”‘’]+|[\s"'`“”‘’]+$/g, "")
-      .replace(
-        /^(help me with|help me|can you help me with|can you help me|i need help with|please help me with|please help me|explain|review|check)\s+/i,
-        "",
-      )
-      .trim();
-    const words = cleaned.split(/\s+/).filter(Boolean);
-    const shortened =
-      words.length > 8 ? words.slice(0, 8).join(" ") : cleaned;
-
-    if (shortened.length <= 52) {
-      return shortened;
-    }
-
-    return `${shortened.slice(0, 49).trimEnd()}...`;
-  }
-
-  if (compactDraft.length > 0) {
-    return shortenTitle(compactDraft);
-  }
-
-  if (input.stagedFiles.length > 0) {
-    return shortenTitle(input.stagedFiles[0].file.name);
-  }
-
-  return shortenTitle(input.subjectTag);
+function buildConversationTitle(existingConversationCount: number) {
+  return `Subject_${String(existingConversationCount + 1).padStart(3, "0")}`;
 }
 
 function getRouteErrorMessage(payload: CreateConversationShellResponse | null) {
@@ -164,6 +132,7 @@ export function StudentSubjectQuickStart({
   initialDraft = null,
   subjectTag,
   languageCode,
+  existingConversationCount = 0,
 }: StudentSubjectQuickStartProps) {
   const router = useRouter();
   const copy = getQuickStartCopy(languageCode);
@@ -252,11 +221,7 @@ export function StudentSubjectQuickStart({
           "content-type": "application/json",
         },
         body: JSON.stringify({
-          title: buildConversationTitle({
-            draft: trimmedDraft,
-            subjectTag,
-            stagedFiles,
-          }),
+          title: buildConversationTitle(existingConversationCount),
           subjectTag,
           gradedHomework: false,
           attachmentReferences: stagedFiles.map((file) => ({
