@@ -744,10 +744,7 @@ export function StudentConversationWorkbench({
           >
             <div className="grid gap-4 pb-2">
               <div className="border-b border-[color:var(--line)] pb-3">
-                <div className="min-w-0 space-y-1.5">
-                  <h1 className="max-w-full break-words font-[family-name:var(--font-heading)] text-3xl leading-tight sm:text-4xl">
-                    {conversation.title}
-                  </h1>
+                <div className="min-w-0">
                   <p className="text-sm text-[color:var(--ink-soft)]">
                     {copy.lastActivity(
                       formatDateLabel(

@@ -51,7 +51,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 10. keeps the right rail pinned under the student header as a true split pane instead of letting it stretch alongside the full transcript length, and now lets desktop users resize that rail manually
 11. adds hover copy controls under each learner-visible turn, keeps those controls aligned to the message body rather than the avatar column, and now shows a lightweight copied toast when a turn is copied
 12. renders assistant turns through a markdown-plus-math path, so simple LaTeX like `$v = d/t$` can display as formatted math instead of raw markup
-13. keeps the live composer pinned at the bottom of the conversation view, now shows a chevron jump-to-latest control above it when the transcript is scrolled upward, and appends the learner's message optimistically with a lightweight pending banban placeholder so the prompt no longer looks stuck in the textarea during the round trip
+13. keeps the live composer pinned at the bottom of the conversation view, now shows a chevron jump-to-latest control above it when the transcript is scrolled upward, appends the learner's message optimistically with a lightweight pending banban placeholder so the prompt no longer looks stuck in the textarea during the round trip, and no longer renders the provisional conversation title inside the live chat body while title summarization is still best-effort
 14. reuses the same learner avatar style as the profile dock for student turns, so the thread feels like one consistent messaging surface instead of mixing unrelated identity treatments
 15. exposes a small reply-mode switch directly in the chat tools, and now routes `fast`, `thinking`, and `interactive` as real prompt-level coaching variants instead of leaving them as a purely hypothetical Pilot note
 16. renders only one explicit completion control at the bottom of the right rail, keeping completion available without the older session-summary card dominating the active chat
@@ -73,6 +73,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 ## Important Boundaries
 
 - the current local workbench is already on the real provider/upload path, and a fixture-backed end-to-end smoke now passes locally, but the latest run still exercised provider fallbacks
+- the live conversation area intentionally hides the stored conversation title for now, because the shell-first bootstrap still seeds a provisional title from the learner's first prompt and the later AI title summary remains best-effort; until the shell can positively distinguish a polished summary from that provisional seed, the stable learner-facing header remains the subject only
 - the live coach reply path does not directly inspect image pixels or PDF page renders; it only receives extracted attachment text plus the persisted conversation or workspace context, so any learner-facing claim about what was "read" from a file must stay grounded in that text context
 - moderation is currently local-rule based, not yet provider-assisted or admin-tunable
 - once the session is marked complete, the workbench becomes read-only for student writes

@@ -1247,3 +1247,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Treat `attachments.extraction_status = failed` with `metadata.extraction_error = provider_failure` as a recoverable state. The student conversation workbench now auto-retries those attachments once per conversation load through `/api/uploads/extract`, and the right-rail file pill also exposes a manual retry affordance for the same provider-failure case. Successful retries replace the attachment state in place and merge any new extracted text into the hidden workspace context if it was not already present.
 - Why: This turns a transient provider outage into a recoverable attachment state instead of a permanent dead end, without falsely retrying attachments that genuinely failed because the content was unreadable or unsafe.
 - Follow-up: If this still proves too manual or too brittle under load, move provider-failure attachment retries into a queued background worker with exponential backoff instead of tying the recovery entirely to the conversation page lifecycle.
+
+### D-20260410-124 - The Student Conversation Body Must Hide Provisional Titles Until The Shell Can Safely Distinguish A Real AI Summary
+
+- Date: 2026-04-10
+- Status: accepted
+- Related tasks: `P1.3`, `P5.3`
+- Context: The first-turn conversation bootstrap still seeds a provisional stored conversation title from the learner's initial prompt so the shell can create a conversation immediately. A later best-effort Gemini title summary may replace that seed after the first successful assistant reply, but in real usage the live conversation area was still visibly rendering the raw provisional title like `explique l'ex 1`, which made the product look unfinished and undermined the point of the title-summarization work.
+- Decision: Stop rendering `conversation.title` inside the live student conversation body. Until the shell has a safe way to tell that a stored title is a polished AI summary instead of the provisional bootstrap seed, the conversation route will show only the stable subject-level header in shell chrome plus the last-activity metadata inside the workbench.
+- Why: Hiding an untrustworthy title is better than surfacing the learner's raw first prompt as if it were a finalized chat title. This keeps the learner-facing UI credible while preserving the existing backend title-summarization path for later hardening.
+- Follow-up: Revisit shell header title exposure only after the app can explicitly mark or infer that a conversation title has been successfully summarized and is no longer just the bootstrap default.
