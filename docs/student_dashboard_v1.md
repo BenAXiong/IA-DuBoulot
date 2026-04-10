@@ -16,7 +16,7 @@ This document started with `A3.1.1` to `A3.1.3` and now also records the later s
 - placeholder `Maps` and `Tests` activity slots
 - subject-level quick-start that now opens the live chat directly
 - legacy `/app/new` compatibility redirect into the homework dashboard
-- learner-owned profile, adult-link actions, and memory review moved to `/app/settings`
+- learner-owned profile editing and deletion controls live on `/app/settings`
 
 ## Source Files
 
@@ -26,11 +26,9 @@ This document started with `A3.1.1` to `A3.1.3` and now also records the later s
 - First-homework launcher: `components/dashboard/student/student-first-homework-launcher.tsx`
 - Subject quick start: `components/dashboard/student/student-subject-quick-start.tsx`
 - Pending bootstrap store: `lib/conversations/pending-bootstrap-store.ts`
-- Student settings support sections: `components/dashboard/student/student-settings-support-sections.tsx`
 - Compatibility redirect route: `app/app/new/page.tsx`
 - Server snapshot service: `lib/server/student-dashboard/student-dashboard-service.ts`
 - Conversation list service: `lib/server/conversations/conversation-service.ts`
-- Memory service: `lib/server/memory/service.ts`
 - Dashboard types: `lib/server/student-dashboard/types.ts`
 - Dashboard localization copy: `lib/i18n/dashboard-copy.ts`
 - Student flow localization copy: `lib/i18n/student-flow-copy.ts`
@@ -105,22 +103,22 @@ Current role:
 
 The student home no longer owns the heavier learner profile controls.
 
-Current `/app/settings` student additions:
+Current `/app/settings` student surface:
 
-- profile editing still lives in the shared privacy/settings view
-- parent-approval and tutor-invite forms now live there for the student role
-- the memory panel now lives there for the student role
+- profile editing still lives there
+- deletion controls still live there
+- the route is now intentionally minimal and no longer carries student support, adult-link, memory, or billing sections
 
 Why:
 
 - `/app` should feel like a homework workspace, not a control center
-- durable memory and adult-link actions are real product features, but they do not belong in the student's first visual scan every time they open the app
+- the first revamp pass is easier if `/app/settings` is reduced to core account operations instead of carrying mixed student-support utilities
 
 ## Known Boundaries
 
 - recent sessions on `/app` are intentionally short and subject-filtered, and the subject-view recent block no longer duplicates a second history surface with a separate `Open` CTA
 - the student dashboard no longer foregrounds quota or adult-link cards on the home surface, but the same server-owned start-state gate still controls the homework launcher
-- billing remains a parent-owned workflow surfaced on `/app/settings`
+- billing remains a parent-owned workflow, but it is no longer surfaced through the current minimalist `/app/settings` page
 - under-13 blocking still depends on the existing parent-approval flow documented in [Invitation flows V1](invitation_flows_v1.md)
 - tutor-facing derived insights still belong to the tutor oversight surface; tutors do not receive raw student memory
 - the current student-shell subject folders are not canonical entities; they are the existing conversation tags presented as filters

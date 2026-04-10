@@ -4,11 +4,11 @@ Related: [README](../README.md) | [Minors privacy baseline](minors_privacy_basel
 
 ## Purpose
 
-This document records the first real billing/settings and privacy-control surface delivered in `A6.4`.
+This document records the current minimal settings and deletion-control surface that grew out of the first `A6.4` privacy slice.
 
 It exists so later sessions do not have to reconstruct:
 
-- where profile, billing, privacy, and deletion controls now live
+- where profile and deletion controls now live
 - which roles can request deletion for themselves or linked children
 - how queued deletion changes access immediately
 - what the current MVP promises about retention and provider disclosures
@@ -17,7 +17,7 @@ It exists so later sessions do not have to reconstruct:
 
 This V1 covers:
 
-- `A6.4.1` through `/app/settings` as the stable settings surface for all roles
+- `A6.4.1` through `/app/settings` as the stable minimalist account surface
 - `A6.4.2` through queued deletion requests, account freeze, linked-child handling, and immediate tutor-access revocation
 - `A6.4.3` through explicit user-facing copy for data categories, retention windows, and provider involvement
 
@@ -77,13 +77,10 @@ Verification:
 For every role, `/app/settings` now owns:
 
 - editable app-profile fields when the account is still active
-- a billing/privacy explainer card even when the role has no billing actions
-- user-facing data-category and retention copy
 - the self-deletion request entry point when that role is eligible
 
-Parent-specific additions:
+Parent-specific addition:
 
-- the canonical Family billing card
 - one deletion control per active linked child account
 
 Admin-specific limit:
@@ -117,15 +114,10 @@ Queued-deletion behavior:
 
 ## User-Facing Privacy Copy
 
-The current settings surface explicitly explains:
-
-- the main stored categories for the signed-in role
-- retention windows for pending approvals, inactive student content, sensitive-access audit logs, and queued deletion
-- provider involvement across Supabase, Gemini, Lemon Squeezy, and future PostHog/Resend usage
-
 Current copy rule:
 
-- keep the language concrete and operational rather than legalistic
+- keep the page operational and minimal
+- avoid long explainers, provider lists, or platform-internal wording on the visible settings surface
 
 ## Verification
 
@@ -137,7 +129,6 @@ Current automated coverage:
 - `npm run smoke:privacy`
 - `npm run smoke:student-flow`
 - `npm run smoke:adult-oversight`
-- `npm run smoke:billing`
 
 Latest local result on 2026-03-11:
 

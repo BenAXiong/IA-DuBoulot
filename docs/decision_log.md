@@ -1287,3 +1287,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Switch the coaching-reply model and the summary-generation model to `gemini-2.5-pro`, while keeping conversation-title generation, attachment extraction, memory refresh, and translation on `gemini-2.5-flash`. Update the in-code Gemini pricing map so usage snapshots and rough cost reporting continue to reflect the actual configured model mix.
 - Why: Replies and summaries are the most visible quality-sensitive learner outputs, while title generation and extraction remain better candidates for the cheaper throughput-oriented model. The existing config boundary already supports this split cleanly, so this is a small operational change rather than a provider-architecture rewrite.
 - Follow-up: If `2.5-pro` still shows avoidable `429` or `503` pressure on coach replies, add an explicit `2.5-pro -> 2.5-flash` fallback path for the coach route and log the effective model used.
+
+### D-20260410-128 - /app/settings Is Reduced To A Minimal Profile-And-Deletion Surface During The Student Shell Revamp
+
+- Date: 2026-04-10
+- Status: accepted
+- Related tasks: `P1.3`, `A6.4.1`
+- Context: `/app/settings` had accreted profile editing, parent billing status, privacy explainer copy, deletion controls, student parent-link and tutor-link forms, and the student memory panel. That mixed real account operations with support tooling and long explanatory copy, which made the page hard to redesign and kept the current student shell feeling more like a control center than a focused product.
+- Decision: Reduce `/app/settings` to the two core account operations that still need a stable home during the redesign: profile editing and deletion controls. Remove the student support block, memory panel, parent billing status card, and the long privacy/provider explainer sections from the route. Keep parent-linked student deletion inside the remaining deletion section.
+- Why: A minimalist settings route is easier to rebuild cleanly, and the removed sections either belong in a future dedicated surface or should be reconsidered before returning at all. The learner-facing page should no longer expose developer- or operations-oriented wording while the shell is being simplified for the demo path.
+- Follow-up: If any removed support function returns later, give it a dedicated product reason and home instead of silently rebuilding the old mixed-purpose settings page.
