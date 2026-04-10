@@ -16,7 +16,7 @@ import {
   truncateForAiContext,
 } from "@/lib/server/ai/guardrails";
 
-export const STUDENT_COACH_PROMPT_VERSION = "student-coach-v4";
+export const STUDENT_COACH_PROMPT_VERSION = "student-coach-v5";
 export const CONVERSATION_TITLE_PROMPT_VERSION = "conversation-title-v1";
 export const STUDENT_SUMMARY_PROMPT_VERSION = "student-summary-v2";
 export const PARENT_SUMMARY_PROMPT_VERSION = "parent-summary-v2";
@@ -50,16 +50,20 @@ export function buildAttachmentContextLines(
   }
 
   return attachments.map((attachment) => {
-    const extractionState =
-      attachment.extraction_status === "ready"
-        ? "texte extrait disponible"
-        : attachment.extraction_status === "failed"
-          ? "extraction à revoir"
-          : "extraction en attente";
     const extractedText = truncateForAiContext(
       normalizeText(attachment.raw_extracted_text),
       AI_CONTEXT_LIMITS.attachmentExtractChars,
     );
+    const extractionState =
+      attachment.extraction_status === "ready"
+        ? extractedText
+          ? "texte extrait disponible"
+          : "aucun texte exploitable disponible"
+        : attachment.extraction_status === "failed"
+          ? extractedText
+            ? "extraction incertaine, texte partiel seulement"
+            : "extraction à revoir, aucun texte fiable disponible"
+          : "extraction en attente, aucun texte disponible encore";
 
     return [
       `- ${attachment.original_filename} (${attachment.mime_type}, ${attachment.attachment_kind}, ${Math.max(

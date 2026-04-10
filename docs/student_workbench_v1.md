@@ -56,6 +56,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 15. exposes a small reply-mode switch directly in the chat tools, and now routes `fast`, `thinking`, and `interactive` as real prompt-level coaching variants instead of leaving them as a purely hypothetical Pilot note
 16. renders only one explicit completion control at the bottom of the right rail, keeping completion available without the older session-summary card dominating the active chat
 17. localizes the workbench shell, composer, the reply-mode switch, and the side rail through `lib/i18n/student-flow-copy.ts`
+18. treats uploaded files honestly inside the live coach path: banban only knows the extracted text or workspace context that the server actually provides, and it must not claim to have read image pixels or PDF pages directly when no reliable extracted text is present
 
 ## Interaction Rules
 
@@ -71,6 +72,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 ## Important Boundaries
 
 - the current local workbench is already on the real provider/upload path, and a fixture-backed end-to-end smoke now passes locally, but the latest run still exercised provider fallbacks
+- the live coach reply path does not directly inspect image pixels or PDF page renders; it only receives extracted attachment text plus the persisted conversation or workspace context, so any learner-facing claim about what was "read" from a file must stay grounded in that text context
 - moderation is currently local-rule based, not yet provider-assisted or admin-tunable
 - once the session is marked complete, the workbench becomes read-only for student writes
 - adult review surfaces now live separately under [Oversight surfaces V1](oversight_surfaces_v1.md); the student workbench remains a student-only mutation surface

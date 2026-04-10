@@ -429,7 +429,7 @@ export function StudentAppShell({
           >
             <span className="sr-only">Expand sidebar</span>
             <span className="brand-mark inline-flex h-full w-full items-center justify-center rounded-[0.8rem] font-[family-name:var(--font-heading)] text-xs font-semibold text-white transition group-hover:opacity-0">
-              bb
+              伴
             </span>
             <span className="absolute inset-0 inline-flex items-center justify-center text-[color:var(--foreground)] opacity-0 transition group-hover:opacity-100">
               <PanelIcon />
