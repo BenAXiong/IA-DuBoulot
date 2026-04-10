@@ -45,6 +45,7 @@ Current repo implication:
 - before live pilot traffic, provision a dedicated billed Gemini project and mirror that project's key into Vercel plus the local production-like env
 - the runtime should log enough provider failure detail to distinguish a project-level `429` or `RESOURCE_EXHAUSTED` limit from a generic upstream provider failure when learner chat falls back to the retry message
 - the learner UI can now surface opaque code-only fallback states for distinct provider failure classes without leaking raw provider wording: rate-window codes, chat high-demand/generic service codes, and upload-analysis high-demand/generic service codes
+- the Gemini adapter now also treats a subset of "successful" responses as suspicious when the provider reports a non-clean finish reason or when the returned text is clearly cut off mid-structure; those turns are retried before the learner sees them, and runtime logs now include the provider finish reason on success paths for later diagnosis
 
 Operational recommendation:
 

@@ -1267,3 +1267,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Seed new student conversation shells with a deterministic placeholder title in the form `Subject_###`, where the counter is `existing conversations for that subject + 1` at creation time. Keep the shell header on the subject only, and continue treating later AI title summarization as best-effort polish that may replace the neutral placeholder once it succeeds.
 - Why: A neutral placeholder is safer than any learner-derived bootstrap title because it cannot leak raw prompt text into product chrome, yet it still gives the backend a stable non-empty title value until the summary path succeeds.
 - Follow-up: If the later AI summary path becomes reliable enough, add an explicit summarized-title signal so the shell can surface the polished title intentionally instead of relying on inference from the stored string alone.
+
+### D-20260410-126 - Gemini Success Paths Must Retry Obviously Cut-Off Replies Instead Of Blindly Persisting Any Non-Empty Text
+
+- Date: 2026-04-10
+- Status: accepted
+- Related tasks: `A7.3.4`, `P5.3`
+- Context: Live production debugging showed that some learner-visible assistant turns were truncated even though the Gemini call logged as a success. The raw successful output stored in `ai_generation_debug_captures` was already cut off mid-sentence, which proved the issue was not a frontend rendering bug. The adapter was treating any non-empty `response.text` as valid and was not inspecting provider finish reasons at all.
+- Decision: Harden the Gemini adapter so successful responses now capture provider finish metadata, retry any text or structured output that reports a non-clean finish reason, and also retry a narrow class of obviously cut-off plain-text replies detected by conservative heuristics. If the adapter still ends on a suspicious partial after retries, treat it as a provider error instead of persisting it as a normal learner reply.
+- Why: Persisting visibly incomplete assistant turns damages trust more than a temporary retry or fallback. Finish-reason-based detection is a strong signal when Gemini exposes it, and the additional text-shape heuristic gives the product a second line of defense for cases where Gemini returns a partial text without an explicit provider error.
+- Follow-up: Expect the heuristic branch to need tuning from real traffic. If false positives appear, keep finish-reason handling as the primary guard and narrow the text heuristic rather than removing the whole cutoff-retry layer.

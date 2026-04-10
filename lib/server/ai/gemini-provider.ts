@@ -72,6 +72,12 @@ type GeneratedTextResult = {
   usage: AiUsageSnapshot;
 };
 
+type GeminiResponseMeta = {
+  finishReason: string | null;
+  promptBlockReason: string | null;
+  candidateCount: number;
+};
+
 function sleep(delayMs: number) {
   return new Promise((resolve) => setTimeout(resolve, delayMs));
 }
@@ -260,6 +266,139 @@ function buildUsageSnapshot(input: {
   } satisfies AiUsageSnapshot;
 }
 
+function normalizeGeminiEnumValue(value: unknown) {
+  if (typeof value === "string" && value.trim()) {
+    return value.trim();
+  }
+
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return String(value);
+  }
+
+  return null;
+}
+
+function extractGeminiResponseMeta(response: unknown): GeminiResponseMeta {
+  const record =
+    response && typeof response === "object"
+      ? (response as Record<string, unknown>)
+      : null;
+  const candidates = Array.isArray(record?.candidates)
+    ? (record.candidates as Array<Record<string, unknown>>)
+    : [];
+  const firstCandidate =
+    candidates.length > 0 && candidates[0] && typeof candidates[0] === "object"
+      ? candidates[0]
+      : null;
+  const promptFeedback =
+    record?.promptFeedback && typeof record.promptFeedback === "object"
+      ? (record.promptFeedback as Record<string, unknown>)
+      : null;
+
+  return {
+    finishReason: normalizeGeminiEnumValue(firstCandidate?.finishReason),
+    promptBlockReason: normalizeGeminiEnumValue(promptFeedback?.blockReason),
+    candidateCount: candidates.length,
+  };
+}
+
+function isGeminiCleanStopReason(value: string | null) {
+  return value === "STOP" || value === "FINISH_REASON_UNSPECIFIED";
+}
+
+function looksLikeObviouslyCutOffText(value: string) {
+  const trimmed = value.trimEnd();
+
+  if (trimmed.length < 200) {
+    return false;
+  }
+
+  const lastLine = trimmed.split(/\r?\n/).at(-1)?.trim() ?? "";
+
+  if (!lastLine || lastLine.length < 40) {
+    return false;
+  }
+
+  if (/[.!?…。！？…]["')\]»”’]*$/u.test(lastLine)) {
+    return false;
+  }
+
+  if (/[:;,\-–—(/]\s*$/u.test(lastLine)) {
+    return true;
+  }
+
+  if (/\n\s*(?:[-*]|\d+\.)\s+/u.test(trimmed)) {
+    return true;
+  }
+
+  const finalWord =
+    lastLine.match(/([\p{L}\p{N}'’_-]+)\s*$/u)?.[1]?.toLowerCase() ?? "";
+
+  return [
+    "and",
+    "or",
+    "to",
+    "of",
+    "for",
+    "with",
+    "the",
+    "a",
+    "an",
+    "et",
+    "ou",
+    "de",
+    "des",
+    "du",
+    "la",
+    "le",
+    "les",
+    "un",
+    "une",
+    "dans",
+    "sur",
+    "avec",
+    "pour",
+    "à",
+    "au",
+    "aux",
+  ].includes(finalWord);
+}
+
+function buildSuspiciousSuccessDetails(input: {
+  responseText: string;
+  responseMeta: GeminiResponseMeta;
+}) {
+  if (
+    input.responseMeta.finishReason &&
+    !isGeminiCleanStopReason(input.responseMeta.finishReason)
+  ) {
+    return {
+      reason: "finish_reason",
+      details: {
+        provider_finish_reason: input.responseMeta.finishReason,
+        provider_prompt_block_reason: input.responseMeta.promptBlockReason,
+        provider_candidate_count: input.responseMeta.candidateCount,
+        truncated_success_output: true,
+      },
+    };
+  }
+
+  if (looksLikeObviouslyCutOffText(input.responseText)) {
+    return {
+      reason: "text_heuristic",
+      details: {
+        provider_finish_reason: input.responseMeta.finishReason,
+        provider_prompt_block_reason: input.responseMeta.promptBlockReason,
+        provider_candidate_count: input.responseMeta.candidateCount,
+        heuristic_cutoff_detected: true,
+        truncated_success_output: true,
+      },
+    };
+  }
+
+  return null;
+}
+
 function buildLogDetails(input: {
   operation: string;
   modelName: string;
@@ -424,13 +563,57 @@ export class GeminiAiProvider implements AiProvider {
           inputTokens,
           outputTokens,
         });
+        const responseMeta = extractGeminiResponseMeta(response);
+        const successExtra = {
+          ...input.extraLogDetails,
+          provider_finish_reason: responseMeta.finishReason,
+          provider_prompt_block_reason: responseMeta.promptBlockReason,
+          provider_candidate_count: responseMeta.candidateCount,
+        };
+
+        if (
+          responseMeta.finishReason &&
+          !isGeminiCleanStopReason(responseMeta.finishReason)
+        ) {
+          const cutoffError = new AppError({
+            code: "provider_error",
+            message: "The AI provider returned an incomplete structured response.",
+            status: 502,
+            retryable: true,
+            details: {
+              provider_finish_reason: responseMeta.finishReason,
+              provider_prompt_block_reason: responseMeta.promptBlockReason,
+              provider_candidate_count: responseMeta.candidateCount,
+              truncated_success_output: true,
+            },
+          });
+          const canRetry = attempt < 2;
+
+          if (canRetry) {
+            await sleep(450 * (attempt + 1));
+            continue;
+          }
+
+          this.logFailure({
+            context: input.requestContext,
+            operation: input.operation,
+            modelName: input.model,
+            errorCode: cutoffError.code,
+            extra: {
+              ...successExtra,
+              retry_attempts: attempt,
+              truncated_success_output: true,
+            },
+          });
+          throw cutoffError;
+        }
 
         this.logSuccess({
           context: input.requestContext,
           operation: input.operation,
           modelName: response.modelVersion ?? input.model,
           usage,
-          extra: input.extraLogDetails,
+          extra: successExtra,
         });
 
         return {
@@ -506,13 +689,54 @@ export class GeminiAiProvider implements AiProvider {
           inputTokens,
           outputTokens,
         });
+        const responseMeta = extractGeminiResponseMeta(response);
+        const successExtra = {
+          ...input.extraLogDetails,
+          provider_finish_reason: responseMeta.finishReason,
+          provider_prompt_block_reason: responseMeta.promptBlockReason,
+          provider_candidate_count: responseMeta.candidateCount,
+        };
+        const suspiciousSuccess = buildSuspiciousSuccessDetails({
+          responseText,
+          responseMeta,
+        });
+
+        if (suspiciousSuccess) {
+          const cutoffError = new AppError({
+            code: "provider_error",
+            message: "The AI provider returned a likely truncated text response.",
+            status: 502,
+            retryable: true,
+            details: suspiciousSuccess.details,
+          });
+          const canRetry = attempt < 2;
+
+          if (canRetry) {
+            await sleep(450 * (attempt + 1));
+            continue;
+          }
+
+          this.logFailure({
+            context: input.requestContext,
+            operation: input.operation,
+            modelName: input.model,
+            errorCode: cutoffError.code,
+            extra: {
+              ...successExtra,
+              retry_attempts: attempt,
+              truncated_success_reason: suspiciousSuccess.reason,
+              ...suspiciousSuccess.details,
+            },
+          });
+          throw cutoffError;
+        }
 
         this.logSuccess({
           context: input.requestContext,
           operation: input.operation,
           modelName: response.modelVersion ?? input.model,
           usage,
-          extra: input.extraLogDetails,
+          extra: successExtra,
         });
 
         return {

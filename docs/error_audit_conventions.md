@@ -114,6 +114,13 @@ For provider failures, also prefer logging a small safe diagnostic subset when t
 - provider error status string such as `RESOURCE_EXHAUSTED`
 - provider body message
 
+For successful provider responses that still look operationally suspicious, prefer logging:
+
+- provider finish reason
+- prompt block reason if exposed
+- candidate count
+- whether the adapter retried because the returned text looked obviously cut off
+
 Do not log raw headers, secrets, or full request bodies.
 
 ## Audit Log Boundaries
