@@ -14,10 +14,16 @@ It is intentionally explicit about the difference between:
 ## Current Provider And Pricing Baseline
 
 - provider: `Gemini`
-- current model for coaching, conversation-title summarization, extraction, summaries, memory, and translation: `gemini-2.5-flash`
+- current model split in code:
+  - coaching replies: `gemini-2.5-pro`
+  - conversation-title summarization: `gemini-2.5-flash`
+  - extraction: `gemini-2.5-flash`
+  - summaries: `gemini-2.5-pro`
+  - memory: `gemini-2.5-flash`
+  - translation: `gemini-2.5-flash`
 - current token pricing snapshot in code:
-  - input: `$0.30 / 1M tokens`
-  - output: `$2.50 / 1M tokens`
+  - `gemini-2.5-flash`: input `$0.30 / 1M tokens`, output `$2.50 / 1M tokens`
+  - `gemini-2.5-pro`: input `$1.25 / 1M tokens`, output `$10.00 / 1M tokens`
 - pricing source of truth in code: `lib/server/ai/config.ts`
 
 These prices are implementation constants, not a legal or billing guarantee. Re-check the provider docs before relying on them for real margin planning.
@@ -141,6 +147,7 @@ Current access model:
 
 - route: `POST /api/conversations/[conversationId]/messages`
 - prompt version: `student-coach-v4`
+- current model: `gemini-2.5-pro`
 - context inputs:
   - assignment text
   - edited extracted text
@@ -156,6 +163,7 @@ Current access model:
 
 - route: `POST /api/conversations/[conversationId]/messages` (first successful learner turn only)
 - prompt version: `conversation-title-v1`
+- current model: `gemini-2.5-flash`
 - context inputs:
   - subject tag
   - first learner message
@@ -167,6 +175,7 @@ Current access model:
 
 - route: `POST /api/uploads/confirm`
 - prompt version: `attachment-extraction-v1`
+- current model: `gemini-2.5-flash`
 - context inputs:
   - uploaded file sent through Gemini file understanding
   - extraction instruction block
@@ -180,6 +189,7 @@ Current access model:
   - `student-summary-v2`
   - `parent-summary-v2`
   - `tutor-summary-v2`
+- current model: `gemini-2.5-pro`
 - output cap: `450` tokens per summary call
 - fallback behavior:
   - student summary is required and falls back deterministically
@@ -190,6 +200,7 @@ Current access model:
 - route path: completion flow only, not a direct parent action
 - prompt version: `translation-v2`
 - languages currently generated: `en`, `zh`
+- current model: `gemini-2.5-flash`
 - output cap: `900` tokens
 - behavior: optional and best-effort
 
@@ -197,6 +208,7 @@ Current access model:
 
 - route path: completion flow only
 - prompt version: `memory-profile-v2`
+- current model: `gemini-2.5-flash`
 - output cap: `280` tokens
 - fallback: deterministic pedagogical memory refresh
 

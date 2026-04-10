@@ -1277,3 +1277,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Harden the Gemini adapter so successful responses now capture provider finish metadata, retry any text or structured output that reports a non-clean finish reason, and also retry a narrow class of obviously cut-off plain-text replies detected by conservative heuristics. If the adapter still ends on a suspicious partial after retries, treat it as a provider error instead of persisting it as a normal learner reply.
 - Why: Persisting visibly incomplete assistant turns damages trust more than a temporary retry or fallback. Finish-reason-based detection is a strong signal when Gemini exposes it, and the additional text-shape heuristic gives the product a second line of defense for cases where Gemini returns a partial text without an explicit provider error.
 - Follow-up: Expect the heuristic branch to need tuning from real traffic. If false positives appear, keep finish-reason handling as the primary guard and narrow the text heuristic rather than removing the whole cutoff-retry layer.
+
+### D-20260410-127 - Student Replies And Completion Summaries Now Use Gemini 2.5 Pro While Titles, Extraction, Memory, And Translation Stay On Flash
+
+- Date: 2026-04-10
+- Status: accepted
+- Related tasks: `A7.3.4`, `P5.3`
+- Context: The student demo push now prioritizes reply quality and summary quality over minimizing per-call cost on every AI path. The repo already separated model constants by use case, but all routes were still configured to `gemini-2.5-flash`, which made the stronger-model discussion theoretical and left cost reporting inaccurate once a split was desired.
+- Decision: Switch the coaching-reply model and the summary-generation model to `gemini-2.5-pro`, while keeping conversation-title generation, attachment extraction, memory refresh, and translation on `gemini-2.5-flash`. Update the in-code Gemini pricing map so usage snapshots and rough cost reporting continue to reflect the actual configured model mix.
+- Why: Replies and summaries are the most visible quality-sensitive learner outputs, while title generation and extraction remain better candidates for the cheaper throughput-oriented model. The existing config boundary already supports this split cleanly, so this is a small operational change rather than a provider-architecture rewrite.
+- Follow-up: If `2.5-pro` still shows avoidable `429` or `503` pressure on coach replies, add an explicit `2.5-pro -> 2.5-flash` fallback path for the coach route and log the effective model used.

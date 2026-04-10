@@ -7,9 +7,9 @@ import {
 } from "@google/genai";
 
 export const GEMINI_PROVIDER_NAME = "gemini";
-export const GEMINI_COACH_MODEL = "gemini-2.5-flash";
+export const GEMINI_COACH_MODEL = "gemini-2.5-pro";
 export const GEMINI_EXTRACTION_MODEL = "gemini-2.5-flash";
-export const GEMINI_SUMMARY_MODEL = "gemini-2.5-flash";
+export const GEMINI_SUMMARY_MODEL = "gemini-2.5-pro";
 export const GEMINI_TRANSLATION_MODEL = "gemini-2.5-flash";
 export const GEMINI_UPLOAD_POLL_ATTEMPTS = 20;
 export const GEMINI_UPLOAD_POLL_DELAY_MS = 750;
@@ -24,6 +24,10 @@ const GEMINI_PRICING: Record<string, GeminiPricingSnapshot> = {
   "gemini-2.5-flash": {
     inputUsdPerMillionTokens: 0.3,
     outputUsdPerMillionTokens: 2.5,
+  },
+  "gemini-2.5-pro": {
+    inputUsdPerMillionTokens: 1.25,
+    outputUsdPerMillionTokens: 10,
   },
 };
 
