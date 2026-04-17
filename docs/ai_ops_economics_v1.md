@@ -52,6 +52,7 @@ Current repo implication:
 - the runtime should log enough provider failure detail to distinguish a project-level `429` or `RESOURCE_EXHAUSTED` limit from a generic upstream provider failure when learner chat falls back to the retry message
 - the learner UI can now surface opaque code-only fallback states for distinct provider failure classes without leaking raw provider wording: rate-window codes, chat high-demand/generic service codes, and upload-analysis high-demand/generic service codes
 - the Gemini adapter now also treats a subset of "successful" responses as suspicious when the provider reports a non-clean finish reason or when the returned text is clearly cut off mid-structure; those turns are retried before the learner sees them, and runtime logs now include the provider finish reason on success paths for later diagnosis
+- the coach-reply path now also treats `empty text payload` results as recoverable model-path failures: it tries to recover text directly from Gemini candidate parts, retries the primary model when the output still looks invalid, and only then falls back from `gemini-2.5-pro` to `gemini-2.5-flash`
 
 Operational recommendation:
 
@@ -133,7 +134,7 @@ The learner-facing coach path now has one dedicated debug sink for successful re
 
 - table: `public.ai_generation_debug_captures`
 - scope: successful `coach_reply` generations only
-- stored fields: conversation and message references, request metadata, provider/model, prompt version, reply mode, raw successful provider text, final learner-visible text, usage snapshot, and lightweight coach metadata
+- stored fields: conversation and message references, request metadata, provider/model, prompt version, reply mode, raw successful provider text, final learner-visible text, usage snapshot, and lightweight coach metadata including requested model plus any fallback model
 
 Current access model:
 
@@ -147,7 +148,8 @@ Current access model:
 
 - route: `POST /api/conversations/[conversationId]/messages`
 - prompt version: `student-coach-v4`
-- current model: `gemini-2.5-pro`
+- current primary model: `gemini-2.5-pro`
+- current fallback model for recoverable coach-reply failures: `gemini-2.5-flash`
 - context inputs:
   - assignment text
   - edited extracted text
@@ -157,7 +159,14 @@ Current access model:
   - attachment context
   - recent transcript excerpt
 - output cap: `500` tokens
-- fallback: deterministic coach reply
+- persistence note:
+  - successful assistant turns now persist `messages.model_provider`, `messages.model_name`, `messages.input_tokens`, and `messages.output_tokens`
+  - `messages.model_name` is the effective model that produced the stored assistant text, so a Pro->Flash fallback will be visible on the assistant row itself
+- fallback:
+  - recover text from Gemini candidate parts when `response.text` is empty but the candidate payload still contains text
+  - retry the requested primary model on empty or suspicious outputs
+  - then fall back from `gemini-2.5-pro` to `gemini-2.5-flash`
+  - still use the deterministic learner-safe fallback only if both provider attempts fail
 
 ### Conversation Title
 

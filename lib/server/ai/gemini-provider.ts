@@ -16,6 +16,7 @@ import {
   GEMINI_EXTRACTION_MODEL,
   GEMINI_PROVIDER_NAME,
   GEMINI_SUMMARY_MODEL,
+  GEMINI_TITLE_MODEL,
   GEMINI_TRANSLATION_MODEL,
   GEMINI_UPLOAD_POLL_ATTEMPTS,
   GEMINI_UPLOAD_POLL_DELAY_MS,
@@ -68,7 +69,9 @@ type GeneratedUsageResult = {
 
 type GeneratedTextResult = {
   responseText: string;
+  requestedModelName: string;
   modelName: string;
+  fallbackModelName: string | null;
   usage: AiUsageSnapshot;
 };
 
@@ -302,6 +305,35 @@ function extractGeminiResponseMeta(response: unknown): GeminiResponseMeta {
   };
 }
 
+function extractTextFromGeminiCandidateParts(response: unknown) {
+  const record =
+    response && typeof response === "object"
+      ? (response as Record<string, unknown>)
+      : null;
+  const candidates = Array.isArray(record?.candidates)
+    ? (record.candidates as Array<Record<string, unknown>>)
+    : [];
+  const textParts = candidates.flatMap((candidate) => {
+    const content =
+      candidate?.content && typeof candidate.content === "object"
+        ? (candidate.content as Record<string, unknown>)
+        : null;
+    const parts = Array.isArray(content?.parts)
+      ? (content.parts as Array<Record<string, unknown>>)
+      : [];
+
+    return parts
+      .map((part) => (typeof part?.text === "string" ? part.text.trim() : null))
+      .filter((value): value is string => Boolean(value));
+  });
+
+  if (textParts.length === 0) {
+    return null;
+  }
+
+  return textParts.join("\n").trim() || null;
+}
+
 function isGeminiCleanStopReason(value: string | null) {
   return value === "STOP" || value === "FINISH_REASON_UNSPECIFIED";
 }
@@ -397,6 +429,30 @@ function buildSuspiciousSuccessDetails(input: {
   }
 
   return null;
+}
+
+function buildEmptyTextPayloadDetails(response: unknown) {
+  const responseMeta = extractGeminiResponseMeta(response);
+
+  return {
+    provider_finish_reason: responseMeta.finishReason,
+    provider_prompt_block_reason: responseMeta.promptBlockReason,
+    provider_candidate_count: responseMeta.candidateCount,
+    empty_text_payload: true,
+  };
+}
+
+function shouldRetryOutputIssue(error: unknown) {
+  if (!(error instanceof AppError)) {
+    return false;
+  }
+
+  const details = error.details ?? {};
+
+  return (
+    details.empty_text_payload === true ||
+    details.truncated_success_output === true
+  );
 }
 
 function buildLogDetails(input: {
@@ -662,6 +718,7 @@ export class GeminiAiProvider implements AiProvider {
     operation: string;
     extraLogDetails?: Record<string, unknown>;
     maxOutputTokens?: number;
+    fallbackModel?: string | null;
   }): Promise<GeneratedTextResult> {
     const inputTokens = await this.countContentTokens(input.model, input.contents);
 
@@ -677,10 +734,17 @@ export class GeminiAiProvider implements AiProvider {
             maxOutputTokens: input.maxOutputTokens,
           },
         });
-        const responseText = response.text?.trim();
+        const responseText =
+          response.text?.trim() ?? extractTextFromGeminiCandidateParts(response);
 
         if (!responseText) {
-          throw new Error("Gemini returned an empty text payload.");
+          throw new AppError({
+            code: "provider_error",
+            message: "Gemini returned an empty text payload.",
+            status: 502,
+            retryable: true,
+            details: buildEmptyTextPayloadDetails(response),
+          });
         }
 
         const outputTokens = await this.countTextTokens(input.model, responseText);
@@ -741,15 +805,72 @@ export class GeminiAiProvider implements AiProvider {
 
         return {
           responseText,
+          requestedModelName: input.model,
           modelName: response.modelVersion ?? input.model,
+          fallbackModelName: null,
           usage,
         };
       } catch (error) {
-        const canRetry = attempt < 2 && shouldRetryProviderFailure(error);
+        const canRetry =
+          attempt < 2 &&
+          (shouldRetryProviderFailure(error) || shouldRetryOutputIssue(error));
 
         if (canRetry) {
           await sleep(450 * (attempt + 1));
           continue;
+        }
+
+        const fallbackModel =
+          input.fallbackModel && input.fallbackModel !== input.model
+            ? input.fallbackModel
+            : null;
+
+        if (fallbackModel) {
+          try {
+            const fallbackResponse = await this.generateTextResponse({
+              ...input,
+              model: fallbackModel,
+              fallbackModel: null,
+            });
+
+            logRuntimeInfo({
+              message: "Gemini provider fell back to a secondary model",
+              requestId: input.requestContext.requestId,
+              route: input.requestContext.route,
+              method: "POST",
+              actorUserId: input.requestContext.actorUserId,
+              actorRole: input.requestContext.actorRole,
+              provider: GEMINI_PROVIDER_NAME,
+              targetStudentUserId: input.requestContext.studentUserId,
+              details: {
+                conversationId: input.requestContext.conversationId,
+                attachmentId: input.requestContext.attachmentId,
+                operation: input.operation,
+                requested_model: input.model,
+                effective_model: fallbackResponse.modelName,
+                fallback_model: fallbackModel,
+              },
+            });
+
+            return {
+              ...fallbackResponse,
+              requestedModelName: input.model,
+              fallbackModelName: fallbackResponse.modelName,
+            };
+          } catch (fallbackError) {
+            const fallbackFailure = extractProviderFailureDetails(fallbackError);
+            this.logFailure({
+              context: input.requestContext,
+              operation: input.operation,
+              modelName: fallbackModel,
+              errorCode: fallbackFailure.appErrorCode,
+              extra: {
+                ...input.extraLogDetails,
+                fallback_from_model: input.model,
+                ...fallbackFailure.logDetails,
+              },
+            });
+          }
         }
 
         const failure = extractProviderFailureDetails(error);
@@ -832,6 +953,7 @@ export class GeminiAiProvider implements AiProvider {
         intent: input.intent,
         reply_mode: input.replyMode,
       },
+      fallbackModel: GEMINI_COACH_MODEL === "gemini-2.5-pro" ? "gemini-2.5-flash" : null,
     });
 
     const replyText = asString(response.responseText);
@@ -856,7 +978,9 @@ export class GeminiAiProvider implements AiProvider {
             : "hint_scaffold",
       asksForAttempt:
         input.replyMode === "interactive" || input.intent !== "summarize",
+      requestedModelName: response.requestedModelName,
       generatedModelName: response.modelName,
+      fallbackModelName: response.fallbackModelName,
       promptVersion: prompt.version,
       usage: response.usage,
     };
@@ -867,7 +991,7 @@ export class GeminiAiProvider implements AiProvider {
   ): Promise<GenerateConversationTitleResult> {
     const prompt = buildConversationTitlePrompt(input);
     const response = await this.generateTextResponse({
-      model: GEMINI_COACH_MODEL,
+      model: GEMINI_TITLE_MODEL,
       systemInstruction: prompt.instruction,
       contents: createUserContent([
         `Matiere: ${input.conversation.subject_tag}`,

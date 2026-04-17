@@ -408,6 +408,10 @@ export function StudentConversationWorkbench({
         role: "student",
         content_text: pendingDraft,
         content_language: languageCode,
+        model_provider: null,
+        model_name: null,
+        input_tokens: null,
+        output_tokens: null,
         created_at: pendingTimestamp,
       });
       setPendingAssistantMessage({
@@ -417,6 +421,10 @@ export function StudentConversationWorkbench({
         role: "assistant",
         content_text: copy.pendingAssistant,
         content_language: languageCode,
+        model_provider: null,
+        model_name: null,
+        input_tokens: null,
+        output_tokens: null,
         created_at: pendingTimestamp,
       });
       setComposerText("");
@@ -519,6 +527,10 @@ export function StudentConversationWorkbench({
       role: "student",
       content_text: bootstrap.promptText,
       content_language: languageCode,
+      model_provider: null,
+      model_name: null,
+      input_tokens: null,
+      output_tokens: null,
       created_at: pendingTimestamp,
     });
     setPendingAssistantMessage({
@@ -528,6 +540,10 @@ export function StudentConversationWorkbench({
       role: "assistant",
       content_text: copy.pendingAssistant,
       content_language: languageCode,
+      model_provider: null,
+      model_name: null,
+      input_tokens: null,
+      output_tokens: null,
       created_at: pendingTimestamp,
     });
 

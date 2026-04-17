@@ -12,7 +12,9 @@ type RecordSuccessfulCoachReplyDebugCaptureInput = {
   studentMessageId: string;
   assistantMessageId: string;
   provider: string;
+  requestedModelName: string;
   modelName: string;
+  fallbackModelName: string | null;
   promptVersion: string;
   replyMode: string;
   rawOutputText: string;
@@ -50,6 +52,9 @@ export async function recordSuccessfulCoachReplyDebugCaptureBestEffort(
       metadata: {
         coachingMode: input.coachingMode,
         asksForAttempt: input.asksForAttempt,
+        requestedModelName: input.requestedModelName,
+        fallbackModelName: input.fallbackModelName,
+        usedFallback: input.requestedModelName !== input.modelName,
       },
     });
 

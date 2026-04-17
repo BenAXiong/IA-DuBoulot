@@ -72,7 +72,9 @@ export type GenerateCoachReplyResult = {
     | "summary_reflection"
     | "boundary_redirect";
   asksForAttempt: boolean;
+  requestedModelName: string;
   generatedModelName: string;
+  fallbackModelName: string | null;
   promptVersion: string;
   usage: AiUsageSnapshot;
 };

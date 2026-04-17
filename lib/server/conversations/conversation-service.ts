@@ -66,7 +66,7 @@ const CONVERSATION_SELECT =
 const WORKSPACE_SELECT =
   "conversation_id, assignment_text, edited_extracted_text, plan_text, draft_answer_text, student_notes, updated_at";
 const MESSAGE_SELECT =
-  "id, conversation_id, author_user_id, role, content_text, content_language, created_at";
+  "id, conversation_id, author_user_id, role, content_text, content_language, model_provider, model_name, input_tokens, output_tokens, created_at";
 const ATTACHMENT_SELECT =
   "id, conversation_id, uploaded_by_user_id, storage_bucket, storage_path, attachment_kind, mime_type, original_filename, byte_size, page_count, extraction_status, raw_extracted_text, source_language, metadata, created_at, updated_at";
 const SUMMARY_SELECT =
@@ -1233,6 +1233,10 @@ export async function appendConversationTurn(input: {
         role: "student",
         content_text: persistedStudentMessageText,
         content_language: appUser.ai_help_language,
+        model_provider: null,
+        model_name: null,
+        input_tokens: null,
+        output_tokens: null,
         created_at: studentCreatedAt.toISOString(),
       },
       {
@@ -1241,6 +1245,10 @@ export async function appendConversationTurn(input: {
         role: "assistant",
         content_text: assistantMessageText,
         content_language: appUser.ai_help_language,
+        model_provider: successfulAiReply ? aiProvider.name : null,
+        model_name: successfulAiReply?.generatedModelName ?? null,
+        input_tokens: providerUsage?.inputTokens ?? null,
+        output_tokens: providerUsage?.outputTokens ?? null,
         created_at: assistantCreatedAt.toISOString(),
       },
     ])
@@ -1318,7 +1326,9 @@ export async function appendConversationTurn(input: {
       studentMessageId: studentMessage.id,
       assistantMessageId: assistantMessage.id,
       provider: aiProvider.name,
+      requestedModelName: successfulAiReply.requestedModelName,
       modelName: successfulAiReply.generatedModelName,
+      fallbackModelName: successfulAiReply.fallbackModelName,
       promptVersion: successfulAiReply.promptVersion,
       replyMode: input.payload.replyMode,
       rawOutputText: successfulAiReply.rawOutputText,

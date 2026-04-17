@@ -69,6 +69,10 @@ export type ConversationMessageRecord = {
   role: "student" | "assistant" | "system";
   content_text: string;
   content_language: UiLanguageCode | null;
+  model_provider: string | null;
+  model_name: string | null;
+  input_tokens: number | null;
+  output_tokens: number | null;
   created_at: string;
 };
 
