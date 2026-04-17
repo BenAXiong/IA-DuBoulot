@@ -176,3 +176,4 @@ then close it as:
 | 2026-04-17 | 13:59 -> 13:59 | 0h00 | A0.3.7 | close the still-open 2026-04-10 session at 16:24 and reopen a fresh execution trace for today before the next implementation slice | |
 | 2026-04-17 | 14:58 -> 14:59 | 0h01 | P2.6 | log the pilot plan change to require birthdate instead of age brackets during onboarding and to remove the related age-band UI once that signup/onboarding merge work is implemented | |
 | 2026-04-17 | 15:11 -> 15:15 | 0h04 | P1.3 P2.1 A7.3.4 | log a pilot follow-up for a more specific new-user dashboard state and diagnose the consistent brand-new-user failure by inspecting current production runtime logs instead of guessing from the UI | |
+| 2026-04-17 | 15:37 -> 15:38 | 0h01 | A7.3.4 P5.3 | explain how to harden Gemini 2.5 Pro replies beyond simple fallback behavior and verify how the current app can tell whether a displayed reply came from Pro or Flash | |
