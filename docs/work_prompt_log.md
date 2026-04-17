@@ -174,3 +174,4 @@ then close it as:
 | 2026-04-10 | 16:13 -> 16:14 | 0h01 | P1.3 | audit the current /app/settings surface and identify which sections are backed by real behavior rather than pure presentation so the page can be safely rebuilt from a blank slate later | |
 | 2026-04-10 | 16:19 -> 16:24 | 0h05 | P1.3 A6.4.1 | strip /app/settings down to a minimalist profile-plus-deletion surface, remove billing and student-support sections from that route, and eliminate developer-oriented wording from the remaining settings chrome | |
 | 2026-04-17 | 13:59 -> 13:59 | 0h00 | A0.3.7 | close the still-open 2026-04-10 session at 16:24 and reopen a fresh execution trace for today before the next implementation slice | |
+| 2026-04-17 | 14:58 -> 14:59 | 0h01 | P2.6 | log the pilot plan change to require birthdate instead of age brackets during onboarding and to remove the related age-band UI once that signup/onboarding merge work is implemented | |
