@@ -2,6 +2,7 @@
 
 import { useEffect, useEffectEvent, useRef, useState, useTransition } from "react";
 import { INTAKE_ACCEPT_ATTR, stageIntakeFiles } from "@/lib/intake/intake-config";
+import { dispatchConversationTitleUpdated } from "@/lib/conversations/conversation-title-sync";
 import {
   clearPendingConversationBootstrap,
   takePendingConversationBootstrap,
@@ -149,6 +150,14 @@ export function StudentConversationWorkbench({
   useEffect(() => {
     workspaceRef.current = workspace;
   }, [workspace]);
+
+  useEffect(() => {
+    dispatchConversationTitleUpdated({
+      conversationId: conversation.id,
+      title: conversation.title,
+      subjectTag: conversation.subject_tag,
+    });
+  }, [conversation.id, conversation.subject_tag, conversation.title]);
 
   function isRetriableAttachmentFailure(
     attachment: ConversationDetail["attachments"][number],

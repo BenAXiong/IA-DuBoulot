@@ -7,6 +7,10 @@ import { SignOutButton } from "@/components/auth/sign-out-button";
 import { ProfileAvatar } from "@/components/dashboard/parent/profile-avatar";
 import { DocumentLanguageSync } from "@/components/i18n/document-language-sync";
 import { AppToolbarControls } from "@/components/layout/app-toolbar-controls";
+import {
+  addConversationTitleUpdatedListener,
+  type ConversationTitleUpdatedDetail,
+} from "@/lib/conversations/conversation-title-sync";
 import { withUiLanguage } from "@/lib/i18n/ui-language";
 import type { AppUserRecord } from "@/lib/server/auth/types";
 import type { StudentDashboardSnapshot } from "@/lib/server/student-dashboard/types";
@@ -136,6 +140,11 @@ function capitalizeSubjectLabel(subject: string) {
   return formatSubjectDisplay(subject) ?? subject;
 }
 
+function isNeutralConversationPlaceholderTitle(title: string | null | undefined) {
+  const normalized = title?.trim() ?? "";
+  return /^Subject_\d{3}$/i.test(normalized);
+}
+
 function readActiveView(value: string | null): StudentView {
   if (value === "maps" || value === "tests" || value === "forward") {
     return value;
@@ -175,6 +184,7 @@ function buildHeaderContent(input: {
   pathname: string;
   view: StudentView;
   selectedSubject: string | null;
+  conversationTitle: string | null;
   copy: ReturnType<typeof getStudentShellCopy>;
 }) {
   if (input.pathname.startsWith("/app/settings")) {
@@ -193,8 +203,11 @@ function buildHeaderContent(input: {
 
   if (input.pathname.startsWith("/app/conversations/")) {
     return {
-      eyebrow: input.copy.pageTitles.homework,
+      eyebrow:
+        formatSubjectDisplay(input.selectedSubject) ??
+        input.copy.pageTitles.homework,
       title:
+        input.conversationTitle ??
         formatSubjectDisplay(input.selectedSubject) ??
         input.copy.pageTitles.conversation,
     };
@@ -365,6 +378,9 @@ export function StudentAppShell({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [homeworkExpanded, setHomeworkExpanded] = useState(true);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [conversationHeaderOverrides, setConversationHeaderOverrides] = useState<
+    Record<string, ConversationTitleUpdatedDetail>
+  >({});
   const profileMenuCloseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
@@ -372,14 +388,49 @@ export function StudentAppShell({
   const copy = getStudentShellCopy(languageCode);
   const activeView = readActiveView(searchParams.get("view"));
   const selectedSubject = searchParams.get("subject")?.trim() || null;
+  const activeConversationId = pathname.startsWith("/app/conversations/")
+    ? pathname.slice("/app/conversations/".length).split("/")[0] ?? null
+    : null;
   const subjectGroups = useMemo(
     () => buildSubjectGroups(conversations),
     [conversations],
   );
+  const activeConversation = useMemo(
+    () =>
+      activeConversationId
+        ? conversations.find((conversation) => conversation.id === activeConversationId) ??
+          null
+        : null,
+    [activeConversationId, conversations],
+  );
+  const activeConversationSubject =
+    selectedSubject ??
+    conversationHeaderOverrides[activeConversationId ?? ""]?.subjectTag ??
+    activeConversation?.subject_tag ??
+    null;
+  const activeConversationTitle =
+    activeConversationId &&
+    !isNeutralConversationPlaceholderTitle(
+      conversationHeaderOverrides[activeConversationId]?.title,
+    )
+      ? conversationHeaderOverrides[activeConversationId]?.title ?? null
+      : activeConversation && !isNeutralConversationPlaceholderTitle(activeConversation.title)
+        ? activeConversation.title
+        : null;
+
+  useEffect(() => {
+    return addConversationTitleUpdatedListener((detail) => {
+      setConversationHeaderOverrides((current) => ({
+        ...current,
+        [detail.conversationId]: detail,
+      }));
+    });
+  }, []);
   const headerContent = buildHeaderContent({
     pathname,
     view: activeView,
-    selectedSubject,
+    selectedSubject: activeConversationSubject,
+    conversationTitle: activeConversationTitle,
     copy,
   });
   const planLabel =

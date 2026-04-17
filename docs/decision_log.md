@@ -1327,3 +1327,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Keep the fast in-memory bootstrap `Map` for normal same-tab route transitions, but add a session-scoped serializable shadow of the first prompt and reply mode in browser storage. The workbench now recovers that shadow if the in-memory payload is gone, so the student still sees and sends the intended first prompt instead of landing on a blank conversation shell. Staged `File` objects still remain tied to the in-memory handoff for now because the serializable shadow does not attempt blob persistence.
 - Why: This hardens the direct-to-conversation UX without reverting to the older launcher-side fake transcript. The most important learner-visible guarantee is that the first prompt appears and the new homework does not look empty or broken right after creation.
 - Follow-up: If staged-file loss on rare route resets becomes a meaningful demo issue, move the bootstrap handoff to a browser storage layer that can persist `File` blobs or hand the first-turn payload off through a server-owned draft record instead of only the client.
+
+### D-20260417-132 - Student Conversation Header Shows Only Real Summarized Titles, Not The Subject_### Seed
+
+- Date: 2026-04-17
+- Status: accepted
+- Related tasks: `P1.3`, `P5.3`
+- Context: The conversation service already performs best-effort title summarization after the first successful assistant reply, but the student shell header still showed only the subject on `/app/conversations/[conversationId]`. At the same time, the workbench intentionally stopped rendering the provisional stored title inside the conversation body because fresh shell conversations start from a neutral `Subject_###` placeholder. That left the summarized title effectively invisible even when it existed.
+- Decision: Keep the conversation body free of title chrome, but let the shared student shell header render the active conversation title once it is no longer the neutral `Subject_###` placeholder. The shell now treats the subject as the eyebrow on the live conversation route and uses a small client-side title-sync event from the workbench so the header can update immediately after the first successful reply without waiting for a full server refresh.
+- Why: This preserves the cleaner chat body while finally exposing the AI-summarized title in the place that actually helps orientation. The explicit placeholder filter also prevents the UI from surfacing the bootstrap seed as if it were a finished ChatGPT-style summary.
+- Follow-up: If title generation remains flaky in production, inspect title-call failures separately from shell rendering; the header path is now wired to show any non-placeholder title it receives.
