@@ -72,4 +72,5 @@ Use `OPEN` for the unfinished side of an active session.
 | 2026-04-08 | 13:14 -> 17:55 | 4h41 | A0.3.7 | reopen the execution trace for today after closing the prior 2026-04-06 session at 17:54 and resync the logs before the next implementation slice |
 | 2026-04-09 | 15:40 -> 17:09 | 1h29 | A0.3.7 | close the prior 2026-04-08 session at 17:55, reopen the trace for today, and keep the execution logs synced through the next implementation slice |
 | 2026-04-10 | 10:42 -> 12:22 | 1h40 | A0.3.7 | close the prior 2026-04-09 session at 17:09 and reopen a fresh execution trace for today before the next slice |
-| 2026-04-10 | 14:32 -> OPEN | OPEN | A0.3.7 | close the earlier 2026-04-10 session at 12:22 and reopen a fresh execution trace for the next implementation slice |
+| 2026-04-10 | 14:32 -> 16:24 | 1h52 | A0.3.7 | close the earlier 2026-04-10 session at 12:22 and reopen a fresh execution trace for the next implementation slice |
+| 2026-04-17 | 13:59 -> OPEN | OPEN | A0.3.7 | close the stale 2026-04-10 open session at 16:24 and reopen a fresh execution trace for today before the next implementation slice |
