@@ -85,7 +85,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 - attachment removal currently deletes the file record plus private storage object, but it does not yet scrub extracted text that may already have been copied into the hidden workspace
 - only provider-failure extraction states auto-retry; attachments that failed because no safe or usable text was found still stay manual so the app does not mask a genuinely unreadable source behind endless retries
 - image preview can still feel slower than a public image gallery because the rail currently fetches the original private file through the authenticated attachment-access route plus signed redirect; there is no dedicated thumbnail generation layer yet
-- the first-turn bootstrap payload is currently in-memory only; if the learner hard-refreshes immediately after the route change and before the first send finishes, the shell conversation still exists but the optimistic bootstrap payload is gone and the student would need to resend manually
+- the first-turn bootstrap path now uses a hybrid client handoff: a fast in-memory payload still carries staged `File` objects during a normal same-tab route transition, while a session-scoped serializable shadow preserves the first prompt and reply mode so the conversation no longer opens as a blank shell if client module state is reset during navigation; staged file blobs still depend on the in-memory handoff and are not yet recoverable from the serializable shadow alone
 
 ## Validation Record
 
