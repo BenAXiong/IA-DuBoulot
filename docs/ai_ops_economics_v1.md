@@ -158,7 +158,7 @@ Current access model:
   - student notes
   - attachment context
   - recent transcript excerpt
-- output cap: `500` tokens
+- output cap: `2000` tokens
 - persistence note:
   - successful assistant turns now persist `messages.model_provider`, `messages.model_name`, `messages.input_tokens`, and `messages.output_tokens`
   - `messages.model_name` is the effective model that produced the stored assistant text, so a Pro->Flash fallback will be visible on the assistant row itself
@@ -289,7 +289,7 @@ Using only the configured output-token caps:
 
 | Operation | Output token cap | Output-side ceiling at current pricing |
 | --- | --- | --- |
-| coach reply | `500` | about `$0.00125` |
+| coach reply | `2000` | about `$0.02000` |
 | summary generation | `450` | about `$0.001125` |
 | memory profile | `280` | about `$0.00070` |
 | translation | `900` | about `$0.00225` |

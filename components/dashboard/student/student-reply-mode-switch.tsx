@@ -88,7 +88,11 @@ function getModeIcon(mode: StudentReplyMode) {
   return <ThinkingIcon />;
 }
 
-const MODE_ORDER: StudentReplyMode[] = ["fast", "thinking", "interactive"];
+function normalizeVisibleMode(mode: StudentReplyMode): Exclude<StudentReplyMode, "interactive"> {
+  return mode === "interactive" ? "thinking" : mode;
+}
+
+const MODE_ORDER: Array<Exclude<StudentReplyMode, "interactive">> = ["fast", "thinking"];
 
 export function StudentReplyModeSwitch({
   languageCode,
@@ -97,6 +101,7 @@ export function StudentReplyModeSwitch({
   onModeChange,
 }: StudentReplyModeSwitchProps) {
   const copy = getStudentReplyModeCopy(languageCode);
+  const visibleMode = normalizeVisibleMode(mode);
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
 
@@ -132,8 +137,8 @@ export function StudentReplyModeSwitch({
         title={copy.switchTooltip}
         type="button"
       >
-        {getModeIcon(mode)}
-        <span>{copy.names[mode]}</span>
+        {getModeIcon(visibleMode)}
+        <span>{copy.names[visibleMode]}</span>
         <span title={copy.chevronTooltip}>
           <ChevronIcon open={open} />
         </span>
@@ -142,7 +147,7 @@ export function StudentReplyModeSwitch({
       {open ? (
         <div className="absolute bottom-full left-0 z-30 mb-2 min-w-[12rem] rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface-raised)] p-1.5 shadow-[var(--shadow)]">
           {MODE_ORDER.map((option) => {
-            const selected = option === mode;
+            const selected = option === visibleMode;
 
             return (
               <button

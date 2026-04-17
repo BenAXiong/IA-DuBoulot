@@ -53,7 +53,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 12. renders assistant turns through a markdown-plus-math path, so simple LaTeX like `$v = d/t$` can display as formatted math instead of raw markup
 13. keeps the live composer pinned at the bottom of the conversation view, now shows a chevron jump-to-latest control above it when the transcript is scrolled upward, appends the learner's message optimistically with a lightweight pending banban placeholder so the prompt no longer looks stuck in the textarea during the round trip, no longer renders the provisional conversation title or last-activity chrome inside the live chat body, and now seeds new shell conversations with a neutral per-subject `Subject_###` placeholder until a later AI summary can replace it
 14. reuses the same learner avatar style as the profile dock for student turns, so the thread feels like one consistent messaging surface instead of mixing unrelated identity treatments
-15. exposes a small reply-mode switch directly in the chat tools, and now routes `fast`, `thinking`, and `interactive` as real prompt-level coaching variants instead of leaving them as a purely hypothetical Pilot note
+15. exposes a small reply-mode switch directly in the chat tools, and now keeps only `fast` and `thinking` learner-visible while routing them as real prompt-level coaching variants; `interactive` remains an internal or future-facing mode and is intentionally hidden again until the richer diagram or embedded-tool path exists
 16. renders only one explicit completion control at the bottom of the right rail, keeping completion available without the older session-summary card dominating the active chat
 17. localizes the workbench shell, composer, the reply-mode switch, and the side rail through `lib/i18n/student-flow-copy.ts`
 18. treats uploaded files honestly inside the live coach path: banban only knows the extracted text or workspace context that the server actually provides, and it must not claim to have read image pixels or PDF pages directly when no reliable extracted text is present
@@ -69,6 +69,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 - moderation outcomes are recorded before blocked or flagged content leaves the server boundary
 - the student-facing shell still assumes the conversation shell already exists before the live workbench opens, but it can now receive a one-time client bootstrap payload from the homework launcher so the workbench itself owns the optimistic first-turn handoff
 - reply modes are not separate models; they are prompt-policy variants on the same student coach path, selected per message through the live composer or subject quick-start
+- the current learner-visible switch intentionally excludes `interactive`, even though the backend type still preserves that enum for compatibility with older payloads and future restoration
 
 ## Important Boundaries
 

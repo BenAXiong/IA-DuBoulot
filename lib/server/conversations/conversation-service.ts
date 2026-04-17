@@ -431,9 +431,7 @@ export async function parseAppendConversationMessageInput(
   const contentText =
     typeof payload.contentText === "string" ? payload.contentText : "";
   const replyMode =
-    payload.replyMode === "fast" ||
-    payload.replyMode === "interactive" ||
-    payload.replyMode === "thinking"
+    payload.replyMode === "fast" || payload.replyMode === "thinking"
       ? payload.replyMode
       : "thinking";
 
