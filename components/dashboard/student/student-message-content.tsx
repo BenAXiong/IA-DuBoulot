@@ -68,27 +68,21 @@ export function StudentMessageContent({
           ),
           table: ({ children }) => (
             <div className="mb-4 overflow-x-auto last:mb-0">
-              <table className="student-markdown-table w-full border-collapse text-left text-sm leading-6">
+              <table className="student-markdown-table text-left text-sm leading-6">
                 {children}
               </table>
             </div>
           ),
-          thead: ({ children }) => (
-            <thead className="bg-[color:var(--surface-strong)]">{children}</thead>
-          ),
+          thead: ({ children }) => <thead>{children}</thead>,
           tbody: ({ children }) => <tbody>{children}</tbody>,
-          tr: ({ children }) => (
-            <tr className="border-b border-[color:var(--line)] last:border-b-0">
-              {children}
-            </tr>
-          ),
+          tr: ({ children }) => <tr>{children}</tr>,
           th: ({ children }) => (
-            <th className="border border-[color:var(--line)] px-3 py-2 font-semibold text-[color:var(--foreground)]">
+            <th className="font-semibold text-[color:var(--foreground)]">
               {children}
             </th>
           ),
           td: ({ children }) => (
-            <td className="border border-[color:var(--line)] px-3 py-2 align-top">
+            <td className="align-top">
               {children}
             </td>
           ),

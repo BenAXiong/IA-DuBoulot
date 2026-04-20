@@ -188,3 +188,4 @@ then close it as:
 | 2026-04-20 | 13:36 -> 13:37 | 0h01 | P1.3 | tighten student chat markdown table column sizing so compact numeric columns no longer stretch across the full chat width | |
 | 2026-04-20 | 13:47 -> 13:48 | 0h01 | P1.3 | restyle student chat markdown tables toward a lighter full-width layout with more uniform column distribution instead of the earlier content-sized table treatment | |
 | 2026-04-20 | 13:53 -> 13:54 | 0h01 | P1.3 | fine-tune student chat markdown tables to better match the lighter screenshot style by removing header tint, lowering row height, and keeping only horizontal separators | |
+| 2026-04-20 | 14:10 -> 14:11 | 0h01 | P1.3 | remove the remaining hard-coded table borders and header tint from the student markdown renderer so the lighter table CSS actually takes effect | |
