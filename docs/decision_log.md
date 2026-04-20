@@ -1357,3 +1357,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Keep the subject as the eyebrow on the live conversation route, but always show the current conversation title on the second line, including the neutral `Subject_###` placeholder when it has not yet been replaced by a summarized title. This makes the fallback visible again without reintroducing the older mistake of duplicating the subject as a fake title.
 - Why: A visible placeholder is a better failure mode than a blank header because it preserves orientation, matches the seeded conversation record, and makes title-generation misses legible instead of silently ambiguous.
 - Follow-up: If title summarization keeps missing often in production, inspect provider logs for the dedicated title call rather than relying on the placeholder as a permanent steady state.
+
+### D-20260420-135 - First-Turn Conversation Titles Now Fall Back To A Deterministic Heuristic When The Dedicated AI Title Pass Misses
+
+- Date: 2026-04-20
+- Status: accepted
+- Related tasks: `P1.3`, `P5.3`
+- Context: The first successful learner turn already attempted a dedicated `conversation_title` AI call, but failures in that branch were intentionally swallowed as best-effort polish. In practice that left some new conversations permanently stuck on the neutral `Subject_###` seed, and the runtime logs were not making it obvious whether the title branch had fired, failed upstream, or never reached the provider layer.
+- Decision: Keep the dedicated AI title pass as the preferred first-turn behavior, but add explicit runtime logs around the title attempt plus a deterministic server-side fallback title builder based on the first learner message and subject. If the AI title pass fails or leaves the conversation on the neutral placeholder, the service now promotes a short heuristic title instead of keeping `Subject_###`.
+- Why: For the pilot flow, a stable non-placeholder title is more important than insisting every title be model-generated. The heuristic fallback preserves product continuity while the new logs make the real title-generation failure mode inspectable.
+- Follow-up: Review the new title-attempt logs on the next failed case and decide whether the dedicated AI title pass needs a deeper provider-side fix, a different model, or more permissive output handling.

@@ -74,7 +74,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 ## Important Boundaries
 
 - the current local workbench is already on the real provider/upload path, and a fixture-backed end-to-end smoke now passes locally, but the latest run still exercised provider fallbacks
-- the live conversation area intentionally hides the stored conversation title inside the transcript body, but the shared student shell header now listens for conversation-title updates from the workbench and always shows the current conversation title on the second line; when AI summarization has not replaced the neutral `Subject_###` placeholder seed yet, that placeholder remains visible in the header instead of disappearing
+- the live conversation area intentionally hides the stored conversation title inside the transcript body, but the shared student shell header now listens for conversation-title updates from the workbench and always shows the current conversation title on the second line; the first successful learner turn still tries the dedicated AI title summarizer first, but if that title pass fails the conversation service now applies a short deterministic fallback title instead of leaving the chat stuck on `Subject_###`
 - the live coach reply path does not directly inspect image pixels or PDF page renders; it only receives extracted attachment text plus the persisted conversation or workspace context, so any learner-facing claim about what was "read" from a file must stay grounded in that text context
 - moderation is currently local-rule based, not yet provider-assisted or admin-tunable
 - once the session is marked complete, the workbench becomes read-only for student writes

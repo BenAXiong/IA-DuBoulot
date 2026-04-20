@@ -99,8 +99,83 @@ function normalizeConversationTitle(value: string | null | undefined) {
   }
 
   return withoutQuotes.length > 120
-    ? withoutQuotes.slice(0, 117).trimEnd() + "..."
-    : withoutQuotes;
+      ? withoutQuotes.slice(0, 117).trimEnd() + "..."
+      : withoutQuotes;
+}
+
+function isNeutralConversationPlaceholderTitle(value: string | null | undefined) {
+  const normalized = value?.trim() ?? "";
+  return /^Subject_\d{3}$/i.test(normalized);
+}
+
+function normalizeTitleCandidate(value: string) {
+  return normalizeConversationTitle(
+    value
+      .replace(/[.!?]+$/g, "")
+      .replace(/\s+/g, " ")
+      .trim(),
+  );
+}
+
+function buildHeuristicConversationTitle(input: {
+  languageCode: UiLanguageCode;
+  subjectTag: string;
+  studentMessageText: string;
+}) {
+  const normalizedMessage = input.studentMessageText
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!normalizedMessage) {
+    return null;
+  }
+
+  const frenchTopicMatch = normalizedMessage.match(
+    /\b(?:sur|de|du|des|d')\s+([^,.!?;:]+)/i,
+  );
+
+  if (frenchTopicMatch?.[1]) {
+    const candidate = normalizeTitleCandidate(
+      `Révision ${frenchTopicMatch[1]}`.replace(/\bd'\s+/i, "d'"),
+    );
+    if (candidate) {
+      return candidate;
+    }
+  }
+
+  const strippedMessage = normalizedMessage
+    .replace(
+      /^(?:non,\s*)?(?:stp|svp)?\s*(?:j['’]ai besoin de toi pour|aide(?:-moi)?(?:\s+avec|\s+sur|\s+à)?|explique(?:-moi)?|donne(?:-moi)?|fournis(?:-le)?|peux-tu|tu peux)\s+/i,
+      "",
+    )
+    .replace(/^(?:le|la|les|un|une|des)\s+/i, "")
+    .trim();
+
+  const words = strippedMessage
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 6);
+
+  if (words.length > 0) {
+    const candidate = normalizeTitleCandidate(words.join(" "));
+    if (candidate) {
+      return candidate;
+    }
+  }
+
+  const subjectDisplay = normalizeTitleCandidate(input.subjectTag);
+  if (!subjectDisplay) {
+    return null;
+  }
+
+  switch (input.languageCode) {
+    case "en":
+      return `Homework in ${subjectDisplay}`;
+    case "zh":
+      return `${subjectDisplay} 作業`;
+    default:
+      return `Devoir en ${subjectDisplay}`;
+  }
 }
 
 function buildModerationSafeReply(languageCode: UiLanguageCode) {
@@ -1161,6 +1236,21 @@ export async function appendConversationTurn(input: {
         !hasSuccessfulAssistantReply &&
         outputModeration.status !== "blocked"
       ) {
+        logRuntimeInfo({
+          message: "Attempting conversation title generation",
+          requestId: input.requestId,
+          route: input.route,
+          method: "POST",
+          actorUserId: appUser.id,
+          actorRole: appUser.role,
+          targetStudentUserId: appUser.id,
+          details: {
+            conversationId: input.conversationId,
+            existing_title: conversation.title,
+            subject_tag: conversation.subject_tag,
+          },
+        });
+
         try {
           const titleResult = await aiProvider.generateConversationTitle({
             conversation,
@@ -1183,9 +1273,71 @@ export async function appendConversationTurn(input: {
           if (summarizedTitle) {
             nextConversationTitle = summarizedTitle;
             titleUsage = titleResult.usage;
+
+            logRuntimeInfo({
+              message: "Generated conversation title",
+              requestId: input.requestId,
+              route: input.route,
+              method: "POST",
+              actorUserId: appUser.id,
+              actorRole: appUser.role,
+              targetStudentUserId: appUser.id,
+              details: {
+                conversationId: input.conversationId,
+                generated_title: summarizedTitle,
+                previous_title: conversation.title,
+              },
+            });
           }
-        } catch {
-          // Best-effort polish only. Provider logs already capture the failure.
+        } catch (error) {
+          logRuntimeInfo({
+            message: "Conversation title generation failed",
+            requestId: input.requestId,
+            route: input.route,
+            method: "POST",
+            actorUserId: appUser.id,
+            actorRole: appUser.role,
+            targetStudentUserId: appUser.id,
+            details: {
+              conversationId: input.conversationId,
+              previous_title: conversation.title,
+              reason:
+                error instanceof Error ? error.message : "title_generation_failed",
+            },
+          });
+        }
+
+        if (
+          isNeutralConversationPlaceholderTitle(nextConversationTitle) ||
+          nextConversationTitle === conversation.title
+        ) {
+          const heuristicTitle = buildHeuristicConversationTitle({
+            languageCode: appUser.ai_help_language,
+            subjectTag: conversation.subject_tag,
+            studentMessageText,
+          });
+
+          if (
+            heuristicTitle &&
+            !isNeutralConversationPlaceholderTitle(heuristicTitle)
+          ) {
+            nextConversationTitle = heuristicTitle;
+
+            logRuntimeInfo({
+              message: "Applied heuristic conversation title fallback",
+              requestId: input.requestId,
+              route: input.route,
+              method: "POST",
+              actorUserId: appUser.id,
+              actorRole: appUser.role,
+              targetStudentUserId: appUser.id,
+              details: {
+                conversationId: input.conversationId,
+                fallback_title: heuristicTitle,
+                previous_title: conversation.title,
+              },
+            });
+          }
         }
       }
     } catch (error) {
