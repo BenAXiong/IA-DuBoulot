@@ -24,7 +24,9 @@ export function StudentChatThread({
 }: StudentChatThreadProps) {
   const copy = getStudentWorkbenchCopy(languageCode);
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
-  const contentColumnClass = "max-w-[min(calc(100%-3rem),38rem)]";
+  const studentBubbleColumnClass = "max-w-[min(calc(100%-3rem),38rem)]";
+  const assistantBodyColumnClass = "max-w-[min(calc(100%-3rem),41rem)]";
+  const avatarSpacerClass = "w-10 shrink-0";
 
   useEffect(() => {
     if (!copiedMessageId) {
@@ -86,8 +88,8 @@ export function StudentChatThread({
               <div
                 className={`flex min-w-0 flex-col ${
                   isStudent
-                    ? `${contentColumnClass} items-end`
-                    : `${contentColumnClass} items-start`
+                    ? `${studentBubbleColumnClass} items-end`
+                    : `flex-1 items-start`
                 }`}
               >
                 <div
@@ -95,10 +97,10 @@ export function StudentChatThread({
                     isStudent
                       ? "w-fit max-w-full rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-3.5 shadow-[0_10px_30px_rgba(15,23,42,0.06)]"
                       : isSystem
-                        ? "w-full rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-[color:var(--ink-soft)]"
+                        ? `${assistantBodyColumnClass} w-full rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-[color:var(--ink-soft)]`
                         : message.isPending
-                          ? "student-pending-shimmer w-full rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-[color:var(--ink-soft)]"
-                          : "w-full px-1 py-1.5"
+                          ? `${assistantBodyColumnClass} student-pending-shimmer w-full rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-[color:var(--ink-soft)]`
+                          : `${assistantBodyColumnClass} w-full px-1 py-1.5`
                   }`}
                 >
                   {isAssistant && !message.isPending ? (
@@ -166,6 +168,8 @@ export function StudentChatThread({
                   </button>
                 </div>
               </div>
+
+              {!isStudent ? <div aria-hidden="true" className={avatarSpacerClass} /> : null}
 
               {isStudent ? (
                 <ProfileAvatar name={studentDisplayName} size="sm" />

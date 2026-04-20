@@ -192,3 +192,4 @@ then close it as:
 | 2026-04-20 | 14:15 -> 14:17 | 0h02 | P1.3 | make the student markdown table header divider slightly more salient without bringing back boxed table styling | |
 | 2026-04-20 | 14:20 -> 14:22 | 0h02 | P1.3 | widen assistant reply body layout to the student-bubble right edge and make student bubbles shrink to fit while keeping their text left-aligned | |
 | 2026-04-20 | 14:29 -> 14:31 | 0h02 | P1.3 | align assistant replies to the same narrower content column as student bubbles and shrink the shared bubble column slightly so short and long line endings feel less uneven | |
+| 2026-04-20 | 14:42 -> 14:51 | 0h09 | P1.3 P5.3 | correct the assistant-width interpretation, reserve the learner-avatar zone on the right side of assistant rows, and harden the conversation-title header path so the left header title line only appears when a real summarized title exists below the subject | | 

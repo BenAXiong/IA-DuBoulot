@@ -9,6 +9,7 @@ import { DocumentLanguageSync } from "@/components/i18n/document-language-sync";
 import { AppToolbarControls } from "@/components/layout/app-toolbar-controls";
 import {
   addConversationTitleUpdatedListener,
+  readStoredConversationTitle,
   type ConversationTitleUpdatedDetail,
 } from "@/lib/conversations/conversation-title-sync";
 import { withUiLanguage } from "@/lib/i18n/ui-language";
@@ -206,10 +207,7 @@ function buildHeaderContent(input: {
       eyebrow:
         formatSubjectDisplay(input.selectedSubject) ??
         input.copy.pageTitles.homework,
-      title:
-        input.conversationTitle ??
-        formatSubjectDisplay(input.selectedSubject) ??
-        input.copy.pageTitles.conversation,
+      title: input.conversationTitle,
     };
   }
 
@@ -403,9 +401,13 @@ export function StudentAppShell({
         : null,
     [activeConversationId, conversations],
   );
+  const storedConversationHeaderOverride = activeConversationId
+    ? readStoredConversationTitle(activeConversationId)
+    : null;
   const activeConversationSubject =
     selectedSubject ??
     conversationHeaderOverrides[activeConversationId ?? ""]?.subjectTag ??
+    storedConversationHeaderOverride?.subjectTag ??
     activeConversation?.subject_tag ??
     null;
   const activeConversationTitle =
@@ -414,6 +416,11 @@ export function StudentAppShell({
       conversationHeaderOverrides[activeConversationId]?.title,
     )
       ? conversationHeaderOverrides[activeConversationId]?.title ?? null
+      : activeConversationId &&
+          !isNeutralConversationPlaceholderTitle(
+            storedConversationHeaderOverride?.title,
+          )
+        ? storedConversationHeaderOverride?.title ?? null
       : activeConversation && !isNeutralConversationPlaceholderTitle(activeConversation.title)
         ? activeConversation.title
         : null;
@@ -786,9 +793,11 @@ export function StudentAppShell({
                   <p className="truncate text-xs uppercase tracking-[0.18em] text-[color:var(--ink-muted)]">
                     {headerContent.eyebrow}
                   </p>
-                  <p className="truncate text-sm font-medium">
-                    {headerContent.title}
-                  </p>
+                  {headerContent.title ? (
+                    <p className="truncate text-sm font-medium">
+                      {headerContent.title}
+                    </p>
+                  ) : null}
                 </div>
               </div>
 
