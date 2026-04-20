@@ -185,3 +185,4 @@ then close it as:
 | 2026-04-17 | 17:12 -> 17:15 | 0h03 | P1.3 P5.3 | investigate why AI-summarized conversation titles still do not appear for student chats, verify whether the summary is generated after the first successful reply, and wire the header to show only real summarized titles instead of the neutral Subject_### placeholder | |
 | 2026-04-20 | 13:13 -> 13:14 | 0h01 | A0.3.7 A7.1.1 A7.1.2 P1.3 P2.1 | close the 2026-04-17 session at 17:15, reopen a fresh session for today, and restate the remaining student-demo work from the current deployed state | |
 | 2026-04-20 | 13:28 -> 13:33 | 0h05 | P1.3 P5.3 | enable proper markdown table rendering in student assistant replies so GFM tables display as real tables instead of raw pipe text | |
+| 2026-04-20 | 13:36 -> 13:37 | 0h01 | P1.3 | tighten student chat markdown table column sizing so compact numeric columns no longer stretch across the full chat width | |

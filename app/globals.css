@@ -850,13 +850,21 @@ html[data-theme="custom"] .bg-\[\#cb5d3c\] {
 }
 
 .student-markdown-table {
-  min-width: 24rem;
+  width: max-content;
+  max-width: 100%;
+  min-width: min(24rem, 100%);
 }
 
 .student-markdown-table th,
 .student-markdown-table td {
   overflow-wrap: normal;
   word-break: normal;
+}
+
+.student-markdown-table th:not(:first-child),
+.student-markdown-table td:not(:first-child) {
+  width: 1%;
+  white-space: nowrap;
 }
 
 .student-markdown .katex-display {
