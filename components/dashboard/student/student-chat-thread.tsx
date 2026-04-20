@@ -62,7 +62,7 @@ export function StudentChatThread({
             key={message.id}
           >
             <div
-              className={`flex w-full max-w-3xl items-start gap-3 ${
+              className={`flex w-full items-start gap-3 ${
                 isStudent ? "justify-end" : "justify-start"
               }`}
             >
@@ -84,24 +84,26 @@ export function StudentChatThread({
 
               <div
                 className={`flex min-w-0 flex-col ${
-                  isStudent ? "items-end" : "items-start"
+                  isStudent
+                    ? "max-w-[min(calc(100%-3rem),42rem)] items-end"
+                    : "flex-1 items-start"
                 }`}
               >
                 <div
                   className={`min-w-0 text-sm leading-7 text-[color:var(--foreground)] ${
                     isStudent
-                      ? "ml-auto w-fit max-w-[min(100%,42rem)] rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-3.5 text-right shadow-[0_10px_30px_rgba(15,23,42,0.06)]"
+                      ? "w-fit max-w-full rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-3.5 shadow-[0_10px_30px_rgba(15,23,42,0.06)]"
                       : isSystem
                         ? "max-w-[min(100%,42rem)] rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-[color:var(--ink-soft)]"
                         : message.isPending
                           ? "student-pending-shimmer max-w-[min(100%,42rem)] rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-[color:var(--ink-soft)]"
-                          : "max-w-[min(100%,42rem)] px-1 py-1.5"
+                          : "w-full px-1 py-1.5"
                   }`}
                 >
                   {isAssistant && !message.isPending ? (
                     <StudentMessageContent content={message.content_text} />
                   ) : (
-                    <p className={`whitespace-pre-wrap ${isStudent ? "text-right" : ""}`}>
+                    <p className="whitespace-pre-wrap text-left">
                       {message.content_text}
                     </p>
                   )}

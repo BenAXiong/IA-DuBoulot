@@ -190,3 +190,4 @@ then close it as:
 | 2026-04-20 | 13:53 -> 13:54 | 0h01 | P1.3 | fine-tune student chat markdown tables to better match the lighter screenshot style by removing header tint, lowering row height, and keeping only horizontal separators | |
 | 2026-04-20 | 14:10 -> 14:11 | 0h01 | P1.3 | remove the remaining hard-coded table borders and header tint from the student markdown renderer so the lighter table CSS actually takes effect | |
 | 2026-04-20 | 14:15 -> 14:17 | 0h02 | P1.3 | make the student markdown table header divider slightly more salient without bringing back boxed table styling | |
+| 2026-04-20 | 14:20 -> 14:22 | 0h02 | P1.3 | widen assistant reply body layout to the student-bubble right edge and make student bubbles shrink to fit while keeping their text left-aligned | |
