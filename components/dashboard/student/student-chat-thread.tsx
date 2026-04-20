@@ -25,7 +25,6 @@ export function StudentChatThread({
   const copy = getStudentWorkbenchCopy(languageCode);
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const studentBubbleColumnClass = "max-w-[min(calc(100%-3rem),38rem)]";
-  const assistantBodyColumnClass = "max-w-[min(calc(100%-3rem),41rem)]";
   const avatarSpacerClass = "w-10 shrink-0";
 
   useEffect(() => {
@@ -97,10 +96,10 @@ export function StudentChatThread({
                     isStudent
                       ? "w-fit max-w-full rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-3.5 shadow-[0_10px_30px_rgba(15,23,42,0.06)]"
                       : isSystem
-                        ? `${assistantBodyColumnClass} w-full rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-[color:var(--ink-soft)]`
+                        ? "w-full rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-[color:var(--ink-soft)]"
                         : message.isPending
-                          ? `${assistantBodyColumnClass} student-pending-shimmer w-full rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-[color:var(--ink-soft)]`
-                          : `${assistantBodyColumnClass} w-full px-1 py-1.5`
+                          ? "student-pending-shimmer w-full rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-[color:var(--ink-soft)]"
+                          : "w-full px-1 py-1.5"
                   }`}
                 >
                   {isAssistant && !message.isPending ? (

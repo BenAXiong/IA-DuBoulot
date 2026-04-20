@@ -1347,3 +1347,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Switch the student assistant markdown renderer to proper markdown plugins for soft line breaks and GitHub-flavored markdown. The workbench now uses `remark-breaks` and `remark-gfm` alongside `remark-math`, and the student markdown surface includes explicit table rendering styles so model-generated tables display as readable tables instead of source text.
 - Why: This is the smallest clean fix for a visible demo-quality problem. It improves learner readability without changing the prompt strategy or inventing a custom table parser.
 - Follow-up: If the assistant starts emitting more complex markdown constructs later, keep extending the same renderer path instead of reintroducing newline-rewrite hacks or format-specific one-off post-processing.
+
+### D-20260420-134 - Conversation Header Falls Back To Subject_### Placeholder When Summarization Has Not Landed Yet
+
+- Date: 2026-04-20
+- Status: accepted
+- Related tasks: `P1.3`, `P5.3`
+- Context: The student shell already received title updates from the live workbench and stored them in a small session-scoped fallback, but the header deliberately filtered out the neutral `Subject_###` bootstrap seed. That meant any conversation whose first-turn title summarization failed or had not completed yet showed only the subject eyebrow and a blank second line, which looked like broken title generation rather than a still-pending fallback state.
+- Decision: Keep the subject as the eyebrow on the live conversation route, but always show the current conversation title on the second line, including the neutral `Subject_###` placeholder when it has not yet been replaced by a summarized title. This makes the fallback visible again without reintroducing the older mistake of duplicating the subject as a fake title.
+- Why: A visible placeholder is a better failure mode than a blank header because it preserves orientation, matches the seeded conversation record, and makes title-generation misses legible instead of silently ambiguous.
+- Follow-up: If title summarization keeps missing often in production, inspect provider logs for the dedicated title call rather than relying on the placeholder as a permanent steady state.

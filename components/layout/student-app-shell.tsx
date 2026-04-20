@@ -141,11 +141,6 @@ function capitalizeSubjectLabel(subject: string) {
   return formatSubjectDisplay(subject) ?? subject;
 }
 
-function isNeutralConversationPlaceholderTitle(title: string | null | undefined) {
-  const normalized = title?.trim() ?? "";
-  return /^Subject_\d{3}$/i.test(normalized);
-}
-
 function readActiveView(value: string | null): StudentView {
   if (value === "maps" || value === "tests" || value === "forward") {
     return value;
@@ -411,19 +406,10 @@ export function StudentAppShell({
     activeConversation?.subject_tag ??
     null;
   const activeConversationTitle =
-    activeConversationId &&
-    !isNeutralConversationPlaceholderTitle(
-      conversationHeaderOverrides[activeConversationId]?.title,
-    )
-      ? conversationHeaderOverrides[activeConversationId]?.title ?? null
-      : activeConversationId &&
-          !isNeutralConversationPlaceholderTitle(
-            storedConversationHeaderOverride?.title,
-          )
-        ? storedConversationHeaderOverride?.title ?? null
-      : activeConversation && !isNeutralConversationPlaceholderTitle(activeConversation.title)
-        ? activeConversation.title
-        : null;
+    conversationHeaderOverrides[activeConversationId ?? ""]?.title?.trim() ??
+    storedConversationHeaderOverride?.title?.trim() ??
+    activeConversation?.title?.trim() ??
+    null;
 
   useEffect(() => {
     return addConversationTitleUpdatedListener((detail) => {
