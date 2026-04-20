@@ -189,3 +189,4 @@ then close it as:
 | 2026-04-20 | 13:47 -> 13:48 | 0h01 | P1.3 | restyle student chat markdown tables toward a lighter full-width layout with more uniform column distribution instead of the earlier content-sized table treatment | |
 | 2026-04-20 | 13:53 -> 13:54 | 0h01 | P1.3 | fine-tune student chat markdown tables to better match the lighter screenshot style by removing header tint, lowering row height, and keeping only horizontal separators | |
 | 2026-04-20 | 14:10 -> 14:11 | 0h01 | P1.3 | remove the remaining hard-coded table borders and header tint from the student markdown renderer so the lighter table CSS actually takes effect | |
+| 2026-04-20 | 14:15 -> 14:17 | 0h02 | P1.3 | make the student markdown table header divider slightly more salient without bringing back boxed table styling | |
