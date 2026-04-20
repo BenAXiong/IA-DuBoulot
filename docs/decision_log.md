@@ -1337,3 +1337,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Keep the conversation body free of title chrome, but let the shared student shell header render the active conversation title once it is no longer the neutral `Subject_###` placeholder. The shell now treats the subject as the eyebrow on the live conversation route and uses a small client-side title-sync event from the workbench so the header can update immediately after the first successful reply without waiting for a full server refresh.
 - Why: This preserves the cleaner chat body while finally exposing the AI-summarized title in the place that actually helps orientation. The explicit placeholder filter also prevents the UI from surfacing the bootstrap seed as if it were a finished ChatGPT-style summary.
 - Follow-up: If title generation remains flaky in production, inspect title-call failures separately from shell rendering; the header path is now wired to show any non-placeholder title it receives.
+
+### D-20260420-133 - Student Assistant Markdown Now Uses GFM Tables And Proper Soft Line Breaks
+
+- Date: 2026-04-20
+- Status: accepted
+- Related tasks: `P1.3`, `P5.3`
+- Context: The student chat renderer already supported markdown, LaTeX, and inline code, but assistant outputs that included pipe-form tables still rendered as raw text because the renderer only used basic markdown plus `remark-math`. It also forced every newline into a hard-break sequence before parsing, which was a brittle workaround that made richer block markdown harder to support cleanly.
+- Decision: Switch the student assistant markdown renderer to proper markdown plugins for soft line breaks and GitHub-flavored markdown. The workbench now uses `remark-breaks` and `remark-gfm` alongside `remark-math`, and the student markdown surface includes explicit table rendering styles so model-generated tables display as readable tables instead of source text.
+- Why: This is the smallest clean fix for a visible demo-quality problem. It improves learner readability without changing the prompt strategy or inventing a custom table parser.
+- Follow-up: If the assistant starts emitting more complex markdown constructs later, keep extending the same renderer path instead of reintroducing newline-rewrite hacks or format-specific one-off post-processing.

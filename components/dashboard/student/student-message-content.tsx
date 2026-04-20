@@ -2,15 +2,13 @@
 
 import ReactMarkdown from "react-markdown";
 import rehypeKatex from "rehype-katex";
+import remarkBreaks from "remark-breaks";
+import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 
 type StudentMessageContentProps = {
   content: string;
 };
-
-function normalizeMarkdown(content: string) {
-  return content.replace(/\n/g, "  \n");
-}
 
 export function StudentMessageContent({
   content,
@@ -19,7 +17,7 @@ export function StudentMessageContent({
     <div className="student-markdown">
       <ReactMarkdown
         rehypePlugins={[rehypeKatex]}
-        remarkPlugins={[remarkMath]}
+        remarkPlugins={[remarkMath, remarkGfm, remarkBreaks]}
         components={{
           p: ({ children }) => <p className="mb-4 last:mb-0">{children}</p>,
           ul: ({ children }) => (
@@ -68,9 +66,35 @@ export function StudentMessageContent({
               {children}
             </blockquote>
           ),
+          table: ({ children }) => (
+            <div className="mb-4 overflow-x-auto last:mb-0">
+              <table className="student-markdown-table w-full border-collapse text-left text-sm leading-6">
+                {children}
+              </table>
+            </div>
+          ),
+          thead: ({ children }) => (
+            <thead className="bg-[color:var(--surface-strong)]">{children}</thead>
+          ),
+          tbody: ({ children }) => <tbody>{children}</tbody>,
+          tr: ({ children }) => (
+            <tr className="border-b border-[color:var(--line)] last:border-b-0">
+              {children}
+            </tr>
+          ),
+          th: ({ children }) => (
+            <th className="border border-[color:var(--line)] px-3 py-2 font-semibold text-[color:var(--foreground)]">
+              {children}
+            </th>
+          ),
+          td: ({ children }) => (
+            <td className="border border-[color:var(--line)] px-3 py-2 align-top">
+              {children}
+            </td>
+          ),
         }}
       >
-        {normalizeMarkdown(content)}
+        {content}
       </ReactMarkdown>
     </div>
   );
