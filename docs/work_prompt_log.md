@@ -187,3 +187,4 @@ then close it as:
 | 2026-04-20 | 13:28 -> 13:33 | 0h05 | P1.3 P5.3 | enable proper markdown table rendering in student assistant replies so GFM tables display as real tables instead of raw pipe text | |
 | 2026-04-20 | 13:36 -> 13:37 | 0h01 | P1.3 | tighten student chat markdown table column sizing so compact numeric columns no longer stretch across the full chat width | |
 | 2026-04-20 | 13:47 -> 13:48 | 0h01 | P1.3 | restyle student chat markdown tables toward a lighter full-width layout with more uniform column distribution instead of the earlier content-sized table treatment | |
+| 2026-04-20 | 13:53 -> 13:54 | 0h01 | P1.3 | fine-tune student chat markdown tables to better match the lighter screenshot style by removing header tint, lowering row height, and keeping only horizontal separators | |

@@ -860,14 +860,14 @@ html[data-theme="custom"] .bg-\[\#cb5d3c\] {
   overflow-wrap: anywhere;
   word-break: normal;
   border-bottom: 1px solid color-mix(in srgb, var(--line) 68%, transparent);
-  padding: 0.95rem 0.9rem;
+  padding: 0.72rem 0.9rem;
   vertical-align: top;
+  background: transparent;
 }
 
 .student-markdown-table thead th {
   color: var(--foreground);
   font-weight: 600;
-  background: transparent;
   border-bottom: 1px solid color-mix(in srgb, var(--line-strong) 74%, transparent);
 }
 
