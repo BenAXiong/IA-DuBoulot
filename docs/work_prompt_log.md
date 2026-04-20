@@ -186,3 +186,4 @@ then close it as:
 | 2026-04-20 | 13:13 -> 13:14 | 0h01 | A0.3.7 A7.1.1 A7.1.2 P1.3 P2.1 | close the 2026-04-17 session at 17:15, reopen a fresh session for today, and restate the remaining student-demo work from the current deployed state | |
 | 2026-04-20 | 13:28 -> 13:33 | 0h05 | P1.3 P5.3 | enable proper markdown table rendering in student assistant replies so GFM tables display as real tables instead of raw pipe text | |
 | 2026-04-20 | 13:36 -> 13:37 | 0h01 | P1.3 | tighten student chat markdown table column sizing so compact numeric columns no longer stretch across the full chat width | |
+| 2026-04-20 | 13:47 -> 13:48 | 0h01 | P1.3 | restyle student chat markdown tables toward a lighter full-width layout with more uniform column distribution instead of the earlier content-sized table treatment | |

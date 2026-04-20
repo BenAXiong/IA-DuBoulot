@@ -850,21 +850,44 @@ html[data-theme="custom"] .bg-\[\#cb5d3c\] {
 }
 
 .student-markdown-table {
-  width: max-content;
-  max-width: 100%;
-  min-width: min(24rem, 100%);
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
 }
 
 .student-markdown-table th,
 .student-markdown-table td {
-  overflow-wrap: normal;
+  overflow-wrap: anywhere;
   word-break: normal;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 68%, transparent);
+  padding: 0.95rem 0.9rem;
+  vertical-align: top;
 }
 
-.student-markdown-table th:not(:first-child),
-.student-markdown-table td:not(:first-child) {
-  width: 1%;
-  white-space: nowrap;
+.student-markdown-table thead th {
+  color: var(--foreground);
+  font-weight: 600;
+  background: transparent;
+  border-bottom: 1px solid color-mix(in srgb, var(--line-strong) 74%, transparent);
+}
+
+.student-markdown-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.student-markdown-table th,
+.student-markdown-table td {
+  text-align: left;
+}
+
+.student-markdown-table th:first-child,
+.student-markdown-table td:first-child {
+  padding-left: 0;
+}
+
+.student-markdown-table th:last-child,
+.student-markdown-table td:last-child {
+  padding-right: 0;
 }
 
 .student-markdown .katex-display {
