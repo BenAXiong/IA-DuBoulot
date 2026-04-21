@@ -202,3 +202,4 @@ then close it as:
 | 2026-04-21 | 10:18 -> 10:21 | 0h03 | A0.3.7 P2.7 P5.3 | close the 2026-04-20 session at 17:18, reopen a fresh 2026-04-21 session row, and finish the pending pilot-log traceability slice by verifying and completing the missed push to origin/main | |
 | 2026-04-21 | 10:40 -> 10:51 | 0h11 | P1.3 | restore the student completion recap inside the live right rail by adding a fourth Summary section and wiring the returned completion summary into the workbench state | |
 | 2026-04-21 | 10:57 -> 11:08 | 0h11 | P1.3 | tighten the PC conversation viewport so only the transcript and rails scroll, and keep the Summary section collapsed by default | | |
+| 2026-04-21 | 11:14 -> 11:17 | 0h03 | P1.3 P5.3 | make the right-rail scrollbar thinner and dimmer on PC, then inspect the exact current title and summary generation instructions | | |

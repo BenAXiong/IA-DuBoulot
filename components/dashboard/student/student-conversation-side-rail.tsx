@@ -179,7 +179,7 @@ export function StudentConversationSideRail({
 
   return (
     <aside className="flex min-h-full flex-1 flex-col">
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="student-scrollbar-subtle min-h-0 flex-1 overflow-y-auto">
         <div className="space-y-4 pr-1">
           <section className="grid gap-2">
             <button

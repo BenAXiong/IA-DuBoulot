@@ -904,3 +904,32 @@ html[data-theme="custom"] .bg-\[\#cb5d3c\] {
 .student-scrollbar-hidden::-webkit-scrollbar {
   display: none;
 }
+
+.student-scrollbar-subtle {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+.student-scrollbar-subtle::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.student-scrollbar-subtle::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.student-scrollbar-subtle::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--line);
+}
+
+.student-scrollbar-subtle:hover::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+}
+
+.student-scrollbar-subtle::-webkit-scrollbar-button {
+  width: 0;
+  height: 0;
+  display: none;
+}
