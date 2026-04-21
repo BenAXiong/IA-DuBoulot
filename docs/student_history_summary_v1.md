@@ -46,7 +46,7 @@ When the student marks a session complete, the app now:
 5. turns the session read-only for student message/workspace writes
 6. reuses the persisted student summary on repeated completion calls instead of regenerating summaries or refreshing memory again
 
-The deterministic student-summary fallback now localizes from the student's `ai_help_language`, and the student plus tutor summary surfaces map the stored weakness-tag codes back to human labels before rendering them.
+The deterministic student-summary fallback now localizes from the student's `ai_help_language`, and the student plus tutor summary surfaces map the stored weakness-tag codes back to human labels before rendering them. The provider-backed student summary prompt is now also intentionally learner-facing: it should describe what was actually worked on, which notions or skills are still fragile, and the next small revision step, without surfacing internal session metadata such as file names, transcript counts, or the presence or absence of a saved plan.
 
 ## Important Boundaries
 

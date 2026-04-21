@@ -81,6 +81,7 @@ export type GenerateCoachReplyResult = {
 
 export type GenerateConversationTitleInput = {
   conversation: ConversationRecord;
+  attachments: ConversationAttachmentRecord[];
   firstStudentMessageText: string;
   firstAssistantReplyText: string;
   languageCode: AiLanguageCode;

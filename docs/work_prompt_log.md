@@ -203,3 +203,4 @@ then close it as:
 | 2026-04-21 | 10:40 -> 10:51 | 0h11 | P1.3 | restore the student completion recap inside the live right rail by adding a fourth Summary section and wiring the returned completion summary into the workbench state | |
 | 2026-04-21 | 10:57 -> 11:08 | 0h11 | P1.3 | tighten the PC conversation viewport so only the transcript and rails scroll, and keep the Summary section collapsed by default | | |
 | 2026-04-21 | 11:14 -> 11:17 | 0h03 | P1.3 P5.3 | make the right-rail scrollbar thinner and dimmer on PC, then inspect the exact current title and summary generation instructions | | |
+| 2026-04-21 | 11:39 -> 11:49 | 0h10 | P5.3 | improve low-quality conversation title generation by using actual homework context from extracted content and simplify the learner-facing completion summary so it focuses on what was done, the skills still fragile, and a cleaner next step | | |

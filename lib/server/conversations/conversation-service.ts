@@ -121,10 +121,42 @@ function buildHeuristicConversationTitle(input: {
   languageCode: UiLanguageCode;
   subjectTag: string;
   studentMessageText: string;
+  supportText: string | null;
 }) {
   const normalizedMessage = input.studentMessageText
     .replace(/\s+/g, " ")
     .trim();
+  const normalizedSupportText =
+    input.supportText
+      ?.replace(/\[Source:[^\]]+\]/gi, " ")
+      .replace(/\b[EÉ]nonc[ée]\b[:\s-]*/gi, " ")
+      .replace(/\s+/g, " ")
+      .trim() ?? "";
+
+  if (normalizedSupportText) {
+    const supportSegments = normalizedSupportText
+      .split(/[\n?.!]+/)
+      .map((segment) => segment.trim())
+      .filter((segment) => segment.length >= 12);
+
+    for (const segment of supportSegments) {
+      const normalizedSegment = segment
+        .replace(
+          /^(?:quelle est|quelles sont|quel est|quels sont|dans quel cas|dans quels cas|comment|pourquoi|détermine|déterminer|indique|indiquer|donne|donner|explique|expliquer|compare|comparer|montre|montrer)\s+/i,
+          "",
+        )
+        .replace(/^(?:l'|la |le |les |un |une |des )/i, "")
+        .trim();
+
+      const words = normalizedSegment.split(/\s+/).filter(Boolean).slice(0, 7);
+      if (words.length >= 3) {
+        const candidate = normalizeTitleCandidate(words.join(" "));
+        if (candidate) {
+          return candidate;
+        }
+      }
+    }
+  }
 
   if (!normalizedMessage) {
     return null;
@@ -1254,6 +1286,7 @@ export async function appendConversationTurn(input: {
         try {
           const titleResult = await aiProvider.generateConversationTitle({
             conversation,
+            attachments,
             firstStudentMessageText: studentMessageText,
             firstAssistantReplyText: assistantMessageText,
             languageCode: appUser.ai_help_language,
@@ -1315,6 +1348,8 @@ export async function appendConversationTurn(input: {
             languageCode: appUser.ai_help_language,
             subjectTag: conversation.subject_tag,
             studentMessageText,
+            supportText:
+              conversation.edited_extracted_text ?? conversation.assignment_text,
           });
 
           if (

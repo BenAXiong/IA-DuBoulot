@@ -171,12 +171,14 @@ Current access model:
 ### Conversation Title
 
 - route: `POST /api/conversations/[conversationId]/messages` (first successful learner turn only)
-- prompt version: `conversation-title-v1`
+- prompt version: `conversation-title-v2`
 - current model: `gemini-2.5-flash`
 - context inputs:
   - subject tag
   - first learner message
   - first successful banban reply
+  - assignment text or reviewed extracted text when available
+  - short extracted snippets from uploaded files when available
 - output cap: `40` tokens
 - fallback: keep the shell title already stored on the conversation
 
@@ -195,7 +197,7 @@ Current access model:
 
 - route: `POST /api/conversations/[conversationId]/complete`
 - prompt versions:
-  - `student-summary-v2`
+  - `student-summary-v3`
   - `parent-summary-v2`
   - `tutor-summary-v2`
 - current model: `gemini-2.5-pro`
@@ -203,6 +205,10 @@ Current access model:
 - fallback behavior:
   - student summary is required and falls back deterministically
   - parent and tutor variants are best-effort
+- student-summary intent:
+  - learner-facing recap of what was actually worked on
+  - fragile notions or skills, not internal session metadata
+  - a small next practice step tied to the topic, not generic workflow advice
 
 ### Parent Summary Translation
 

@@ -17,8 +17,8 @@ import {
 } from "@/lib/server/ai/guardrails";
 
 export const STUDENT_COACH_PROMPT_VERSION = "student-coach-v6";
-export const CONVERSATION_TITLE_PROMPT_VERSION = "conversation-title-v1";
-export const STUDENT_SUMMARY_PROMPT_VERSION = "student-summary-v2";
+export const CONVERSATION_TITLE_PROMPT_VERSION = "conversation-title-v2";
+export const STUDENT_SUMMARY_PROMPT_VERSION = "student-summary-v3";
 export const PARENT_SUMMARY_PROMPT_VERSION = "parent-summary-v2";
 export const TUTOR_SUMMARY_PROMPT_VERSION = "tutor-summary-v2";
 export const ATTACHMENT_EXTRACTION_PROMPT_VERSION = "attachment-extraction-v1";
@@ -75,6 +75,27 @@ export function buildAttachmentContextLines(
       .filter(Boolean)
       .join("\n");
   });
+}
+
+function buildAttachmentExcerptLines(
+  attachments: ConversationAttachmentRecord[],
+  fallbackText: string,
+) {
+  const excerpts = attachments
+    .map((attachment) =>
+      truncateForAiContext(
+        normalizeText(attachment.raw_extracted_text),
+        Math.min(320, AI_CONTEXT_LIMITS.attachmentExtractChars),
+      ),
+    )
+    .filter((value): value is string => Boolean(value))
+    .slice(0, 2);
+
+  if (excerpts.length === 0) {
+    return [fallbackText];
+  }
+
+  return excerpts.map((excerpt, index) => `- Extrait ${index + 1}: ${excerpt}`);
 }
 
 export function buildTranscriptExcerpt(messages: ConversationMessageRecord[]) {
@@ -169,6 +190,57 @@ export function buildSummarySourceContext(input: GenerateSummaryInput) {
     messages: input.messages,
     attachments: input.attachments,
   });
+}
+
+export function buildStudentSummarySourceContext(input: GenerateSummaryInput) {
+  const workspace = buildWorkspaceContext(input.workspace);
+
+  return [
+    `Matière: ${input.conversation.subject_tag}`,
+    "",
+    "Consigne ou support utile",
+    workspace.assignmentText !== "non renseigné"
+      ? workspace.assignmentText
+      : workspace.editedExtractedText !== "non renseigné"
+        ? workspace.editedExtractedText
+        : "aucune consigne exploitable n'a été conservée",
+    "",
+    "Extraits utiles des pièces jointes",
+    ...buildAttachmentExcerptLines(
+      input.attachments,
+      "- aucun extrait de pièce jointe exploitable",
+    ),
+    "",
+    "Échanges de la session",
+    buildTranscriptExcerpt(input.messages),
+  ].join("\n");
+}
+
+export function buildConversationTitleSourceContext(input: {
+  conversation: ConversationRecord;
+  attachments: ConversationAttachmentRecord[];
+}) {
+  const assignmentText = truncateForAiContext(
+    normalizeText(input.conversation.assignment_text),
+    320,
+  );
+  const editedExtractedText = truncateForAiContext(
+    normalizeText(input.conversation.edited_extracted_text),
+    360,
+  );
+
+  return [
+    `Matière: ${input.conversation.subject_tag}`,
+    "",
+    "Consigne ou support utile",
+    assignmentText ?? editedExtractedText ?? "aucune consigne exploitable",
+    "",
+    "Extraits utiles des pièces jointes",
+    ...buildAttachmentExcerptLines(
+      input.attachments,
+      "- aucun extrait de pièce jointe exploitable",
+    ),
+  ].join("\n");
 }
 
 export function buildMemorySourceContext(input: GenerateMemoryProfileInput) {

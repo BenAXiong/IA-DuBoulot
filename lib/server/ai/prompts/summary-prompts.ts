@@ -2,6 +2,7 @@ import "server-only";
 
 import {
   buildSummarySourceContext,
+  buildStudentSummarySourceContext,
   getLanguageLabel,
   PARENT_SUMMARY_PROMPT_VERSION,
   STUDENT_SUMMARY_PROMPT_VERSION,
@@ -13,8 +14,12 @@ function buildAudienceInstruction(input: GenerateSummaryInput) {
   if (input.audience === "student") {
     return [
       "Audience: élève.",
-      "Ton résumé doit rester motivant, concret, et centré sur la prochaine étape de travail.",
+      "Ton résumé doit rester concret, clair, et utile pour reprendre le travail.",
+      "Dis d'abord ce qui a été réellement travaillé ou compris pendant la session.",
+      "N'inclus pas de métadonnées de session: pas de titre, pas de matière, pas de nom de fichier, pas de compteur d'échanges, pas d'état de plan ou de brouillon, pas de formule comme 'session terminée'.",
       "N'écris pas une solution complète du devoir.",
+      "Les weaknessTags doivent décrire des notions ou compétences encore fragiles pendant cette séance, pas des manques de process génériques.",
+      "La prochaine étape doit proposer une action de révision ou d'entraînement directement liée à la notion travaillée.",
       "Les weaknessTags doivent rester pédagogiques et courts en snake_case français.",
     ].join("\n");
   }
@@ -53,12 +58,16 @@ export function buildSummaryPrompt(input: GenerateSummaryInput) {
       `La sortie finale doit être en ${languageLabel}.`,
       buildAudienceInstruction(input),
       "Retourne un JSON valide avec summaryText, weaknessTags et nextStepRecommendation.",
-      "summaryText doit être un paragraphe ou plusieurs courts paragraphes lisibles, sans markdown complexe.",
+      input.audience === "student"
+        ? "summaryText doit être 2 à 4 phrases courtes ou très courts paragraphes lisibles, sans markdown complexe, centrés sur ce qui a été fait puis sur ce qui reste fragile."
+        : "summaryText doit être un paragraphe ou plusieurs courts paragraphes lisibles, sans markdown complexe.",
       "weaknessTags doit contenir 0 à 4 tags maximum.",
       "nextStepRecommendation doit être une action concrète et brève.",
       "",
       "Contexte source",
-      buildSummarySourceContext(input),
+      input.audience === "student"
+        ? buildStudentSummarySourceContext(input)
+        : buildSummarySourceContext(input),
     ].join("\n"),
   };
 }
