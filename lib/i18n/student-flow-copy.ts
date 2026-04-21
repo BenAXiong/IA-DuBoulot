@@ -846,6 +846,9 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       retryAttachment: "Relancer l'analyse",
       removeAttachmentConfirm:
         "Retirer ce fichier de cette discussion ?",
+      completeConfirm:
+        "Terminer ce devoir et figer le résumé de cette session ?",
+      regenerateSummaryButton: "Régénérer le résumé",
         copyMessage: "Copier",
         copyPrompt: "Copier ce message",
         copyReply: "Copier la réponse",
@@ -912,6 +915,9 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       retryAttachment: "Retry analysis",
       removeAttachmentConfirm:
         "Remove this file from this conversation?",
+      completeConfirm:
+        "Wrap up this homework and lock the session summary?",
+      regenerateSummaryButton: "Regenerate summary",
         copyMessage: "Copy",
         copyPrompt: "Copy this prompt",
         copyReply: "Copy the reply",
@@ -974,6 +980,9 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       retryAttachment: "重新分析",
       removeAttachmentConfirm:
         "要把這個檔案從這段對話中移除嗎？",
+      completeConfirm:
+        "要結束這份作業並固定這次課程的摘要嗎？",
+      regenerateSummaryButton: "重新產生摘要",
         copyMessage: "複製",
         copyPrompt: "複製這則訊息",
         copyReply: "複製這則回覆",
@@ -1303,105 +1312,78 @@ export function getDeterministicStudentSummaryCopy(
 ) {
   return pickLocalizedValue(languageCode, {
     fr: {
-      progressTitle: "Progression observée",
-      progressLines: {
-        studentMessages: (count: number) => `- Échanges élève : ${count}`,
-        assistantMessages: (count: number) => `- Réponses de coaching : ${count}`,
-        planSaved: (saved: boolean) =>
-          `- Plan noté : ${saved ? "oui" : "non"}`,
-        draftSaved: (saved: boolean) =>
-          `- Brouillon présent : ${saved ? "oui" : "non"}`,
-      },
       nextSteps: {
-        refineDraft:
-          "Reprends ton brouillon, vérifie chaque étape, puis ouvre une nouvelle session si tu veux un feedback plus ciblé.",
-        writeDraft:
-          "Transforme maintenant ton plan en premier brouillon complet avant de lancer une nouvelle session.",
-        clarifyPlan:
-          "Reformule la consigne et écris un plan court en 3 étapes avant la prochaine reprise.",
+        masterUnits:
+          "Refais 3 questions flash sur la grandeur, l'unité et le symbole avant de reprendre les exercices.",
+        readDiagram:
+          "Refais un exercice court où tu identifies d'abord ce que montre le schéma avant de répondre.",
+        historyRecall:
+          "Refais une mini-fiche avec les dates, le rôle et le contexte, puis raconte l'essentiel sans regarder le cours.",
+        selectKeyIdeas:
+          "Relis le cours et note seulement 3 idées clés à retenir avant de reprendre les questions.",
+        grammarPractice:
+          "Refais 3 phrases courtes en appliquant la règle travaillée aujourd'hui.",
+        expressionPractice:
+          "Réécris deux ou trois phrases en corrigeant le mot ou la tournure qui posait problème.",
+        generic: (topic: string) =>
+          `Refais un exercice court sur ${topic}, puis explique l'idée principale sans regarder l'aide.`,
       },
       summary: {
-        title: (title: string) => `Session terminée : ${title}`,
-        subject: (subject: string) => `Matière : ${subject}`,
-        assignment: (text: string) => `Consigne retenue : ${text}`,
-        noAssignment:
-          "Consigne retenue : la session doit encore conserver un énoncé plus explicite.",
-        reviewedText: (text: string) => `Texte relu disponible : ${text}`,
-        noReviewedText:
-          "Texte relu disponible : aucun texte relu n'a été sauvegardé pour cette session.",
-        plan: (text: string) => `Plan de travail : ${text}`,
-        noPlan:
-          "Plan de travail : aucun plan n'a été noté pendant la session.",
-        draft: (text: string) => `Brouillon actuel : ${text}`,
-        noDraft:
-          "Brouillon actuel : aucune tentative rédigée n'a été gardée.",
-        nextStep: (text: string) => `Prochaine étape conseillée : ${text}`,
+        workedOn: (topic: string) => `Tu as travaillé sur ${topic}.`,
+        progress: (text: string) =>
+          `Pendant cette séance, tu as surtout revu ou validé ce point : ${text}.`,
+        progressFallback:
+          "Pendant cette séance, tu as repris les idées principales et vérifié quelques points importants.",
       },
     },
     en: {
-      progressTitle: "Observed progress",
-      progressLines: {
-        studentMessages: (count: number) => `- Student turns: ${count}`,
-        assistantMessages: (count: number) => `- Coaching replies: ${count}`,
-        planSaved: (saved: boolean) =>
-          `- Plan recorded: ${saved ? "yes" : "no"}`,
-        draftSaved: (saved: boolean) =>
-          `- Draft present: ${saved ? "yes" : "no"}`,
-      },
       nextSteps: {
-        refineDraft:
-          "Review your draft, verify each step, then open a new session if you want more targeted feedback.",
-        writeDraft:
-          "Turn your plan into a first complete draft before starting a new session.",
-        clarifyPlan:
-          "Restate the assignment and write a short 3-step plan before resuming again.",
+        masterUnits:
+          "Do 3 quick checks on the quantity, unit, and symbol before going back to the exercises.",
+        readDiagram:
+          "Redo one short exercise where you first identify what the diagram shows before answering.",
+        historyRecall:
+          "Make a tiny recap sheet with dates, role, and context, then explain the key points without looking at the course.",
+        selectKeyIdeas:
+          "Reread the lesson and keep only 3 key ideas before returning to the questions.",
+        grammarPractice:
+          "Write 3 short sentences that apply the rule you worked on today.",
+        expressionPractice:
+          "Rewrite two or three sentences by correcting the word or expression that caused trouble.",
+        generic: (topic: string) =>
+          `Do one short exercise on ${topic}, then explain the main idea without looking at the help.`,
       },
       summary: {
-        title: (title: string) => `Session completed: ${title}`,
-        subject: (subject: string) => `Subject: ${subject}`,
-        assignment: (text: string) => `Saved assignment: ${text}`,
-        noAssignment:
-          "Saved assignment: the session still needs a clearer prompt to be kept here.",
-        reviewedText: (text: string) => `Reviewed text available: ${text}`,
-        noReviewedText:
-          "Reviewed text available: no reviewed text was saved for this session.",
-        plan: (text: string) => `Work plan: ${text}`,
-        noPlan: "Work plan: no plan was saved during this session.",
-        draft: (text: string) => `Current draft: ${text}`,
-        noDraft: "Current draft: no written attempt was kept.",
-        nextStep: (text: string) => `Recommended next step: ${text}`,
+        workedOn: (topic: string) => `You worked on ${topic}.`,
+        progress: (text: string) =>
+          `During this session, you mostly reviewed or confirmed this point: ${text}.`,
+        progressFallback:
+          "During this session, you revisited the main ideas and checked a few important points.",
       },
     },
     zh: {
-      progressTitle: "觀察到的進展",
-      progressLines: {
-        studentMessages: (count: number) => `- 學生訊息輪次：${count}`,
-        assistantMessages: (count: number) => `- 教練回覆輪次：${count}`,
-        planSaved: (saved: boolean) =>
-          `- 是否記錄計畫：${saved ? "是" : "否"}`,
-        draftSaved: (saved: boolean) =>
-          `- 是否保留草稿：${saved ? "是" : "否"}`,
-      },
       nextSteps: {
-        refineDraft:
-          "回頭檢查你的草稿、逐步驗證每個步驟；如果需要更精準的回饋，再開一個新課程。",
-        writeDraft:
-          "先把目前的計畫擴寫成第一版完整草稿，再開始新的課程。",
-        clarifyPlan:
-          "下次續接前，先重新表述題目，並寫一個三步驟短計畫。",
+        masterUnits:
+          "先做 3 題快速檢查，確認物理量、單位和符號，再回到原本的題目。",
+        readDiagram:
+          "先重做一題短題，練習先看懂圖示或電路圖，再回答問題。",
+        historyRecall:
+          "先整理一張很短的重點卡，寫下時間、角色和背景，再不看課本口頭說一次重點。",
+        selectKeyIdeas:
+          "先重讀課文，只留下 3 個最重要的重點，再回去做題目。",
+        grammarPractice:
+          "先寫 3 句短句，把今天練到的規則真正用一次。",
+        expressionPractice:
+          "先重寫兩三句，把卡住的字詞或表達方式改正過來。",
+        generic: (topic: string) =>
+          `先做一題和 ${topic} 有關的短練習，再不看提示把重點講一遍。`,
       },
       summary: {
-        title: (title: string) => `課程已結束：${title}`,
-        subject: (subject: string) => `科目：${subject}`,
-        assignment: (text: string) => `保留的題目內容：${text}`,
-        noAssignment: "保留的題目內容：這個課程仍需要更清楚的題目敘述。",
-        reviewedText: (text: string) => `可用的重讀文字：${text}`,
-        noReviewedText: "可用的重讀文字：這個課程沒有儲存任何重讀文字。",
-        plan: (text: string) => `工作計畫：${text}`,
-        noPlan: "工作計畫：這次課程中沒有記錄任何計畫。",
-        draft: (text: string) => `目前草稿：${text}`,
-        noDraft: "目前草稿：沒有保留任何已寫出的嘗試。",
-        nextStep: (text: string) => `建議下一步：${text}`,
+        workedOn: (topic: string) => `這次你主要在處理 ${topic}。`,
+        progress: (text: string) =>
+          `這次課程裡，你主要重新確認或釐清了這個重點：${text}。`,
+        progressFallback:
+          "這次課程裡，你重新看過了主要觀念，也確認了幾個重要重點。",
       },
     },
   });
@@ -1538,6 +1520,18 @@ export function getWeaknessTagLabel(
       clarifier_la_consigne: "Clarifier la consigne",
       verifier_le_raisonnement: "Vérifier le raisonnement",
       justifier_la_reponse: "Justifier la réponse",
+      lecture_de_consigne: "Lecture de consigne",
+      justification_des_reponses: "Justification des réponses",
+      reformulation_de_la_lecon: "Reformulation de la leçon",
+      vocabulaire_scientifique: "Vocabulaire scientifique",
+      justification_du_raisonnement: "Justification du raisonnement",
+      lecture_de_schema: "Lecture de schéma",
+      maitrise_des_unites: "Maîtrise des unités",
+      reperes_historiques: "Repères historiques",
+      selection_des_infos_cles: "Sélection des informations clés",
+      restitution_des_connaissances: "Restitution des connaissances",
+      grammaire_en_contexte: "Grammaire en contexte",
+      vocabulaire_et_expression: "Vocabulaire et expression",
     },
     en: {
       structurer_la_demarche: "Structure the approach",
@@ -1545,6 +1539,18 @@ export function getWeaknessTagLabel(
       clarifier_la_consigne: "Clarify the prompt",
       verifier_le_raisonnement: "Check the reasoning",
       justifier_la_reponse: "Justify the answer",
+      lecture_de_consigne: "Read the prompt carefully",
+      justification_des_reponses: "Justify the answers",
+      reformulation_de_la_lecon: "Restate the lesson clearly",
+      vocabulaire_scientifique: "Scientific vocabulary",
+      justification_du_raisonnement: "Explain the reasoning",
+      lecture_de_schema: "Read the diagram",
+      maitrise_des_unites: "Units and symbols",
+      reperes_historiques: "Historical reference points",
+      selection_des_infos_cles: "Select the key ideas",
+      restitution_des_connaissances: "Recall the lesson clearly",
+      grammaire_en_contexte: "Grammar in context",
+      vocabulaire_et_expression: "Vocabulary and expression",
     },
     zh: {
       structurer_la_demarche: "整理解題步驟",
@@ -1552,6 +1558,18 @@ export function getWeaknessTagLabel(
       clarifier_la_consigne: "釐清題目要求",
       verifier_le_raisonnement: "檢查推理過程",
       justifier_la_reponse: "說明答案依據",
+      lecture_de_consigne: "仔細讀懂題目",
+      justification_des_reponses: "說明答案依據",
+      reformulation_de_la_lecon: "重新說清楚課程重點",
+      vocabulaire_scientifique: "科學詞彙",
+      justification_du_raisonnement: "說明推理過程",
+      lecture_de_schema: "讀懂圖示或電路圖",
+      maitrise_des_unites: "單位與符號掌握",
+      reperes_historiques: "歷史時序與背景",
+      selection_des_infos_cles: "抓住關鍵資訊",
+      restitution_des_connaissances: "清楚重述知識點",
+      grammaire_en_contexte: "在語境中運用文法",
+      vocabulaire_et_expression: "詞彙與表達",
     },
   });
 

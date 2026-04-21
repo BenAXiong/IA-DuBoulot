@@ -18,6 +18,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 
 ## Current Decisions
 
+### D-20260421-01 - Completion Reuses Stored Summaries By Default But Allows Explicit Dev Regeneration
+
+- Date: 2026-04-21
+- Status: accepted
+- Related tasks: `P1.3`, `P5.3`
+- Context: The student completion summary had two separate problems. First, the deterministic fallback was still leaking internal session metadata instead of giving the learner a useful recap. Second, testing summary quality was cumbersome because the completion route always reused the stored student summary once a session was already completed.
+- Decision: Keep `POST /api/conversations/[conversationId]/complete` as the single completion and summary route, but add an optional `forceRegenerateSummary` flag for explicit dev-only re-generation. Also tighten the deterministic student-summary fallback so it stays learner-facing and only reports what was worked on, which skills still look fragile, and the next concrete revision step.
+- Why: This avoids adding a second summary-specific endpoint, keeps repeated completion cheap in production by default, and makes bad fallback summaries less misleading for learners.
+- Follow-up: Re-check whether the provider-backed student summary path still needs prompt tightening after the fallback is improved and the dev-only regenerate control is available.
+
 ### D-20260310-01 - Documentation Spine Is Mandatory
 
 - Date: 2026-03-10

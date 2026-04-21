@@ -595,7 +595,7 @@ export function StudentConversationWorkbench({
     void runBootstrap();
   }, [conversation.id, detail.messages.length]);
 
-  function completeSession() {
+  function completeSession(options?: { forceRegenerateSummary?: boolean }) {
     setWorkspaceError(null);
 
     startCompleting(async () => {
@@ -603,6 +603,12 @@ export function StudentConversationWorkbench({
         `/api/conversations/${conversation.id}/complete`,
         {
           method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            forceRegenerateSummary: options?.forceRegenerateSummary ?? false,
+          }),
         },
       );
 
@@ -862,11 +868,14 @@ export function StudentConversationWorkbench({
           <div className="flex h-full min-h-0 flex-col">
             <StudentConversationSideRail
               attachments={attachments}
-              disabled={isUploading || isReadOnly}
+              disabled={isUploading}
               isCompleted={conversation.status === "completed"}
               isCompleting={isCompleting}
               languageCode={languageCode}
               onComplete={completeSession}
+              onRegenerateSummary={() =>
+                completeSession({ forceRegenerateSummary: true })
+              }
               onRemoveAttachment={removeAttachment}
               onRetryAttachment={(attachmentId) => {
                 void retryAttachmentExtraction(attachmentId);

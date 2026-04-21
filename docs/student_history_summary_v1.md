@@ -44,16 +44,16 @@ When the student marks a session complete, the app now:
 3. generates a required student summary, with a deterministic fallback if the provider call fails
 4. attempts provider-backed parent and tutor summaries plus translated parent variants for `en` and `zh`, but treats those adult artifacts as best-effort during the student completion path
 5. turns the session read-only for student message/workspace writes
-6. reuses the persisted student summary on repeated completion calls instead of regenerating summaries or refreshing memory again
+6. reuses the persisted student summary on repeated completion calls instead of regenerating summaries or refreshing memory again, unless an explicit dev-only regenerate action forces a fresh summary pass for testing
 
-The deterministic student-summary fallback now localizes from the student's `ai_help_language`, and the student plus tutor summary surfaces map the stored weakness-tag codes back to human labels before rendering them. The provider-backed student summary prompt is now also intentionally learner-facing: it should describe what was actually worked on, which notions or skills are still fragile, and the next small revision step, without surfacing internal session metadata such as file names, transcript counts, or the presence or absence of a saved plan.
+The deterministic student-summary fallback now localizes from the student's `ai_help_language`, stays learner-facing instead of dumping internal session metadata, and the student plus tutor summary surfaces map the stored weakness-tag codes back to human labels before rendering them. The provider-backed student summary prompt is now also intentionally learner-facing: it should describe what was actually worked on, which notions or skills are still fragile, and the next small revision step, without surfacing internal session metadata such as file names, transcript counts, or the presence or absence of a saved plan.
 
 ## Important Boundaries
 
 - the summary path is now provider-backed in the current local workspace, but the required student artifact has a localized deterministic fallback and adult artifacts are best-effort
 - parent and tutor summary data now feeds the dedicated adult review surfaces documented in [Oversight surfaces V1](oversight_surfaces_v1.md)
 - completed sessions stay readable, but the student must start a new session to keep working
-- repeated completion of an already-completed session should be a cheap read of the stored student artifact, not a second expensive generation pass
+- repeated completion of an already-completed session should be a cheap read of the stored student artifact, not a second expensive generation pass, unless a dev-only explicit regenerate action asks the same endpoint to bypass reuse for testing
 
 ## Why The Completion Contract Still Matters
 

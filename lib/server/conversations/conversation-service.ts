@@ -44,6 +44,7 @@ import {
 import type {
   AppendConversationMessageInput,
   AppendConversationMessageResult,
+  CompleteConversationInput,
   CompleteConversationResult,
   ConversationDetail,
   ConversationMessageRecord,
@@ -1609,12 +1610,9 @@ export async function updateWorkspaceState(input: {
   return workspace;
 }
 
-export async function completeConversation(input: {
-  context: AuthenticatedUserContext;
-  conversationId: string;
-  requestId: string;
-  route: string;
-}): Promise<CompleteConversationResult> {
+export async function completeConversation(
+  input: CompleteConversationInput,
+): Promise<CompleteConversationResult> {
   const { appUser, conversation, supabase } =
     await requireWritableStudentConversation({
       context: input.context,
@@ -1677,7 +1675,11 @@ export async function completeConversation(input: {
   const existingStudentSummary =
     existingVisibleSummaries.find((summary) => summary.audience === "student") ?? null;
 
-  if (conversation.status === "completed" && existingStudentSummary) {
+  if (
+    conversation.status === "completed" &&
+    existingStudentSummary &&
+    !input.forceRegenerateSummary
+  ) {
     logRuntimeInfo({
       message: "Reused existing completion artifacts",
       requestId: input.requestId,

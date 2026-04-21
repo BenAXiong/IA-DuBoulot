@@ -2,7 +2,11 @@ import "server-only";
 
 import type { IntakeAttachmentCategory } from "@/lib/intake/intake-config";
 import type { ConversationAttachmentRecord } from "@/lib/server/ai/types";
-import type { AppUserRecord, UiLanguageCode } from "@/lib/server/auth/types";
+import type {
+  AppUserRecord,
+  AuthenticatedUserContext,
+  UiLanguageCode,
+} from "@/lib/server/auth/types";
 
 export type ConversationActionIntent =
   | "student_message"
@@ -143,6 +147,14 @@ export type CreateConversationShellResult = {
 export type CompleteConversationResult = {
   conversation: ConversationRecord;
   summaries: SessionSummaryRecord[];
+};
+
+export type CompleteConversationInput = {
+  context: AuthenticatedUserContext;
+  conversationId: string;
+  requestId: string;
+  route: string;
+  forceRegenerateSummary?: boolean;
 };
 
 export type ConversationViewer = Pick<

@@ -267,7 +267,7 @@ async function generateRequiredStudentSummary(
 
     return {
       ...fallbackSummary,
-      promptVersion: "deterministic-summary-v1",
+      promptVersion: "deterministic-summary-v2",
       usage: buildEmptyUsageSnapshot(),
     };
   }

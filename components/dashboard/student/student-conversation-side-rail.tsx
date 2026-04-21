@@ -19,6 +19,7 @@ type StudentConversationSideRailProps = {
   isCompleting?: boolean;
   retryingAttachmentId?: string | null;
   onComplete: () => void;
+  onRegenerateSummary?: () => void;
   onRemoveAttachment: (attachmentId: string) => void;
   onRetryAttachment: (attachmentId: string) => void;
 };
@@ -95,6 +96,7 @@ export function StudentConversationSideRail({
   isCompleting = false,
   retryingAttachmentId = null,
   onComplete,
+  onRegenerateSummary,
   onRemoveAttachment,
   onRetryAttachment,
 }: StudentConversationSideRailProps) {
@@ -112,6 +114,7 @@ export function StudentConversationSideRail({
   const [summaryOpen, setSummaryOpen] = useState(false);
   const studentSummary =
     summaries.find((summary) => summary.audience === "student") ?? null;
+  const showDevSummaryControls = process.env.NODE_ENV !== "production";
 
   useEffect(() => {
     if (!previewAttachment) {
@@ -156,6 +159,15 @@ export function StudentConversationSideRail({
     } finally {
       setPendingAttachmentId(null);
     }
+  }
+
+  function handleCompleteClick() {
+    const confirmed = window.confirm(copy.completeConfirm);
+    if (!confirmed) {
+      return;
+    }
+
+    onComplete();
   }
 
   function SectionChevron(props: { open: boolean }) {
@@ -375,13 +387,23 @@ export function StudentConversationSideRail({
       <div className="mt-4 pt-4">
         <button
           className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[color:var(--foreground)] px-5 py-3 text-sm font-medium text-[color:var(--background)] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
-          disabled={disabled || isCompleting}
-          onClick={onComplete}
+          disabled={disabled || isCompleting || isCompleted}
+          onClick={handleCompleteClick}
           title={copy.completeTooltip}
           type="button"
         >
           {copy.completeButton}
         </button>
+        {showDevSummaryControls && isCompleted && onRegenerateSummary ? (
+          <button
+            className="mt-2 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[color:var(--line)] bg-transparent px-5 py-3 text-sm font-medium text-[color:var(--foreground)] transition hover:border-[color:var(--foreground)]/30 hover:bg-white/[0.02] disabled:cursor-not-allowed disabled:opacity-60"
+            disabled={disabled || isCompleting}
+            onClick={onRegenerateSummary}
+            type="button"
+          >
+            {copy.regenerateSummaryButton}
+          </button>
+        ) : null}
       </div>
 
       {expandedPreviewAttachment ? (
