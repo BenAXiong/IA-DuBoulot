@@ -748,7 +748,7 @@ export function StudentConversationWorkbench({
   }, [attachments, isUploading, isReadOnly, retryingAttachmentId]);
 
   return (
-    <div className="grid h-full min-h-0 gap-4">
+    <div className="flex h-full min-h-0 flex-col gap-4">
       <input
         accept={INTAKE_ACCEPT_ATTR}
         className="hidden"
@@ -759,7 +759,7 @@ export function StudentConversationWorkbench({
       />
 
       <section
-        className="grid min-h-0 flex-1 gap-0 overflow-hidden xl:-my-4 xl:-mr-8 xl:items-start xl:[grid-template-columns:minmax(0,1fr)_var(--student-rail-width)]"
+        className="grid min-h-0 flex-1 gap-0 overflow-hidden xl:-my-4 xl:-mr-8 xl:flex-1 xl:items-start xl:[grid-template-columns:minmax(0,1fr)_var(--student-rail-width)]"
         ref={sectionRef}
         style={{
           ["--student-rail-width" as string]: `${railWidth}px`,
