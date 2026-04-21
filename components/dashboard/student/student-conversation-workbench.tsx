@@ -748,7 +748,7 @@ export function StudentConversationWorkbench({
   }, [attachments, isUploading, isReadOnly, retryingAttachmentId]);
 
   return (
-    <div className="grid gap-4">
+    <div className="grid h-full min-h-0 gap-4">
       <input
         accept={INTAKE_ACCEPT_ATTR}
         className="hidden"
@@ -759,13 +759,13 @@ export function StudentConversationWorkbench({
       />
 
       <section
-        className="grid gap-0 xl:-my-4 xl:-mr-8 xl:items-start xl:[grid-template-columns:minmax(0,1fr)_var(--student-rail-width)]"
+        className="grid min-h-0 flex-1 gap-0 overflow-hidden xl:-my-4 xl:-mr-8 xl:items-start xl:[grid-template-columns:minmax(0,1fr)_var(--student-rail-width)]"
         ref={sectionRef}
         style={{
           ["--student-rail-width" as string]: `${railWidth}px`,
         }}
       >
-        <article className="flex min-h-0 flex-col gap-3 py-1 md:min-h-[calc(100vh-7.25rem)] xl:h-[calc(100vh-3.25rem)] xl:py-4 xl:pr-8">
+        <article className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden py-1 xl:py-4 xl:pr-8">
           <div
             className="student-scrollbar-hidden min-h-0 flex-1 overflow-y-auto pt-1"
             onScroll={updateTranscriptPositionState}
@@ -849,7 +849,7 @@ export function StudentConversationWorkbench({
           </div>
         </article>
 
-        <aside className="relative border-l border-[color:var(--line)] bg-[color:var(--surface)] px-5 py-4 xl:sticky xl:top-[3.25rem] xl:h-[calc(100vh-3.25rem)] xl:self-start">
+        <aside className="relative min-h-0 overflow-hidden border-l border-[color:var(--line)] bg-[color:var(--surface)] px-5 py-4 xl:h-full">
           <button
             aria-label="Resize side rail"
             className="absolute bottom-0 left-[-4px] top-0 hidden w-2 cursor-col-resize xl:block"

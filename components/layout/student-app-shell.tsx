@@ -426,6 +426,7 @@ export function StudentAppShell({
     conversationTitle: activeConversationTitle,
     copy,
   });
+  const isConversationRoute = pathname.startsWith("/app/conversations/");
   const planLabel =
     snapshot.usage.quota.planKind === "paid"
       ? copy.familyPlan
@@ -747,7 +748,12 @@ export function StudentAppShell({
   );
 
   return (
-    <main className="min-h-screen bg-[color:var(--background)]" lang={languageCode}>
+    <main
+      className={`bg-[color:var(--background)] ${
+        isConversationRoute ? "h-screen overflow-hidden" : "min-h-screen"
+      }`}
+      lang={languageCode}
+    >
       <DocumentLanguageSync languageCode={languageCode} />
 
       {sidebarOpen ? (
@@ -763,7 +769,7 @@ export function StudentAppShell({
         </div>
       ) : null}
 
-      <div className="flex min-h-screen">
+      <div className={`flex ${isConversationRoute ? "h-full min-h-0 overflow-hidden" : "min-h-screen"}`}>
         <aside
           className="hidden border-r border-[color:var(--line)] bg-[color:var(--surface)] transition-[width] duration-200 md:sticky md:top-0 md:flex md:h-screen md:flex-col md:self-start"
           style={{ width: desktopSidebarWidth }}
@@ -771,7 +777,11 @@ export function StudentAppShell({
           {content}
         </aside>
 
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div
+          className={`flex min-w-0 flex-1 flex-col ${
+            isConversationRoute ? "min-h-0 overflow-hidden" : ""
+          }`}
+        >
           <header className="sticky top-0 z-20 min-h-[3.25rem] border-b border-[color:var(--line)] bg-[color:var(--background)]/88 px-3 py-0 backdrop-blur sm:px-4">
             <div className="mx-auto flex min-h-[3.25rem] w-full max-w-7xl items-center justify-between gap-4">
               <div className="flex min-w-0 items-center">
@@ -797,8 +807,18 @@ export function StudentAppShell({
             </div>
           </header>
 
-          <div className="flex-1 px-4 py-4 sm:px-5 lg:px-6">
-            <div className="mx-auto w-full max-w-7xl">{children}</div>
+          <div
+            className={`flex-1 px-4 py-4 sm:px-5 lg:px-6 ${
+              isConversationRoute ? "min-h-0 overflow-hidden" : ""
+            }`}
+          >
+            <div
+              className={`mx-auto w-full max-w-7xl ${
+                isConversationRoute ? "h-full min-h-0" : ""
+              }`}
+            >
+              {children}
+            </div>
           </div>
         </div>
       </div>

@@ -109,9 +109,7 @@ export function StudentConversationSideRail({
   const [subjectUploadsOpen, setSubjectUploadsOpen] = useState(false);
   const [homeworkUploadsOpen, setHomeworkUploadsOpen] = useState(true);
   const [chatMaterialOpen, setChatMaterialOpen] = useState(false);
-  const [summaryOpen, setSummaryOpen] = useState(
-    summaries.length > 0 || isCompleted,
-  );
+  const [summaryOpen, setSummaryOpen] = useState(false);
   const studentSummary =
     summaries.find((summary) => summary.audience === "student") ?? null;
 
@@ -144,12 +142,6 @@ export function StudentConversationSideRail({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [expandedPreviewAttachment]);
-
-  useEffect(() => {
-    if (summaries.length > 0 || isCompleted) {
-      setSummaryOpen(true);
-    }
-  }, [isCompleted, summaries.length]);
 
   async function handleRemoveAttachment(attachmentId: string) {
     const confirmed = window.confirm(copy.removeAttachmentConfirm);
