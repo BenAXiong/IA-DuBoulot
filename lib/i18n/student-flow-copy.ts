@@ -863,6 +863,13 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       chatMaterialTitle: "Matériel de chat",
       chatMaterialPlaceholder:
         "Les rappels, notions utiles, ou futurs schémas générés apparaîtront ici.",
+      summaryTitle: "Résumé",
+      summaryPlaceholder:
+        "Le récapitulatif apparaîtra ici quand tu termineras le devoir.",
+      summaryUnavailable:
+        "Cette session est terminée, mais aucun résumé élève n'est encore disponible.",
+      summaryWeaknessesLabel: "Points à revoir",
+      summaryNextStepLabel: "Prochaine étape",
       completeTooltip:
         "Le chat reste ouvert tant que tu ne choisis pas de terminer cette session.",
       completeButton: "Devoir terminé !",
@@ -922,6 +929,13 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       chatMaterialTitle: "Chat material",
       chatMaterialPlaceholder:
         "Useful reminders, concepts, or future generated diagrams will appear here.",
+      summaryTitle: "Summary",
+      summaryPlaceholder:
+        "The recap will appear here once you mark the homework done.",
+      summaryUnavailable:
+        "This session is completed, but no student summary is available yet.",
+      summaryWeaknessesLabel: "Points to revisit",
+      summaryNextStepLabel: "Next step",
       completeTooltip:
         "The chat stays open until you decide to wrap up this session.",
       completeButton: "Homework done!",
@@ -977,6 +991,13 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       chatMaterialTitle: "聊天材料",
       chatMaterialPlaceholder:
         "有用的提醒、重點概念或未來生成的互動圖示會顯示在這裡。",
+      summaryTitle: "摘要",
+      summaryPlaceholder:
+        "當你完成這份作業後，這裡會顯示整理好的摘要。",
+      summaryUnavailable:
+        "這個課程已完成，但目前還沒有可用的學生摘要。",
+      summaryWeaknessesLabel: "待加強重點",
+      summaryNextStepLabel: "下一步",
       completeTooltip:
         "只要你還沒選擇結束，聊天就會保持開放。",
       completeButton: "作業完成！",

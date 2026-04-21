@@ -54,9 +54,10 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 13. keeps the live composer pinned at the bottom of the conversation view, now shows a chevron jump-to-latest control above it when the transcript is scrolled upward, appends the learner's message optimistically with a lightweight pending banban placeholder so the prompt no longer looks stuck in the textarea during the round trip, no longer renders the provisional conversation title or last-activity chrome inside the live chat body, and now seeds new shell conversations with a neutral per-subject `Subject_###` placeholder until a later AI summary can replace it
 14. reuses the same learner avatar style as the profile dock for student turns, so the thread feels like one consistent messaging surface instead of mixing unrelated identity treatments
 15. exposes a small reply-mode switch directly in the chat tools, and now keeps only `fast` and `thinking` learner-visible while routing them as real prompt-level coaching variants; `interactive` remains an internal or future-facing mode and is intentionally hidden again until the richer diagram or embedded-tool path exists
-16. renders only one explicit completion control at the bottom of the right rail, keeping completion available without the older session-summary card dominating the active chat
-17. localizes the workbench shell, composer, the reply-mode switch, and the side rail through `lib/i18n/student-flow-copy.ts`
-18. treats uploaded files honestly inside the live coach path: banban only knows the extracted text or workspace context that the server actually provides, and it must not claim to have read image pixels or PDF pages directly when no reliable extracted text is present
+16. renders a fourth collapsible `Summary` section in the right rail; it stays quiet during an active session, but once the learner clicks `Homework done!` the workbench now applies the returned student summary immediately in that rail instead of waiting for a page reload
+17. keeps the explicit completion control at the bottom of the right rail, so completion stays available without the older session-summary card dominating the active chat
+18. localizes the workbench shell, composer, the reply-mode switch, and the side rail through `lib/i18n/student-flow-copy.ts`
+19. treats uploaded files honestly inside the live coach path: banban only knows the extracted text or workspace context that the server actually provides, and it must not claim to have read image pixels or PDF pages directly when no reliable extracted text is present
 
 ## Interaction Rules
 
@@ -80,7 +81,7 @@ When the student opens `/app/conversations/[conversationId]`, the app now:
 - once the session is marked complete, the workbench becomes read-only for student writes
 - adult review surfaces now live separately under [Oversight surfaces V1](oversight_surfaces_v1.md); the student workbench remains a student-only mutation surface
 - the core student workbench path now localizes its server-side validation messages, upload warnings, moderation-safe fallback reply, and learner-facing provider-retry fallback through `lib/i18n/student-flow-copy.ts`; the remaining language risk near this surface is now mostly the broader accented-French or Unicode audit and any residual generic provider or service fallback strings
-- this redesign still keeps explicit completion as the current backend contract; it does not yet auto-generate summaries on an implicit chat-close event
+- this redesign still keeps explicit completion as the current backend contract; it does not yet auto-generate summaries on an implicit chat-close event, but the returned student summary is now surfaced immediately inside the live right rail once completion succeeds
 - the workbench still uses the persisted workspace fields under the hood, even though the learner no longer sees that workspace as a full separate product surface
 - attachment removal currently deletes the file record plus private storage object, but it does not yet scrub extracted text that may already have been copied into the hidden workspace
 - only provider-failure extraction states auto-retry; attachments that failed because no safe or usable text was found still stay manual so the app does not mask a genuinely unreadable source behind endless retries

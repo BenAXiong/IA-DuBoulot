@@ -200,3 +200,4 @@ then close it as:
 | 2026-04-20 | 17:12 -> 17:12 | 0h00 | P5.3 | explain what enabling image-native reasoning would require in the current architecture, including the difference between true multimodal coaching and text-only extraction preprocessing | |
 | 2026-04-20 | 17:17 -> 17:18 | 0h01 | P2.7 P5.3 | log the recommended image-native reasoning preprocessing path in the Pilot backlog and record the tradeoff versus a later true multimodal coach path | |
 | 2026-04-21 | 10:18 -> 10:21 | 0h03 | A0.3.7 P2.7 P5.3 | close the 2026-04-20 session at 17:18, reopen a fresh 2026-04-21 session row, and finish the pending pilot-log traceability slice by verifying and completing the missed push to origin/main | |
+| 2026-04-21 | 10:40 -> 10:51 | 0h11 | P1.3 | restore the student completion recap inside the live right rail by adding a fourth Summary section and wiring the returned completion summary into the workbench state | |

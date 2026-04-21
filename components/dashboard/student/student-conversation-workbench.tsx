@@ -19,6 +19,7 @@ import type {
   ConversationDetail,
   ConversationMessageRecord,
   ConversationRecord,
+  SessionSummaryRecord,
   StudentReplyMode,
 } from "@/lib/server/conversations/types";
 import { uploadConversationFiles } from "@/lib/uploads/client-upload";
@@ -115,6 +116,9 @@ export function StudentConversationWorkbench({
   const [conversation, setConversation] = useState(detail.conversation);
   const [messages, setMessages] = useState(detail.messages);
   const [attachments, setAttachments] = useState(detail.attachments);
+  const [summaries, setSummaries] = useState<SessionSummaryRecord[]>(
+    detail.summaries,
+  );
   const [workspace, setWorkspace] = useState<WorkspaceDraftState>(
     buildInitialWorkspace(detail),
   );
@@ -614,6 +618,7 @@ export function StudentConversationWorkbench({
       }
 
       setConversation(payload.data.conversation);
+      setSummaries(payload.data.summaries ?? []);
       setChatError(null);
       setWorkspaceError(null);
     });
@@ -858,6 +863,7 @@ export function StudentConversationWorkbench({
             <StudentConversationSideRail
               attachments={attachments}
               disabled={isUploading || isReadOnly}
+              isCompleted={conversation.status === "completed"}
               isCompleting={isCompleting}
               languageCode={languageCode}
               onComplete={completeSession}
@@ -866,6 +872,7 @@ export function StudentConversationWorkbench({
                 void retryAttachmentExtraction(attachmentId);
               }}
               retryingAttachmentId={retryingAttachmentId}
+              summaries={summaries}
             />
           </div>
         </aside>

@@ -2,13 +2,19 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { getStudentWorkbenchCopy } from "@/lib/i18n/student-flow-copy";
+import {
+  getStudentWorkbenchCopy,
+  getWeaknessTagLabel,
+} from "@/lib/i18n/student-flow-copy";
 import type { ConversationAttachmentRecord } from "@/lib/server/ai/types";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
+import type { SessionSummaryRecord } from "@/lib/server/conversations/types";
 
 type StudentConversationSideRailProps = {
   attachments: ConversationAttachmentRecord[];
   languageCode: UiLanguageCode;
+  summaries: SessionSummaryRecord[];
+  isCompleted?: boolean;
   disabled?: boolean;
   isCompleting?: boolean;
   retryingAttachmentId?: string | null;
@@ -83,6 +89,8 @@ function isRetriableAttachmentFailure(attachment: ConversationAttachmentRecord) 
 export function StudentConversationSideRail({
   attachments,
   languageCode,
+  summaries,
+  isCompleted = false,
   disabled = false,
   isCompleting = false,
   retryingAttachmentId = null,
@@ -101,6 +109,11 @@ export function StudentConversationSideRail({
   const [subjectUploadsOpen, setSubjectUploadsOpen] = useState(false);
   const [homeworkUploadsOpen, setHomeworkUploadsOpen] = useState(true);
   const [chatMaterialOpen, setChatMaterialOpen] = useState(false);
+  const [summaryOpen, setSummaryOpen] = useState(
+    summaries.length > 0 || isCompleted,
+  );
+  const studentSummary =
+    summaries.find((summary) => summary.audience === "student") ?? null;
 
   useEffect(() => {
     if (!previewAttachment) {
@@ -131,6 +144,12 @@ export function StudentConversationSideRail({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [expandedPreviewAttachment]);
+
+  useEffect(() => {
+    if (summaries.length > 0 || isCompleted) {
+      setSummaryOpen(true);
+    }
+  }, [isCompleted, summaries.length]);
 
   async function handleRemoveAttachment(attachmentId: string) {
     const confirmed = window.confirm(copy.removeAttachmentConfirm);
@@ -303,6 +322,59 @@ export function StudentConversationSideRail({
               <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
                 {copy.chatMaterialPlaceholder}
               </p>
+            ) : null}
+          </section>
+
+          <section className="grid gap-2">
+            <button
+              className="flex w-full items-center justify-between gap-3 text-left text-sm font-medium text-[color:var(--foreground)]"
+              onClick={() => setSummaryOpen((value) => !value)}
+              type="button"
+            >
+              <span>{copy.summaryTitle}</span>
+              <SectionChevron open={summaryOpen} />
+            </button>
+            {summaryOpen ? (
+              studentSummary ? (
+                <div className="space-y-3 rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4">
+                  <p className="text-sm leading-6 text-[color:var(--foreground)]">
+                    {studentSummary.summary_text}
+                  </p>
+
+                  {studentSummary.weakness_tags.length > 0 ? (
+                    <div className="grid gap-2">
+                      <p className="text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
+                        {copy.summaryWeaknessesLabel}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {studentSummary.weakness_tags.map((tag) => (
+                          <span
+                            className="inline-flex items-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface)] px-3 py-1 text-xs text-[color:var(--foreground)]"
+                            key={tag}
+                          >
+                            {getWeaknessTagLabel(tag, languageCode)}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {studentSummary.next_step_recommendation ? (
+                    <div className="grid gap-1.5">
+                      <p className="text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
+                        {copy.summaryNextStepLabel}
+                      </p>
+                      <p className="text-sm leading-6 text-[color:var(--foreground)]">
+                        {studentSummary.next_step_recommendation}
+                      </p>
+                    </div>
+                  ) : null}
+                </div>
+              ) : (
+                <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
+                  {isCompleted ? copy.summaryUnavailable : copy.summaryPlaceholder}
+                </p>
+              )
             ) : null}
           </section>
         </div>

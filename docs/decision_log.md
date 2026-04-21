@@ -1367,3 +1367,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Keep the dedicated AI title pass as the preferred first-turn behavior, but add explicit runtime logs around the title attempt plus a deterministic server-side fallback title builder based on the first learner message and subject. If the AI title pass fails or leaves the conversation on the neutral placeholder, the service now promotes a short heuristic title instead of keeping `Subject_###`.
 - Why: For the pilot flow, a stable non-placeholder title is more important than insisting every title be model-generated. The heuristic fallback preserves product continuity while the new logs make the real title-generation failure mode inspectable.
 - Follow-up: Review the new title-attempt logs on the next failed case and decide whether the dedicated AI title pass needs a deeper provider-side fix, a different model, or more permissive output handling.
+
+### D-20260421-136 - Completed Homework Summaries Now Surface Immediately In The Live Student Right Rail
+
+- Date: 2026-04-21
+- Status: accepted
+- Related tasks: `P1.3`
+- Context: The explicit completion route already returned the persisted student summary audience after `Homework done!`, and the completion service already froze the conversation plus generated the required recap. But the live student workbench only updated `conversation.status` locally and ignored the returned `summaries` payload, so the learner saw the chat become read-only without seeing the freshly generated recap unless they reloaded or navigated elsewhere.
+- Decision: Keep the explicit completion button at the bottom of the right rail, but restore completion visibility by adding a fourth collapsible `Summary` section to that same rail. The workbench now stores the returned `payload.data.summaries` on successful completion, and the side rail renders the student-facing recap, weakness tags, and next-step recommendation immediately after the session is completed.
+- Why: This preserves the simplified chat-first workbench while removing the current product gap where completion looked structurally unfinished. The learner should see the outcome of clicking `Homework done!` in the same live surface, not only in backend state or after a later reload.
+- Follow-up: If the summary section starts feeling too dense in the right rail on iPad widths, decide whether the student completion recap needs a condensed mobile layout or a stronger summary-information hierarchy rather than removing it again.

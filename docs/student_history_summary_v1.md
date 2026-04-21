@@ -35,7 +35,7 @@ The student flow now has two active session surfaces plus one compatibility redi
 2. `/app/conversations/[conversationId]` for the detailed transcript, workspace, and final summary
 3. `/app/history` only as a compatibility redirect back into the homework surface
 
-The student completion or summary panel now also localizes its route copy through `lib/i18n/student-flow-copy.ts`, while the persisted summary artifacts continue to come from the provider-backed summary pipeline.
+The student completion or summary panel now also localizes its route copy through `lib/i18n/student-flow-copy.ts`, while the persisted summary artifacts continue to come from the provider-backed summary pipeline. The live student workbench now also consumes the returned student summary immediately after completion and shows it inside the right-rail `Summary` section instead of waiting for a later page reload.
 
 When the student marks a session complete, the app now:
 
