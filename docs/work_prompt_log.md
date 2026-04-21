@@ -206,3 +206,4 @@ then close it as:
 | 2026-04-21 | 11:39 -> 11:49 | 0h10 | P5.3 | improve low-quality conversation title generation by using actual homework context from extracted content and simplify the learner-facing completion summary so it focuses on what was done, the skills still fragile, and a cleaner next step | | |
 | 2026-04-21 | 14:45 -> 14:48 | 0h03 | A0.3.7 | reopen the active 2026-04-21 execution trace after the earlier session was explicitly closed | | |
 | 2026-04-21 | 14:54 -> 14:57 | 0h03 | P1.3 | fix the conversation transcript scroll regression introduced by the viewport-lock layout pass so the panel scrolls again without bringing back the page-level scrollbar | | |
+| 2026-04-21 | 15:22 -> 15:24 | 0h02 | P1.3 | finish the conversation transcript scroll fix by giving the desktop grid a real constrained row height so the panel scrolls inside the viewport instead of expanding with content | | |
