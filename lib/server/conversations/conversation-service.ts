@@ -1674,6 +1674,9 @@ export async function completeConversation(
     (summariesResult.data ?? []) as SessionSummaryRecord[];
   const existingStudentSummary =
     existingVisibleSummaries.find((summary) => summary.audience === "student") ?? null;
+  const studentOnlyRegeneration =
+    input.forceRegenerateSummary &&
+    input.summaryRegenerationMode === "student_only";
 
   if (
     conversation.status === "completed" &&
@@ -1730,39 +1733,42 @@ export async function completeConversation(
     workspace: workspaceResult.data ?? null,
     messages: (messagesResult.data ?? []) as ConversationMessageRecord[],
     attachments: (attachmentsResult.data ?? []) as ConversationAttachmentRecord[],
+    studentOnly: studentOnlyRegeneration,
   });
-  try {
-    await refreshStudentMemoryFromConversationCompletion({
-      appUser,
-      conversation: completedConversation,
-      workspace: workspaceResult.data ?? null,
-      messages: (messagesResult.data ?? []) as ConversationMessageRecord[],
-      attachments: (attachmentsResult.data ?? []) as ConversationAttachmentRecord[],
-      summaries,
-      requestId: input.requestId,
-      route: input.route,
-    });
-  } catch (error) {
-    logRuntimeError({
-      message: "Student memory refresh failed",
-      requestId: input.requestId,
-      route: input.route,
-      method: "POST",
-      actorUserId: appUser.id,
-      actorRole: appUser.role,
-      targetStudentUserId: appUser.id,
-      errorCode: "memory_refresh_failed",
-      details: {
-        conversationId: input.conversationId,
-        error:
-          error instanceof Error
-            ? {
-                name: error.name,
-                message: error.message,
-              }
-            : error,
-      },
-    });
+  if (!studentOnlyRegeneration) {
+    try {
+      await refreshStudentMemoryFromConversationCompletion({
+        appUser,
+        conversation: completedConversation,
+        workspace: workspaceResult.data ?? null,
+        messages: (messagesResult.data ?? []) as ConversationMessageRecord[],
+        attachments: (attachmentsResult.data ?? []) as ConversationAttachmentRecord[],
+        summaries,
+        requestId: input.requestId,
+        route: input.route,
+      });
+    } catch (error) {
+      logRuntimeError({
+        message: "Student memory refresh failed",
+        requestId: input.requestId,
+        route: input.route,
+        method: "POST",
+        actorUserId: appUser.id,
+        actorRole: appUser.role,
+        targetStudentUserId: appUser.id,
+        errorCode: "memory_refresh_failed",
+        details: {
+          conversationId: input.conversationId,
+          error:
+            error instanceof Error
+              ? {
+                  name: error.name,
+                  message: error.message,
+                }
+              : error,
+        },
+      });
+    }
   }
   const studentSummary =
     summaries.find((summary) => summary.audience === "student") ?? null;

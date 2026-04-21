@@ -595,7 +595,10 @@ export function StudentConversationWorkbench({
     void runBootstrap();
   }, [conversation.id, detail.messages.length]);
 
-  function completeSession(options?: { forceRegenerateSummary?: boolean }) {
+  function completeSession(options?: {
+    forceRegenerateSummary?: boolean;
+    summaryRegenerationMode?: "all" | "student_only";
+  }) {
     setWorkspaceError(null);
 
     startCompleting(async () => {
@@ -608,6 +611,8 @@ export function StudentConversationWorkbench({
           },
           body: JSON.stringify({
             forceRegenerateSummary: options?.forceRegenerateSummary ?? false,
+            summaryRegenerationMode:
+              options?.summaryRegenerationMode ?? "all",
           }),
         },
       );
@@ -874,7 +879,10 @@ export function StudentConversationWorkbench({
               languageCode={languageCode}
               onComplete={completeSession}
               onRegenerateSummary={() =>
-                completeSession({ forceRegenerateSummary: true })
+                completeSession({
+                  forceRegenerateSummary: true,
+                  summaryRegenerationMode: "student_only",
+                })
               }
               onRemoveAttachment={removeAttachment}
               onRetryAttachment={(attachmentId) => {

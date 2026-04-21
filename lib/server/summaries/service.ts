@@ -33,6 +33,7 @@ type GenerateConversationSummariesInput = {
   workspace: WorkspaceStateRecord | null;
   messages: ConversationMessageRecord[];
   attachments: ConversationAttachmentRecord[];
+  studentOnly?: boolean;
 };
 
 function toSummaryServiceError(
@@ -290,6 +291,10 @@ export async function generateConversationSummaries(
       }),
     ),
   );
+
+  if (input.studentOnly) {
+    return summaries;
+  }
 
   const parentBaseSummary = await runOptionalSummaryStep(
     input,

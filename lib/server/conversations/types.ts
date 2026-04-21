@@ -155,6 +155,7 @@ export type CompleteConversationInput = {
   requestId: string;
   route: string;
   forceRegenerateSummary?: boolean;
+  summaryRegenerationMode?: "all" | "student_only";
 };
 
 export type ConversationViewer = Pick<

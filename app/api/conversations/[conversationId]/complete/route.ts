@@ -15,6 +15,7 @@ export const POST = withRouteErrorHandling<{ params: Params }>(
     );
     const rawBody = await request.text();
     let forceRegenerateSummary = false;
+    let summaryRegenerationMode: "all" | "student_only" = "all";
 
     if (rawBody.trim().length > 0) {
       let parsedBody: unknown;
@@ -43,6 +44,9 @@ export const POST = withRouteErrorHandling<{ params: Params }>(
 
       const candidateForceRegenerate = (parsedBody as Record<string, unknown>)
         .forceRegenerateSummary;
+      const candidateSummaryRegenerationMode = (
+        parsedBody as Record<string, unknown>
+      ).summaryRegenerationMode;
 
       if (
         candidateForceRegenerate !== undefined &&
@@ -55,7 +59,20 @@ export const POST = withRouteErrorHandling<{ params: Params }>(
         });
       }
 
+      if (
+        candidateSummaryRegenerationMode !== undefined &&
+        candidateSummaryRegenerationMode !== "all" &&
+        candidateSummaryRegenerationMode !== "student_only"
+      ) {
+        throw new AppError({
+          code: "bad_request",
+          message: copy.requestErrors.invalidFields,
+          status: 400,
+        });
+      }
+
       forceRegenerateSummary = candidateForceRegenerate ?? false;
+      summaryRegenerationMode = candidateSummaryRegenerationMode ?? "all";
     }
 
     const resolvedParams = await params;
@@ -65,6 +82,7 @@ export const POST = withRouteErrorHandling<{ params: Params }>(
       requestId,
       route: "/api/conversations/[conversationId]/complete",
       forceRegenerateSummary,
+      summaryRegenerationMode,
     });
 
     return NextResponse.json({

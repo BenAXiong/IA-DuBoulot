@@ -24,9 +24,9 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Status: accepted
 - Related tasks: `P1.3`, `P5.3`
 - Context: The student completion summary had two separate problems. First, the deterministic fallback was still leaking internal session metadata instead of giving the learner a useful recap. Second, testing summary quality was cumbersome because the completion route always reused the stored student summary once a session was already completed.
-- Decision: Keep `POST /api/conversations/[conversationId]/complete` as the single completion and summary route, but add an optional `forceRegenerateSummary` flag for explicit dev-only re-generation. Also tighten the deterministic student-summary fallback so it stays learner-facing and only reports what was worked on, which skills still look fragile, and the next concrete revision step.
-- Why: This avoids adding a second summary-specific endpoint, keeps repeated completion cheap in production by default, and makes bad fallback summaries less misleading for learners.
-- Follow-up: Re-check whether the provider-backed student summary path still needs prompt tightening after the fallback is improved and the dev-only regenerate control is available.
+- Decision: Keep `POST /api/conversations/[conversationId]/complete` as the single completion and summary route, but add an optional `forceRegenerateSummary` flag for explicit dev-only re-generation. Also tighten the deterministic student-summary fallback so it stays learner-facing and only reports what was worked on, which skills still look fragile, and the next concrete revision step. The dev-only regenerate action now bypasses reuse only for the student summary artifact and intentionally does not re-trigger the parent, tutor, or memory branches.
+- Why: This avoids adding a second summary-specific endpoint, keeps repeated completion cheap in production by default, keeps bad fallback summaries less misleading for learners, and makes summary iteration much less noisy during development.
+- Follow-up: Re-check whether the provider-backed student summary path still needs prompt tightening after the fallback is improved and the dev-only regenerate control is available. Also keep watching Gemini Pro structured JSON behavior, because empty-payload failures may still come from the SDK or model-output shape rather than from the prompt alone.
 
 ### D-20260310-01 - Documentation Spine Is Mandatory
 

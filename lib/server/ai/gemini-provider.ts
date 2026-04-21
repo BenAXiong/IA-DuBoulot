@@ -334,6 +334,28 @@ function extractTextFromGeminiCandidateParts(response: unknown) {
   return textParts.join("\n").trim() || null;
 }
 
+function extractJsonTextFromGeminiResponse(response: unknown) {
+  const directText =
+    response && typeof response === "object"
+      ? asString((response as Record<string, unknown>).text)
+      : null;
+
+  if (directText) {
+    return directText;
+  }
+
+  const candidateText = extractTextFromGeminiCandidateParts(response);
+
+  if (!candidateText) {
+    return null;
+  }
+
+  const fencedMatch = candidateText.match(/```(?:json)?\s*([\s\S]+?)\s*```/i);
+  const normalized = fencedMatch?.[1]?.trim() ?? candidateText.trim();
+
+  return normalized.length > 0 ? normalized : null;
+}
+
 function isGeminiCleanStopReason(value: string | null) {
   return value === "STOP" || value === "FINISH_REASON_UNSPECIFIED";
 }
@@ -606,7 +628,7 @@ export class GeminiAiProvider implements AiProvider {
             maxOutputTokens: input.maxOutputTokens,
           },
         });
-        const responseText = response.text?.trim();
+        const responseText = extractJsonTextFromGeminiResponse(response);
 
         if (!responseText) {
           throw new Error("Gemini returned an empty JSON payload.");
@@ -1149,7 +1171,7 @@ export class GeminiAiProvider implements AiProvider {
           },
           nextStepRecommendation: { type: Type.STRING },
         },
-        required: ["summaryText", "weaknessTags", "nextStepRecommendation"],
+        required: ["summaryText", "weaknessTags"],
       },
       requestContext: input.requestContext,
       operation: "summary",
