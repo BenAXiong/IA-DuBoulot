@@ -52,7 +52,7 @@ import type {
   TranslateTextResult,
 } from "@/lib/server/ai/types";
 import { logRuntimeError, logRuntimeInfo } from "@/lib/server/audit/runtime-logger";
-import { AppError } from "@/lib/server/errors/app-error";
+import { AppError, isAppError } from "@/lib/server/errors/app-error";
 
 type JsonSchema = {
   type: Type;
@@ -149,6 +149,7 @@ function safeJson(value: unknown) {
 
 function extractProviderFailureDetails(error: unknown) {
   const details: Record<string, unknown> = {};
+  const appError = isAppError(error) ? error : null;
   const record =
     error && typeof error === "object" ? (error as Record<string, unknown>) : null;
   const httpStatus =
@@ -212,6 +213,10 @@ function extractProviderFailureDetails(error: unknown) {
 
   if (providerDetailsJson) {
     details.provider_details = providerDetailsJson;
+  }
+
+  if (appError?.details) {
+    Object.assign(details, appError.details);
   }
 
   return {

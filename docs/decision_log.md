@@ -1477,3 +1477,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Keep the current shell-first architecture, but move the real upload-and-extraction pass onto the subject quick-start before the prompt is auto-sent. The launcher now creates the shell, uploads and confirms staged files, syncs extracted text into the hidden workspace, and only then hands off the learner prompt. If attachment prep fails, the conversation still opens, but bootstrap auto-send is paused and the learner draft is restored in the composer with an explicit launcher-side error message.
 - Why: This is the narrowest fix that removes the trust break without inventing a new all-in-one backend contract. The learner no longer wastes the first prompt just to discover afterward that the attached source never became readable context.
 - Follow-up: Surface extraction-failure state more clearly on the attachment pills or rail and decide later whether half-created shell conversations that never receive a first learner turn need a dedicated cleanup policy.
+
+### D-20260422-146 - Attachment Extraction Failures Now Preserve Structured Gemini Diagnostics
+
+- Date: 2026-04-22
+- Status: accepted
+- Related tasks: `P1.3`
+- Context: The attachment-extraction path already used the shared Gemini JSON-generation helper, but provider failures on that path still risked losing the helper's structured payload diagnostics before they reached the runtime log. That made extraction incidents harder to classify than summary incidents, even when both were failing in the same underlying JSON-output layer.
+- Decision: Preserve `AppError.details` when extracting provider-failure metadata inside the Gemini adapter, so attachment-extraction failures now carry the same payload-shape and finish-reason diagnostics as other structured Gemini calls.
+- Why: The next extraction investigation needs to distinguish a bad file from a bad model response shape. Without these diagnostics, too many different extraction failures look identical in runtime logs.
+- Follow-up: Re-run the failing course PDF extraction and inspect whether the next failure shows an empty payload, malformed JSON, `MAX_TOKENS`, or another provider-side finish reason. Only then decide whether to tighten the prompt, split the extraction, or add a non-Gemini PDF fallback first.
