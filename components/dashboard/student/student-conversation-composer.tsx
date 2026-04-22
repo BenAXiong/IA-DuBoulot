@@ -12,6 +12,7 @@ type StudentConversationComposerProps = {
   languageCode: UiLanguageCode;
   replyMode: StudentReplyMode;
   disabled?: boolean;
+  isUploading?: boolean;
   isSending?: boolean;
   onComposerTextChange: (value: string) => void;
   onReplyModeChange: (mode: StudentReplyMode) => void;
@@ -70,6 +71,7 @@ export function StudentConversationComposer({
   languageCode,
   replyMode,
   disabled = false,
+  isUploading = false,
   isSending = false,
   onComposerTextChange,
   onReplyModeChange,
@@ -100,7 +102,7 @@ export function StudentConversationComposer({
 
     event.preventDefault();
 
-    if (disabled || isSending || composerText.trim().length === 0) {
+    if (disabled || isSending || isUploading || composerText.trim().length === 0) {
       return;
     }
 
@@ -112,7 +114,7 @@ export function StudentConversationComposer({
   ) {
     const files = extractClipboardFiles(event.clipboardData);
 
-    if (files.length === 0 || disabled || isSending) {
+    if (files.length === 0 || disabled) {
       return;
     }
 
@@ -139,7 +141,7 @@ export function StudentConversationComposer({
           <button
             aria-label={copy.addAttachment}
             className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
-            disabled={disabled || isSending}
+            disabled={disabled || isSending || isUploading}
             onClick={onUploadAttachments}
             title={copy.addAttachment}
             type="button"
@@ -163,15 +165,26 @@ export function StudentConversationComposer({
           </button>
         </div>
 
-        <button
-          aria-label={isSending ? copy.sending : copy.send}
-          className="inline-flex h-8 w-8 items-center justify-center text-[color:var(--foreground)] transition hover:text-[color:var(--accent)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-40"
-          disabled={disabled || isSending || composerText.trim().length === 0}
-          onClick={onSendMessage}
-          type="button"
+        <span
+          className="inline-flex"
+          title={
+            isUploading ? copy.uploadInProgressTooltip : undefined
+          }
         >
-          <SendIcon />
-        </button>
+          <button
+            aria-label={
+              isUploading ? copy.uploadInProgressTooltip : isSending ? copy.sending : copy.send
+            }
+            className="inline-flex h-8 w-8 items-center justify-center text-[color:var(--foreground)] transition hover:text-[color:var(--accent)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-40"
+            disabled={
+              disabled || isSending || isUploading || composerText.trim().length === 0
+            }
+            onClick={onSendMessage}
+            type="button"
+          >
+            <SendIcon />
+          </button>
+        </span>
       </div>
     </div>
   );

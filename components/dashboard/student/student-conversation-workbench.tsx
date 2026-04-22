@@ -823,7 +823,8 @@ export function StudentConversationWorkbench({
               <StudentConversationComposer
                 composerText={composerText}
                 disabled={isReadOnly}
-                isSending={isSending || isUploading || isBootstrapping}
+                isSending={isSending}
+                isUploading={isUploading || isBootstrapping}
                 languageCode={languageCode}
                 onComposerTextChange={setComposerText}
                 onReplyModeChange={setReplyMode}
@@ -842,12 +843,6 @@ export function StudentConversationWorkbench({
               {workspaceError ? (
                 <p className="rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-sm leading-6 text-[color:var(--ink-soft)]">
                   {workspaceError}
-                </p>
-              ) : null}
-
-              {isUploading || isBootstrapping ? (
-                <p className="rounded-[1.25rem] border border-[color:var(--line)] bg-white px-4 py-3 text-sm leading-6 text-[color:var(--ink-soft)]">
-                  {copy.uploadInProgress}
                 </p>
               ) : null}
 

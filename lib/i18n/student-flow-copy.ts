@@ -660,6 +660,7 @@ export function getStudentConversationComposerCopy(languageCode: UiLanguageCode)
           "Explique où tu bloques, ce que tu as déjà essayé, ou l'étape que tu veux clarifier.",
         sending: "Envoi...",
         send: "Envoyer",
+        uploadInProgressTooltip: "Upload et extraction en cours...",
       },
       en: {
         addAttachment: "Add attachment",
@@ -668,6 +669,7 @@ export function getStudentConversationComposerCopy(languageCode: UiLanguageCode)
           "Explain where you're stuck, what you've already tried, or the step you want to clarify.",
         sending: "Sending...",
         send: "Send",
+        uploadInProgressTooltip: "Upload and extraction in progress...",
       },
       zh: {
         addAttachment: "加入附件",
@@ -675,7 +677,8 @@ export function getStudentConversationComposerCopy(languageCode: UiLanguageCode)
         placeholder: "說明你卡住的地方、已經試過什麼，或你想釐清的步驟。",
         sending: "傳送中...",
         send: "送出",
-    },
+        uploadInProgressTooltip: "正在上傳並擷取...",
+      },
   });
 }
 
