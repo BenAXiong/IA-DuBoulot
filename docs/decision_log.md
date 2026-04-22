@@ -1417,3 +1417,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Raise the shared summary output cap from `450` to `1000` tokens while keeping the current learner-facing fallback behavior unchanged.
 - Why: This is the lowest-risk first fix for the newly confirmed failure mode. The provider is not merely returning content in an unsupported shape; it is hitting the output ceiling before yielding any usable structured payload. Increasing the cap is more direct and less distorting than immediately splitting the call or downgrading the model.
 - Follow-up: Re-run summary regeneration on the same conversation class. If `MAX_TOKENS` still appears, add a Pro-only retry or a relaxed-JSON second pass before considering any model fallback.
+
+### D-20260422-140 - Temporary Summary Output Cap Raised To 5000 Tokens For Pro Structured-Output Troubleshooting
+
+- Date: 2026-04-22
+- Status: accepted
+- Related tasks: `P5.3`
+- Context: After increasing the summary output cap to `1000`, the same student summary regeneration still failed with `finishReason: MAX_TOKENS` and zero returned content parts. That means the troubleshooting hypothesis did not clear at `1000`, and the next need is to determine whether the summary can complete at all under a much higher ceiling before adding more invasive retries or prompt restructuring.
+- Decision: Temporarily raise the summary output cap again, from `1000` to `5000`, strictly as a troubleshooting override for the current `gemini-2.5-pro` structured-summary failure investigation.
+- Why: This isolates the token-ceiling question quickly. If `MAX_TOKENS` still happens at `5000`, the next fix should not be another incremental cap bump; it should move to prompt reduction, a Pro-only retry strategy, or a different structured-output approach.
+- Follow-up: Re-run the same closed-conversation summary regeneration. If it still fails with `MAX_TOKENS`, stop using cap increases as the primary lever and inspect prompt/context size plus structured-response strategy instead.

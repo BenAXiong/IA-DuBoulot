@@ -201,7 +201,7 @@ Current access model:
   - `parent-summary-v2`
   - `tutor-summary-v2`
 - current model: `gemini-2.5-pro`
-- output cap: `1000` tokens per summary call
+- output cap: `5000` tokens per summary call for current troubleshooting on `gemini-2.5-pro` structured-summary failures
 - fallback behavior:
   - student summary is required and falls back deterministically
   - parent and tutor variants are best-effort
