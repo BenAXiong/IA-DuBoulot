@@ -88,30 +88,37 @@ function UploadProgressIcon({
       ),
     ),
   );
-  const fillDegrees = completedSegments * 120;
+  const fillRatio = completedSegments / 3;
+  const radius = 8;
+  const circumference = 2 * Math.PI * radius;
+  const dashOffset = circumference * (1 - fillRatio);
 
   return (
-    <span className="relative inline-flex h-5 w-5 items-center justify-center">
-      <span
-        aria-hidden="true"
-        className="absolute inset-0 rounded-full"
-        style={{
-          background: `conic-gradient(var(--accent) 0deg ${fillDegrees}deg, color-mix(in srgb, var(--foreground) 14%, transparent) ${fillDegrees}deg 360deg)`,
-        }}
+    <svg
+      aria-hidden="true"
+      className="h-5 w-5 -rotate-90"
+      viewBox="0 0 20 20"
+    >
+      <circle
+        cx="10"
+        cy="10"
+        fill="none"
+        r={radius}
+        stroke="color-mix(in srgb, var(--foreground) 14%, transparent)"
+        strokeWidth="2"
       />
-      <span
-        aria-hidden="true"
-        className="absolute inset-[2px] rounded-full bg-[color:var(--surface)]"
+      <circle
+        cx="10"
+        cy="10"
+        fill="none"
+        r={radius}
+        stroke="var(--accent)"
+        strokeDasharray={circumference}
+        strokeDashoffset={dashOffset}
+        strokeLinecap="round"
+        strokeWidth="2"
       />
-      <span
-        aria-hidden="true"
-        className="absolute inset-0 rounded-full border"
-        style={{
-          borderColor:
-            "color-mix(in srgb, var(--foreground) 18%, transparent)",
-        }}
-      />
-    </span>
+    </svg>
   );
 }
 
