@@ -1407,3 +1407,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Keep the current learner-facing fallback behavior unchanged, but add structured diagnostics to the JSON-generation helper before the fallback path triggers. Empty or malformed structured responses now log payload-shape metadata such as whether direct text existed, whether candidate text existed, whether fenced JSON was detected, the normalized payload length, and a safe summary of candidate part kinds and text lengths rather than raw learner content.
 - Why: The immediate need is observability, not another silent model swap. These diagnostics let future troubleshooting determine whether the remaining Pro failures are true provider empties, malformed structured outputs, or a new response shape we still do not harvest, without leaking the full summary text into runtime logs.
 - Follow-up: Review the next failed Pro summary generation. If the new diagnostics show candidate parts with no harvested text, extend the extractor to that response shape. If they show genuine empties or repeated malformed JSON, add a Pro-only retry or relaxed-JSON second pass before considering a model fallback.
+
+### D-20260422-139 - Session Summary Output Cap Raised To 1000 Tokens After Pro Returned MAX_TOKENS With No Structured Payload
+
+- Date: 2026-04-22
+- Status: accepted
+- Related tasks: `P5.3`
+- Context: After the new structured-output diagnostics landed, the next failed student summary generation on `gemini-2.5-pro` showed `finishReason: MAX_TOKENS` together with zero returned parts and zero returned text. That ruled out the earlier extraction-blind-spot hypothesis and pointed instead to the current summary output cap being too tight for some Pro structured-summary calls.
+- Decision: Raise the shared summary output cap from `450` to `1000` tokens while keeping the current learner-facing fallback behavior unchanged.
+- Why: This is the lowest-risk first fix for the newly confirmed failure mode. The provider is not merely returning content in an unsupported shape; it is hitting the output ceiling before yielding any usable structured payload. Increasing the cap is more direct and less distorting than immediately splitting the call or downgrading the model.
+- Follow-up: Re-run summary regeneration on the same conversation class. If `MAX_TOKENS` still appears, add a Pro-only retry or a relaxed-JSON second pass before considering any model fallback.
