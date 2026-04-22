@@ -1437,3 +1437,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Change Gemini usage accounting to prefer provider-native `usageMetadata` whenever the response includes it, and use local `countTokens` calls only as a fallback when that metadata is missing. At the same time, lower the summary output cap back down from the temporary `5000` troubleshooting override to `2000`.
 - Why: Provider-reported usage is the closest thing to a real source of truth for token accounting in this adapter. It is materially more useful than reconstructing counts locally from partial request fragments. Returning the summary cap to `2000` keeps a large safety margin over the earlier failing `1000` cap without leaving the route in an obviously over-wide debug state.
 - Follow-up: Review the next few successful summary generations. If provider-native usage keeps appearing consistently, consider de-emphasizing the fallback counter logs. If summaries still hit `MAX_TOKENS` at `2000`, the next fix should move to retry/prompt-shaping rather than another cap increase.
+
+### D-20260422-142 - Gemini Output Usage Now Counts Thinking Tokens As Billable Output
+
+- Date: 2026-04-22
+- Status: accepted
+- Related tasks: `P5.3`
+- Context: The first successful post-refactor summary log finally exposed provider-native usage metadata, including `promptTokenCount`, `candidatesTokenCount`, `totalTokenCount`, and `thoughtsTokenCount`. That revealed a remaining accounting flaw: the adapter had started trusting provider metadata, but it still mapped `outputTokens` only to `candidatesTokenCount`, which undercounted both real billable output and the actual output budget consumption for thinking-capable Gemini calls.
+- Decision: Keep using Gemini `usageMetadata` as the primary source of truth, but change `outputTokens` to mean **billable output tokens**, i.e. visible candidate tokens plus `thoughtsTokenCount` when Gemini reports it. Runtime logs now also distinguish visible output tokens from billable output tokens.
+- Why: For current Gemini Pro usage, visible output is not the whole output cost. Thinking tokens matter for both economics and operational sizing, so treating only visible candidate text as output would keep underestimating both spend and output-budget pressure.
+- Follow-up: Review the next successful summary log and confirm that `output_tokens` now matches billable output instead of only visible text. If future Gemini models change the meaning of these metadata fields, revisit the billing mapping rather than silently trusting the old assumption.

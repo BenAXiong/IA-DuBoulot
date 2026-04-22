@@ -636,7 +636,11 @@ export class GeminiAiProvider implements AiProvider {
   }): Promise<GeminiUsageExtraction> {
     const usageMeta = extractGeminiUsageMeta(input.response);
     let inputTokens = usageMeta.promptTokenCount;
-    let outputTokens = usageMeta.candidatesTokenCount;
+    const providerBillableOutputTokens =
+      usageMeta.candidatesTokenCount === null
+        ? null
+        : usageMeta.candidatesTokenCount + (usageMeta.thoughtsTokenCount ?? 0);
+    let outputTokens = providerBillableOutputTokens;
     let usageSource = "provider_usage_metadata";
 
     if (inputTokens === null) {
@@ -654,7 +658,7 @@ export class GeminiAiProvider implements AiProvider {
 
     if (
       usageMeta.promptTokenCount === null &&
-      usageMeta.candidatesTokenCount === null
+      providerBillableOutputTokens === null
     ) {
       usageSource = "count_tokens_fallback";
     }
@@ -668,7 +672,8 @@ export class GeminiAiProvider implements AiProvider {
       logDetails: {
         usage_source: usageSource,
         provider_prompt_token_count: usageMeta.promptTokenCount,
-        provider_candidates_token_count: usageMeta.candidatesTokenCount,
+        provider_visible_output_token_count: usageMeta.candidatesTokenCount,
+        provider_billable_output_token_count: providerBillableOutputTokens,
         provider_total_token_count: usageMeta.totalTokenCount,
         provider_thoughts_token_count: usageMeta.thoughtsTokenCount,
         provider_tool_use_prompt_token_count: usageMeta.toolUsePromptTokenCount,

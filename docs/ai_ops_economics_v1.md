@@ -133,6 +133,7 @@ Current measurement rule:
 - prefer Gemini provider `usageMetadata` when the response includes it
 - fall back to local `countTokens` calls only when provider usage metadata is missing
 - treat fallback counts as approximate only; they are useful for resilience, but the provider-reported usage should be considered the more trustworthy operational signal
+- when Gemini returns `thoughtsTokenCount`, treat `outputTokens` as **billable output** (`visible output + thinking tokens`), not just the visible candidate text
 
 ## Successful Coach Output Debug Capture
 
