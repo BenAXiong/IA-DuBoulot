@@ -1427,3 +1427,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Temporarily raise the summary output cap again, from `1000` to `5000`, strictly as a troubleshooting override for the current `gemini-2.5-pro` structured-summary failure investigation.
 - Why: This isolates the token-ceiling question quickly. If `MAX_TOKENS` still happens at `5000`, the next fix should not be another incremental cap bump; it should move to prompt reduction, a Pro-only retry strategy, or a different structured-output approach.
 - Follow-up: Re-run the same closed-conversation summary regeneration. If it still fails with `MAX_TOKENS`, stop using cap increases as the primary lever and inspect prompt/context size plus structured-response strategy instead.
+
+### D-20260422-141 - Gemini Usage Accounting Now Prefers Provider Usage Metadata, And Summary Cap Returns To 2000
+
+- Date: 2026-04-22
+- Status: accepted
+- Related tasks: `P5.3`
+- Context: The successful post-troubleshooting summary finally returned a good student recap, but the logged usage snapshot still showed implausible numbers like `input_tokens: 10`, because the current accounting path relied mainly on local `countTokens` calls over simplified request fragments. That made the token logs weak as an operational sizing signal and especially undercounted structured calls whose real provider request included more context than the fallback counter saw.
+- Decision: Change Gemini usage accounting to prefer provider-native `usageMetadata` whenever the response includes it, and use local `countTokens` calls only as a fallback when that metadata is missing. At the same time, lower the summary output cap back down from the temporary `5000` troubleshooting override to `2000`.
+- Why: Provider-reported usage is the closest thing to a real source of truth for token accounting in this adapter. It is materially more useful than reconstructing counts locally from partial request fragments. Returning the summary cap to `2000` keeps a large safety margin over the earlier failing `1000` cap without leaving the route in an obviously over-wide debug state.
+- Follow-up: Review the next few successful summary generations. If provider-native usage keeps appearing consistently, consider de-emphasizing the fallback counter logs. If summaries still hit `MAX_TOKENS` at `2000`, the next fix should move to retry/prompt-shaping rather than another cap increase.

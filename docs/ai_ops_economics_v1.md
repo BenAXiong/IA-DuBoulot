@@ -128,6 +128,12 @@ The canonical per-call usage snapshot currently contains:
 
 This snapshot is intentionally small. It is used for quota accounting, rough cost estimation, and runtime diagnostics, not as a full provider transcript.
 
+Current measurement rule:
+
+- prefer Gemini provider `usageMetadata` when the response includes it
+- fall back to local `countTokens` calls only when provider usage metadata is missing
+- treat fallback counts as approximate only; they are useful for resilience, but the provider-reported usage should be considered the more trustworthy operational signal
+
 ## Successful Coach Output Debug Capture
 
 The learner-facing coach path now has one dedicated debug sink for successful replies:
@@ -201,7 +207,7 @@ Current access model:
   - `parent-summary-v2`
   - `tutor-summary-v2`
 - current model: `gemini-2.5-pro`
-- output cap: `5000` tokens per summary call for current troubleshooting on `gemini-2.5-pro` structured-summary failures
+- output cap: `2000` tokens per summary call
 - fallback behavior:
   - student summary is required and falls back deterministically
   - parent and tutor variants are best-effort

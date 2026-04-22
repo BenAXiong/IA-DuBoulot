@@ -81,6 +81,20 @@ type GeminiResponseMeta = {
   candidateCount: number;
 };
 
+type GeminiUsageMeta = {
+  promptTokenCount: number | null;
+  candidatesTokenCount: number | null;
+  totalTokenCount: number | null;
+  thoughtsTokenCount: number | null;
+  toolUsePromptTokenCount: number | null;
+  cachedContentTokenCount: number | null;
+};
+
+type GeminiUsageExtraction = {
+  usage: AiUsageSnapshot;
+  logDetails: Record<string, unknown>;
+};
+
 function sleep(delayMs: number) {
   return new Promise((resolve) => setTimeout(resolve, delayMs));
 }
@@ -302,6 +316,26 @@ function extractGeminiResponseMeta(response: unknown): GeminiResponseMeta {
     finishReason: normalizeGeminiEnumValue(firstCandidate?.finishReason),
     promptBlockReason: normalizeGeminiEnumValue(promptFeedback?.blockReason),
     candidateCount: candidates.length,
+  };
+}
+
+function extractGeminiUsageMeta(response: unknown): GeminiUsageMeta {
+  const record =
+    response && typeof response === "object"
+      ? (response as Record<string, unknown>)
+      : null;
+  const usageMetadata =
+    record?.usageMetadata && typeof record.usageMetadata === "object"
+      ? (record.usageMetadata as Record<string, unknown>)
+      : null;
+
+  return {
+    promptTokenCount: asNumber(usageMetadata?.promptTokenCount),
+    candidatesTokenCount: asNumber(usageMetadata?.candidatesTokenCount),
+    totalTokenCount: asNumber(usageMetadata?.totalTokenCount),
+    thoughtsTokenCount: asNumber(usageMetadata?.thoughtsTokenCount),
+    toolUsePromptTokenCount: asNumber(usageMetadata?.toolUsePromptTokenCount),
+    cachedContentTokenCount: asNumber(usageMetadata?.cachedContentTokenCount),
   };
 }
 
@@ -594,6 +628,55 @@ export class GeminiAiProvider implements AiProvider {
     }
   }
 
+  private async buildUsageFromGeminiResponse(input: {
+    response: unknown;
+    modelName: string;
+    fallbackInputTokens: () => Promise<number | null>;
+    fallbackOutputTokens: () => Promise<number | null>;
+  }): Promise<GeminiUsageExtraction> {
+    const usageMeta = extractGeminiUsageMeta(input.response);
+    let inputTokens = usageMeta.promptTokenCount;
+    let outputTokens = usageMeta.candidatesTokenCount;
+    let usageSource = "provider_usage_metadata";
+
+    if (inputTokens === null) {
+      inputTokens = await input.fallbackInputTokens();
+      usageSource = "mixed_fallback";
+    }
+
+    if (outputTokens === null) {
+      outputTokens = await input.fallbackOutputTokens();
+      usageSource =
+        usageSource === "provider_usage_metadata"
+          ? "mixed_fallback"
+          : "count_tokens_fallback";
+    }
+
+    if (
+      usageMeta.promptTokenCount === null &&
+      usageMeta.candidatesTokenCount === null
+    ) {
+      usageSource = "count_tokens_fallback";
+    }
+
+    return {
+      usage: buildUsageSnapshot({
+        modelName: input.modelName,
+        inputTokens,
+        outputTokens,
+      }),
+      logDetails: {
+        usage_source: usageSource,
+        provider_prompt_token_count: usageMeta.promptTokenCount,
+        provider_candidates_token_count: usageMeta.candidatesTokenCount,
+        provider_total_token_count: usageMeta.totalTokenCount,
+        provider_thoughts_token_count: usageMeta.thoughtsTokenCount,
+        provider_tool_use_prompt_token_count: usageMeta.toolUsePromptTokenCount,
+        provider_cached_content_token_count: usageMeta.cachedContentTokenCount,
+      },
+    };
+  }
+
   private logSuccess(input: {
     context: AiProviderLogContext;
     operation: string;
@@ -660,8 +743,6 @@ export class GeminiAiProvider implements AiProvider {
     extraLogDetails?: Record<string, unknown>;
     maxOutputTokens?: number;
   }): Promise<T & GeneratedUsageResult> {
-    const inputTokens = await this.countContentTokens(input.model, input.contents);
-
     for (let attempt = 0; attempt < 3; attempt += 1) {
       try {
         const response = await this.client.models.generateContent({
@@ -707,15 +788,19 @@ export class GeminiAiProvider implements AiProvider {
             },
           });
         }
-        const outputTokens = await this.countTextTokens(input.model, responseText);
-        const usage = buildUsageSnapshot({
+        const usageResult = await this.buildUsageFromGeminiResponse({
+          response,
           modelName: response.modelVersion ?? input.model,
-          inputTokens,
-          outputTokens,
+          fallbackInputTokens: () =>
+            this.countContentTokens(input.model, input.contents),
+          fallbackOutputTokens: () =>
+            this.countTextTokens(input.model, responseText),
         });
+        const usage = usageResult.usage;
         const responseMeta = extractGeminiResponseMeta(response);
         const successExtra = {
           ...input.extraLogDetails,
+          ...usageResult.logDetails,
           provider_finish_reason: responseMeta.finishReason,
           provider_prompt_block_reason: responseMeta.promptBlockReason,
           provider_candidate_count: responseMeta.candidateCount,
@@ -829,8 +914,6 @@ export class GeminiAiProvider implements AiProvider {
     maxOutputTokens?: number;
     fallbackModel?: string | null;
   }): Promise<GeneratedTextResult> {
-    const inputTokens = await this.countContentTokens(input.model, input.contents);
-
     for (let attempt = 0; attempt < 3; attempt += 1) {
       try {
         const response = await this.client.models.generateContent({
@@ -856,15 +939,19 @@ export class GeminiAiProvider implements AiProvider {
           });
         }
 
-        const outputTokens = await this.countTextTokens(input.model, responseText);
-        const usage = buildUsageSnapshot({
+        const usageResult = await this.buildUsageFromGeminiResponse({
+          response,
           modelName: response.modelVersion ?? input.model,
-          inputTokens,
-          outputTokens,
+          fallbackInputTokens: () =>
+            this.countContentTokens(input.model, input.contents),
+          fallbackOutputTokens: () =>
+            this.countTextTokens(input.model, responseText),
         });
+        const usage = usageResult.usage;
         const responseMeta = extractGeminiResponseMeta(response);
         const successExtra = {
           ...input.extraLogDetails,
+          ...usageResult.logDetails,
           provider_finish_reason: responseMeta.finishReason,
           provider_prompt_block_reason: responseMeta.promptBlockReason,
           provider_candidate_count: responseMeta.candidateCount,
@@ -1373,10 +1460,6 @@ export class GeminiAiProvider implements AiProvider {
 
   async translateText(input: TranslateTextInput): Promise<TranslateTextResult> {
     const prompt = buildTranslationPrompt(input);
-    const inputTokens = await this.countTextTokens(
-      GEMINI_TRANSLATION_MODEL,
-      prompt.instruction,
-    );
 
     try {
       const response = await this.client.models.generateContent({
@@ -1395,15 +1478,15 @@ export class GeminiAiProvider implements AiProvider {
         throw new Error("Gemini returned an empty translation.");
       }
 
-      const outputTokens = await this.countTextTokens(
-        GEMINI_TRANSLATION_MODEL,
-        translatedText,
-      );
-      const usage = buildUsageSnapshot({
+      const usageResult = await this.buildUsageFromGeminiResponse({
+        response,
         modelName: response.modelVersion ?? GEMINI_TRANSLATION_MODEL,
-        inputTokens,
-        outputTokens,
+        fallbackInputTokens: () =>
+          this.countTextTokens(GEMINI_TRANSLATION_MODEL, prompt.instruction),
+        fallbackOutputTokens: () =>
+          this.countTextTokens(GEMINI_TRANSLATION_MODEL, translatedText),
       });
+      const usage = usageResult.usage;
 
       this.logSuccess({
         context: input.requestContext,
@@ -1413,6 +1496,7 @@ export class GeminiAiProvider implements AiProvider {
         extra: {
           source_language: input.sourceLanguage,
           target_language: input.targetLanguage,
+          ...usageResult.logDetails,
         },
       });
 
