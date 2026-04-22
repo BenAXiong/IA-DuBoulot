@@ -502,6 +502,11 @@ export function StudentConversationWorkbench({
       existingFiles: [],
       incomingFiles: files,
       languageCode,
+      existingCount: attachments.length,
+      existingTotalBytes: attachments.reduce(
+        (sum, attachment) => sum + Number(attachment.byte_size ?? 0),
+        0,
+      ),
     });
 
     if (staged.errors.length > 0) {

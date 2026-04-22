@@ -2,7 +2,7 @@ import {
   ATTACHMENT_ACCEPT_ATTR,
   ATTACHMENT_MAX_IMAGE_BYTES,
   ATTACHMENT_MAX_PDF_BYTES,
-  resolveAttachmentPolicy,
+  resolveAttachmentPolicyInput,
   type SharedAttachmentCategory,
 } from "@/lib/uploads/attachment-policy";
 import { getIntakeConfigCopy } from "@/lib/i18n/student-flow-copy";
@@ -39,7 +39,12 @@ export function formatBytes(bytes: number) {
 export function resolveIntakeCategory(
   file: File,
 ): IntakeAttachmentCategory | null {
-  return resolveAttachmentPolicy(file.type)?.category ?? null;
+  return (
+    resolveAttachmentPolicyInput({
+      mimeType: file.type,
+      originalFilename: file.name,
+    })?.policy.category ?? null
+  );
 }
 
 export function extractClipboardFiles(input: DataTransfer | null) {
@@ -67,10 +72,15 @@ export function stageIntakeFiles(input: {
   existingFiles: StagedIntakeFile[];
   incomingFiles: File[];
   languageCode?: UiLanguageCode;
+  existingCount?: number;
+  existingTotalBytes?: number;
 }) {
   const acceptedFiles = [...input.existingFiles];
   const errors: string[] = [];
-  let totalBytes = acceptedFiles.reduce((sum, staged) => sum + staged.file.size, 0);
+  let acceptedCount = input.existingCount ?? acceptedFiles.length;
+  let totalBytes =
+    input.existingTotalBytes ??
+    acceptedFiles.reduce((sum, staged) => sum + staged.file.size, 0);
   const copy = getIntakeConfigCopy(input.languageCode ?? "fr");
 
   for (const file of input.incomingFiles) {
@@ -89,7 +99,7 @@ export function stageIntakeFiles(input: {
       continue;
     }
 
-    if (acceptedFiles.length >= INTAKE_MAX_ATTACHMENTS) {
+    if (acceptedCount >= INTAKE_MAX_ATTACHMENTS) {
       errors.push(copy.stageErrors.tooManyFiles(INTAKE_MAX_ATTACHMENTS));
       break;
     }
@@ -108,6 +118,7 @@ export function stageIntakeFiles(input: {
       file,
       category,
     });
+    acceptedCount += 1;
     totalBytes += file.size;
   }
 

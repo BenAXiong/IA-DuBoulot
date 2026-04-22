@@ -32,6 +32,7 @@ import {
   type AllowedAttachmentMimeType,
   type UploadSource,
 } from "@/lib/server/uploads/constants";
+import { resolveAttachmentPolicyInput } from "@/lib/uploads/attachment-policy";
 import type {
   AttachmentAccessInput,
   AttachmentAccessResult,
@@ -520,7 +521,12 @@ export async function createUploadTarget(
     languageCode: appUser.preferred_ui_language,
   });
 
-  if (!isAllowedMimeType(input.mimeType)) {
+  const resolvedAttachmentInput = resolveAttachmentPolicyInput({
+    mimeType: input.mimeType,
+    originalFilename: input.originalFilename,
+  });
+
+  if (!resolvedAttachmentInput || !isAllowedMimeType(resolvedAttachmentInput.resolvedMimeType)) {
     throw new AppError({
       code: "validation_error",
       message: copy.requestErrors.invalidFields,
@@ -542,7 +548,8 @@ export async function createUploadTarget(
     });
   }
 
-  const attachmentRule = ALLOWED_ATTACHMENT_RULES[input.mimeType];
+  const resolvedMimeType = resolvedAttachmentInput.resolvedMimeType;
+  const attachmentRule = ALLOWED_ATTACHMENT_RULES[resolvedMimeType];
 
   if (input.byteSize > attachmentRule.maxBytes) {
     throw new AppError({
@@ -597,7 +604,7 @@ export async function createUploadTarget(
     studentUserId: conversation.student_user_id,
     conversationId: input.conversationId,
     attachmentId,
-    mimeType: input.mimeType,
+    mimeType: resolvedMimeType,
   });
   const attachmentKind =
     input.uploadSource === "paste" &&
@@ -616,7 +623,7 @@ export async function createUploadTarget(
       storage_bucket: HOMEWORK_ATTACHMENTS_BUCKET,
       storage_path: storagePath,
       attachment_kind: attachmentKind,
-      mime_type: input.mimeType,
+      mime_type: resolvedMimeType,
       original_filename: originalFilename,
       byte_size: input.byteSize,
       metadata: {

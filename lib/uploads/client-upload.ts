@@ -5,6 +5,7 @@ import type { ConversationAttachmentRecord } from "@/lib/server/ai/types";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { UploadSource } from "@/lib/server/uploads/constants";
+import { resolveAttachmentMimeType } from "@/lib/uploads/attachment-policy";
 
 type UploadStepResult = {
   attachment: ConversationAttachmentRecord;
@@ -28,6 +29,7 @@ type CreateUploadResponse =
       ok?: false;
       error?: {
         message?: string;
+        fieldErrors?: Record<string, string>;
       };
     };
 
@@ -40,6 +42,7 @@ type ConfirmUploadResponse =
       ok?: false;
       error?: {
         message?: string;
+        fieldErrors?: Record<string, string>;
       };
     };
 
@@ -50,7 +53,11 @@ function getResponseErrorMessage(
     return null;
   }
 
-  return payload.error?.message ?? null;
+  const fieldError = payload.error?.fieldErrors
+    ? Object.values(payload.error.fieldErrors)[0]
+    : null;
+
+  return fieldError ?? payload.error?.message ?? null;
 }
 
 export async function uploadConversationFiles(input: {
@@ -64,6 +71,11 @@ export async function uploadConversationFiles(input: {
   const copy = getClientUploadCopy(input.languageCode ?? "fr");
 
   for (const file of input.files) {
+    const resolvedMimeType =
+      resolveAttachmentMimeType({
+        mimeType: file.type,
+        originalFilename: file.name,
+      }) ?? file.type;
     const createResponse = await fetch("/api/uploads/create", {
       method: "POST",
       headers: {
@@ -72,7 +84,7 @@ export async function uploadConversationFiles(input: {
       body: JSON.stringify({
         conversationId: input.conversationId,
         originalFilename: file.name,
-        mimeType: file.type,
+        mimeType: resolvedMimeType,
         byteSize: file.size,
         uploadSource: input.uploadSource ?? "file_picker",
       }),
