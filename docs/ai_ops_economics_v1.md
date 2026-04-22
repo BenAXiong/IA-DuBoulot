@@ -231,7 +231,7 @@ Current access model:
 - route path: completion flow only
 - prompt version: `memory-profile-v2`
 - current model: `gemini-2.5-flash`
-- output cap: `280` tokens
+- output cap: `600` tokens
 - fallback: deterministic pedagogical memory refresh
 
 ## Context Compaction And Guardrails

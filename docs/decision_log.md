@@ -1447,3 +1447,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Keep using Gemini `usageMetadata` as the primary source of truth, but change `outputTokens` to mean **billable output tokens**, i.e. visible candidate tokens plus `thoughtsTokenCount` when Gemini reports it. Runtime logs now also distinguish visible output tokens from billable output tokens.
 - Why: For current Gemini Pro usage, visible output is not the whole output cost. Thinking tokens matter for both economics and operational sizing, so treating only visible candidate text as output would keep underestimating both spend and output-budget pressure.
 - Follow-up: Review the next successful summary log and confirm that `output_tokens` now matches billable output instead of only visible text. If future Gemini models change the meaning of these metadata fields, revisit the billing mapping rather than silently trusting the old assumption.
+
+### D-20260422-143 - Memory Profile Output Cap Raised To 600 Tokens
+
+- Date: 2026-04-22
+- Status: accepted
+- Related tasks: `P5.3`
+- Context: After the summary-cap investigation, the remaining cap most likely to be too tight was the structured memory refresh path. Its schema is compact, but `280` output tokens left little headroom for Gemini to return a stable structured profile when the underlying conversation and summary context grows.
+- Decision: Raise the memory profile output cap from `280` to `600` tokens.
+- Why: This is a modest increase that keeps the memory artifact structured and small while reducing the chance that the model compresses too hard or hits an avoidable output ceiling during profile refresh.
+- Follow-up: Review the next few memory refresh logs. If the route still shows empty or truncated structured outputs, inspect the prompt/schema shape next rather than continuing to bump the cap blindly.

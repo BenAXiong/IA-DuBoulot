@@ -18,7 +18,7 @@ export const AI_CONTEXT_LIMITS = {
 export const AI_OUTPUT_TOKEN_LIMITS = {
   coachReply: 2000,
   summary: 2000,
-  memoryProfile: 280,
+  memoryProfile: 600,
   translation: 900,
 } as const;
 
