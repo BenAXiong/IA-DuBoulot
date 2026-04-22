@@ -6,6 +6,7 @@ import { extractClipboardFiles } from "@/lib/intake/intake-config";
 import { getStudentConversationComposerCopy } from "@/lib/i18n/student-flow-copy";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type { StudentReplyMode } from "@/lib/server/conversations/types";
+import type { ConversationUploadPhase } from "@/lib/uploads/client-upload";
 
 type StudentConversationComposerProps = {
   composerText: string;
@@ -14,6 +15,11 @@ type StudentConversationComposerProps = {
   disabled?: boolean;
   isUploading?: boolean;
   isSending?: boolean;
+  uploadProgress?: {
+    phase: ConversationUploadPhase;
+    completedPhases: number;
+    totalPhases: number;
+  } | null;
   onComposerTextChange: (value: string) => void;
   onReplyModeChange: (mode: StudentReplyMode) => void;
   onPasteAttachments: (files: File[]) => void;
@@ -66,6 +72,49 @@ function SendIcon() {
   );
 }
 
+function UploadProgressIcon({
+  progress,
+}: {
+  progress: NonNullable<StudentConversationComposerProps["uploadProgress"]>;
+}) {
+  const phaseIndex =
+    progress.phase === "prepare" ? 0 : progress.phase === "upload" ? 1 : 2;
+  const completedSegments = Math.min(
+    3,
+    Math.max(
+      0,
+      Math.ceil(
+        ((progress.completedPhases + phaseIndex + 1) / progress.totalPhases) * 3,
+      ),
+    ),
+  );
+  const fillDegrees = completedSegments * 120;
+
+  return (
+    <span className="relative inline-flex h-5 w-5 items-center justify-center">
+      <span
+        aria-hidden="true"
+        className="absolute inset-0 rounded-full"
+        style={{
+          background: `conic-gradient(var(--accent) 0deg ${fillDegrees}deg, color-mix(in srgb, var(--foreground) 14%, transparent) ${fillDegrees}deg 360deg)`,
+        }}
+      />
+      <span
+        aria-hidden="true"
+        className="absolute inset-[2px] rounded-full bg-[color:var(--surface)]"
+      />
+      <span
+        aria-hidden="true"
+        className="absolute inset-0 rounded-full border"
+        style={{
+          borderColor:
+            "color-mix(in srgb, var(--foreground) 18%, transparent)",
+        }}
+      />
+    </span>
+  );
+}
+
 export function StudentConversationComposer({
   composerText,
   languageCode,
@@ -73,6 +122,7 @@ export function StudentConversationComposer({
   disabled = false,
   isUploading = false,
   isSending = false,
+  uploadProgress = null,
   onComposerTextChange,
   onReplyModeChange,
   onPasteAttachments,
@@ -182,7 +232,11 @@ export function StudentConversationComposer({
             onClick={onSendMessage}
             type="button"
           >
-            <SendIcon />
+            {isUploading && uploadProgress ? (
+              <UploadProgressIcon progress={uploadProgress} />
+            ) : (
+              <SendIcon />
+            )}
           </button>
         </span>
       </div>

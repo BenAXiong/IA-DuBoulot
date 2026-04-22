@@ -13,6 +13,8 @@ type UploadStepResult = {
   warningMessage: string | null;
 };
 
+export type ConversationUploadPhase = "prepare" | "upload" | "extract";
+
 type CreateUploadResponse =
   | {
       ok: true;
@@ -65,12 +67,28 @@ export async function uploadConversationFiles(input: {
   files: File[];
   uploadSource?: UploadSource;
   languageCode?: UiLanguageCode;
+  onProgress?: (progress: {
+    fileIndex: number;
+    fileCount: number;
+    phase: ConversationUploadPhase;
+    completedPhases: number;
+    totalPhases: number;
+  }) => void;
 }) {
   const supabase = createSupabaseBrowserClient();
   const results: UploadStepResult[] = [];
   const copy = getClientUploadCopy(input.languageCode ?? "fr");
+  const totalPhases = input.files.length * 3;
 
-  for (const file of input.files) {
+  for (const [fileIndex, file] of input.files.entries()) {
+    const baseCompletedPhases = fileIndex * 3;
+    input.onProgress?.({
+      fileIndex,
+      fileCount: input.files.length,
+      phase: "prepare",
+      completedPhases: baseCompletedPhases,
+      totalPhases,
+    });
     const resolvedMimeType =
       resolveAttachmentMimeType({
         mimeType: file.type,
@@ -104,6 +122,13 @@ export async function uploadConversationFiles(input: {
       );
     }
 
+    input.onProgress?.({
+      fileIndex,
+      fileCount: input.files.length,
+      phase: "upload",
+      completedPhases: baseCompletedPhases + 1,
+      totalPhases,
+    });
     const uploadResult = await supabase.storage
       .from(createPayload.data.uploadTarget.bucket)
       .uploadToSignedUrl(
@@ -116,6 +141,13 @@ export async function uploadConversationFiles(input: {
       throw new Error(copy.transferUpload(file.name, uploadResult.error.message));
     }
 
+    input.onProgress?.({
+      fileIndex,
+      fileCount: input.files.length,
+      phase: "extract",
+      completedPhases: baseCompletedPhases + 2,
+      totalPhases,
+    });
     const confirmResponse = await fetch("/api/uploads/confirm", {
       method: "POST",
       headers: {

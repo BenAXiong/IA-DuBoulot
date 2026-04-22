@@ -22,7 +22,10 @@ import type {
   SessionSummaryRecord,
   StudentReplyMode,
 } from "@/lib/server/conversations/types";
-import { uploadConversationFiles } from "@/lib/uploads/client-upload";
+import {
+  type ConversationUploadPhase,
+  uploadConversationFiles,
+} from "@/lib/uploads/client-upload";
 
 type StudentConversationWorkbenchProps = {
   detail: ConversationDetail;
@@ -91,6 +94,12 @@ type ExtractionRouteResponse =
       };
     };
 
+type UploadProgressState = {
+  phase: ConversationUploadPhase;
+  completedPhases: number;
+  totalPhases: number;
+};
+
 function buildInitialWorkspace(detail: ConversationDetail): WorkspaceDraftState {
   return {
     assignmentText:
@@ -140,6 +149,9 @@ export function StudentConversationWorkbench({
     useState<ConversationMessageRecord | null>(null);
   const [pendingAssistantMessage, setPendingAssistantMessage] =
     useState<ConversationMessageRecord | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgressState | null>(
+    null,
+  );
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const workspaceRef = useRef(workspace);
   const bootstrapStartedRef = useRef(false);
@@ -311,6 +323,13 @@ export function StudentConversationWorkbench({
         files,
         languageCode,
         uploadSource,
+        onProgress: (progress) => {
+          setUploadProgress({
+            phase: progress.phase,
+            completedPhases: progress.completedPhases,
+            totalPhases: progress.totalPhases,
+          });
+        },
       });
 
       setAttachments((currentAttachments) => [
@@ -348,6 +367,8 @@ export function StudentConversationWorkbench({
         error instanceof Error ? error.message : copy.errors.addAttachment;
       setWorkspaceError(message);
       throw error;
+    } finally {
+      setUploadProgress(null);
     }
   }
 
@@ -825,13 +846,14 @@ export function StudentConversationWorkbench({
                 </div>
               ) : null}
 
-              <StudentConversationComposer
-                composerText={composerText}
-                disabled={isReadOnly}
-                isSending={isSending}
-                isUploading={isUploading || isBootstrapping}
-                languageCode={languageCode}
-                onComposerTextChange={setComposerText}
+          <StudentConversationComposer
+            composerText={composerText}
+            disabled={isReadOnly}
+            isSending={isSending}
+            isUploading={isUploading || isBootstrapping}
+            uploadProgress={uploadProgress}
+            languageCode={languageCode}
+            onComposerTextChange={setComposerText}
                 onReplyModeChange={setReplyMode}
                 onPasteAttachments={(files) => void uploadFiles(files, "paste")}
                 onSendMessage={() => sendMessage("student_message")}
