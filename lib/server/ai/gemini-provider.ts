@@ -334,26 +334,74 @@ function extractTextFromGeminiCandidateParts(response: unknown) {
   return textParts.join("\n").trim() || null;
 }
 
-function extractJsonTextFromGeminiResponse(response: unknown) {
+function buildGeminiCandidatePartSummaries(response: unknown) {
+  const record =
+    response && typeof response === "object"
+      ? (response as Record<string, unknown>)
+      : null;
+  const candidates = Array.isArray(record?.candidates)
+    ? (record.candidates as Array<Record<string, unknown>>)
+    : [];
+
+  return candidates.map((candidate, index) => {
+    const content =
+      candidate?.content && typeof candidate.content === "object"
+        ? (candidate.content as Record<string, unknown>)
+        : null;
+    const parts = Array.isArray(content?.parts)
+      ? (content.parts as Array<Record<string, unknown>>)
+      : [];
+    const textLengths = parts
+      .map((part) => (typeof part?.text === "string" ? part.text.trim().length : null))
+      .filter((value): value is number => typeof value === "number");
+    const partKinds = Array.from(
+      new Set(
+        parts.flatMap((part) =>
+          Object.keys(part).filter((key) => key !== "text" && part[key] != null),
+        ),
+      ),
+    );
+
+    return {
+      candidateIndex: index,
+      finishReason: normalizeGeminiEnumValue(candidate?.finishReason),
+      partCount: parts.length,
+      textPartCount: textLengths.length,
+      textPartLengths: textLengths,
+      partKinds,
+    };
+  });
+}
+
+function inspectGeminiStructuredPayload(response: unknown) {
   const directText =
     response && typeof response === "object"
       ? asString((response as Record<string, unknown>).text)
       : null;
-
-  if (directText) {
-    return directText;
-  }
-
   const candidateText = extractTextFromGeminiCandidateParts(response);
+  const fencedMatch = candidateText?.match(/```(?:json)?\s*([\s\S]+?)\s*```/i);
+  const normalizedPayload =
+    directText ?? fencedMatch?.[1]?.trim() ?? candidateText?.trim() ?? null;
+  const responseMeta = extractGeminiResponseMeta(response);
+  const candidateSummaries = buildGeminiCandidatePartSummaries(response);
 
-  if (!candidateText) {
-    return null;
-  }
-
-  const fencedMatch = candidateText.match(/```(?:json)?\s*([\s\S]+?)\s*```/i);
-  const normalized = fencedMatch?.[1]?.trim() ?? candidateText.trim();
-
-  return normalized.length > 0 ? normalized : null;
+  return {
+    normalizedPayload,
+    responseMeta,
+    logDetails: {
+      provider_finish_reason: responseMeta.finishReason,
+      provider_prompt_block_reason: responseMeta.promptBlockReason,
+      provider_candidate_count: responseMeta.candidateCount,
+      structured_json_direct_text_present: Boolean(directText),
+      structured_json_direct_text_length: directText?.length ?? null,
+      structured_json_candidate_text_present: Boolean(candidateText),
+      structured_json_candidate_text_length: candidateText?.length ?? null,
+      structured_json_fenced_payload_detected: Boolean(fencedMatch),
+      structured_json_normalized_payload_length: normalizedPayload?.length ?? null,
+      structured_json_candidate_summaries:
+        candidateSummaries.length > 0 ? safeJson(candidateSummaries) : null,
+    } satisfies Record<string, unknown>,
+  };
 }
 
 function isGeminiCleanStopReason(value: string | null) {
@@ -628,13 +676,37 @@ export class GeminiAiProvider implements AiProvider {
             maxOutputTokens: input.maxOutputTokens,
           },
         });
-        const responseText = extractJsonTextFromGeminiResponse(response);
+        const payloadInspection = inspectGeminiStructuredPayload(response);
+        const responseText = payloadInspection.normalizedPayload;
 
         if (!responseText) {
-          throw new Error("Gemini returned an empty JSON payload.");
+          throw new AppError({
+            code: "provider_error",
+            message: "Gemini returned an empty JSON payload.",
+            status: 502,
+            retryable: true,
+            details: {
+              ...payloadInspection.logDetails,
+              empty_json_payload: true,
+            },
+          });
         }
 
-        const parsed = JSON.parse(responseText) as T;
+        let parsed: T;
+        try {
+          parsed = JSON.parse(responseText) as T;
+        } catch {
+          throw new AppError({
+            code: "provider_error",
+            message: "Gemini returned malformed JSON.",
+            status: 502,
+            retryable: true,
+            details: {
+              ...payloadInspection.logDetails,
+              malformed_json_payload: true,
+            },
+          });
+        }
         const outputTokens = await this.countTextTokens(input.model, responseText);
         const usage = buildUsageSnapshot({
           modelName: response.modelVersion ?? input.model,
@@ -701,6 +773,21 @@ export class GeminiAiProvider implements AiProvider {
           usage,
         };
       } catch (error) {
+        if (error instanceof AppError) {
+          this.logFailure({
+            context: input.requestContext,
+            operation: input.operation,
+            modelName: input.model,
+            errorCode: error.code,
+            extra: {
+              ...input.extraLogDetails,
+              retry_attempts: attempt,
+              ...(error.details ?? {}),
+            },
+          });
+          throw error;
+        }
+
         const canRetry = attempt < 2 && shouldRetryProviderFailure(error);
 
         if (canRetry) {
