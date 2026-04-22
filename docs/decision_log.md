@@ -1457,3 +1457,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Raise the memory profile output cap from `280` to `600` tokens.
 - Why: This is a modest increase that keeps the memory artifact structured and small while reducing the chance that the model compresses too hard or hits an avoidable output ceiling during profile refresh.
 - Follow-up: Review the next few memory refresh logs. If the route still shows empty or truncated structured outputs, inspect the prompt/schema shape next rather than continuing to bump the cap blindly.
+
+### D-20260422-144 - Conversation Title Output Cap Raised To 1000 Tokens For Failure Analysis
+
+- Date: 2026-04-22
+- Status: accepted
+- Related tasks: `P1.3`
+- Context: The current AI conversation-title path still fails often enough that the product falls back to a weak heuristic title, but the first-pass title troubleshooting had not yet taken the most obvious low-effort variable off the table: the title call was still capped at only `40` output tokens even after other Gemini failure investigations had already shown that under-sized output ceilings can trigger misleading empty or unusable responses.
+- Decision: Raise the Gemini conversation-title output cap from `40` to `1000` tokens as a direct troubleshooting step.
+- Why: This is the fastest way to rule out an avoidable low-ceiling failure mode before adding more instrumentation or changing the model path. If title generation still fails at `1000`, the next investigation should focus on provider-response details and acceptance criteria rather than output budget.
+- Follow-up: Re-run a real first-turn title generation and inspect whether the AI path now succeeds. If it still falls back, add title-specific provider diagnostics so the exact failure class is visible instead of being masked by the heuristic fallback.

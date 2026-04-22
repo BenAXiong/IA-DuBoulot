@@ -1201,7 +1201,7 @@ export class GeminiAiProvider implements AiProvider {
       ]),
       requestContext: input.requestContext,
       operation: "conversation_title",
-      maxOutputTokens: 40,
+      maxOutputTokens: 1000,
       extraLogDetails: {
         subject_tag: input.conversation.subject_tag,
         conversation_id: input.conversation.id,

@@ -186,7 +186,7 @@ Current access model:
   - first successful banban reply
   - assignment text or reviewed extracted text when available
   - short extracted snippets from uploaded files when available
-- output cap: `40` tokens
+- output cap: `1000` tokens
 - fallback: keep the shell title already stored on the conversation
 
 ### Attachment Extraction
