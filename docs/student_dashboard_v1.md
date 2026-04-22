@@ -91,11 +91,11 @@ Current role:
 - when the learner already has subjects, the root homework view now still exposes subject creation and selection directly, so the `+` affordance in the left rail simply returns to the same homework surface instead of opening a separate launcher mode
 - the root homework view now always keeps the subject pills launcher visible, so adding a new subject is part of the normal homework home rather than a separate hidden URL state
 - the subject quick-start on `/app?view=homework&subject=...` creates a bare conversation shell
-- it can stage files before the chat starts
+- it can now complete the real upload-plus-extraction pass before the first learner prompt is handed off to the live chat
 - while the subject quick-start is preparing a chat that already has staged files, its submit control now reuses the same tiered ring language as the live composer for the first `prepare` stage instead of flashing a different loading affordance
 - once the shell exists, it now routes immediately into `/app/conversations/[conversationId]`
-- it hands the first learner prompt, reply mode, and staged files into a small client bootstrap store
-- the live conversation view now owns the optimistic first-turn UI, the staged upload work, and the first real message send instead of faking a mini transcript on the launcher
+- it hands the first learner prompt, reply mode, and any launcher error state into a small client bootstrap store
+- the live conversation view now owns the optimistic first-turn UI and the first real message send, while the subject launcher can front-load attachment preparation so the learner does not spend that first prompt before upload or extraction has either succeeded or failed explicitly
 - both the subject quick-start and the live conversation composer now support `Ctrl+Enter` as a submit shortcut while keeping the visible send affordance icon-only
 
 `/app/new` no longer acts as a destination in the product. Old student links now redirect into `/app?view=homework`, preserving optional `subject` and `draft` query params so the learner lands on the current subject launcher instead of the retired intake page.

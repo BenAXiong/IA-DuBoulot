@@ -1467,3 +1467,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Raise the Gemini conversation-title output cap from `40` to `1000` tokens as a direct troubleshooting step.
 - Why: This is the fastest way to rule out an avoidable low-ceiling failure mode before adding more instrumentation or changing the model path. If title generation still fails at `1000`, the next investigation should focus on provider-response details and acceptance criteria rather than output budget.
 - Follow-up: Re-run a real first-turn title generation and inspect whether the AI path now succeeds. If it still falls back, add title-specific provider diagnostics so the exact failure class is visible instead of being masked by the heuristic fallback.
+
+### D-20260422-145 - Subject Quick-Start Now Completes Attachment Prep Before The First Prompt Handoff
+
+- Date: 2026-04-22
+- Status: accepted
+- Related tasks: `P1.3`
+- Context: The student subject quick-start still spent the learner's first real prompt inside the conversation route before attachment upload and extraction had fully succeeded. On unstable PDFs this created two inconsistent failure experiences: either the coach reply failed outright with a provider fallback code, or the reply succeeded but had to admit it could not actually use the attached PDF because extraction had produced no usable text.
+- Decision: Keep the current shell-first architecture, but move the real upload-and-extraction pass onto the subject quick-start before the prompt is auto-sent. The launcher now creates the shell, uploads and confirms staged files, syncs extracted text into the hidden workspace, and only then hands off the learner prompt. If attachment prep fails, the conversation still opens, but bootstrap auto-send is paused and the learner draft is restored in the composer with an explicit launcher-side error message.
+- Why: This is the narrowest fix that removes the trust break without inventing a new all-in-one backend contract. The learner no longer wastes the first prompt just to discover afterward that the attached source never became readable context.
+- Follow-up: Surface extraction-failure state more clearly on the attachment pills or rail and decide later whether half-created shell conversations that never receive a first learner turn need a dedicated cleanup policy.

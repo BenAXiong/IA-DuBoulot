@@ -558,6 +558,13 @@ export function StudentConversationWorkbench({
     setComposerText("");
     setIsBootstrapping(true);
 
+    if (bootstrap.autoSend === false) {
+      setComposerText(bootstrap.promptText);
+      setChatError(bootstrap.launchErrorMessage ?? copy.errors.addAttachment);
+      setIsBootstrapping(false);
+      return;
+    }
+
     const pendingTimestamp = new Date().toISOString();
     setPendingStudentMessage({
       id: `pending-student-${pendingTimestamp}`,

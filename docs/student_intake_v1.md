@@ -31,6 +31,7 @@ The route still exists for compatibility, but it is no longer a real student des
 What works now:
 
 - the main subject quick-start on `/app?view=homework&subject=...` now creates a bare conversation shell, optionally uploads staged files, sends the learner's first real message through the normal message route, and only then opens `/app/conversations/[conversationId]`
+- the main subject quick-start now also front-loads the real upload and extraction pass before that first learner prompt is handed off, so attachment failures can pause the handoff without burning the learner's first chat message
 - the direct subject quick-start now uses the learner's actual typed text as the first visible student message, instead of persisting the older machine-written intake summary
 - the `+` control inside the subject quick-start now opens a real file picker and stages files before the chat starts
 - `/app/new` now redirects straight into `/app?view=homework`, preserving `subject` and `draft` query params so older links still land in the current subject launcher
@@ -39,7 +40,7 @@ What works now:
 
 What does not happen yet:
 
-- the direct subject quick-start still creates the conversation shell first, then uploads files, then sends the first message; there is still no single server-side "one request creates the chat and includes staged files" contract
+- the direct subject quick-start still creates the conversation shell first, then uploads files, then sends the first message; there is still no single server-side "one request creates the chat and includes staged files" contract, even though the launcher now owns more of that upload work before navigation
 - the direct subject quick-start no longer exposes the graded-homework toggle, because that flag has not shown clear learner-facing value in the chat-first flow
 - there is still no dedicated background queue for extraction retries or long-running attachment processing
 - per-file enforcement and metadata capture still need to be tightened to match the full storage contract exactly

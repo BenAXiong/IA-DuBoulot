@@ -8,6 +8,8 @@ export type PendingConversationBootstrap = {
   replyMode: StudentReplyMode;
   subjectTag: string;
   createdAt: number;
+  autoSend?: boolean;
+  launchErrorMessage?: string | null;
 };
 
 type SerializablePendingConversationBootstrap = Omit<
@@ -46,6 +48,8 @@ function writeSerializableBootstrap(
     subjectTag: bootstrap.subjectTag,
     createdAt: bootstrap.createdAt,
     stagedFileCount: bootstrap.stagedFiles.length,
+    autoSend: bootstrap.autoSend ?? true,
+    launchErrorMessage: bootstrap.launchErrorMessage ?? null,
   };
 
   window.sessionStorage.setItem(
@@ -81,15 +85,21 @@ function readSerializableBootstrap(conversationId: string) {
       return null;
     }
 
-    return {
-      promptText: parsed.promptText,
-      stagedFiles: [],
-      replyMode: parsed.replyMode as StudentReplyMode,
-      subjectTag: parsed.subjectTag,
-      createdAt: parsed.createdAt,
-      stagedFileCount:
-        typeof parsed.stagedFileCount === "number" ? parsed.stagedFileCount : 0,
-    };
+      return {
+        promptText: parsed.promptText,
+        stagedFiles: [],
+        replyMode: parsed.replyMode as StudentReplyMode,
+        subjectTag: parsed.subjectTag,
+        createdAt: parsed.createdAt,
+        autoSend:
+          typeof parsed.autoSend === "boolean" ? parsed.autoSend : true,
+        launchErrorMessage:
+          typeof parsed.launchErrorMessage === "string"
+            ? parsed.launchErrorMessage
+            : null,
+        stagedFileCount:
+          typeof parsed.stagedFileCount === "number" ? parsed.stagedFileCount : 0,
+      };
   } catch {
     window.sessionStorage.removeItem(getSessionStorageKey(conversationId));
     return null;
@@ -130,6 +140,8 @@ export function takePendingConversationBootstrap(conversationId: string) {
       replyMode: serializableBootstrap.replyMode,
       subjectTag: serializableBootstrap.subjectTag,
       createdAt: serializableBootstrap.createdAt,
+      autoSend: serializableBootstrap.autoSend,
+      launchErrorMessage: serializableBootstrap.launchErrorMessage,
     };
   }
 

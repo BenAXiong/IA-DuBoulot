@@ -13,6 +13,10 @@ import {
 } from "@/lib/intake/intake-config";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type { StudentReplyMode } from "@/lib/server/conversations/types";
+import {
+  type ConversationUploadPhase,
+  uploadConversationFiles,
+} from "@/lib/uploads/client-upload";
 
 type StudentSubjectQuickStartProps = {
   initialDraft?: string | null;
@@ -35,6 +39,30 @@ type CreateConversationShellResponse =
       };
     };
 
+type WorkspaceRouteResponse =
+  | {
+      ok: true;
+      data: {
+        workspace: {
+          assignment_text: string | null;
+          edited_extracted_text: string | null;
+          student_notes: string | null;
+        };
+      };
+    }
+  | {
+      ok?: false;
+      error?: {
+        message?: string;
+      };
+    };
+
+type UploadProgressState = {
+  phase: ConversationUploadPhase;
+  completedPhases: number;
+  totalPhases: number;
+};
+
 function getQuickStartCopy(languageCode: UiLanguageCode) {
   switch (languageCode) {
     case "en":
@@ -46,6 +74,8 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
         submit: "Start chat",
         sending: "Opening chat...",
         preparingUpload: "Preparing uploads...",
+        extractionBlocked:
+          "The file was added, but its text could not be extracted reliably. Your message was not sent automatically.",
         voice: "Voice input coming soon!",
         startError: "Unable to open the chat right now.",
       };
@@ -57,6 +87,8 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
         submit: "開始聊天",
         sending: "正在開啟聊天...",
         preparingUpload: "正在準備上傳...",
+        extractionBlocked:
+          "檔案已加入，但系統無法可靠地擷取文字。你的訊息沒有被自動送出。",
         voice: "語音輸入即將推出！",
         startError: "目前無法開啟聊天。",
       };
@@ -69,6 +101,8 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
         submit: "Lancer le chat",
         sending: "Ouverture du chat...",
         preparingUpload: "Préparation des fichiers...",
+        extractionBlocked:
+          "Le fichier a bien été ajouté, mais son texte n'a pas pu être extrait de façon fiable. Ton message n'a pas été envoyé automatiquement.",
         voice: "Saisie vocale bientôt !",
         startError: "Impossible d'ouvrir le chat pour l'instant.",
       };
@@ -85,6 +119,31 @@ function getRouteErrorMessage(payload: CreateConversationShellResponse | null) {
   }
 
   return payload.error?.message ?? null;
+}
+
+function getWorkspaceRouteErrorMessage(payload: WorkspaceRouteResponse | null) {
+  if (!payload || payload.ok) {
+    return null;
+  }
+
+  return payload.error?.message ?? null;
+}
+
+function getUploadProgressSegments(
+  progress: UploadProgressState | null,
+): 1 | 2 | 3 {
+  if (!progress) {
+    return 1;
+  }
+
+  switch (progress.phase) {
+    case "prepare":
+      return 1;
+    case "upload":
+      return 2;
+    case "extract":
+      return 3;
+  }
 }
 
 function PlusIcon() {
@@ -145,6 +204,9 @@ export function StudentSubjectQuickStart({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isStarting, setIsStarting] = useState(false);
   const [replyMode, setReplyMode] = useState<StudentReplyMode>("thinking");
+  const [uploadProgress, setUploadProgress] = useState<UploadProgressState | null>(
+    null,
+  );
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -210,6 +272,7 @@ export function StudentSubjectQuickStart({
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const trimmedDraft = draft.trim();
+    let conversationId: string | null = null;
 
     if (trimmedDraft.length === 0 || isStarting) {
       return;
@@ -239,7 +302,7 @@ export function StudentSubjectQuickStart({
       const createPayload = (await createResponse
         .json()
         .catch(() => null)) as CreateConversationShellResponse | null;
-      const conversationId =
+      conversationId =
         createPayload?.ok && createPayload.data?.conversationId
           ? createPayload.data.conversationId
           : null;
@@ -251,12 +314,70 @@ export function StudentSubjectQuickStart({
         return;
       }
 
+      const uploadResults =
+        stagedFiles.length > 0
+          ? await uploadConversationFiles({
+              conversationId,
+              files: stagedFiles.map((file) => file.file),
+              languageCode,
+              uploadSource: "file_picker",
+              onProgress: (progress) => {
+                setUploadProgress({
+                  phase: progress.phase,
+                  completedPhases: progress.completedPhases,
+                  totalPhases: progress.totalPhases,
+                });
+              },
+            })
+          : [];
+      const extractedBlocks = uploadResults
+        .map((result) => result.extractedTextBlock)
+        .filter((value): value is string => Boolean(value));
+      const warningMessages = uploadResults
+        .map((result) => result.warningMessage)
+        .filter((value): value is string => Boolean(value));
+
+      if (uploadResults.length > 0) {
+        const workspaceResponse = await fetch(
+          `/api/conversations/${conversationId}/workspace`,
+          {
+            method: "PATCH",
+            headers: {
+              "content-type": "application/json",
+            },
+            body: JSON.stringify({
+              assignmentText: "",
+              editedExtractedText: extractedBlocks.join("\n\n"),
+              planText: "",
+              draftAnswerText: "",
+              studentNotes: warningMessages.join("\n"),
+            }),
+          },
+        );
+        const workspacePayload = (await workspaceResponse
+          .json()
+          .catch(() => null)) as WorkspaceRouteResponse | null;
+
+        if (!workspaceResponse.ok || !workspacePayload?.ok) {
+          throw new Error(
+            getWorkspaceRouteErrorMessage(workspacePayload) ?? copy.startError,
+          );
+        }
+      }
+
+      const launchErrorMessage =
+        uploadResults.some((result) => result.attachment.extraction_status !== "ready")
+          ? copy.extractionBlocked
+          : null;
+
       setPendingConversationBootstrap(conversationId, {
         promptText: trimmedDraft,
-        stagedFiles: stagedFiles.map((file) => file.file),
+        stagedFiles: [],
         replyMode,
         subjectTag,
         createdAt: Date.now(),
+        autoSend: !launchErrorMessage,
+        launchErrorMessage,
       });
       setStagedFiles([]);
       setDraft("");
@@ -264,10 +385,29 @@ export function StudentSubjectQuickStart({
         `/app/conversations/${conversationId}?subject=${encodeURIComponent(subjectTag)}`,
       );
     } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : copy.startError,
-      );
+      const message =
+        error instanceof Error ? error.message : copy.startError;
+
+      if (conversationId) {
+        setPendingConversationBootstrap(conversationId, {
+          promptText: trimmedDraft,
+          stagedFiles: [],
+          replyMode,
+          subjectTag,
+          createdAt: Date.now(),
+          autoSend: false,
+          launchErrorMessage: message,
+        });
+        setStagedFiles([]);
+        router.push(
+          `/app/conversations/${conversationId}?subject=${encodeURIComponent(subjectTag)}`,
+        );
+        return;
+      }
+
+      setErrorMessage(message);
     } finally {
+      setUploadProgress(null);
       setIsStarting(false);
     }
   }
@@ -342,7 +482,9 @@ export function StudentSubjectQuickStart({
           type="submit"
         >
           {isStarting && stagedFiles.length > 0 ? (
-            <StudentUploadProgressRing completedSegments={1} />
+            <StudentUploadProgressRing
+              completedSegments={getUploadProgressSegments(uploadProgress)}
+            />
           ) : (
             <SendIcon />
           )}
