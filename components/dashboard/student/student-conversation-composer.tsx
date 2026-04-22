@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { StudentReplyModeSwitch } from "@/components/dashboard/student/student-reply-mode-switch";
+import { StudentUploadProgressRing } from "@/components/dashboard/student/student-upload-progress-ring";
 import { extractClipboardFiles } from "@/lib/intake/intake-config";
 import { getStudentConversationComposerCopy } from "@/lib/i18n/student-flow-copy";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
@@ -72,54 +73,26 @@ function SendIcon() {
   );
 }
 
-function UploadProgressIcon({
-  progress,
-}: {
-  progress: NonNullable<StudentConversationComposerProps["uploadProgress"]>;
-}) {
+function getCompletedUploadSegments(
+  progress: NonNullable<StudentConversationComposerProps["uploadProgress"]>,
+): 1 | 2 | 3 {
   const phaseIndex =
     progress.phase === "prepare" ? 0 : progress.phase === "upload" ? 1 : 2;
   const completedSegments = Math.min(
     3,
     Math.max(
-      0,
+      1,
       Math.ceil(
         ((progress.completedPhases + phaseIndex + 1) / progress.totalPhases) * 3,
       ),
     ),
   );
-  const fillRatio = completedSegments / 3;
-  const radius = 8;
-  const circumference = 2 * Math.PI * radius;
-  const dashOffset = circumference * (1 - fillRatio);
 
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-5 w-5 -rotate-90"
-      viewBox="0 0 20 20"
-    >
-      <circle
-        cx="10"
-        cy="10"
-        fill="none"
-        r={radius}
-        stroke="color-mix(in srgb, var(--foreground) 14%, transparent)"
-        strokeWidth="2"
-      />
-      <circle
-        cx="10"
-        cy="10"
-        fill="none"
-        r={radius}
-        stroke="var(--accent)"
-        strokeDasharray={circumference}
-        strokeDashoffset={dashOffset}
-        strokeLinecap="round"
-        strokeWidth="2"
-      />
-    </svg>
-  );
+  if (completedSegments === 1 || completedSegments === 2) {
+    return completedSegments;
+  }
+
+  return 3;
 }
 
 export function StudentConversationComposer({
@@ -240,7 +213,9 @@ export function StudentConversationComposer({
             type="button"
           >
             {isUploading && uploadProgress ? (
-              <UploadProgressIcon progress={uploadProgress} />
+              <StudentUploadProgressRing
+                completedSegments={getCompletedUploadSegments(uploadProgress)}
+              />
             ) : (
               <SendIcon />
             )}

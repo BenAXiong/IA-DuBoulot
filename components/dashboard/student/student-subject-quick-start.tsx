@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { StudentReplyModeSwitch } from "@/components/dashboard/student/student-reply-mode-switch";
+import { StudentUploadProgressRing } from "@/components/dashboard/student/student-upload-progress-ring";
 import { setPendingConversationBootstrap } from "@/lib/conversations/pending-bootstrap-store";
 import {
   extractClipboardFiles,
@@ -44,6 +45,7 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
           `${count} ${count === 1 ? "file ready" : "files ready"}`,
         submit: "Start chat",
         sending: "Opening chat...",
+        preparingUpload: "Preparing uploads...",
         voice: "Voice input coming soon!",
         startError: "Unable to open the chat right now.",
       };
@@ -54,6 +56,7 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
         attachmentsReady: (count: number) => `已準備 ${count} 個檔案`,
         submit: "開始聊天",
         sending: "正在開啟聊天...",
+        preparingUpload: "正在準備上傳...",
         voice: "語音輸入即將推出！",
         startError: "目前無法開啟聊天。",
       };
@@ -65,6 +68,7 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
           `${count} fichier${count > 1 ? "s" : ""} prêt${count > 1 ? "s" : ""}`,
         submit: "Lancer le chat",
         sending: "Ouverture du chat...",
+        preparingUpload: "Préparation des fichiers...",
         voice: "Saisie vocale bientôt !",
         startError: "Impossible d'ouvrir le chat pour l'instant.",
       };
@@ -326,12 +330,22 @@ export function StudentSubjectQuickStart({
         </div>
 
         <button
-          aria-label={isStarting ? copy.sending : copy.submit}
+          aria-label={
+            isStarting && stagedFiles.length > 0
+              ? copy.preparingUpload
+              : isStarting
+                ? copy.sending
+                : copy.submit
+          }
           className="inline-flex h-8 w-8 items-center justify-center text-[color:var(--foreground)] transition hover:text-[color:var(--accent)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-40"
           disabled={isStarting || draft.trim().length === 0}
           type="submit"
         >
-          <SendIcon />
+          {isStarting && stagedFiles.length > 0 ? (
+            <StudentUploadProgressRing completedSegments={1} />
+          ) : (
+            <SendIcon />
+          )}
         </button>
       </div>
 

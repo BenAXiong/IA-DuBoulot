@@ -92,6 +92,7 @@ Current role:
 - the root homework view now always keeps the subject pills launcher visible, so adding a new subject is part of the normal homework home rather than a separate hidden URL state
 - the subject quick-start on `/app?view=homework&subject=...` creates a bare conversation shell
 - it can stage files before the chat starts
+- while the subject quick-start is preparing a chat that already has staged files, its submit control now reuses the same tiered ring language as the live composer for the first `prepare` stage instead of flashing a different loading affordance
 - once the shell exists, it now routes immediately into `/app/conversations/[conversationId]`
 - it hands the first learner prompt, reply mode, and staged files into a small client bootstrap store
 - the live conversation view now owns the optimistic first-turn UI, the staged upload work, and the first real message send instead of faking a mini transcript on the launcher
