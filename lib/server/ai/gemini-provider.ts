@@ -95,8 +95,75 @@ type GeminiUsageExtraction = {
   logDetails: Record<string, unknown>;
 };
 
+type GeminiRetryPolicy = {
+  maxProviderRetries: number;
+  providerBaseDelayMs: number;
+  providerMaxDelayMs: number;
+  maxOutputRetries: number;
+  outputBaseDelayMs: number;
+  outputMaxDelayMs: number;
+};
+
 function sleep(delayMs: number) {
   return new Promise((resolve) => setTimeout(resolve, delayMs));
+}
+
+function getRetryDelayMs(input: {
+  attempt: number;
+  baseDelayMs: number;
+  maxDelayMs: number;
+}) {
+  const exponentialDelay = Math.min(
+    input.maxDelayMs,
+    input.baseDelayMs * 2 ** input.attempt,
+  );
+  const jitterMultiplier = 0.75 + Math.random() * 0.5;
+
+  return Math.round(exponentialDelay * jitterMultiplier);
+}
+
+function getGeminiRetryPolicy(operation: string): GeminiRetryPolicy {
+  switch (operation) {
+    case "attachment_extraction":
+      return {
+        maxProviderRetries: 2,
+        providerBaseDelayMs: 1200,
+        providerMaxDelayMs: 5000,
+        maxOutputRetries: 0,
+        outputBaseDelayMs: 0,
+        outputMaxDelayMs: 0,
+      };
+    case "coach_reply":
+      return {
+        maxProviderRetries: 1,
+        providerBaseDelayMs: 800,
+        providerMaxDelayMs: 2400,
+        maxOutputRetries: 1,
+        outputBaseDelayMs: 650,
+        outputMaxDelayMs: 1600,
+      };
+    case "summary":
+    case "memory_profile":
+    case "conversation_title":
+    case "translation":
+      return {
+        maxProviderRetries: 1,
+        providerBaseDelayMs: 900,
+        providerMaxDelayMs: 2600,
+        maxOutputRetries: 0,
+        outputBaseDelayMs: 0,
+        outputMaxDelayMs: 0,
+      };
+    default:
+      return {
+        maxProviderRetries: 1,
+        providerBaseDelayMs: 900,
+        providerMaxDelayMs: 2400,
+        maxOutputRetries: 0,
+        outputBaseDelayMs: 0,
+        outputMaxDelayMs: 0,
+      };
+  }
 }
 
 function asString(value: unknown) {
@@ -564,6 +631,14 @@ function shouldRetryOutputIssue(error: unknown) {
   );
 }
 
+function isMaxTokensOutputIssue(error: AppError | null) {
+  if (!error) {
+    return false;
+  }
+
+  return error.details?.provider_finish_reason === "MAX_TOKENS";
+}
+
 function buildLogDetails(input: {
   operation: string;
   modelName: string;
@@ -753,6 +828,8 @@ export class GeminiAiProvider implements AiProvider {
     extraLogDetails?: Record<string, unknown>;
     maxOutputTokens?: number;
   }): Promise<T & GeneratedUsageResult> {
+    const retryPolicy = getGeminiRetryPolicy(input.operation);
+
     for (let attempt = 0; attempt < 3; attempt += 1) {
       try {
         const response = await this.client.models.generateContent({
@@ -832,10 +909,18 @@ export class GeminiAiProvider implements AiProvider {
               truncated_success_output: true,
             },
           });
-          const canRetry = attempt < 2;
+          const canRetry =
+            !isMaxTokensOutputIssue(cutoffError) &&
+            attempt < retryPolicy.maxOutputRetries;
 
           if (canRetry) {
-            await sleep(450 * (attempt + 1));
+            await sleep(
+              getRetryDelayMs({
+                attempt,
+                baseDelayMs: retryPolicy.outputBaseDelayMs,
+                maxDelayMs: retryPolicy.outputMaxDelayMs,
+              }),
+            );
             continue;
           }
 
@@ -869,6 +954,25 @@ export class GeminiAiProvider implements AiProvider {
         };
       } catch (error) {
         if (error instanceof AppError) {
+          const canRetry =
+            error.retryable &&
+            !isMaxTokensOutputIssue(error) &&
+            attempt < retryPolicy.maxOutputRetries &&
+            (error.details?.empty_json_payload === true ||
+              error.details?.malformed_json_payload === true ||
+              error.details?.truncated_success_output === true);
+
+          if (canRetry) {
+            await sleep(
+              getRetryDelayMs({
+                attempt,
+                baseDelayMs: retryPolicy.outputBaseDelayMs,
+                maxDelayMs: retryPolicy.outputMaxDelayMs,
+              }),
+            );
+            continue;
+          }
+
           this.logFailure({
             context: input.requestContext,
             operation: input.operation,
@@ -883,10 +987,18 @@ export class GeminiAiProvider implements AiProvider {
           throw error;
         }
 
-        const canRetry = attempt < 2 && shouldRetryProviderFailure(error);
+        const canRetry =
+          attempt < retryPolicy.maxProviderRetries &&
+          shouldRetryProviderFailure(error);
 
         if (canRetry) {
-          await sleep(450 * (attempt + 1));
+          await sleep(
+            getRetryDelayMs({
+              attempt,
+              baseDelayMs: retryPolicy.providerBaseDelayMs,
+              maxDelayMs: retryPolicy.providerMaxDelayMs,
+            }),
+          );
           continue;
         }
 
@@ -924,6 +1036,8 @@ export class GeminiAiProvider implements AiProvider {
     maxOutputTokens?: number;
     fallbackModel?: string | null;
   }): Promise<GeneratedTextResult> {
+    const retryPolicy = getGeminiRetryPolicy(input.operation);
+
     for (let attempt = 0; attempt < 3; attempt += 1) {
       try {
         const response = await this.client.models.generateContent({
@@ -979,10 +1093,18 @@ export class GeminiAiProvider implements AiProvider {
             retryable: true,
             details: suspiciousSuccess.details,
           });
-          const canRetry = attempt < 2;
+          const canRetry =
+            !isMaxTokensOutputIssue(cutoffError) &&
+            attempt < retryPolicy.maxOutputRetries;
 
           if (canRetry) {
-            await sleep(450 * (attempt + 1));
+            await sleep(
+              getRetryDelayMs({
+                attempt,
+                baseDelayMs: retryPolicy.outputBaseDelayMs,
+                maxDelayMs: retryPolicy.outputMaxDelayMs,
+              }),
+            );
             continue;
           }
 
@@ -1017,12 +1139,26 @@ export class GeminiAiProvider implements AiProvider {
           usage,
         };
       } catch (error) {
+        const appError = error instanceof AppError ? error : null;
+        const retryingOutputIssue =
+          shouldRetryOutputIssue(error) && !isMaxTokensOutputIssue(appError);
         const canRetry =
-          attempt < 2 &&
-          (shouldRetryProviderFailure(error) || shouldRetryOutputIssue(error));
+          (attempt < retryPolicy.maxProviderRetries &&
+            shouldRetryProviderFailure(error)) ||
+          (attempt < retryPolicy.maxOutputRetries && retryingOutputIssue);
 
         if (canRetry) {
-          await sleep(450 * (attempt + 1));
+          await sleep(
+            getRetryDelayMs({
+              attempt,
+              baseDelayMs: retryingOutputIssue
+                ? retryPolicy.outputBaseDelayMs
+                : retryPolicy.providerBaseDelayMs,
+              maxDelayMs: retryingOutputIssue
+                ? retryPolicy.outputMaxDelayMs
+                : retryPolicy.providerMaxDelayMs,
+            }),
+          );
           continue;
         }
 

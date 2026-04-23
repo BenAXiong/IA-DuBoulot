@@ -1507,3 +1507,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Preserve the paused first prompt in the workbench while the automatic extraction retry runs. If the retry succeeds and the learner has not edited the restored draft, clear the stale error state and send the original prompt automatically.
 - Why: The retry success means the original precondition for pausing auto-send has disappeared. Resuming only when the draft is unchanged avoids surprising the learner if they already started editing after the warning.
 - Follow-up: Re-run the same PDF on production after deploy and confirm that a transient Gemini extraction failure either auto-recovers into the first coach reply or, if retry also fails, leaves the draft clearly ready for manual send.
+
+### D-20260423-149 - Gemini Retries Now Use Operation-Specific Backoff, And MAX_TOKENS Stops Triggering Same-Model Repeats
+
+- Date: 2026-04-23
+- Status: accepted
+- Related tasks: `P1.3`, `P5.3`
+- Context: Production logs showed two different failure classes happening close together but not for the same reason. Attachment extraction was repeatedly hitting transient Gemini `503 UNAVAILABLE` errors, while a later coach-reply log showed `provider_finish_reason: MAX_TOKENS` on a successful-but-truncated `gemini-2.5-pro` response. The old adapter treated retry timing too uniformly, using the same short fixed delay across operations, and it could keep retrying the same model after non-clean finish reasons even when the signal pointed to an output-cap problem rather than a transient provider outage.
+- Decision: Replace the fixed retry sleep with jittered exponential backoff and separate retry budgets per operation. Keep a larger retry budget for attachment extraction than for coach replies, and stop retrying the same model when a suspicious output is explicitly marked `MAX_TOKENS`.
+- Why: Extraction is the most outage-prone synchronous path and benefits from patient retries. Coach replies already have a secondary Flash fallback, so repeatedly hammering Pro after a cap-shaped failure only adds load and latency without solving the underlying issue. Treating `MAX_TOKENS` as a cap or prompt-shape problem first makes the retry policy better aligned with the failure evidence.
+- Follow-up: Watch the next extraction and coach-reply logs in production. If `503` clusters still happen, add a short circuit-breaker or queueing layer on extraction next. If `MAX_TOKENS` remains common on coach replies, reduce prompt/context size or revisit the output cap before widening retries again.

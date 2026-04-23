@@ -53,6 +53,8 @@ Current repo implication:
 - the learner UI can now surface opaque code-only fallback states for distinct provider failure classes without leaking raw provider wording: rate-window codes, chat high-demand/generic service codes, and upload-analysis high-demand/generic service codes
 - the Gemini adapter now also treats a subset of "successful" responses as suspicious when the provider reports a non-clean finish reason or when the returned text is clearly cut off mid-structure; those turns are retried before the learner sees them, and runtime logs now include the provider finish reason on success paths for later diagnosis
 - the coach-reply path now also treats `empty text payload` results as recoverable model-path failures: it tries to recover text directly from Gemini candidate parts, retries the primary model when the output still looks invalid, and only then falls back from `gemini-2.5-pro` to `gemini-2.5-flash`
+- the Gemini adapter now uses operation-specific retry budgets with jittered exponential backoff instead of one fixed short delay everywhere: attachment extraction keeps the larger retry budget, while coach replies retry the primary model less aggressively before using the existing Flash fallback
+- when Gemini reports `MAX_TOKENS` on a suspiciously truncated success, the adapter no longer keeps retrying the same model just because the finish reason was non-clean; that class is now treated as a cap or prompt-shape problem first, not as a transient overload signal
 
 Operational recommendation:
 
