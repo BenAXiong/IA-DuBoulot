@@ -106,6 +106,11 @@ type UploadProgressState = {
   totalPhases: number;
 };
 
+type PendingAutoSendAfterExtraction = {
+  promptText: string;
+  replyMode: StudentReplyMode;
+};
+
 function buildInitialWorkspace(detail: ConversationDetail): WorkspaceDraftState {
   return {
     assignmentText:
@@ -160,8 +165,11 @@ export function StudentConversationWorkbench({
   );
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const workspaceRef = useRef(workspace);
+  const composerTextRef = useRef(composerText);
   const bootstrapStartedRef = useRef(false);
   const autoRetriedAttachmentIdsRef = useRef<Set<string>>(new Set());
+  const pendingAutoSendAfterExtractionRef =
+    useRef<PendingAutoSendAfterExtraction | null>(null);
   const isReadOnly = conversation.status !== "active";
   const displayMessages = [
     ...messages,
@@ -172,6 +180,10 @@ export function StudentConversationWorkbench({
   useEffect(() => {
     workspaceRef.current = workspace;
   }, [workspace]);
+
+  useEffect(() => {
+    composerTextRef.current = composerText;
+  }, [composerText]);
 
   useEffect(() => {
     dispatchConversationTitleUpdated({
@@ -430,6 +442,49 @@ export function StudentConversationWorkbench({
     return true;
   }
 
+  async function autoSendAfterExtractionRetry(input: PendingAutoSendAfterExtraction) {
+    if (composerTextRef.current.trim() !== input.promptText) {
+      return;
+    }
+
+    const pendingTimestamp = new Date().toISOString();
+    setChatError(null);
+    setComposerText("");
+    setPendingStudentMessage({
+      id: `pending-student-${pendingTimestamp}`,
+      conversation_id: conversation.id,
+      author_user_id: conversation.student_user_id,
+      role: "student",
+      content_text: input.promptText,
+      content_language: languageCode,
+      model_provider: null,
+      model_name: null,
+      input_tokens: null,
+      output_tokens: null,
+      created_at: pendingTimestamp,
+    });
+    setPendingAssistantMessage({
+      id: `pending-assistant-${pendingTimestamp}`,
+      conversation_id: conversation.id,
+      author_user_id: null,
+      role: "assistant",
+      content_text: copy.pendingAssistant,
+      content_language: languageCode,
+      model_provider: null,
+      model_name: null,
+      input_tokens: null,
+      output_tokens: null,
+      created_at: pendingTimestamp,
+    });
+
+    await performSendTurnRequest({
+      pendingDraft: input.promptText,
+      intent: "student_message",
+      replyMode: input.replyMode,
+      restoreComposerOnFailure: true,
+    });
+  }
+
   async function sendMessage(intent: "student_message" | "hint" | "summarize") {
     setChatError(null);
 
@@ -572,6 +627,10 @@ export function StudentConversationWorkbench({
     if (bootstrap.autoSend === false) {
       setComposerText(bootstrap.promptText);
       setChatError(bootstrap.launchErrorMessage ?? copy.errors.addAttachment);
+      pendingAutoSendAfterExtractionRef.current = {
+        promptText: bootstrap.promptText,
+        replyMode: bootstrap.replyMode,
+      };
       setIsBootstrapping(false);
       return;
     }
@@ -771,6 +830,15 @@ export function StudentConversationWorkbench({
 
       if (!options?.silent && payload.data.attachment.extraction_status === "ready") {
         setWorkspaceError(copy.errors.extractionRetried);
+      }
+
+      if (options?.silent && payload.data.attachment.extraction_status === "ready") {
+        const pendingAutoSend = pendingAutoSendAfterExtractionRef.current;
+        pendingAutoSendAfterExtractionRef.current = null;
+
+        if (pendingAutoSend) {
+          await autoSendAfterExtractionRetry(pendingAutoSend);
+        }
       }
     } finally {
       setRetryingAttachmentId((current) =>

@@ -1497,3 +1497,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Keep the attachment record as the source of truth for full extracted text, but clamp the client-side workspace mirror to the same source/support text limits already enforced by the server and prefer field-level workspace validation messages when a workspace save still fails.
 - Why: This is the narrowest fix that removes the misleading demo-time error without weakening the existing server limits or pretending the workspace needs to store the full PDF. A valid extraction can now remain usable in the student flow even when the hidden workspace copy must stay smaller.
 - Follow-up: Re-run the same long course PDF on production after the next deploy. If extraction succeeds again, confirm that the learner no longer sees the generic workspace validation banner. If the PDF still fails before the workspace sync, continue the investigation on the Gemini extraction path itself rather than the workspace lane.
+
+### D-20260423-148 - Silent Extraction Retry Can Resume The Paused First Prompt
+
+- Date: 2026-04-23
+- Status: accepted
+- Related tasks: `P1.3`
+- Context: The next production retry showed a different failure sequence from the earlier workspace `400`: the initial `/api/uploads/confirm` call hit Gemini `503 UNAVAILABLE`, so the subject quick-start opened the conversation with the learner's draft restored and auto-send paused. The workbench then ran its existing silent `/api/uploads/extract` retry, which succeeded and saved the workspace, but the learner still saw the stale extraction-unreliable banner and had to manually send the original prompt.
+- Decision: Preserve the paused first prompt in the workbench while the automatic extraction retry runs. If the retry succeeds and the learner has not edited the restored draft, clear the stale error state and send the original prompt automatically.
+- Why: The retry success means the original precondition for pausing auto-send has disappeared. Resuming only when the draft is unchanged avoids surprising the learner if they already started editing after the warning.
+- Follow-up: Re-run the same PDF on production after deploy and confirm that a transient Gemini extraction failure either auto-recovers into the first coach reply or, if retry also fails, leaves the draft clearly ready for manual send.
