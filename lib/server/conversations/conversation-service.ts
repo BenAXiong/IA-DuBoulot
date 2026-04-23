@@ -23,6 +23,10 @@ import {
   buildInitialWorkspaceFromDraft,
   buildStudentIntentMessage,
 } from "@/lib/server/conversations/draft-coach";
+import {
+  WORKSPACE_SOURCE_TEXT_MAX_CHARS,
+  WORKSPACE_SUPPORT_TEXT_MAX_CHARS,
+} from "@/lib/conversations/workspace-limits";
 import type {
   AiUsageSnapshot,
   ConversationAttachmentRecord,
@@ -72,8 +76,6 @@ const ATTACHMENT_SELECT =
   "id, conversation_id, uploaded_by_user_id, storage_bucket, storage_path, attachment_kind, mime_type, original_filename, byte_size, page_count, extraction_status, raw_extracted_text, source_language, metadata, created_at, updated_at";
 const SUMMARY_SELECT =
   "id, conversation_id, audience, language_code, summary_text, weakness_tags, next_step_recommendation, generated_model_name, created_at, updated_at";
-const MAX_CONVERSATION_SOURCE_TEXT_CHARS = 12_000;
-const MAX_WORKSPACE_SUPPORT_TEXT_CHARS = 8_000;
 const MAX_STUDENT_MESSAGE_CHARS = 4_000;
 
 function toServiceError(message: string, cause: unknown) {
@@ -412,8 +414,8 @@ export async function parseCreateConversationDraftInput(
   }
 
   if (
-    pastedText.length > MAX_CONVERSATION_SOURCE_TEXT_CHARS ||
-    editedExtractedText.length > MAX_CONVERSATION_SOURCE_TEXT_CHARS
+    pastedText.length > WORKSPACE_SOURCE_TEXT_MAX_CHARS ||
+    editedExtractedText.length > WORKSPACE_SOURCE_TEXT_MAX_CHARS
   ) {
     throw new AppError({
       code: "validation_error",
@@ -605,8 +607,8 @@ export async function parseUpdateWorkspaceInput(
     typeof payload.studentNotes === "string" ? payload.studentNotes : "";
 
   if (
-    assignmentText.length > MAX_CONVERSATION_SOURCE_TEXT_CHARS ||
-    editedExtractedText.length > MAX_CONVERSATION_SOURCE_TEXT_CHARS
+    assignmentText.length > WORKSPACE_SOURCE_TEXT_MAX_CHARS ||
+    editedExtractedText.length > WORKSPACE_SOURCE_TEXT_MAX_CHARS
   ) {
     throw new AppError({
       code: "validation_error",
@@ -619,9 +621,9 @@ export async function parseUpdateWorkspaceInput(
   }
 
   if (
-    planText.length > MAX_WORKSPACE_SUPPORT_TEXT_CHARS ||
-    draftAnswerText.length > MAX_WORKSPACE_SUPPORT_TEXT_CHARS ||
-    studentNotes.length > MAX_WORKSPACE_SUPPORT_TEXT_CHARS
+    planText.length > WORKSPACE_SUPPORT_TEXT_MAX_CHARS ||
+    draftAnswerText.length > WORKSPACE_SUPPORT_TEXT_MAX_CHARS ||
+    studentNotes.length > WORKSPACE_SUPPORT_TEXT_MAX_CHARS
   ) {
     throw new AppError({
       code: "validation_error",

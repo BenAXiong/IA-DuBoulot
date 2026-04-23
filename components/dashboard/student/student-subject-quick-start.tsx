@@ -17,6 +17,10 @@ import {
   type ConversationUploadPhase,
   uploadConversationFiles,
 } from "@/lib/uploads/client-upload";
+import {
+  clampWorkspaceSourceText,
+  clampWorkspaceSupportText,
+} from "@/lib/conversations/workspace-limits";
 
 type StudentSubjectQuickStartProps = {
   initialDraft?: string | null;
@@ -36,6 +40,7 @@ type CreateConversationShellResponse =
       ok?: false;
       error?: {
         message?: string;
+        fieldErrors?: Record<string, string>;
       };
     };
 
@@ -54,6 +59,7 @@ type WorkspaceRouteResponse =
       ok?: false;
       error?: {
         message?: string;
+        fieldErrors?: Record<string, string>;
       };
     };
 
@@ -126,7 +132,11 @@ function getWorkspaceRouteErrorMessage(payload: WorkspaceRouteResponse | null) {
     return null;
   }
 
-  return payload.error?.message ?? null;
+  const fieldError = payload.error?.fieldErrors
+    ? Object.values(payload.error.fieldErrors)[0]
+    : null;
+
+  return fieldError ?? payload.error?.message ?? null;
 }
 
 function getUploadProgressSegments(
@@ -347,10 +357,14 @@ export function StudentSubjectQuickStart({
             },
             body: JSON.stringify({
               assignmentText: "",
-              editedExtractedText: extractedBlocks.join("\n\n"),
+              editedExtractedText: clampWorkspaceSourceText(
+                extractedBlocks.join("\n\n"),
+              ),
               planText: "",
               draftAnswerText: "",
-              studentNotes: warningMessages.join("\n"),
+              studentNotes: clampWorkspaceSupportText(
+                warningMessages.join("\n"),
+              ),
             }),
           },
         );

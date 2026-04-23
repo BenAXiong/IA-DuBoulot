@@ -26,6 +26,10 @@ import {
   type ConversationUploadPhase,
   uploadConversationFiles,
 } from "@/lib/uploads/client-upload";
+import {
+  mergeWorkspaceSourceTextBlocks,
+  mergeWorkspaceSupportTextBlocks,
+} from "@/lib/conversations/workspace-limits";
 
 type StudentConversationWorkbenchProps = {
   detail: ConversationDetail;
@@ -46,6 +50,7 @@ type MessageRouteResponse =
       ok?: false;
       error?: {
         message?: string;
+        fieldErrors?: Record<string, string>;
       };
     };
 
@@ -60,6 +65,7 @@ type WorkspaceRouteResponse =
       ok?: false;
       error?: {
         message?: string;
+        fieldErrors?: Record<string, string>;
       };
     };
 
@@ -206,12 +212,10 @@ export function StudentConversationWorkbench({
     ) {
       nextWorkspace = {
         ...nextWorkspace,
-        editedExtractedText: [
-          nextWorkspace.editedExtractedText.trim(),
-          input.extractedTextBlock,
-        ]
-          .filter(Boolean)
-          .join("\n\n"),
+        editedExtractedText: mergeWorkspaceSourceTextBlocks(
+          nextWorkspace.editedExtractedText,
+          [input.extractedTextBlock],
+        ),
       };
     }
 
@@ -222,9 +226,10 @@ export function StudentConversationWorkbench({
     ) {
       nextWorkspace = {
         ...nextWorkspace,
-        studentNotes: [nextWorkspace.studentNotes.trim(), input.warningMessage]
-          .filter(Boolean)
-          .join("\n"),
+        studentNotes: mergeWorkspaceSupportTextBlocks(
+          nextWorkspace.studentNotes,
+          [input.warningMessage],
+        ),
       };
     }
 
@@ -348,15 +353,17 @@ export function StudentConversationWorkbench({
         ...currentWorkspace,
         editedExtractedText:
           extractedBlocks.length > 0
-            ? [currentWorkspace.editedExtractedText.trim(), ...extractedBlocks]
-                .filter(Boolean)
-                .join("\n\n")
+            ? mergeWorkspaceSourceTextBlocks(
+                currentWorkspace.editedExtractedText,
+                extractedBlocks,
+              )
             : currentWorkspace.editedExtractedText,
         studentNotes:
           warningMessages.length > 0
-            ? [currentWorkspace.studentNotes.trim(), ...warningMessages]
-                .filter(Boolean)
-                .join("\n")
+            ? mergeWorkspaceSupportTextBlocks(
+                currentWorkspace.studentNotes,
+                warningMessages,
+              )
             : currentWorkspace.studentNotes,
       };
 
@@ -487,7 +494,11 @@ export function StudentConversationWorkbench({
       .json()
       .catch(() => null)) as WorkspaceRouteResponse | null;
     const routeErrorMessage =
-      payload && "error" in payload ? payload.error?.message : null;
+      payload && "error" in payload
+        ? (payload.error?.fieldErrors
+            ? Object.values(payload.error.fieldErrors)[0]
+            : null) ?? payload.error?.message
+        : null;
 
     if (!response.ok || !payload?.ok || !payload.data?.workspace) {
       throw new Error(routeErrorMessage ?? copy.errors.saveWorkspace);

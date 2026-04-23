@@ -1487,3 +1487,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Preserve `AppError.details` when extracting provider-failure metadata inside the Gemini adapter, so attachment-extraction failures now carry the same payload-shape and finish-reason diagnostics as other structured Gemini calls.
 - Why: The next extraction investigation needs to distinguish a bad file from a bad model response shape. Without these diagnostics, too many different extraction failures look identical in runtime logs.
 - Follow-up: Re-run the failing course PDF extraction and inspect whether the next failure shows an empty payload, malformed JSON, `MAX_TOKENS`, or another provider-side finish reason. Only then decide whether to tighten the prompt, split the extraction, or add a non-Gemini PDF fallback first.
+
+### D-20260423-147 - Workspace Sync Now Bounds Extracted PDF Preview Instead Of Failing The Attached File Flow
+
+- Date: 2026-04-23
+- Status: accepted
+- Related tasks: `P1.3`
+- Context: Production Vercel logs for the current demo issue showed the attachment route and the visible UI error were no longer the same failure. `POST /api/uploads/confirm` could fail transiently with Gemini `503 UNAVAILABLE`, but on the later successful retry the PDF extraction finished and the attachment stayed attached. The visible `400` came from the follow-up `PATCH /api/conversations/[conversationId]/workspace`, because the extracted PDF text being mirrored into the hidden workspace exceeded the existing `12000`-character source-text validation cap and the client still surfaced only the generic `Un ou plusieurs champs sont invalides.` wrapper.
+- Decision: Keep the attachment record as the source of truth for full extracted text, but clamp the client-side workspace mirror to the same source/support text limits already enforced by the server and prefer field-level workspace validation messages when a workspace save still fails.
+- Why: This is the narrowest fix that removes the misleading demo-time error without weakening the existing server limits or pretending the workspace needs to store the full PDF. A valid extraction can now remain usable in the student flow even when the hidden workspace copy must stay smaller.
+- Follow-up: Re-run the same long course PDF on production after the next deploy. If extraction succeeds again, confirm that the learner no longer sees the generic workspace validation banner. If the PDF still fails before the workspace sync, continue the investigation on the Gemini extraction path itself rather than the workspace lane.
