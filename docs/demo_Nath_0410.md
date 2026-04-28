@@ -38,6 +38,8 @@ That means:
 - student conversation mode is the only path that must feel polished
 - parent or tutor entry points can be temporarily hidden, blocked, or deprioritized if that reduces confusion
 - placeholder tools should not distract from the homework chat if they are not ready
+- not-implemented "later" sections in the student sidebar should be disabled, hidden, or visibly unavailable for the demo instead of looking like usable destinations
+- homework mode should warn or redirect the learner when they ask for exploration, test practice, revision maps, or other non-homework tasks that are not implemented yet
 
 ## Must-Have Before Demo
 
@@ -73,6 +75,7 @@ That means:
 - polish the recent-homework-chat list so it looks credible, readable, and tap-friendly on iPad
 - keep the default avatar system playful enough for a learner demo if real avatar upload is still deferred
 - localize the subject toggles so subject creation and switching do not expose mixed-language labels in the demo
+- disable, hide, or clearly mark the not-implemented sidebar "later" sections so Nath cannot tap into placeholder-only product areas during the walkthrough
 - remove any remaining visual rough edges in the student shell that still read like a prototype rather than a product
 
 ### 5. Demo Narrative Tightening
@@ -81,6 +84,7 @@ That means:
 - no internal fallback-looking phrasing
 - no confusing multi-role affordances
 - no dead-end navigation around homework start or completion
+- if a learner tries to use homework mode for exploration, test practice, revision maps, or another unsupported task, show a concise warning that the current demo flow is focused on homework help
 
 ### 6. Demo Commercial Posture
 
