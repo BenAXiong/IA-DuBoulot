@@ -18,6 +18,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 
 ## Current Decisions
 
+### D-20260428-01 - Coach Context Caps Raised For Common PDF Homework
+
+- Date: 2026-04-28
+- Status: accepted
+- Related tasks: `A7.3.4`, `P1.3`, `P2.7`, `P5.3`
+- Context: Investigation of `C.21 Circuit Electrique I-Cours.pdf` showed that extraction completed across all 7 pages and stored roughly 11.6k extracted characters, but the live coach prompt only received front-loaded excerpts from workspace and attachment context. The old caps of `3,500` chars for reviewed extracted text and `2,000` chars for attachment extracted text made common 5-10 page PDFs look partially read even when the attachment extraction itself was complete.
+- Decision: Raise the source-text workspace cap to `20,000` chars and raise the coach context caps for assignment text, reviewed extracted text, attachment prompt excerpts, and Gemini attachment-part text to `20,000` chars. Leave unrelated support-text, transcript, summary, and translation caps unchanged.
+- Why: A 5-10 page homework PDF is normal student material, and the observed document fits comfortably below the new cap. This gives the product a practical troubleshooting and usage-measurement baseline without prematurely building the full subject-wide resource library.
+- Follow-up: Watch provider-reported input/output token counts and estimated costs after deployment. The raised caps are not the final long-document architecture: `P2.7` still needs subject-level resources, extraction-once storage, chunking, retrieval, and deduplication so long-lived course PDFs are not resent wholesale on every chat turn.
+
 ### D-20260421-01 - Completion Reuses Stored Summaries By Default But Allows Explicit Dev Regeneration
 
 - Date: 2026-04-21

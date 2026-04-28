@@ -1,13 +1,13 @@
 import "server-only";
 
 export const AI_CONTEXT_LIMITS = {
-  assignmentTextChars: 3500,
-  editedExtractedTextChars: 3500,
+  assignmentTextChars: 20_000,
+  editedExtractedTextChars: 20_000,
   planTextChars: 1800,
   draftAnswerTextChars: 1800,
   studentNotesChars: 1200,
-  attachmentExtractChars: 2000,
-  attachmentPartChars: 1200,
+  attachmentExtractChars: 20_000,
+  attachmentPartChars: 20_000,
   transcriptMessageCount: 8,
   transcriptMessageChars: 600,
   summaryCount: 5,

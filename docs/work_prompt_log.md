@@ -243,3 +243,4 @@ then close it as:
 | 2026-04-23 | 17:11 -> 17:11 | 0h00 | A0.3.7 | clarify that repeated `rg` probes are wasted motion in this Windows Codex shell after the first ResourceUnavailable failure, and commit to defaulting to PowerShell-native search commands instead of retrying `rg` in later turns | | |
 | 2026-04-28 | 11:34 -> 11:35 | 0h01 | A0.3.7 P1.3 P2.7 | close the stale 2026-04-23 session, reopen the current execution trace, and rebuild operating-doc context before PDF extraction plus subject-wide upload work | | |
 | 2026-04-28 | 11:49 -> 11:57 | 0h08 | P1.3 P2.7 P5.3 | investigate consistent partial extraction of the attached circuit-course PDF through local PDF inspection, Vercel/API logs, and the current Gemini extraction path | | |
+| 2026-04-28 | 12:03 -> 12:08 | 0h05 | A7.3.4 P1.3 P2.7 P5.3 | raise PDF-context caps for troubleshooting and usage measurement, document cost and reliability cautions, and outline the subject-wide upload/chunking plan | | |

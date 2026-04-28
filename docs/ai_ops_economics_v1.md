@@ -26,7 +26,7 @@ It is intentionally explicit about the difference between:
   - `gemini-2.5-pro`: input `$1.25 / 1M tokens`, output `$10.00 / 1M tokens`
 - pricing source of truth in code: `lib/server/ai/config.ts`
 
-These prices are implementation constants, not a legal or billing guarantee. Re-check the provider docs before relying on them for real margin planning.
+These prices are implementation constants, not a legal or billing guarantee. They matched the Google Gemini Developer API pricing table when re-checked on 2026-04-28; re-check the provider docs before relying on them for real margin planning.
 
 ## Gemini Provider Limit Model
 
@@ -242,8 +242,8 @@ Current access model:
 
 Current route-level validation caps:
 
-- pasted text: `12,000` chars
-- edited extracted text: `12,000` chars
+- pasted text: `20,000` chars
+- edited extracted text: `20,000` chars
 - plan text: `8,000` chars
 - draft answer text: `8,000` chars
 - student notes: `8,000` chars
@@ -253,13 +253,13 @@ Current AI context caps:
 
 | Context piece | Limit |
 | --- | --- |
-| assignment text | `3,500` chars |
-| edited extracted text | `3,500` chars |
+| assignment text | `20,000` chars |
+| edited extracted text | `20,000` chars |
 | plan text | `1,800` chars |
 | draft answer text | `1,800` chars |
 | student notes | `1,200` chars |
-| attachment extracted text in prompt context | `2,000` chars |
-| attachment text inside Gemini attachment-part context | `1,200` chars |
+| attachment extracted text in prompt context | `20,000` chars |
+| attachment text inside Gemini attachment-part context | `20,000` chars |
 | recent transcript messages | `8` |
 | each transcript message excerpt | `600` chars |
 | summaries used for memory generation | `5` |
@@ -270,6 +270,13 @@ Implementation rule:
 
 - truncation happens server-side in `lib/server/ai/guardrails.ts`
 - truncated text is explicitly marked with `[tronque pour limiter le cout IA]`
+
+2026-04-28 troubleshooting baseline:
+
+- the source and attachment caps were raised to `20,000` chars because common 5-10 page student PDFs can exceed the older front-loaded coach excerpts even when extraction is complete
+- this is acceptable for measuring real usage on ordinary worksheets, but it is not the final subject-wide document strategy
+- the current coach path can still duplicate the same PDF content through workspace source text, prompt attachment excerpts, and Gemini attachment parts; monitor this while measuring token impact
+- use runtime provider metadata, especially prompt/input tokens, thinking/output tokens, effective model, and estimated cost, before raising broader monthly quotas or treating full-document context as a permanent default
 
 ## Artifact Reuse
 
@@ -307,8 +314,8 @@ Using only the configured output-token caps:
 | Operation | Output token cap | Output-side ceiling at current pricing |
 | --- | --- | --- |
 | coach reply | `2000` | about `$0.02000` |
-| summary generation | `450` | about `$0.001125` |
-| memory profile | `280` | about `$0.00070` |
+| summary generation | `2000` | about `$0.02000` |
+| memory profile | `600` | about `$0.00150` |
 | translation | `900` | about `$0.00225` |
 
 Important limitation:
