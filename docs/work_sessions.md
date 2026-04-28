@@ -79,4 +79,5 @@ Use `OPEN` for the unfinished side of an active session.
 | 2026-04-21 | 14:48 -> 17:49 | 3h01 | A0.3.7 | reopen a fresh execution trace for today after the earlier 2026-04-21 session was explicitly closed |
 | 2026-04-22 | 10:33 -> 12:32 | 1h59 | A0.3.7 | close the 2026-04-21 session at 17:49 and reopen a fresh execution trace for today |
 | 2026-04-22 | 14:02 -> 18:01 | 3h59 | A0.3.7 | split the 2026-04-22 execution trace at 12:32 and reopen a fresh work-session row from 14:02 |
-| 2026-04-23 | 14:57 -> OPEN | OPEN | A0.3.7 | close the 2026-04-22 session at 18:01 and reopen a fresh execution trace for today |
+| 2026-04-23 | 14:57 -> 17:11 | 2h14 | A0.3.7 P1.3 P5.3 | close the 2026-04-22 session at 18:01, then investigate production PDF extraction and workspace-sync failures, harden retry behavior, and capture the Windows search-tool workflow note |
+| 2026-04-28 | 11:34 -> OPEN | OPEN | A0.3.7 P1.3 P2.7 | reopen the execution trace after a full operating-doc context rebuild, with next focus on partial PDF extraction and subject-wide uploads |
