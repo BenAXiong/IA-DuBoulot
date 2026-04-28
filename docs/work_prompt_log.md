@@ -254,3 +254,4 @@ then close it as:
 | 2026-04-28 | 14:34 -> 14:35 | 0h01 | P1.3 P2.7 P5.3 | decide whether coach prompts should prefer workspace source text or raw attachment extraction in ordinary tutoring turns | | |
 | 2026-04-28 | 14:38 -> 14:39 | 0h01 | P1.3 P2.7 P5.3 | prioritize reviewed workspace extracted text over raw attachment excerpts in coach context when both are available | | |
 | 2026-04-28 | 14:42 -> 14:44 | 0h02 | P1.3 P2.4 | log demo follow-ups to disable unfinished sidebar sections and warn when homework mode is used for unsupported non-homework tasks | | |
+| 2026-04-28 | 14:45 -> 14:48 | 0h03 | P1.3 P2.7 | assess whether adding a PDF-pill dropdown with short summary and page or section structure is a straightforward demo slice | | |
