@@ -49,6 +49,14 @@ This document records the original `A3.3` persistence boundary.
 
 The current local workspace has already moved beyond the original boundary into the real upload path, but the older intake-summary bootstrap still explains why some server-side draft code exists even though the learner no longer sees that route.
 
+Deployment and reload boundary:
+
+- conversation continuity must not depend on in-memory server state
+- after a site deploy or browser reload, `/app/conversations/[conversationId]` should reload persisted messages, workspace state, and attachments from storage/database state
+- a deploy can still interrupt an in-flight request before a learner message or assistant reply is persisted; that is a retry/draft-recovery problem, not an acceptable reason for banban to treat an already persisted conversation as brand new
+- if the learner can see earlier messages in the transcript but banban replies as if no prior context exists, treat it as a context-assembly or transcript-window defect to investigate
+- the current coach prompt only includes a bounded recent transcript excerpt, so very old turns may still fall outside active AI context until a rolling summary or retrieval layer is added
+
 At the original `A3.3` exit point:
 
 - there are no `attachments` rows yet for the staged browser files
