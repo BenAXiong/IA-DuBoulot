@@ -8,7 +8,7 @@ export const AI_CONTEXT_LIMITS = {
   studentNotesChars: 1200,
   attachmentExtractChars: 20_000,
   attachmentPartChars: 20_000,
-  transcriptMessageCount: 8,
+  transcriptMessageCount: 30,
   transcriptMessageChars: 600,
   summaryCount: 5,
   summaryTextChars: 900,

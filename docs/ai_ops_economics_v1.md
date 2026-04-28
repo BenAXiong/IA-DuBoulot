@@ -156,7 +156,7 @@ Current access model:
 ### Student Coach
 
 - route: `POST /api/conversations/[conversationId]/messages`
-- prompt version: `student-coach-v4`
+- prompt version: `student-coach-v6`
 - current primary model: `gemini-2.5-pro`
 - current fallback model for recoverable coach-reply failures: `gemini-2.5-flash`
 - context inputs:
@@ -260,7 +260,7 @@ Current AI context caps:
 | student notes | `1,200` chars |
 | attachment extracted text in prompt context | `20,000` chars |
 | attachment text inside Gemini attachment-part context | `20,000` chars |
-| recent transcript messages | `8` |
+| recent transcript messages | `30` |
 | each transcript message excerpt | `600` chars |
 | summaries used for memory generation | `5` |
 | each summary excerpt | `900` chars |
@@ -274,6 +274,7 @@ Implementation rule:
 2026-04-28 troubleshooting baseline:
 
 - the source and attachment caps were raised to `20,000` chars because common 5-10 page student PDFs can exceed the older front-loaded coach excerpts even when extraction is complete
+- the recent transcript window was raised to `30` messages after a real 24-message conversation showed that earlier student answers could fall out while still visible in the UI; this is an immediate trust fix, not a substitute for durable working memory
 - this is acceptable for measuring real usage on ordinary worksheets, but it is not the final subject-wide document strategy
 - the current coach path can still duplicate the same PDF content through workspace source text, prompt attachment excerpts, and Gemini attachment parts; monitor this while measuring token impact
 - use runtime provider metadata, especially prompt/input tokens, thinking/output tokens, effective model, and estimated cost, before raising broader monthly quotas or treating full-document context as a permanent default

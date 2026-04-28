@@ -18,6 +18,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 
 ## Current Decisions
 
+### D-20260428-02 - Coach Transcript Window Raised To 30 Messages
+
+- Date: 2026-04-28
+- Status: accepted
+- Related tasks: `P1.3`, `P2.7`, `P2.8`, `P5.3`
+- Context: A production 24-message physics conversation kept all turns in storage and in the learner UI, but the coach prompt only serialized the last `8` messages. Earlier student answers fell outside the active prompt window, so banban later asked for answers that were visibly already above.
+- Decision: Raise the recent transcript context window to `30` messages while keeping the per-message excerpt cap at `600` chars. Track durable active-session working memory separately as Pilot task `P2.8` instead of treating a larger raw transcript as the final architecture.
+- Why: The present behavior is unacceptable for normal tutoring. A 30-message bounded window is a low-risk immediate fix because source PDFs and workspace context are already the larger token drivers, while the cap still prevents unbounded transcript growth.
+- Follow-up: During `P2.8`, evaluate a structured working-memory layer for assistant-generated questions, student answers, current correction targets, unresolved points, and its interactions with completion summaries, student memory profiles, subject-wide resources, and transcript compaction.
+
 ### D-20260428-01 - Coach Context Caps Raised For Common PDF Homework
 
 - Date: 2026-04-28

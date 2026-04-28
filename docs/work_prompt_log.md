@@ -247,3 +247,4 @@ then close it as:
 | 2026-04-28 | 13:36 -> 13:37 | 0h01 | P1.3 P2.7 P3.1 | confirm where PDF-context cautions are logged and clarify deployment-time conversation persistence expectations | | |
 | 2026-04-28 | 13:53 -> 14:02 | 0h09 | P1.3 P2.7 P3.1 | inspect production conversation fa7390b3-a238-45a3-ae85-1405e0e81cfc for transcript-window fall-out and source-context coverage | | |
 | 2026-04-28 | 14:07 -> 14:07 | 0h00 | P1.3 P2.7 P3.1 | evaluate immediate transcript-window widening versus durable working-memory strategy for unacceptable coach context loss | | |
+| 2026-04-28 | 14:16 -> 14:18 | 0h02 | P1.3 P2.7 P2.8 P3.1 | raise coach transcript context to 30 messages, document the troubleshooting baseline, and log the working-memory layer for pilot reconsideration | | |
