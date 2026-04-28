@@ -112,6 +112,7 @@ export type ExtractAttachmentTextResult = {
   needsManualReview: boolean;
   pageCountEstimate: number | null;
   sourceSummary: string | null;
+  sourceOutline: string | null;
   generatedModelName: string;
   promptVersion: string;
   usage: AiUsageSnapshot;

@@ -1373,6 +1373,7 @@ export class GeminiAiProvider implements AiProvider {
         needsManualReview?: boolean | null;
         pageCountEstimate?: number | null;
         sourceSummary?: string | null;
+        sourceOutline?: string | null;
       }>({
         model: GEMINI_EXTRACTION_MODEL,
         systemInstruction: prompt.instruction,
@@ -1392,6 +1393,7 @@ export class GeminiAiProvider implements AiProvider {
             needsManualReview: { type: Type.BOOLEAN },
             pageCountEstimate: { type: Type.INTEGER },
             sourceSummary: { type: Type.STRING },
+            sourceOutline: { type: Type.STRING },
           },
           required: ["extractedText", "confidenceScore", "needsManualReview"],
         },
@@ -1411,6 +1413,7 @@ export class GeminiAiProvider implements AiProvider {
         needsManualReview: asBoolean(response.needsManualReview) ?? true,
         pageCountEstimate: asNumber(response.pageCountEstimate),
         sourceSummary: asString(response.sourceSummary),
+        sourceOutline: asString(response.sourceOutline),
         generatedModelName: response.modelName,
         promptVersion: prompt.version,
         usage: response.usage,

@@ -257,3 +257,4 @@ then close it as:
 | 2026-04-28 | 14:45 -> 14:48 | 0h03 | P1.3 P2.7 | assess whether adding a PDF-pill dropdown with short summary and page or section structure is a straightforward demo slice | | |
 | 2026-04-28 | 15:39 -> 15:40 | 0h01 | A0.3.7 | close the active 2026-04-28 session at 14:48 and reopen a fresh execution trace for the next slice | | |
 | 2026-04-28 | 15:44 -> 15:53 | 0h09 | P1.3 P2.7 | implement the lightweight PDF-pill details dropdown with stored extraction summary and existing PDF metadata, then assess the outline-only extraction shortcut | | |
+| 2026-04-28 | 16:14 -> 16:22 | 0h08 | P1.3 P2.7 | add optional PDF source-outline extraction for new uploads and tighten PDF details status/pages microcopy | | |

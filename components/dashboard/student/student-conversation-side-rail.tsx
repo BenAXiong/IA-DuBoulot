@@ -111,6 +111,15 @@ function getAttachmentSourceSummary(attachment: ConversationAttachmentRecord) {
     : null;
 }
 
+function getAttachmentSourceOutline(attachment: ConversationAttachmentRecord) {
+  const metadata = getAttachmentMetadata(attachment);
+  const sourceOutline = metadata.source_outline;
+
+  return typeof sourceOutline === "string" && sourceOutline.trim()
+    ? sourceOutline.trim()
+    : null;
+}
+
 function isRetriableAttachmentFailure(attachment: ConversationAttachmentRecord) {
   const metadata = getAttachmentMetadata(attachment);
 
@@ -283,6 +292,8 @@ export function StudentConversationSideRail({
                       const canRetry = isRetriableAttachmentFailure(attachment);
                       const sourceSummary =
                         getAttachmentSourceSummary(attachment);
+                      const sourceOutline =
+                        getAttachmentSourceOutline(attachment);
                       const detailsOpen =
                         openAttachmentDetailsId === attachment.id;
 
@@ -358,28 +369,32 @@ export function StudentConversationSideRail({
                           {isPdf && detailsOpen ? (
                             <div className="w-72 max-w-full rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface)] p-3 text-left text-xs shadow-[0_18px_50px_rgba(15,23,42,0.18)]">
                               <div className="grid gap-3">
-                                <div className="grid gap-1">
-                                  <p className="text-[0.68rem] font-medium uppercase tracking-[0.16em] text-[color:var(--ink-soft)]">
-                                    {copy.attachmentStatusLabel}
-                                  </p>
-                                  <p className="text-sm text-[color:var(--foreground)]">
-                                    {copy.attachmentStatus[
-                                      attachment.extraction_status
-                                    ]}
-                                  </p>
-                                </div>
-                                <div className="grid gap-1">
-                                  <p className="text-[0.68rem] font-medium uppercase tracking-[0.16em] text-[color:var(--ink-soft)]">
-                                    {copy.attachmentPageCountLabel}
-                                  </p>
-                                  <p className="text-sm text-[color:var(--foreground)]">
-                                    {attachment.page_count
-                                      ? copy.attachmentPageCount(
-                                          attachment.page_count,
-                                        )
-                                      : copy.attachmentPageCountUnavailable}
-                                  </p>
-                                </div>
+                                <dl className="grid grid-cols-2 gap-2 text-sm">
+                                  <div className="flex items-center gap-1.5">
+                                    <dt className="text-[color:var(--ink-soft)]">
+                                      {copy.attachmentStatusLabel}
+                                    </dt>
+                                    <dd className="font-medium text-[color:var(--foreground)]">
+                                      {
+                                        copy.attachmentStatus[
+                                          attachment.extraction_status
+                                        ]
+                                      }
+                                    </dd>
+                                  </div>
+                                  <div className="flex items-center gap-1.5">
+                                    <dt className="text-[color:var(--ink-soft)]">
+                                      {copy.attachmentPageCountLabel}
+                                    </dt>
+                                    <dd className="font-medium text-[color:var(--foreground)]">
+                                      {attachment.page_count
+                                        ? copy.attachmentPageCount(
+                                            attachment.page_count,
+                                          )
+                                        : copy.attachmentPageCountUnavailable}
+                                    </dd>
+                                  </div>
+                                </dl>
                                 <div className="grid gap-1">
                                   <p className="text-[0.68rem] font-medium uppercase tracking-[0.16em] text-[color:var(--ink-soft)]">
                                     {copy.attachmentSummaryLabel}
@@ -393,8 +408,9 @@ export function StudentConversationSideRail({
                                   <p className="text-[0.68rem] font-medium uppercase tracking-[0.16em] text-[color:var(--ink-soft)]">
                                     {copy.attachmentStructureLabel}
                                   </p>
-                                  <p className="text-sm leading-5 text-[color:var(--ink-soft)]">
-                                    {copy.attachmentStructureUnavailable}
+                                  <p className="whitespace-pre-line text-sm leading-5 text-[color:var(--foreground)]">
+                                    {sourceOutline ??
+                                      copy.attachmentStructureUnavailable}
                                   </p>
                                 </div>
                               </div>

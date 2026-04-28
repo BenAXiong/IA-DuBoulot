@@ -774,6 +774,7 @@ async function runAttachmentExtraction(input: {
       ? buildPartialExtractionWarningMessage(input.languageCode)
       : null;
   const sourceSummary = extraction.sourceSummary?.trim() || null;
+  const sourceOutline = extraction.sourceOutline?.trim() || null;
 
   const { data: updatedAttachment, error: updateError } = await admin
     .from("attachments")
@@ -791,6 +792,7 @@ async function runAttachmentExtraction(input: {
         detected_language: extraction.detectedLanguage,
         needs_manual_review: extraction.needsManualReview,
         source_summary: sourceSummary,
+        source_outline: sourceOutline,
       },
     })
     .eq("id", input.attachment.id)

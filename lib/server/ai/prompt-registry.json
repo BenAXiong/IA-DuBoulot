@@ -47,7 +47,7 @@
       ],
       "serviceMethod": "AiProvider.extractAttachmentText",
       "aim": "Extract readable homework text and basic metadata from uploaded images or PDFs.",
-      "outcome": "Returns JSON with extractedText, detectedLanguage, confidenceScore, needsManualReview, pageCountEstimate, and sourceSummary.",
+        "outcome": "Returns JSON with extractedText, detectedLanguage, confidenceScore, needsManualReview, pageCountEstimate, sourceSummary, and optional sourceOutline.",
       "docs": [
         "docs/student_intake_v1.md",
         "docs/storage_attachment_rules.md",

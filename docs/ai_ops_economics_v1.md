@@ -194,7 +194,7 @@ Current access model:
 ### Attachment Extraction
 
 - route: `POST /api/uploads/confirm`
-- prompt version: `attachment-extraction-v1`
+- prompt version: `attachment-extraction-v2`
 - current model: `gemini-2.5-flash`
 - context inputs:
   - uploaded file sent through Gemini file understanding

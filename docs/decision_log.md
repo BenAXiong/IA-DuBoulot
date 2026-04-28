@@ -1567,3 +1567,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Add a lightweight PDF details dropdown from the existing attachment pill that reads only stored attachment metadata: extraction status, `page_count`, and a new compact `metadata.source_summary` value persisted from the existing Gemini extraction result for new uploads.
 - Why: This gives learners a low-risk way to confirm what a PDF probably contains without re-reading the file, widening the coach prompt, or pretending that the app already has a reliable page/section table of contents.
 - Follow-up: Keep structured page/section outlines under `P2.7`, alongside extract-once storage, chunking, relevance retrieval, and graceful behavior for older or weakly structured attachments.
+
+### D-20260428-151 - Attachment Extraction May Store An Optional Lightweight Outline
+
+- Date: 2026-04-28
+- Status: accepted
+- Related tasks: `P1.3`, `P2.7`
+- Context: The lightweight PDF dropdown can become more useful if new extraction runs also return a compact structure outline, but the app is not yet ready for a full durable document-indexing contract.
+- Decision: Extend `attachment-extraction` to version `v2` with optional `sourceOutline`, persist it as `attachments.metadata.source_outline` when present, and render it only from stored metadata in the PDF details dropdown.
+- Why: This adds the demo-useful outline affordance for new uploads without a schema migration, without reprocessing old PDFs, and without making ordinary chat turns resend or reparse the PDF.
+- Follow-up: `P2.7` still owns the stronger version: robust outline validation, old-resource backfill or degradation policy, chunking, and retrieval.
