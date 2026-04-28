@@ -5,6 +5,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getAiProvider } from "@/lib/server/ai/provider";
 import type { ConversationAttachmentRecord } from "@/lib/server/ai/types";
+import type { ConversationRecord } from "@/lib/server/conversations/types";
 import {
   requireActiveAppUser,
   requireAppUserContext,
@@ -22,6 +23,12 @@ import {
   recordStudentAiUsageBestEffort,
   recordStudentUsageDeltaBestEffort,
 } from "@/lib/server/usage/service";
+import {
+  buildAttachmentUpdateFromSubjectResource,
+  findReadySubjectResourceByHash,
+  linkSubjectResourceToConversation,
+  upsertSubjectResourceFromReadyAttachment,
+} from "@/lib/server/subject-resources/service";
 import {
   ALLOWED_ATTACHMENT_RULES,
   ATTACHMENT_MAX_PER_CONVERSATION,
@@ -198,9 +205,11 @@ function buildStoredExtractionWarningMessage(
 function buildExistingExtractionResult(
   attachment: ConversationAttachmentRecord,
   languageCode: UiLanguageCode,
+  subjectResource: ConfirmUploadResult["subjectResource"] = null,
 ): ConfirmUploadResult {
   return {
     attachment,
+    subjectResource,
     extractedTextBlock:
       attachment.extraction_status === "ready"
         ? buildExtractedTextBlock({
@@ -673,7 +682,7 @@ async function runAttachmentExtraction(input: {
   appUserId: string;
   appUserRole: "student";
   languageCode: UiLanguageCode;
-  conversationId: string;
+  conversation: Pick<ConversationRecord, "id" | "student_user_id" | "subject_tag">;
   attachment: ConversationAttachmentRecord;
   requestId: string;
   route: string;
@@ -688,8 +697,69 @@ async function runAttachmentExtraction(input: {
   }
 
   const sha256 = await sha256Hex(fileBlob);
-  const aiProvider = getAiProvider();
   const normalizedMetadata = normalizeMetadata(input.attachment.metadata);
+  const readySubjectResource =
+    input.attachment.attachment_kind === "pdf"
+      ? await findReadySubjectResourceByHash({
+          supabase: admin,
+          studentUserId: input.conversation.student_user_id,
+          subjectTag: input.conversation.subject_tag,
+          sha256,
+        })
+      : null;
+
+  if (readySubjectResource) {
+    const attachmentUpdate = buildAttachmentUpdateFromSubjectResource({
+      attachment: input.attachment,
+      resource: readySubjectResource,
+    });
+    const { data: reusedAttachment, error: updateError } = await admin
+      .from("attachments")
+      .update(attachmentUpdate)
+      .eq("id", input.attachment.id)
+      .select(ATTACHMENT_SELECT)
+      .single();
+
+    if (updateError) {
+      throw toServiceError("Unable to persist reused subject resource extraction.", updateError);
+    }
+
+    await linkSubjectResourceToConversation({
+      supabase: admin,
+      conversationId: input.conversation.id,
+      resourceId: readySubjectResource.id,
+      createdByUserId: input.appUserId,
+    });
+
+    logRuntimeInfo({
+      message: "Reused subject resource extraction for attachment",
+      requestId: input.requestId,
+      route: input.route,
+      method: "POST",
+      actorUserId: input.appUserId,
+      actorRole: input.appUserRole,
+      targetStudentUserId: input.conversation.student_user_id,
+      details: {
+        attachmentId: input.attachment.id,
+        conversationId: input.conversation.id,
+        subjectResourceId: readySubjectResource.id,
+        subjectTag: input.conversation.subject_tag,
+      },
+    });
+
+    return {
+      attachment: reusedAttachment as ConversationAttachmentRecord,
+      subjectResource: readySubjectResource,
+      extractedTextBlock: buildExtractedTextBlock({
+        filename: input.attachment.original_filename,
+        extractedText: readySubjectResource.raw_extracted_text,
+        languageCode: input.languageCode,
+      }),
+      warningMessage: null,
+    };
+  }
+
+  const aiProvider = getAiProvider();
   let extraction;
 
   try {
@@ -704,9 +774,9 @@ async function runAttachmentExtraction(input: {
         route: input.route,
         actorUserId: input.appUserId,
         actorRole: input.appUserRole,
-        conversationId: input.conversationId,
+        conversationId: input.conversation.id,
         attachmentId: input.attachment.id,
-        studentUserId: input.appUserId,
+        studentUserId: input.conversation.student_user_id,
       },
     });
   } catch (error) {
@@ -733,6 +803,7 @@ async function runAttachmentExtraction(input: {
 
     return {
       attachment: failedAttachment as ConversationAttachmentRecord,
+      subjectResource: null,
       extractedTextBlock: null,
       warningMessage: buildUploadProviderFailureCode(
         error,
@@ -752,16 +823,16 @@ async function runAttachmentExtraction(input: {
     result: moderation,
     actorUserId: input.appUserId,
     actorRole: input.appUserRole,
-    conversationId: input.conversationId,
+    conversationId: input.conversation.id,
     attachmentId: input.attachment.id,
     requestContext: {
       requestId: input.requestId,
       route: input.route,
       actorUserId: input.appUserId,
       actorRole: input.appUserRole,
-      conversationId: input.conversationId,
+      conversationId: input.conversation.id,
       attachmentId: input.attachment.id,
-      studentUserId: input.appUserId,
+      studentUserId: input.conversation.student_user_id,
     },
     textPreview: extraction.extractedText?.slice(0, 200) ?? null,
   });
@@ -803,8 +874,19 @@ async function runAttachmentExtraction(input: {
     throw toServiceError("Unable to persist extraction metadata.", updateError);
   }
 
+  const subjectResource = shouldFailExtraction
+    ? null
+    : await upsertSubjectResourceFromReadyAttachment({
+        supabase: admin,
+        conversation: input.conversation,
+        attachment: updatedAttachment as ConversationAttachmentRecord,
+        sha256,
+        createdByUserId: input.appUserId,
+      });
+
   return {
     attachment: updatedAttachment as ConversationAttachmentRecord,
+    subjectResource: subjectResource?.resource ?? null,
     extractedTextBlock: buildExtractedTextBlock({
       filename: input.attachment.original_filename,
       extractedText: shouldFailExtraction ? null : extraction.extractedText,
@@ -863,6 +945,24 @@ export async function confirmUpload(
     (currentAttachment.extraction_status === "ready" &&
       typeof currentAttachment.raw_extracted_text === "string")
   ) {
+    const metadata = normalizeMetadata(currentAttachment.metadata);
+    const existingSha256 =
+      typeof metadata.sha256 === "string" && metadata.sha256.trim()
+        ? metadata.sha256.trim()
+        : null;
+    const subjectResource =
+      currentAttachment.attachment_kind === "pdf" &&
+      currentAttachment.extraction_status === "ready" &&
+      existingSha256
+        ? await upsertSubjectResourceFromReadyAttachment({
+            supabase: admin,
+            conversation,
+            attachment: currentAttachment,
+            sha256: existingSha256,
+            createdByUserId: appUser.id,
+          })
+        : null;
+
     logRuntimeInfo({
       message: "Reused existing attachment extraction result",
       requestId: input.requestId,
@@ -881,6 +981,7 @@ export async function confirmUpload(
     return buildExistingExtractionResult(
       currentAttachment,
       appUser.preferred_ui_language,
+      subjectResource?.resource ?? null,
     );
   }
 
@@ -888,7 +989,7 @@ export async function confirmUpload(
     appUserId: appUser.id,
     appUserRole: "student",
     languageCode: appUser.preferred_ui_language,
-    conversationId: conversation.id,
+    conversation,
     attachment: currentAttachment,
     requestId: input.requestId,
     route: input.route,
@@ -908,7 +1009,7 @@ export async function retryAttachmentExtraction(
     appUserId: appUser.id,
     appUserRole: "student",
     languageCode: appUser.preferred_ui_language,
-    conversationId: conversation.id,
+    conversation,
     attachment,
     requestId: input.requestId,
     route: input.route,

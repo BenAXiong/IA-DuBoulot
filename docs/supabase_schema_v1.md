@@ -43,6 +43,8 @@ Why:
 - `conversations`: session shell and intake metadata
 - `messages`: chronological chat turns
 - `attachments`: uploaded files and raw extraction output
+- `subject_resources`: reusable subject-level uploaded source text promoted from successful PDF extraction
+- `conversation_resource_links`: explicit links between a conversation and selected subject resources
 - `workspace_states`: the editable side-panel state
 - `session_summaries`: audience-specific summary outputs
 
@@ -55,6 +57,7 @@ This avoids a single giant session table and keeps later policy logic easier to 
 - learning-content tables cascade from student-owned roots, so purge jobs can delete account content cleanly
 - `subscriptions`, `audit_logs`, `moderation_events`, and the server-owned `ai_generation_debug_captures` table are structured so limited operational/debug records can survive separately when necessary
 - the current successful-coach debug capture schema addition lives in [`supabase/migrations/20260408000400_ai_generation_debug_captures.sql`](../supabase/migrations/20260408000400_ai_generation_debug_captures.sql)
+- the first subject-wide resource schema addition lives in [`supabase/migrations/20260428000500_subject_resources.sql`](../supabase/migrations/20260428000500_subject_resources.sql)
 
 ### RLS Is Enabled Immediately
 

@@ -158,3 +158,4 @@ Current local status:
 - the canonical storage constants now live in `lib/server/uploads/constants.ts`
 - the current local flow creates real `attachments` rows, signed upload targets, extraction updates, short-lived attachment access URLs, and `needs_manual_review` extraction metadata when extraction confidence is low or partial
 - the upload service now enforces the documented per-MIME byte limits and reuses existing extraction results on repeated confirmation instead of repeating provider work
+- successful PDF extraction now also promotes the result into `subject_resources` keyed by `student_user_id + subject_tag + sha256`, links it to the source conversation through `conversation_resource_links`, and lets later same-subject uploads reuse the ready resource before another provider extraction call

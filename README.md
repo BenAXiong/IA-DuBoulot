@@ -31,6 +31,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Student workbench V1](docs/student_workbench_v1.md)
 - [Student history and summary V1](docs/student_history_summary_v1.md)
 - [Student memory profile V1](docs/student_memory_profile_v1.md)
+- [Subject-wide upload plan](docs/subject_wide_upload_plan.md)
 - [Invitation flows V1](docs/invitation_flows_v1.md)
 - [Oversight surfaces V1](docs/oversight_surfaces_v1.md)
 - [Privacy controls V1](docs/privacy_controls_v1.md)

@@ -24,6 +24,7 @@ export const POST = withRouteErrorHandling(async (request, { requestId }) => {
     data: {
       requestId,
       attachment: result.attachment,
+      subjectResource: result.subjectResource,
       extractedTextBlock: result.extractedTextBlock,
       warningMessage: result.warningMessage,
     },

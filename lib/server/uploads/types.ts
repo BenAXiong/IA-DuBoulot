@@ -2,6 +2,7 @@ import "server-only";
 
 import type { AuthenticatedUserContext } from "@/lib/server/auth/types";
 import type { ConversationAttachmentRecord } from "@/lib/server/ai/types";
+import type { SubjectResourceRecord } from "@/lib/server/subject-resources/types";
 import type { UploadSource } from "@/lib/server/uploads/constants";
 
 export type CreateUploadTargetInput = {
@@ -34,6 +35,7 @@ export type ConfirmUploadInput = {
 
 export type ConfirmUploadResult = {
   attachment: ConversationAttachmentRecord;
+  subjectResource: SubjectResourceRecord | null;
   extractedTextBlock: string | null;
   warningMessage: string | null;
 };

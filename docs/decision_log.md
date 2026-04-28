@@ -18,6 +18,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 
 ## Current Decisions
 
+### D-20260428-05 - Add Durable Subject Resources Before Retrieval
+
+- Date: 2026-04-28
+- Status: accepted
+- Related tasks: `P2.7`
+- Context: Conversation-scoped attachments can store extracted PDF text, but they do not provide a reusable subject-level source library. Re-uploading the same course PDF in later chats would otherwise keep treating the file as a fresh per-chat attachment and could repeat provider extraction work.
+- Decision: Add `subject_resources` and `conversation_resource_links` before implementing chunked retrieval. Successful PDF attachment extraction is promoted into a subject resource keyed by `student_user_id + subject_tag + sha256`, and later same-student, same-subject PDF uploads reuse that ready resource before calling the extraction provider again.
+- Why: This creates the durable extract-once boundary without changing coach prompt behavior yet. It also keeps per-chat resource selection explicit through links, which will support learner toggles and retrieval later.
+- Follow-up: Build chunking, learner-facing toggles, resource deletion semantics, and coach-context retrieval under `P2.7`.
+
 ### D-20260428-04 - Coach Prefers Reviewed Workspace Source Over Raw Attachment Excerpts
 
 - Date: 2026-04-28

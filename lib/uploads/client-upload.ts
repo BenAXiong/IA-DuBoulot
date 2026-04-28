@@ -3,12 +3,14 @@
 import { getClientUploadCopy } from "@/lib/i18n/student-flow-copy";
 import type { ConversationAttachmentRecord } from "@/lib/server/ai/types";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
+import type { SubjectResourceRecord } from "@/lib/server/subject-resources/types";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { UploadSource } from "@/lib/server/uploads/constants";
 import { resolveAttachmentMimeType } from "@/lib/uploads/attachment-policy";
 
 type UploadStepResult = {
   attachment: ConversationAttachmentRecord;
+  subjectResource: SubjectResourceRecord | null;
   extractedTextBlock: string | null;
   warningMessage: string | null;
 };
