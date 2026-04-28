@@ -246,3 +246,4 @@ then close it as:
 | 2026-04-28 | 12:03 -> 12:08 | 0h05 | A7.3.4 P1.3 P2.7 P5.3 | raise PDF-context caps for troubleshooting and usage measurement, document cost and reliability cautions, and outline the subject-wide upload/chunking plan | | |
 | 2026-04-28 | 13:36 -> 13:37 | 0h01 | P1.3 P2.7 P3.1 | confirm where PDF-context cautions are logged and clarify deployment-time conversation persistence expectations | | |
 | 2026-04-28 | 13:53 -> 14:02 | 0h09 | P1.3 P2.7 P3.1 | inspect production conversation fa7390b3-a238-45a3-ae85-1405e0e81cfc for transcript-window fall-out and source-context coverage | | |
+| 2026-04-28 | 14:07 -> 14:07 | 0h00 | P1.3 P2.7 P3.1 | evaluate immediate transcript-window widening versus durable working-memory strategy for unacceptable coach context loss | | |
