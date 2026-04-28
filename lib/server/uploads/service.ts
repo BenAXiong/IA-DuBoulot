@@ -25,6 +25,7 @@ import {
 } from "@/lib/server/usage/service";
 import {
   buildAttachmentUpdateFromSubjectResource,
+  ensureSubjectResourceChunks,
   findReadySubjectResourceByHash,
   linkSubjectResourceToConversation,
   upsertSubjectResourceFromReadyAttachment,
@@ -730,6 +731,10 @@ async function runAttachmentExtraction(input: {
       resourceId: readySubjectResource.id,
       createdByUserId: input.appUserId,
     });
+    const resourceChunks = await ensureSubjectResourceChunks({
+      supabase: admin,
+      resource: readySubjectResource,
+    });
 
     logRuntimeInfo({
       message: "Reused subject resource extraction for attachment",
@@ -744,6 +749,7 @@ async function runAttachmentExtraction(input: {
         conversationId: input.conversation.id,
         subjectResourceId: readySubjectResource.id,
         subjectTag: input.conversation.subject_tag,
+        chunkCount: resourceChunks.length,
       },
     });
 

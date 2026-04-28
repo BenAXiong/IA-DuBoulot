@@ -33,7 +33,27 @@ export type ConversationResourceLinkRecord = {
   updated_at: string;
 };
 
+export type SubjectResourceChunkRecord = {
+  id: string;
+  resource_id: string;
+  student_user_id: string;
+  subject_tag: string;
+  chunk_index: number;
+  stable_chunk_id: string;
+  page_start: number | null;
+  page_end: number | null;
+  section_title: string | null;
+  content: string;
+  char_count: number;
+  token_estimate: number;
+  extraction_confidence: number | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+};
+
 export type SubjectResourceReuseResult = {
   resource: SubjectResourceRecord;
   link: ConversationResourceLinkRecord;
+  chunks: SubjectResourceChunkRecord[];
 };

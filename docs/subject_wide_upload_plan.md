@@ -26,10 +26,20 @@ This first implementation slice is intentionally smaller than the final feature:
 - automatically link the resource to the conversation that introduced or reused it
 - keep the existing attachment UI and coach prompt behavior unchanged
 
+## Slice 2
+
+The second slice adds durable chunk storage without changing coach prompt behavior yet:
+
+- create `subject_resource_chunks` as a child table of `subject_resources`
+- create deterministic chunks after successful PDF extraction or same-hash reuse
+- prefer explicit page markers when present, otherwise use page-count estimates or document-length splits
+- store chunk index, stable chunk ID, page range, optional section title, character count, token estimate, extraction confidence, and chunker metadata
+- keep retrieval, learner toggles, and coach-context injection deferred
+
 ## Deferred
 
 - learner-facing subject resource library and per-chat toggles
-- section-aware chunking and formatting improvements
+- stronger section-aware chunking and formatting improvements
 - lexical retrieval and coach-context injection
 - old-PDF backfill and weak-outline cleanup
 - embeddings

@@ -44,6 +44,7 @@ Why:
 - `messages`: chronological chat turns
 - `attachments`: uploaded files and raw extraction output
 - `subject_resources`: reusable subject-level uploaded source text promoted from successful PDF extraction
+- `subject_resource_chunks`: deterministic text chunks for reusable subject resources, ready for later retrieval
 - `conversation_resource_links`: explicit links between a conversation and selected subject resources
 - `workspace_states`: the editable side-panel state
 - `session_summaries`: audience-specific summary outputs
@@ -58,6 +59,7 @@ This avoids a single giant session table and keeps later policy logic easier to 
 - `subscriptions`, `audit_logs`, `moderation_events`, and the server-owned `ai_generation_debug_captures` table are structured so limited operational/debug records can survive separately when necessary
 - the current successful-coach debug capture schema addition lives in [`supabase/migrations/20260408000400_ai_generation_debug_captures.sql`](../supabase/migrations/20260408000400_ai_generation_debug_captures.sql)
 - the first subject-wide resource schema addition lives in [`supabase/migrations/20260428000500_subject_resources.sql`](../supabase/migrations/20260428000500_subject_resources.sql)
+- the subject-resource chunk schema addition lives in [`supabase/migrations/20260428000600_subject_resource_chunks.sql`](../supabase/migrations/20260428000600_subject_resource_chunks.sql)
 
 ### RLS Is Enabled Immediately
 

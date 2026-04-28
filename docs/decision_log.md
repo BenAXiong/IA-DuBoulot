@@ -1587,3 +1587,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Extend `attachment-extraction` to version `v2` with optional `sourceOutline`, persist it as `attachments.metadata.source_outline` when present, and render it only from stored metadata in the PDF details dropdown.
 - Why: This adds the demo-useful outline affordance for new uploads without a schema migration, without reprocessing old PDFs, and without making ordinary chat turns resend or reparse the PDF.
 - Follow-up: `P2.7` still owns the stronger version: robust outline validation, old-resource backfill or degradation policy, chunking, and retrieval.
+
+### D-20260428-152 - Subject Resources Now Persist Chunks Before Retrieval
+
+- Date: 2026-04-28
+- Status: accepted
+- Related tasks: `P2.7`
+- Context: The first durable subject-resource slice extracted and reused PDFs by subject/hash, but it still stored only full raw text. That was enough to avoid repeated provider extraction, but not enough to support cost-safe retrieval or late-page checks.
+- Decision: Add `subject_resource_chunks` as a child table and create deterministic chunks whenever a ready PDF resource is promoted or reused. The chunker prefers explicit page markers, falls back to page-count estimates when available, and stores page range, optional section title, character count, token estimate, extraction confidence, and chunker metadata.
+- Why: Retrieval should operate over bounded, addressable excerpts instead of repeatedly sending a full long-lived PDF. Persisting chunks before changing the coach prompt makes the next retrieval slice smaller and easier to verify.
+- Follow-up: Add lexical ranking over selected conversation resources, then a late-page-marker regression check proving that content beyond the front of a PDF can be found without full-document prompt injection.

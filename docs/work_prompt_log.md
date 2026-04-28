@@ -260,3 +260,4 @@ then close it as:
 | 2026-04-28 | 16:14 -> 16:22 | 0h08 | P1.3 P2.7 | add optional PDF source-outline extraction for new uploads and tighten PDF details status/pages microcopy | | |
 | 2026-04-28 | 21:56 -> 21:56 | 0h00 | P2.7 | log that extracted PDF structure should be formatted around course sections rather than pages | | |
 | 2026-04-28 | 22:23 -> 22:32 | 0h09 | P2.7 | document the subject-wide upload plan and implement the first durable subject-resource slice | | |
+| 2026-04-28 | 22:41 -> 22:48 | 0h07 | P2.7 | implement the next subject-wide upload slice: deterministic subject-resource chunk storage after extraction/reuse, without retrieval or learner toggles yet | | |

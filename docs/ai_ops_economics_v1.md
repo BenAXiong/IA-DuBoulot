@@ -287,6 +287,7 @@ Implemented reuse:
 
 - repeated upload confirmation reuses the stored extraction result
 - repeated same-student, same-subject PDF uploads can reuse a ready `subject_resources` extraction by `sha256` before another attachment-extraction provider call
+- ready PDF subject resources now create deterministic `subject_resource_chunks`, so the later retrieval slice can select excerpts instead of sending full long-lived PDFs
 - repeated conversation completion reuses the stored student summary and skips another memory refresh
 
 This matters because the most expensive student path is completion, not a single coach turn.
