@@ -275,7 +275,8 @@ Implementation rule:
 - the source and attachment caps were raised to `20,000` chars because common 5-10 page student PDFs can exceed the older front-loaded coach excerpts even when extraction is complete
 - the recent transcript window was raised to `30` messages after a real 24-message conversation showed that earlier student answers could fall out while still visible in the UI; this is an immediate trust fix, not a substitute for durable working memory
 - this is acceptable for measuring real usage on ordinary worksheets, but it is not the final subject-wide document strategy
-- the coach path no longer sends a second copy of extracted attachment text as extra Gemini user-content parts; source text can still appear through both the workspace mirror and prompt attachment context until `P2.7` replaces full-document injection with chunk retrieval
+- the coach path no longer sends a second copy of extracted attachment text as extra Gemini user-content parts
+- when reviewed workspace extracted text exists, ordinary coach turns now include attachment names/statuses but omit full raw attachment excerpts; if the workspace source is empty, attachment extracted text still fills the gap
 - use runtime provider metadata, especially prompt/input tokens, thinking/output tokens, effective model, and estimated cost, before raising broader monthly quotas or treating full-document context as a permanent default
 
 ## Artifact Reuse

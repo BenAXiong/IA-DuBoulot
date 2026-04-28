@@ -68,6 +68,7 @@ export function buildStudentCoachSystemPrompt(input: GenerateCoachReplyInput) {
         workspace: input.workspace,
         messages: input.messages,
         attachments: input.attachments,
+        preferWorkspaceSource: true,
       }),
       "",
       `Intent actuel: ${input.intent}`,

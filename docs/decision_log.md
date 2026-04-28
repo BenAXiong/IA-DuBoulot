@@ -18,6 +18,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 
 ## Current Decisions
 
+### D-20260428-04 - Coach Prefers Reviewed Workspace Source Over Raw Attachment Excerpts
+
+- Date: 2026-04-28
+- Status: accepted
+- Related tasks: `P1.3`, `P2.7`, `P5.3`
+- Context: The live coach prompt could still receive the same PDF-derived text twice when `workspace.edited_extracted_text` already contained useful extracted source text and `attachments.raw_extracted_text` was also injected as full attachment context.
+- Decision: For student coach replies only, prefer reviewed workspace extracted text when it exists. In that case, keep attachment filenames, sizes, kinds, and extraction statuses visible, but omit full raw attachment excerpts from the coach prompt. If the reviewed workspace source is empty, include attachment extracted text as the fallback source.
+- Why: The workspace panel is the current homework's working source, while attachment rows are the canonical stored extraction. This removes a common duplicate without hiding file availability or changing summaries, memory refresh, or attachment extraction behavior.
+- Follow-up: Measure provider input tokens on the same PDF flow after deployment. `P2.7` still needs chunked retrieval and stronger source-selection rules for subject-wide resources.
+
 ### D-20260428-03 - Coach No Longer Sends Duplicate Attachment Text Parts
 
 - Date: 2026-04-28

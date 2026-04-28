@@ -44,16 +44,21 @@ export function getLanguageLabel(languageCode: UiLanguageCode | AiLanguageCode) 
 
 export function buildAttachmentContextLines(
   attachments: ConversationAttachmentRecord[],
+  options?: { includeExtractedText?: boolean },
 ) {
   if (attachments.length === 0) {
     return ["- aucune pièce jointe durable"];
   }
 
+  const includeExtractedText = options?.includeExtractedText ?? true;
+
   return attachments.map((attachment) => {
-    const extractedText = truncateForAiContext(
-      normalizeText(attachment.raw_extracted_text),
-      AI_CONTEXT_LIMITS.attachmentExtractChars,
-    );
+    const extractedText = includeExtractedText
+      ? truncateForAiContext(
+          normalizeText(attachment.raw_extracted_text),
+          AI_CONTEXT_LIMITS.attachmentExtractChars,
+        )
+      : null;
     const extractionState =
       attachment.extraction_status === "ready"
         ? extractedText
@@ -152,8 +157,13 @@ export function buildConversationCoreContext(input: {
   workspace: WorkspaceStateRecord | null;
   messages: ConversationMessageRecord[];
   attachments: ConversationAttachmentRecord[];
+  preferWorkspaceSource?: boolean;
 }) {
   const workspace = buildWorkspaceContext(input.workspace);
+  const hasReviewedSource = workspace.editedExtractedText !== "non renseigné";
+  const includeAttachmentExtractedText = !(
+    input.preferWorkspaceSource && hasReviewedSource
+  );
 
   return [
     `Titre: ${input.conversation.title}`,
@@ -176,7 +186,9 @@ export function buildConversationCoreContext(input: {
     workspace.studentNotes,
     "",
     "Pièces jointes",
-    ...buildAttachmentContextLines(input.attachments),
+    ...buildAttachmentContextLines(input.attachments, {
+      includeExtractedText: includeAttachmentExtractedText,
+    }),
     "",
     "Extrait récent du transcript",
     buildTranscriptExcerpt(input.messages),

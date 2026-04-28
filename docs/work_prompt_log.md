@@ -252,3 +252,4 @@ then close it as:
 | 2026-04-28 | 14:26 -> 14:28 | 0h02 | P1.3 P2.7 P5.3 | remove duplicate coach attachment text parts while preserving extracted-text prompt context, then explain the simplified information flow | | |
 | 2026-04-28 | 14:31 -> 14:31 | 0h00 | P1.3 P2.7 P5.3 | clarify workspace extracted-text mirroring, removed attachment-part cap, and remaining source-context overlap | | |
 | 2026-04-28 | 14:34 -> 14:35 | 0h01 | P1.3 P2.7 P5.3 | decide whether coach prompts should prefer workspace source text or raw attachment extraction in ordinary tutoring turns | | |
+| 2026-04-28 | 14:38 -> 14:39 | 0h01 | P1.3 P2.7 P5.3 | prioritize reviewed workspace extracted text over raw attachment excerpts in coach context when both are available | | |
