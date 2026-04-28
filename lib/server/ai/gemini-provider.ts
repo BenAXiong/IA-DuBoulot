@@ -10,7 +10,6 @@ import {
 import { env } from "@/lib/env";
 import {
   estimateGeminiCostUsd,
-  GEMINI_ATTACHMENT_CONTEXT_LIMIT,
   GEMINI_COACH_MODEL,
   GEMINI_DEFAULT_SAFETY_SETTINGS,
   GEMINI_EXTRACTION_MODEL,
@@ -22,9 +21,7 @@ import {
   GEMINI_UPLOAD_POLL_DELAY_MS,
 } from "@/lib/server/ai/config";
 import {
-  AI_CONTEXT_LIMITS,
   AI_OUTPUT_TOKEN_LIMITS,
-  truncateForAiContext,
 } from "@/lib/server/ai/guardrails";
 import { buildAttachmentExtractionPrompt } from "@/lib/server/ai/prompts/attachment-extraction";
 import { buildConversationTitlePrompt } from "@/lib/server/ai/prompts/conversation-title";
@@ -36,7 +33,6 @@ import type {
   AiProvider,
   AiProviderLogContext,
   AiUsageSnapshot,
-  ConversationAttachmentRecord,
   ExtractAttachmentTextInput,
   ExtractAttachmentTextResult,
   GenerateCoachReplyInput,
@@ -656,24 +652,6 @@ function buildLogDetails(input: {
   };
 }
 
-function buildAttachmentParts(attachments: ConversationAttachmentRecord[]) {
-  return attachments
-    .filter((attachment) => attachment.raw_extracted_text?.trim())
-    .slice(-GEMINI_ATTACHMENT_CONTEXT_LIMIT)
-    .map((attachment) => {
-      const extractedText =
-        truncateForAiContext(
-          attachment.raw_extracted_text,
-          AI_CONTEXT_LIMITS.attachmentPartChars,
-        ) ?? "";
-
-      return [
-        `Piece jointe: ${attachment.original_filename} (${attachment.mime_type})`,
-        extractedText,
-      ].join("\n");
-    });
-}
-
 export class GeminiAiProvider implements AiProvider {
   readonly name = GEMINI_PROVIDER_NAME;
   private readonly client = new GoogleGenAI({
@@ -1279,14 +1257,12 @@ export class GeminiAiProvider implements AiProvider {
     input: GenerateCoachReplyInput,
   ): Promise<GenerateCoachReplyResult> {
     const prompt = buildStudentCoachSystemPrompt(input);
-    const attachmentParts = buildAttachmentParts(input.attachments);
     const response = await this.generateTextResponse({
       model: GEMINI_COACH_MODEL,
       systemInstruction: prompt.instruction,
       contents: createUserContent([
         `Message eleve: ${input.studentMessageText}`,
         `Intent: ${input.intent}`,
-        ...attachmentParts,
       ]),
       requestContext: input.requestContext,
       operation: "coach_reply",

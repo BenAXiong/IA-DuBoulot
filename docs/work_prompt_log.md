@@ -249,3 +249,4 @@ then close it as:
 | 2026-04-28 | 14:07 -> 14:07 | 0h00 | P1.3 P2.7 P3.1 | evaluate immediate transcript-window widening versus durable working-memory strategy for unacceptable coach context loss | | |
 | 2026-04-28 | 14:16 -> 14:18 | 0h02 | P1.3 P2.7 P2.8 P3.1 | raise coach transcript context to 30 messages, document the troubleshooting baseline, and log the working-memory layer for pilot reconsideration | | |
 | 2026-04-28 | 14:22 -> 14:23 | 0h01 | P1.3 P2.7 P5.3 | answer whether the current coach path has a simple lever to limit repeated extracted-text injection | | |
+| 2026-04-28 | 14:26 -> 14:28 | 0h02 | P1.3 P2.7 P5.3 | remove duplicate coach attachment text parts while preserving extracted-text prompt context, then explain the simplified information flow | | |

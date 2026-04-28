@@ -18,6 +18,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 
 ## Current Decisions
 
+### D-20260428-03 - Coach No Longer Sends Duplicate Attachment Text Parts
+
+- Date: 2026-04-28
+- Status: accepted
+- Related tasks: `P1.3`, `P2.7`, `P5.3`
+- Context: After raising PDF/source caps, the coach reply path could send the same extracted attachment text through multiple channels: the workspace source mirror, the prompt attachment context, and extra Gemini user-content text parts. The extra user-content parts did not add new information because the system prompt already included extracted attachment context.
+- Decision: Remove the extra extracted-text attachment parts from `generateCoachReply`. Keep attachment extraction, workspace/source context, prompt attachment context, title snippets, summaries, and memory refresh behavior unchanged.
+- Why: This is the smallest safe reduction in repeated extracted-text injection. It lowers repeated coach input without removing Banban's access to the extracted PDF text.
+- Follow-up: Measure `messages.input_tokens` and provider `usage_snapshot.inputTokens` after deployment. `P2.7` should still replace broad per-turn document injection with chunked, relevant resource retrieval.
+
 ### D-20260428-02 - Coach Transcript Window Raised To 30 Messages
 
 - Date: 2026-04-28
