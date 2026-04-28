@@ -1,9 +1,25 @@
 {
   "version": 1,
-  "updated_at": "2026-03-10",
+  "updated_at": "2026-04-28",
   "notes": [
     "All sample content is fictional and safe for demos, tests, and extraction work.",
     "Every attachment fixture must have a paired extracted-text file and explicit metadata expectations."
+  ],
+  "retrieval_fixtures": [
+    {
+      "fixture_key": "late_page_marker_circuit_fr",
+      "extracted_text_path": "fixtures/homework-samples/extracted/late-page-marker-circuit.txt",
+      "subject_tag": "physique-chimie",
+      "language_code": "fr",
+      "scenario": "late-page marker retrieval",
+      "expected_query": "explique le court-circuit du resume",
+      "expected_marker": "court-circuit",
+      "expected_top_page_min": 6,
+      "notes": [
+        "This fixture guards the regression where only the front of a longer PDF is useful to the coach.",
+        "The top retrieval result must come from page 6 or later for the court-circuit query."
+      ]
+    }
   ],
   "samples": [
     {

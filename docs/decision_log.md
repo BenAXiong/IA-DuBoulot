@@ -1607,3 +1607,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: On each student coach turn, retrieve selected conversation-resource chunks with simple lexical ranking against the current learner message, then inject only a bounded top set into the coach prompt with filename and page or section references. Retrieval can backfill chunks for selected ready resources that predate the chunk table, and it is best-effort and fail-open so it cannot block the homework chat.
 - Why: This is the smallest usable retrieval loop: no embeddings, no learner library UI, and no wholesale resource injection. It gives banban a path to late-page content while keeping token cost bounded and observable through normal provider usage metadata.
 - Follow-up: Add learner-facing resource selection/toggles, retrieval-quality fixtures including a late-page marker, and stronger section-aware chunking once real PDFs show where the deterministic chunker is weak.
+
+### D-20260428-154 - Add A Late-Page Retrieval Guard Before Broad Retrieval Tuning
+
+- Date: 2026-04-28
+- Status: accepted
+- Related tasks: `P2.7`
+- Context: The original PDF issue was not only extraction completeness; the coach-visible context was front-loaded, so later content such as the `court-circuit` section could disappear from the answer path.
+- Decision: Add an extracted-text-only retrieval fixture plus `npm run verify:subject-resource-retrieval`, asserting that a query about `court-circuit` ranks page 6 or later above early pages.
+- Why: This creates a small repeatable guard for the specific failure class before adding broader retrieval evaluation or UI toggles.
+- Follow-up: Replace this narrow script with a richer retrieval-quality suite once the resource library and section-aware chunking stabilize.

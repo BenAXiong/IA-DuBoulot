@@ -1,0 +1,51 @@
+Page 1
+
+Chapitre 21 : Circuit electrique I
+
+Un circuit simple contient un generateur, un recepteur et des fils conducteurs.
+Un dipole est un composant electrique qui possede deux bornes.
+
+Page 2
+
+Generateur et recepteur
+
+Le generateur fournit de l'energie electrique. Une pile convertit une partie de
+l'energie chimique en energie electrique. Un recepteur utilise cette energie.
+
+Page 3
+
+Circuit ouvert et circuit ferme
+
+Pour fonctionner, un circuit doit former une boucle fermee. Quand l'interrupteur
+est ouvert, la lampe ne brille pas car le courant ne peut pas circuler.
+
+Page 4
+
+Circuit en serie
+
+Dans un circuit en serie, les dipoles sont places les uns a la suite des autres.
+Il n'existe qu'une seule boucle pour le courant.
+
+Page 5
+
+Ordre des dipoles
+
+Dans une boucle simple, l'ordre des dipoles ne change pas l'energie fournie a
+chaque recepteur. On peut donc deplacer une lampe dans la boucle sans changer
+son fonctionnement attendu.
+
+Page 6
+
+Court-circuit
+
+Un court-circuit apparait quand le courant dispose d'un chemin de tres faible
+resistance qui contourne un recepteur. La lampe peut alors s'eteindre et le
+generateur peut chauffer dangereusement.
+
+Page 7
+
+Resume
+
+Un circuit electrique doit etre une boucle fermee. En serie, il n'y a qu'une
+seule boucle. Il faut eviter le court-circuit, car il peut provoquer un
+echauffement important du generateur.

@@ -47,11 +47,19 @@ The third slice adds retrieval v1 while keeping the learner library UI deferred:
 - log chunk retrieval counts and selected chunk IDs for troubleshooting
 - fail open if retrieval cannot run, so a missing retrieval context does not block the live homework chat
 
+## Slice 4
+
+The fourth slice adds a small regression fixture for the original late-page failure class:
+
+- add `late_page_marker_circuit_fr` to the sample attachment corpus as an extracted-text retrieval fixture
+- add `npm run verify:subject-resource-retrieval`
+- assert that a query about `court-circuit` ranks page 6 or later above front-loaded PDF content
+
 ## Deferred
 
 - learner-facing subject resource library and per-chat toggles
 - stronger section-aware chunking and formatting improvements
-- stronger retrieval evaluation and late-page-marker fixture tests
+- broader retrieval evaluation beyond the first late-page fixture
 - old-PDF backfill and weak-outline cleanup
 - embeddings
 - provider or local page-aware extraction fallback
