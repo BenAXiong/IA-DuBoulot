@@ -245,3 +245,4 @@ then close it as:
 | 2026-04-28 | 11:49 -> 11:57 | 0h08 | P1.3 P2.7 P5.3 | investigate consistent partial extraction of the attached circuit-course PDF through local PDF inspection, Vercel/API logs, and the current Gemini extraction path | | |
 | 2026-04-28 | 12:03 -> 12:08 | 0h05 | A7.3.4 P1.3 P2.7 P5.3 | raise PDF-context caps for troubleshooting and usage measurement, document cost and reliability cautions, and outline the subject-wide upload/chunking plan | | |
 | 2026-04-28 | 13:36 -> 13:37 | 0h01 | P1.3 P2.7 P3.1 | confirm where PDF-context cautions are logged and clarify deployment-time conversation persistence expectations | | |
+| 2026-04-28 | 13:53 -> 14:02 | 0h09 | P1.3 P2.7 P3.1 | inspect production conversation fa7390b3-a238-45a3-ae85-1405e0e81cfc for transcript-window fall-out and source-context coverage | | |
