@@ -65,6 +65,20 @@ function RetryIcon() {
   );
 }
 
+function InfoIcon() {
+  return (
+    <svg aria-hidden="true" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
+      <path
+        d="M12 11.25v5M12 7.75h.01M20 12a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
 function isPreviewableAttachment(attachment: ConversationAttachmentRecord) {
   return (
     attachment.mime_type.startsWith("image/") ||
@@ -73,13 +87,32 @@ function isPreviewableAttachment(attachment: ConversationAttachmentRecord) {
   );
 }
 
-function isRetriableAttachmentFailure(attachment: ConversationAttachmentRecord) {
-  const metadata =
-    attachment.metadata &&
+function isPdfAttachment(attachment: ConversationAttachmentRecord) {
+  return (
+    attachment.attachment_kind === "pdf" ||
+    attachment.mime_type === "application/pdf"
+  );
+}
+
+function getAttachmentMetadata(attachment: ConversationAttachmentRecord) {
+  return attachment.metadata &&
     typeof attachment.metadata === "object" &&
     !Array.isArray(attachment.metadata)
-      ? (attachment.metadata as Record<string, unknown>)
-      : null;
+    ? (attachment.metadata as Record<string, unknown>)
+    : {};
+}
+
+function getAttachmentSourceSummary(attachment: ConversationAttachmentRecord) {
+  const metadata = getAttachmentMetadata(attachment);
+  const sourceSummary = metadata.source_summary;
+
+  return typeof sourceSummary === "string" && sourceSummary.trim()
+    ? sourceSummary.trim()
+    : null;
+}
+
+function isRetriableAttachmentFailure(attachment: ConversationAttachmentRecord) {
+  const metadata = getAttachmentMetadata(attachment);
 
   return (
     attachment.extraction_status === "failed" &&
@@ -108,6 +141,8 @@ export function StudentConversationSideRail({
     useState<ConversationAttachmentRecord | null>(null);
   const [expandedPreviewAttachment, setExpandedPreviewAttachment] =
     useState<ConversationAttachmentRecord | null>(null);
+  const [openAttachmentDetailsId, setOpenAttachmentDetailsId] =
+    useState<string | null>(null);
   const [subjectUploadsOpen, setSubjectUploadsOpen] = useState(false);
   const [homeworkUploadsOpen, setHomeworkUploadsOpen] = useState(true);
   const [chatMaterialOpen, setChatMaterialOpen] = useState(false);
@@ -130,6 +165,20 @@ export function StudentConversationSideRail({
       setExpandedPreviewAttachment(null);
     }
   }, [attachments, previewAttachment]);
+
+  useEffect(() => {
+    if (!openAttachmentDetailsId) {
+      return;
+    }
+
+    const stillExists = attachments.some(
+      (attachment) => attachment.id === openAttachmentDetailsId,
+    );
+
+    if (!stillExists) {
+      setOpenAttachmentDetailsId(null);
+    }
+  }, [attachments, openAttachmentDetailsId]);
 
   useEffect(() => {
     if (!expandedPreviewAttachment) {
@@ -230,56 +279,127 @@ export function StudentConversationSideRail({
                       const isPending = pendingAttachmentId === attachment.id;
                       const isRetrying = retryingAttachmentId === attachment.id;
                       const isPreviewable = isPreviewableAttachment(attachment);
+                      const isPdf = isPdfAttachment(attachment);
                       const canRetry = isRetriableAttachmentFailure(attachment);
+                      const sourceSummary =
+                        getAttachmentSourceSummary(attachment);
+                      const detailsOpen =
+                        openAttachmentDetailsId === attachment.id;
 
                       return (
                         <div
-                          className="group relative inline-flex max-w-full items-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] pr-8 text-xs text-[color:var(--foreground)]"
+                          className="inline-grid max-w-full gap-2"
                           key={attachment.id}
                         >
-                          {isPreviewable ? (
-                            <button
-                              className="min-w-0 rounded-full px-3 py-1.5 text-left transition hover:text-[color:var(--foreground)]"
-                              onClick={() => setPreviewAttachment(attachment)}
-                              title={copy.previewImage}
-                              type="button"
-                            >
-                              <span className="block max-w-[11rem] truncate">
+                          <div className="group relative inline-flex max-w-full items-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] pr-8 text-xs text-[color:var(--foreground)]">
+                            {isPreviewable ? (
+                              <button
+                                className="min-w-0 rounded-full px-3 py-1.5 text-left transition hover:text-[color:var(--foreground)]"
+                                onClick={() => setPreviewAttachment(attachment)}
+                                title={copy.previewImage}
+                                type="button"
+                              >
+                                <span className="block max-w-[11rem] truncate">
+                                  {attachment.original_filename}
+                                </span>
+                              </button>
+                            ) : (
+                              <span className="block max-w-[11rem] truncate px-3 py-1.5">
                                 {attachment.original_filename}
                               </span>
-                            </button>
-                          ) : (
-                            <span className="block max-w-[11rem] truncate px-3 py-1.5">
-                              {attachment.original_filename}
-                            </span>
-                          )}
-                          {canRetry ? (
+                            )}
+                            {isPdf ? (
+                              <button
+                                aria-expanded={detailsOpen}
+                                aria-label={copy.attachmentDetails}
+                                className="mr-1 inline-flex h-6 w-6 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface)] hover:text-[color:var(--foreground)]"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  setOpenAttachmentDetailsId((currentId) =>
+                                    currentId === attachment.id
+                                      ? null
+                                      : attachment.id,
+                                  );
+                                }}
+                                title={copy.attachmentDetails}
+                                type="button"
+                              >
+                                <InfoIcon />
+                              </button>
+                            ) : null}
+                            {canRetry ? (
+                              <button
+                                aria-label={copy.retryAttachment}
+                                className="mr-1 inline-flex h-6 w-6 items-center justify-center rounded-full text-[color:var(--ink-soft)] opacity-0 transition hover:bg-[color:var(--surface)] hover:text-[color:var(--foreground)] group-hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
+                                disabled={disabled || isRetrying}
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  onRetryAttachment(attachment.id);
+                                }}
+                                title={copy.retryAttachment}
+                                type="button"
+                              >
+                                <RetryIcon />
+                              </button>
+                            ) : null}
                             <button
-                              aria-label={copy.retryAttachment}
-                              className="absolute right-7 inline-flex h-4 w-4 items-center justify-center rounded-full text-[color:var(--ink-soft)] opacity-0 transition hover:text-[color:var(--foreground)] group-hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
-                              disabled={disabled || isRetrying}
+                              aria-label={copy.removeAttachment}
+                              className="absolute right-2 inline-flex h-4 w-4 items-center justify-center rounded-full text-[color:var(--ink-soft)] opacity-0 transition hover:text-[#c95f44] group-hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
+                              disabled={disabled || isPending || isRetrying}
                               onClick={(event) => {
                                 event.stopPropagation();
-                                onRetryAttachment(attachment.id);
+                                void handleRemoveAttachment(attachment.id);
                               }}
-                              title={copy.retryAttachment}
                               type="button"
                             >
-                              <RetryIcon />
+                              <CloseIcon />
                             </button>
+                          </div>
+                          {isPdf && detailsOpen ? (
+                            <div className="w-72 max-w-full rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface)] p-3 text-left text-xs shadow-[0_18px_50px_rgba(15,23,42,0.18)]">
+                              <div className="grid gap-3">
+                                <div className="grid gap-1">
+                                  <p className="text-[0.68rem] font-medium uppercase tracking-[0.16em] text-[color:var(--ink-soft)]">
+                                    {copy.attachmentStatusLabel}
+                                  </p>
+                                  <p className="text-sm text-[color:var(--foreground)]">
+                                    {copy.attachmentStatus[
+                                      attachment.extraction_status
+                                    ]}
+                                  </p>
+                                </div>
+                                <div className="grid gap-1">
+                                  <p className="text-[0.68rem] font-medium uppercase tracking-[0.16em] text-[color:var(--ink-soft)]">
+                                    {copy.attachmentPageCountLabel}
+                                  </p>
+                                  <p className="text-sm text-[color:var(--foreground)]">
+                                    {attachment.page_count
+                                      ? copy.attachmentPageCount(
+                                          attachment.page_count,
+                                        )
+                                      : copy.attachmentPageCountUnavailable}
+                                  </p>
+                                </div>
+                                <div className="grid gap-1">
+                                  <p className="text-[0.68rem] font-medium uppercase tracking-[0.16em] text-[color:var(--ink-soft)]">
+                                    {copy.attachmentSummaryLabel}
+                                  </p>
+                                  <p className="text-sm leading-5 text-[color:var(--foreground)]">
+                                    {sourceSummary ??
+                                      copy.attachmentSummaryUnavailable}
+                                  </p>
+                                </div>
+                                <div className="grid gap-1">
+                                  <p className="text-[0.68rem] font-medium uppercase tracking-[0.16em] text-[color:var(--ink-soft)]">
+                                    {copy.attachmentStructureLabel}
+                                  </p>
+                                  <p className="text-sm leading-5 text-[color:var(--ink-soft)]">
+                                    {copy.attachmentStructureUnavailable}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
                           ) : null}
-                          <button
-                            aria-label={copy.removeAttachment}
-                            className="absolute right-2 inline-flex h-4 w-4 items-center justify-center rounded-full text-[color:var(--ink-soft)] opacity-0 transition hover:text-[#c95f44] group-hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
-                            disabled={disabled || isPending || isRetrying}
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              void handleRemoveAttachment(attachment.id);
-                            }}
-                            type="button"
-                          >
-                            <CloseIcon />
-                          </button>
                         </div>
                       );
                     })}

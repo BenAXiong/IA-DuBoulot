@@ -773,6 +773,7 @@ async function runAttachmentExtraction(input: {
     : extraction.needsManualReview || (extraction.confidenceScore ?? 0) < 0.55
       ? buildPartialExtractionWarningMessage(input.languageCode)
       : null;
+  const sourceSummary = extraction.sourceSummary?.trim() || null;
 
   const { data: updatedAttachment, error: updateError } = await admin
     .from("attachments")
@@ -789,6 +790,7 @@ async function runAttachmentExtraction(input: {
         ocr_confidence: extraction.confidenceScore,
         detected_language: extraction.detectedLanguage,
         needs_manual_review: extraction.needsManualReview,
+        source_summary: sourceSummary,
       },
     })
     .eq("id", input.attachment.id)

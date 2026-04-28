@@ -86,6 +86,7 @@ Recommended canonical keys:
 | `ocr_confidence` | number | no | optional normalized confidence score |
 | `detected_language` | string | no | source language guess when available |
 | `needs_manual_review` | boolean | no | whether the extracted text should be treated as partial or low-confidence |
+| `source_summary` | string or null | no | short provider-generated summary of the uploaded file, used for lightweight learner-facing PDF details |
 | `preview_generated` | boolean | no | whether a preview artifact exists |
 
 Rules:

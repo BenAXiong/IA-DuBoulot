@@ -847,6 +847,23 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       noFilesUploaded: "Aucun fichier uploadé",
       removeAttachment: "Retirer",
       retryAttachment: "Relancer l'analyse",
+      attachmentDetails: "Détails du PDF",
+      attachmentStatusLabel: "État",
+      attachmentPageCountLabel: "Pages",
+      attachmentSummaryLabel: "Résumé du fichier",
+      attachmentStructureLabel: "Structure",
+      attachmentSummaryUnavailable:
+        "Aucun résumé court n'est encore disponible pour ce fichier.",
+      attachmentStructureUnavailable:
+        "La structure par pages et sections sera ajoutée plus tard.",
+      attachmentPageCountUnavailable: "Nombre de pages indisponible",
+      attachmentPageCount: (pageCount: number) =>
+        pageCount === 1 ? "1 page" : `${pageCount} pages`,
+      attachmentStatus: {
+        pending: "Analyse en cours",
+        ready: "Texte extrait",
+        failed: "Analyse à relancer",
+      },
       removeAttachmentConfirm:
         "Retirer ce fichier de cette discussion ?",
       completeConfirm:
@@ -916,6 +933,23 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       noFilesUploaded: "No files uploaded",
       removeAttachment: "Remove",
       retryAttachment: "Retry analysis",
+      attachmentDetails: "PDF details",
+      attachmentStatusLabel: "Status",
+      attachmentPageCountLabel: "Pages",
+      attachmentSummaryLabel: "File summary",
+      attachmentStructureLabel: "Structure",
+      attachmentSummaryUnavailable:
+        "No short summary is available for this file yet.",
+      attachmentStructureUnavailable:
+        "The page and section structure will be added later.",
+      attachmentPageCountUnavailable: "Page count unavailable",
+      attachmentPageCount: (pageCount: number) =>
+        pageCount === 1 ? "1 page" : `${pageCount} pages`,
+      attachmentStatus: {
+        pending: "Analysis in progress",
+        ready: "Text extracted",
+        failed: "Analysis needs retry",
+      },
       removeAttachmentConfirm:
         "Remove this file from this conversation?",
       completeConfirm:
@@ -981,6 +1015,20 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       noFilesUploaded: "尚未上傳檔案",
       removeAttachment: "移除",
       retryAttachment: "重新分析",
+      attachmentDetails: "PDF 詳細資訊",
+      attachmentStatusLabel: "狀態",
+      attachmentPageCountLabel: "頁數",
+      attachmentSummaryLabel: "檔案摘要",
+      attachmentStructureLabel: "結構",
+      attachmentSummaryUnavailable: "這個檔案目前還沒有短摘要。",
+      attachmentStructureUnavailable: "頁面與章節結構之後會補上。",
+      attachmentPageCountUnavailable: "頁數不可用",
+      attachmentPageCount: (pageCount: number) => `${pageCount} 頁`,
+      attachmentStatus: {
+        pending: "分析中",
+        ready: "文字已擷取",
+        failed: "需要重新分析",
+      },
       removeAttachmentConfirm:
         "要把這個檔案從這段對話中移除嗎？",
       completeConfirm:

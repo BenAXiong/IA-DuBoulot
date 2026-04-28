@@ -1557,3 +1557,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Replace the fixed retry sleep with jittered exponential backoff and separate retry budgets per operation. Keep a larger retry budget for attachment extraction than for coach replies, and stop retrying the same model when a suspicious output is explicitly marked `MAX_TOKENS`.
 - Why: Extraction is the most outage-prone synchronous path and benefits from patient retries. Coach replies already have a secondary Flash fallback, so repeatedly hammering Pro after a cap-shaped failure only adds load and latency without solving the underlying issue. Treating `MAX_TOKENS` as a cap or prompt-shape problem first makes the retry policy better aligned with the failure evidence.
 - Follow-up: Watch the next extraction and coach-reply logs in production. If `503` clusters still happen, add a short circuit-breaker or queueing layer on extraction next. If `MAX_TOKENS` remains common on coach replies, reduce prompt/context size or revisit the output cap before widening retries again.
+
+### D-20260428-150 - PDF Pill Details Use Stored Extraction Metadata Only
+
+- Date: 2026-04-28
+- Status: accepted
+- Related tasks: `P1.3`, `P2.7`
+- Context: The student workbench needed a quick PDF-preview affordance for the demo, but the app does not yet have subject-wide document chunking, page-level resource indexing, or durable PDF outline storage.
+- Decision: Add a lightweight PDF details dropdown from the existing attachment pill that reads only stored attachment metadata: extraction status, `page_count`, and a new compact `metadata.source_summary` value persisted from the existing Gemini extraction result for new uploads.
+- Why: This gives learners a low-risk way to confirm what a PDF probably contains without re-reading the file, widening the coach prompt, or pretending that the app already has a reliable page/section table of contents.
+- Follow-up: Keep structured page/section outlines under `P2.7`, alongside extract-once storage, chunking, relevance retrieval, and graceful behavior for older or weakly structured attachments.
