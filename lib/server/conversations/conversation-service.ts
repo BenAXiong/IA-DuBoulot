@@ -34,6 +34,7 @@ import type {
 } from "@/lib/server/ai/types";
 import { getAiProvider } from "@/lib/server/ai/provider";
 import { refreshStudentMemoryFromConversationCompletion } from "@/lib/server/memory/service";
+import { retrieveSubjectResourceContextForCoach } from "@/lib/server/subject-resources/service";
 import { generateConversationSummaries } from "@/lib/server/summaries/service";
 import {
   moderateAssistantOutput,
@@ -1211,6 +1212,7 @@ export async function appendConversationTurn(input: {
   let titleUsage: AiUsageSnapshot | null = null;
   let successfulAiReply: GenerateCoachReplyResult | null = null;
   let nextConversationTitle = conversation.title;
+  let subjectResourceContext: string | null = null;
   const hasSuccessfulAssistantReply = ((messages ?? []) as ConversationMessageRecord[]).some(
     (message) =>
       message.role === "assistant" &&
@@ -1222,11 +1224,58 @@ export async function appendConversationTurn(input: {
 
   if (inputModeration.status !== "blocked") {
     try {
+      try {
+        const resourceRetrieval = await retrieveSubjectResourceContextForCoach({
+          supabase,
+          conversationId: input.conversationId,
+          queryText: studentMessageText,
+        });
+        subjectResourceContext = resourceRetrieval.contextText;
+
+        if (resourceRetrieval.selectedResourceCount > 0) {
+          logRuntimeInfo({
+            message: "Retrieved subject resource chunks for coach context",
+            requestId: input.requestId,
+            route: input.route,
+            method: "POST",
+            actorUserId: appUser.id,
+            actorRole: appUser.role,
+            targetStudentUserId: appUser.id,
+            details: {
+              conversationId: input.conversationId,
+              selectedResourceCount: resourceRetrieval.selectedResourceCount,
+              retrievedChunkCount: resourceRetrieval.chunks.length,
+              retrievedChunkIds: resourceRetrieval.chunks.map(
+                (chunk) => chunk.stable_chunk_id,
+              ),
+            },
+          });
+        }
+      } catch (error) {
+        logRuntimeInfo({
+          message: "Skipped subject resource retrieval for coach context",
+          requestId: input.requestId,
+          route: input.route,
+          method: "POST",
+          actorUserId: appUser.id,
+          actorRole: appUser.role,
+          targetStudentUserId: appUser.id,
+          details: {
+            conversationId: input.conversationId,
+            reason:
+              error instanceof Error
+                ? error.message
+                : "subject_resource_retrieval_failed",
+          },
+        });
+      }
+
       const aiReply = await aiProvider.generateCoachReply({
         conversation,
         workspace: workspace ?? null,
         messages: (messages ?? []) as ConversationMessageRecord[],
         attachments: (attachments ?? []) as ConversationAttachmentRecord[],
+        subjectResourceContext,
         studentMessageText,
         intent: input.payload.intent,
         replyMode: input.payload.replyMode,

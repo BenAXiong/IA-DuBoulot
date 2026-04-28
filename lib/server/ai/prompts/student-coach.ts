@@ -68,6 +68,7 @@ export function buildStudentCoachSystemPrompt(input: GenerateCoachReplyInput) {
         workspace: input.workspace,
         messages: input.messages,
         attachments: input.attachments,
+        subjectResourceContext: input.subjectResourceContext,
         preferWorkspaceSource: true,
       }),
       "",

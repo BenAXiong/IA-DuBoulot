@@ -159,4 +159,5 @@ Current local status:
 - the current local flow creates real `attachments` rows, signed upload targets, extraction updates, short-lived attachment access URLs, and `needs_manual_review` extraction metadata when extraction confidence is low or partial
 - the upload service now enforces the documented per-MIME byte limits and reuses existing extraction results on repeated confirmation instead of repeating provider work
 - successful PDF extraction now also promotes the result into `subject_resources` keyed by `student_user_id + subject_tag + sha256`, links it to the source conversation through `conversation_resource_links`, and lets later same-subject uploads reuse the ready resource before another provider extraction call
-- ready subject resources now also get deterministic `subject_resource_chunks` rows for later retrieval; the current coach prompt does not read those chunks yet
+- ready subject resources now also get deterministic `subject_resource_chunks` rows for retrieval
+- selected conversation resources now contribute bounded top chunk excerpts to the coach prompt through lexical retrieval; raw long-lived resource text is not injected wholesale

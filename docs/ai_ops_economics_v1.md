@@ -156,7 +156,7 @@ Current access model:
 ### Student Coach
 
 - route: `POST /api/conversations/[conversationId]/messages`
-- prompt version: `student-coach-v6`
+- prompt version: `student-coach-v7`
 - current primary model: `gemini-2.5-pro`
 - current fallback model for recoverable coach-reply failures: `gemini-2.5-flash`
 - context inputs:
@@ -259,6 +259,9 @@ Current AI context caps:
 | draft answer text | `1,800` chars |
 | student notes | `1,200` chars |
 | attachment extracted text in prompt context | `20,000` chars |
+| subject-resource retrieved chunks | `4` chunks |
+| each subject-resource chunk excerpt | `1,400` chars |
+| total subject-resource retrieval context | `6,500` chars |
 | recent transcript messages | `30` |
 | each transcript message excerpt | `600` chars |
 | summaries used for memory generation | `5` |
@@ -277,6 +280,7 @@ Implementation rule:
 - this is acceptable for measuring real usage on ordinary worksheets, but it is not the final subject-wide document strategy
 - the coach path no longer sends a second copy of extracted attachment text as extra Gemini user-content parts
 - when reviewed workspace extracted text exists, ordinary coach turns now include attachment names/statuses but omit full raw attachment excerpts; if the workspace source is empty, attachment extracted text still fills the gap
+- when a conversation has selected subject resources, the coach prompt now receives only top lexical chunk matches with page or section refs, not the whole subject PDF
 - use runtime provider metadata, especially prompt/input tokens, thinking/output tokens, effective model, and estimated cost, before raising broader monthly quotas or treating full-document context as a permanent default
 
 ## Artifact Reuse
@@ -288,6 +292,7 @@ Implemented reuse:
 - repeated upload confirmation reuses the stored extraction result
 - repeated same-student, same-subject PDF uploads can reuse a ready `subject_resources` extraction by `sha256` before another attachment-extraction provider call
 - ready PDF subject resources now create deterministic `subject_resource_chunks`, so the later retrieval slice can select excerpts instead of sending full long-lived PDFs
+- selected conversation resources now contribute only the top lexical chunk excerpts to coach context
 - repeated conversation completion reuses the stored student summary and skips another memory refresh
 
 This matters because the most expensive student path is completion, not a single coach turn.

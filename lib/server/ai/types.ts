@@ -55,6 +55,7 @@ export type GenerateCoachReplyInput = {
   workspace: WorkspaceStateRecord | null;
   messages: ConversationMessageRecord[];
   attachments: ConversationAttachmentRecord[];
+  subjectResourceContext: string | null;
   studentMessageText: string;
   intent: ConversationActionIntent;
   replyMode: StudentReplyMode;

@@ -1597,3 +1597,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Add `subject_resource_chunks` as a child table and create deterministic chunks whenever a ready PDF resource is promoted or reused. The chunker prefers explicit page markers, falls back to page-count estimates when available, and stores page range, optional section title, character count, token estimate, extraction confidence, and chunker metadata.
 - Why: Retrieval should operate over bounded, addressable excerpts instead of repeatedly sending a full long-lived PDF. Persisting chunks before changing the coach prompt makes the next retrieval slice smaller and easier to verify.
 - Follow-up: Add lexical ranking over selected conversation resources, then a late-page-marker regression check proving that content beyond the front of a PDF can be found without full-document prompt injection.
+
+### D-20260428-153 - Coach Context Uses Selected Resource Chunk Retrieval
+
+- Date: 2026-04-28
+- Status: accepted
+- Related tasks: `P2.7`
+- Context: Subject resources and chunks existed, but the live coach prompt still depended on workspace text and attachment excerpts. That avoided repeated extraction but did not yet solve the main prompt-shape problem for long-lived PDFs.
+- Decision: On each student coach turn, retrieve selected conversation-resource chunks with simple lexical ranking against the current learner message, then inject only a bounded top set into the coach prompt with filename and page or section references. Retrieval can backfill chunks for selected ready resources that predate the chunk table, and it is best-effort and fail-open so it cannot block the homework chat.
+- Why: This is the smallest usable retrieval loop: no embeddings, no learner library UI, and no wholesale resource injection. It gives banban a path to late-page content while keeping token cost bounded and observable through normal provider usage metadata.
+- Follow-up: Add learner-facing resource selection/toggles, retrieval-quality fixtures including a late-page marker, and stronger section-aware chunking once real PDFs show where the deterministic chunker is weak.

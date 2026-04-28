@@ -36,11 +36,22 @@ The second slice adds durable chunk storage without changing coach prompt behavi
 - store chunk index, stable chunk ID, page range, optional section title, character count, token estimate, extraction confidence, and chunker metadata
 - keep retrieval, learner toggles, and coach-context injection deferred
 
+## Slice 3
+
+The third slice adds retrieval v1 while keeping the learner library UI deferred:
+
+- read only resources selected through `conversation_resource_links`
+- lexically rank stored chunks against the current learner message
+- include only a bounded set of top chunk excerpts in the coach prompt, with filename and page or section references
+- backfill chunks for selected ready resources if they were promoted before chunk rows existed
+- log chunk retrieval counts and selected chunk IDs for troubleshooting
+- fail open if retrieval cannot run, so a missing retrieval context does not block the live homework chat
+
 ## Deferred
 
 - learner-facing subject resource library and per-chat toggles
 - stronger section-aware chunking and formatting improvements
-- lexical retrieval and coach-context injection
+- stronger retrieval evaluation and late-page-marker fixture tests
 - old-PDF backfill and weak-outline cleanup
 - embeddings
 - provider or local page-aware extraction fallback

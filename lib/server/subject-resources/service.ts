@@ -6,9 +6,15 @@ import type { ConversationRecord } from "@/lib/server/conversations/types";
 import type {
   ConversationResourceLinkRecord,
   SubjectResourceChunkRecord,
+  SubjectResourceRetrievalChunk,
+  SubjectResourceRetrievalResult,
   SubjectResourceRecord,
   SubjectResourceReuseResult,
 } from "@/lib/server/subject-resources/types";
+import {
+  AI_CONTEXT_LIMITS,
+  truncateForAiContext,
+} from "@/lib/server/ai/guardrails";
 
 const SUBJECT_RESOURCE_SELECT =
   "id, student_user_id, created_by_user_id, subject_tag, source_attachment_id, source_conversation_id, source_storage_bucket, source_storage_path, attachment_kind, mime_type, original_filename, byte_size, page_count, extraction_status, raw_extracted_text, source_language, sha256, metadata, created_at, updated_at";
@@ -34,6 +40,10 @@ function metadataString(metadata: Record<string, unknown>, key: string) {
 function metadataNumber(metadata: Record<string, unknown>, key: string) {
   const value = metadata[key];
   return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function metadataBoolean(metadata: Record<string, unknown>, key: string) {
+  return metadata[key] === true;
 }
 
 function normalizeText(text: string) {
@@ -299,6 +309,294 @@ export async function ensureSubjectResourceChunks(input: {
   }
 
   return replaceSubjectResourceChunks(input);
+}
+
+const LEXICAL_STOPWORDS = new Set([
+  "a",
+  "ai",
+  "au",
+  "aux",
+  "avec",
+  "ce",
+  "ces",
+  "cette",
+  "dans",
+  "de",
+  "des",
+  "du",
+  "elle",
+  "en",
+  "est",
+  "et",
+  "faire",
+  "je",
+  "la",
+  "le",
+  "les",
+  "me",
+  "mon",
+  "ma",
+  "mes",
+  "nous",
+  "on",
+  "ou",
+  "pour",
+  "que",
+  "qui",
+  "sur",
+  "tu",
+  "un",
+  "une",
+  "the",
+  "and",
+  "for",
+  "with",
+  "what",
+  "why",
+  "how",
+  "can",
+  "you",
+]);
+
+function tokenizeForLexicalSearch(value: string) {
+  const normalized = value
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase();
+  const tokens = normalized.match(/[\p{L}\p{N}]{3,}/gu) ?? [];
+
+  return Array.from(
+    new Set(tokens.filter((token) => !LEXICAL_STOPWORDS.has(token))),
+  ).slice(0, 24);
+}
+
+function countOccurrences(haystack: string, needle: string) {
+  let count = 0;
+  let index = haystack.indexOf(needle);
+
+  while (index !== -1) {
+    count += 1;
+    index = haystack.indexOf(needle, index + needle.length);
+  }
+
+  return count;
+}
+
+function scoreChunk(input: {
+  chunk: SubjectResourceChunkRecord;
+  resource: SubjectResourceRecord;
+  tokens: string[];
+  normalizedQuery: string;
+}) {
+  const chunkText = `${input.chunk.section_title ?? ""}\n${input.chunk.content}`
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase();
+  const filenameText = input.resource.original_filename
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase();
+  let score = 0;
+
+  for (const token of input.tokens) {
+    const contentHits = countOccurrences(chunkText, token);
+    const filenameHits = countOccurrences(filenameText, token);
+    score += contentHits * 3 + filenameHits;
+
+    if (input.chunk.section_title?.toLowerCase().includes(token)) {
+      score += 2;
+    }
+  }
+
+  if (
+    input.normalizedQuery.length >= 24 &&
+    chunkText.includes(input.normalizedQuery.slice(0, 80))
+  ) {
+    score += 8;
+  }
+
+  const metadata = normalizeMetadata(input.chunk.metadata);
+  if (metadataBoolean(metadata, "manual_pin")) {
+    score += 3;
+  }
+
+  return score;
+}
+
+function formatPageRange(chunk: SubjectResourceChunkRecord) {
+  if (chunk.page_start && chunk.page_end && chunk.page_start !== chunk.page_end) {
+    return `pages ${chunk.page_start}-${chunk.page_end}`;
+  }
+
+  if (chunk.page_start) {
+    return `page ${chunk.page_start}`;
+  }
+
+  return "page inconnue";
+}
+
+function formatRetrievedChunks(chunks: SubjectResourceRetrievalChunk[]) {
+  if (chunks.length === 0) {
+    return null;
+  }
+
+  return chunks
+    .map((chunk, index) => {
+      const excerpt =
+        truncateForAiContext(
+          chunk.content,
+          AI_CONTEXT_LIMITS.subjectResourceChunkChars,
+        ) ?? "";
+      const section = chunk.section_title ? ` | ${chunk.section_title}` : "";
+      const summary = chunk.resource_summary
+        ? `\n  Résumé ressource: ${chunk.resource_summary}`
+        : "";
+
+      return [
+        `[R${index + 1}] ${chunk.resource_filename} | ${formatPageRange(chunk)}${section}`,
+        summary,
+        `  Extrait: ${excerpt}`,
+      ]
+        .filter(Boolean)
+        .join("\n");
+    })
+    .join("\n\n");
+}
+
+export async function retrieveSubjectResourceContextForCoach(input: {
+  supabase: SupabaseClient;
+  conversationId: string;
+  queryText: string;
+}): Promise<SubjectResourceRetrievalResult> {
+  const { data: links, error: linksError } = await input.supabase
+    .from("conversation_resource_links")
+    .select("resource_id")
+    .eq("conversation_id", input.conversationId)
+    .eq("selected", true);
+
+  if (linksError) {
+    throw linksError;
+  }
+
+  const resourceIds = Array.from(
+    new Set(
+      ((links ?? []) as Array<{ resource_id: string | null }>)
+        .map((link) => link.resource_id)
+        .filter((resourceId): resourceId is string => Boolean(resourceId)),
+    ),
+  );
+
+  if (resourceIds.length === 0) {
+    return {
+      contextText: null,
+      chunks: [],
+      selectedResourceCount: 0,
+    };
+  }
+
+  const [resourcesResult, chunksResult] = await Promise.all([
+    input.supabase
+      .from("subject_resources")
+      .select(SUBJECT_RESOURCE_SELECT)
+      .in("id", resourceIds),
+    input.supabase
+      .from("subject_resource_chunks")
+      .select(SUBJECT_RESOURCE_CHUNK_SELECT)
+      .in("resource_id", resourceIds)
+      .order("chunk_index", { ascending: true }),
+  ]);
+
+  if (resourcesResult.error) {
+    throw resourcesResult.error;
+  }
+
+  if (chunksResult.error) {
+    throw chunksResult.error;
+  }
+
+  const resources = ((resourcesResult.data ?? []) as SubjectResourceRecord[]).reduce(
+    (acc, resource) => acc.set(resource.id, resource),
+    new Map<string, SubjectResourceRecord>(),
+  );
+  const existingChunks = (chunksResult.data ?? []) as SubjectResourceChunkRecord[];
+  const resourceIdsWithChunks = new Set(
+    existingChunks.map((chunk) => chunk.resource_id),
+  );
+  const resourcesMissingChunks = Array.from(resources.values()).filter(
+    (resource) =>
+      resource.extraction_status === "ready" &&
+      resource.raw_extracted_text &&
+      !resourceIdsWithChunks.has(resource.id),
+  );
+  const backfilledChunks =
+    resourcesMissingChunks.length > 0
+      ? (
+          await Promise.all(
+            resourcesMissingChunks.map((resource) =>
+              ensureSubjectResourceChunks({
+                supabase: input.supabase,
+                resource,
+              }),
+            ),
+          )
+        ).flat()
+      : [];
+  const chunks = [...existingChunks, ...backfilledChunks];
+  const tokens = tokenizeForLexicalSearch(input.queryText);
+  const normalizedQuery = input.queryText
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase()
+    .trim();
+  const scoredChunks = chunks
+    .map((chunk) => {
+      const resource = resources.get(chunk.resource_id);
+
+      if (!resource) {
+        return null;
+      }
+
+      return {
+        ...chunk,
+        resource_filename: resource.original_filename,
+        resource_summary: metadataString(
+          normalizeMetadata(resource.metadata),
+          "source_summary",
+        ),
+        score: scoreChunk({
+          chunk,
+          resource,
+          tokens,
+          normalizedQuery,
+        }),
+      } satisfies SubjectResourceRetrievalChunk;
+    })
+    .filter((chunk): chunk is SubjectResourceRetrievalChunk => Boolean(chunk))
+    .sort((a, b) => {
+      if (b.score !== a.score) {
+        return b.score - a.score;
+      }
+
+      if (a.resource_id !== b.resource_id) {
+        return a.resource_id.localeCompare(b.resource_id);
+      }
+
+      return a.chunk_index - b.chunk_index;
+    });
+  const selectedChunks =
+    scoredChunks.some((chunk) => chunk.score > 0)
+      ? scoredChunks
+      : scoredChunks.slice().sort((a, b) => a.chunk_index - b.chunk_index);
+  const topChunks = selectedChunks.slice(
+    0,
+    AI_CONTEXT_LIMITS.subjectResourceChunkCount,
+  );
+
+  return {
+    contextText: formatRetrievedChunks(topChunks),
+    chunks: topChunks,
+    selectedResourceCount: resourceIds.length,
+  };
 }
 
 async function upsertConversationResourceLink(input: {
