@@ -173,6 +173,10 @@ Status note: summary iteration now also uses the existing completion route as th
 ### P6 Post-Pilot Candidate Backlog
 
 - [ ] P6.1 Optionally add an explicit "promote to subject doc" action for chat-only uploads from the workspace, after Pilot evidence shows learners need a shortcut. This must remain opt-in and must not silently convert chat attachments into long-lived subject docs.
+- [ ] P6.2 Evaluate embeddings or a stronger retrieval/reranking layer for subject resources only after `P2.7.12` token-impact and retrieval-quality data show lexical retrieval is insufficient.
+- [ ] P6.3 Add stronger section-aware chunking for subject resources so chunks follow real course sections, methods, exercises, definitions, or headings instead of only page estimates and lightweight first-line title inference.
+- [ ] P6.4 Decide whether to run an old-PDF subject-resource backfill. Only implement it after an explicit product/ops choice on cost, user value, failure handling, and whether old weak outlines/chunks should be updated automatically or left untouched.
+- [ ] P6.5 If old-PDF backfill is approved, implement it as a bounded operator/admin job with progress logs, retry limits, weak-outline handling, and no silent learner-visible semantic changes.
 
 ## Working Method
 

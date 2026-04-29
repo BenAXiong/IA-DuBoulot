@@ -102,9 +102,20 @@ The fourth slice adds regression fixtures for the original retrieval failure cla
 ## Deferred
 
 - stronger section-aware chunking beyond the lightweight heading/title inference now in place
-- old-PDF backfill and weak-outline cleanup
 - embeddings
+- optional chat-to-subject promotion from the workspace
+- old-PDF backfill and weak-outline cleanup only if explicitly approved after Pilot evidence
 - provider or local page-aware extraction fallback
+
+## Post-Pilot Candidate Tasks
+
+These follow-ups are tracked in [Pilot_todo](pilot_todo.md) under `P6` so they do not disappear as vague "later" notes:
+
+- `P6.1`: optional explicit chat-to-subject promotion from the workspace, opt-in only
+- `P6.2`: evaluate embeddings or stronger retrieval/reranking after real lexical-retrieval evidence
+- `P6.3`: stronger section-aware chunking around course structure rather than page estimates alone
+- `P6.4`: decide whether old-PDF backfill is worth the cost and operational risk
+- `P6.5`: implement old-PDF backfill only if approved, as a bounded operator/admin job
 
 ## Slice 5
 

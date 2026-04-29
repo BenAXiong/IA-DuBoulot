@@ -276,3 +276,4 @@ then close it as:
 | 2026-04-29 | 17:45 -> 17:53 | 0h08 | P2.7.11 | define and implement subject-resource unlink/delete/purge behavior while keeping adult/tutor visibility limited to conversation-linked resources | | |
 | 2026-04-29 | 17:55 -> 18:03 | 0h08 | P2.7.12 | expand subject-resource retrieval evaluation, observability, and real token-impact measurement | | |
 | 2026-04-29 | 22:12 -> 22:12 | 0h00 | A0.3.7 | close the previous subject-resource work session at 18:03 and reopen a fresh execution trace | | |
+| 2026-04-29 | 22:13 -> 22:14 | 0h01 | P6.1 P6.2 P6.3 P6.4 P6.5 | log post-pilot subject-resource follow-ups for embeddings, stronger section chunking, chat-to-subject promotion, and optional old-PDF backfill | | |
