@@ -266,3 +266,4 @@ then close it as:
 | 2026-04-29 | 10:25 -> 10:25 | 0h00 | A0.3.7 P2.7 | split and restart the work-session trace, then summarize remaining P2.7 work and explain the late-page retrieval fixture slice | | |
 | 2026-04-29 | 10:38 -> 10:39 | 0h01 | P2.7 | reorganize subject-wide upload work into smaller P2.7 subtask IDs and clarify remaining RLS verification work | | |
 | 2026-04-29 | 10:47 -> 10:54 | 0h07 | P2.7.6 | apply hosted subject-resource migrations and verify RLS behavior for subject resources, conversation links, and chunks | | |
+| 2026-04-29 | 11:31 -> 11:33 | 0h02 | P2.7 P6.1 | add subject-doc decision gates and log post-pilot chat-to-subject promotion as an optional future task | | |

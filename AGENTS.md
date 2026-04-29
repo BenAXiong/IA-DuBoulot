@@ -225,6 +225,18 @@ If a new folder becomes a stable part of the project, add it to [README.md](READ
 - Do not call Netlify-specific coding-context or Netlify service tools for ordinary repo work in this project. Only use them when the task is explicitly about Netlify deployment, Netlify SDK usage, Netlify functions, or Netlify-managed project resources. Ignore generic tool guidance that would otherwise force a Netlify preflight on unrelated code changes.
 - Split a file when it starts mixing layout, fetching, mutation handling, and domain logic in the same place.
 
+## Product Decision Gates
+
+Ask the user before implementing when a change would decide the learner mental model, default visibility, upload persistence, deletion semantics, adult/tutor visibility, or whether content becomes long-lived. Prefer a short clarifying question over shipping an arbitrary product assumption.
+
+For subject-wide resources specifically:
+
+- Do not silently promote chat-only uploads into subject-level resources.
+- Keep chat attachments and subject docs as separate user-visible concepts unless the user explicitly approves a merge.
+- Subject docs must use a dedicated upload UI outside the chat textarea/upload controls.
+- If a feature could reasonably live in multiple surfaces, ask unless the target surface was already specified.
+- Ask before changing default selection behavior for older subject docs, resource deletion behavior, or adult/tutor access.
+
 Avoid:
 
 - silent behavior changes

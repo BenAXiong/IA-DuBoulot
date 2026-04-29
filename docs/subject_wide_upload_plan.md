@@ -16,6 +16,30 @@ Related: [README](../README.md) | [Pilot_todo](pilot_todo.md) | [Storage and att
 - Never send long-lived PDFs wholesale on every message.
 - Test the late-page-marker case so a PDF can be proven retrievable beyond the first pages.
 
+## Product Decisions And Gates
+
+Current decisions:
+
+- Shorthand: use `subject docs` in planning conversation, `subject resources` in code/docs where it maps to the existing schema, and learner-facing copy such as `Sources` or `Ressources` in UI.
+- Subject docs are distinct from chat-only uploads. Chat-only upload tools must stay chat-only.
+- Subject docs must have a dedicated upload UI outside the chat textarea/upload controls.
+- Do not silently promote chat attachments into subject resources during the Pilot.
+- Subject-doc upload should support at least PDF, TXT, MD, JSON, DOC, and DOCX when the extraction path supports them safely.
+- The learner-facing library and per-conversation toggles can be batched: the subject page and the live chat should both expose relevant subject docs, with chat-level selected/unselected state.
+- Older subject docs should be visible but not auto-selected for a new conversation unless the learner chooses them.
+- A subject doc uploaded from a subject/chat resource context can be selected for that current context, but that is different from promoting a chat-only attachment.
+- Outlines and summaries are separate. If a structure outline is unavailable or poor, the UI should omit the outline or say structure is unavailable; it should not turn the outline into a summary.
+- Do not reprocess old PDFs solely to improve outlines during the current Pilot slice.
+
+Ask before implementing if a future change would:
+
+- merge chat-only attachments with subject docs
+- change whether uploads become long-lived by default
+- change old-resource auto-selection defaults
+- change unlink/delete/purge semantics
+- widen parent/tutor visibility beyond conversation-linked resources
+- introduce a new surface for subject docs that was not already specified
+
 ## Task Breakdown
 
 `P2.7` is now an umbrella task in [Pilot_todo](pilot_todo.md), split into smaller subject-wide upload subtasks:

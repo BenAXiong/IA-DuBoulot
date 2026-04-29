@@ -159,6 +159,10 @@ Status note: the first `P5.1` hotspot audit flags six areas as the highest-value
 Status note: `P5.3` now has a first foundation. The current prompt families are inventoried in `docs/ai_prompt_registry_v1.md`, generated from `lib/server/ai/prompt-registry.json` plus live version constants in `lib/server/ai/prompts/shared.ts`, and synced by `scripts/sync-prompt-registry.mjs`. `P5.3` remains open because this still needs stronger enforcement and later coverage if the prompt surface expands beyond the current seven families.
 Status note: summary iteration now also uses the existing completion route as the single regeneration surface in development. A non-production-only summary-regenerate control can explicitly bypass stored-summary reuse for testing, instead of introducing a second summary-specific endpoint that would be harder to govern.
 
+### P6 Post-Pilot Candidate Backlog
+
+- [ ] P6.1 Optionally add an explicit "promote to subject doc" action for chat-only uploads from the workspace, after Pilot evidence shows learners need a shortcut. This must remain opt-in and must not silently convert chat attachments into long-lived subject docs.
+
 ## Working Method
 
 For each pilot slice record:

@@ -1637,3 +1637,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Add `20260429000700_subject_resource_policy_recursion.sql`, replacing the recursive `FOR ALL` manage policies with explicit insert, update, and delete policies while leaving separate select policies in charge of read access.
 - Why: The product needs adults to see conversation-linked resources without gaining full subject-library management, and the policies must enforce that without recursive SELECT evaluation.
 - Follow-up: Keep future RLS policy changes covered by the hosted fixture scripts before building learner-facing subject-resource UI.
+
+### D-20260429-03 - Add Decision Gates For Subject Docs
+
+- Date: 2026-04-29
+- Status: accepted
+- Related tasks: `P2.7`, `P6.1`
+- Context: The subject-wide upload work has product choices that should not be made silently by future implementation agents, especially around whether documents become long-lived, where upload UI lives, and whether chat attachments can become subject docs.
+- Decision: Add explicit decision gates to `AGENTS.md` and `docs/subject_wide_upload_plan.md`. Subject docs are a separate concept from chat-only uploads, require dedicated UI outside the chat textarea, and must not be silently promoted from chat attachments during Pilot. A future chat-to-subject promotion action is logged only as an optional post-Pilot task.
+- Why: The user prefers follow-up questions over arbitrary product assumptions for learner mental model, persistence, visibility, deletion, and adult/tutor access choices.
+- Follow-up: Before implementing `P2.7.7` to `P2.7.10`, ask if any remaining UI placement or semantics are unclear instead of filling gaps by default.
