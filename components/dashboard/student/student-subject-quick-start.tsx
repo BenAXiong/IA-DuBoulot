@@ -281,6 +281,44 @@ function renderConversationRows(input: {
   );
 }
 
+function renderSubjectTabPanel(input: {
+  activeTab: SubjectQuickStartTab;
+  conversations: ListConversationSummary[];
+  initialSubjectResources: SubjectResourceLibraryItem[];
+  languageCode: UiLanguageCode;
+  subjectTag: string;
+  copy: ReturnType<typeof getQuickStartCopy>;
+}) {
+  if (input.activeTab === "resources") {
+    return (
+      <StudentSubjectResourceLibrary
+        initialResources={input.initialSubjectResources}
+        languageCode={input.languageCode}
+        subjectTag={input.subjectTag}
+      />
+    );
+  }
+
+  if (input.activeTab === "instructions") {
+    return (
+      <p className="text-sm leading-7 text-[color:var(--ink-soft)]">
+        {input.copy.noInstructions}
+      </p>
+    );
+  }
+
+  return input.conversations.length === 0 ? (
+    <p className="text-sm leading-7 text-[color:var(--ink-soft)]">
+      {input.copy.noSubjectChats}
+    </p>
+  ) : (
+    renderConversationRows({
+      conversations: input.conversations,
+      languageCode: input.languageCode,
+    })
+  );
+}
+
 export function StudentSubjectQuickStart({
   initialDraft = null,
   subjectTag,
@@ -636,29 +674,15 @@ export function StudentSubjectQuickStart({
           })}
         </div>
 
-        <div role="tabpanel">
-          {activeTab === "history" ? (
-            conversations.length === 0 ? (
-              <p className="text-sm leading-7 text-[color:var(--ink-soft)]">
-                {copy.noSubjectChats}
-              </p>
-            ) : (
-              renderConversationRows({
-                conversations,
-                languageCode,
-              })
-            )
-          ) : activeTab === "resources" ? (
-            <StudentSubjectResourceLibrary
-              initialResources={initialSubjectResources}
-              languageCode={languageCode}
-              subjectTag={subjectTag}
-            />
-          ) : (
-            <p className="text-sm leading-7 text-[color:var(--ink-soft)]">
-              {copy.noInstructions}
-            </p>
-          )}
+        <div key={activeTab} role="tabpanel">
+          {renderSubjectTabPanel({
+            activeTab,
+            conversations,
+            initialSubjectResources,
+            languageCode,
+            subjectTag,
+            copy,
+          })}
         </div>
       </section>
     </div>
