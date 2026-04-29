@@ -25,7 +25,7 @@ Related: [README](../README.md) | [Pilot_todo](pilot_todo.md) | [Storage and att
 - `P2.7.3` deterministic chunk storage
 - `P2.7.4` retrieval v1 into coach context
 - `P2.7.5` first late-page retrieval regression guard
-- `P2.7.6` hosted migration and RLS verification
+- `P2.7.6` hosted migration and RLS verification (complete)
 - `P2.7.7` learner-facing subject resource library UI
 - `P2.7.8` per-conversation resource toggles
 - `P2.7.9` upload entry points and chat-only versus subject-saved semantics

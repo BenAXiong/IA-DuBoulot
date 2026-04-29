@@ -1627,3 +1627,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Keep `P2.7` as the umbrella and split the remaining work into `P2.7.1` through `P2.7.12`, marking the already-shipped plan, storage, chunking, retrieval v1, and late-page fixture slices complete.
 - Why: Smaller task IDs make future commits and sessions easier to audit, and separate product UI work from backend retrieval and safety checks.
 - Follow-up: Use the narrower subtask IDs in future commits, especially `P2.7.6` for hosted migration/RLS verification and `P2.7.7` to `P2.7.9` for learner-facing subject-wide upload UX.
+
+### D-20260429-02 - Split Subject-Resource Manage Policies Away From SELECT
+
+- Date: 2026-04-29
+- Status: accepted
+- Related tasks: `P2.7.6`
+- Context: Hosted RLS verification for the new subject-resource tables caught an infinite recursion error when selecting `subject_resources`. The cause was that `FOR ALL` manage policies on related resource-link and chunk tables also applied during SELECT and could join back through `subject_resources`.
+- Decision: Add `20260429000700_subject_resource_policy_recursion.sql`, replacing the recursive `FOR ALL` manage policies with explicit insert, update, and delete policies while leaving separate select policies in charge of read access.
+- Why: The product needs adults to see conversation-linked resources without gaining full subject-library management, and the policies must enforce that without recursive SELECT evaluation.
+- Follow-up: Keep future RLS policy changes covered by the hosted fixture scripts before building learner-facing subject-resource UI.

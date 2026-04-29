@@ -60,6 +60,7 @@ This avoids a single giant session table and keeps later policy logic easier to 
 - the current successful-coach debug capture schema addition lives in [`supabase/migrations/20260408000400_ai_generation_debug_captures.sql`](../supabase/migrations/20260408000400_ai_generation_debug_captures.sql)
 - the first subject-wide resource schema addition lives in [`supabase/migrations/20260428000500_subject_resources.sql`](../supabase/migrations/20260428000500_subject_resources.sql)
 - the subject-resource chunk schema addition lives in [`supabase/migrations/20260428000600_subject_resource_chunks.sql`](../supabase/migrations/20260428000600_subject_resource_chunks.sql)
+- the subject-resource RLS recursion fix lives in [`supabase/migrations/20260429000700_subject_resource_policy_recursion.sql`](../supabase/migrations/20260429000700_subject_resource_policy_recursion.sql)
 
 ### RLS Is Enabled Immediately
 

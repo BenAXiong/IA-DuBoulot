@@ -198,6 +198,126 @@ async function main() {
     throw attachmentError;
   }
 
+  const { error: subjectResourcesError } = await admin.from("subject_resources").insert([
+    {
+      id: FIXTURE.ids.subjectResourceLinked,
+      student_user_id: userIds.student,
+      created_by_user_id: userIds.student,
+      subject_tag: "mathematiques",
+      source_attachment_id: FIXTURE.ids.attachment,
+      source_conversation_id: FIXTURE.ids.conversation,
+      source_storage_bucket: FIXTURE.buckets.homeworkAttachments,
+      source_storage_path: fixtureAttachmentPath(userIds.student),
+      attachment_kind: "pdf",
+      mime_type: "application/pdf",
+      original_filename: "fractions-course-resource.pdf",
+      byte_size: 182341,
+      page_count: 2,
+      extraction_status: "ready",
+      raw_extracted_text:
+        "Page 1\nFractions et partage.\nPage 2\nVerifier que chaque ami recoit trois quarts.",
+      source_language: "fr",
+      sha256: "fixture-linked-subject-resource-sha256",
+      metadata: {
+        fixture_tag: FIXTURE.tag,
+        source_summary: "Ressource liee a la conversation fixture.",
+        extraction_engine: "fixture-parser",
+        extraction_version: "v1",
+        ocr_confidence: 0.98,
+      },
+    },
+    {
+      id: FIXTURE.ids.subjectResourceUnlinked,
+      student_user_id: userIds.student,
+      created_by_user_id: userIds.student,
+      subject_tag: "mathematiques",
+      source_attachment_id: null,
+      source_conversation_id: null,
+      source_storage_bucket: null,
+      source_storage_path: null,
+      attachment_kind: "pdf",
+      mime_type: "application/pdf",
+      original_filename: "private-subject-library-only.pdf",
+      byte_size: 98432,
+      page_count: 1,
+      extraction_status: "ready",
+      raw_extracted_text:
+        "Private library-only resource that should not be visible through adult conversation review.",
+      source_language: "fr",
+      sha256: "fixture-unlinked-subject-resource-sha256",
+      metadata: {
+        fixture_tag: FIXTURE.tag,
+        source_summary: "Ressource non liee a une conversation.",
+        extraction_engine: "fixture-parser",
+        extraction_version: "v1",
+        ocr_confidence: 0.96,
+      },
+    },
+  ]);
+
+  if (subjectResourcesError) {
+    throw subjectResourcesError;
+  }
+
+  const { error: resourceLinkError } = await admin
+    .from("conversation_resource_links")
+    .insert({
+      id: FIXTURE.ids.subjectResourceLink,
+      conversation_id: FIXTURE.ids.conversation,
+      resource_id: FIXTURE.ids.subjectResourceLinked,
+      created_by_user_id: userIds.student,
+      selected: true,
+    });
+
+  if (resourceLinkError) {
+    throw resourceLinkError;
+  }
+
+  const { error: resourceChunksError } = await admin.from("subject_resource_chunks").insert([
+    {
+      id: FIXTURE.ids.subjectResourceChunkLinked,
+      resource_id: FIXTURE.ids.subjectResourceLinked,
+      student_user_id: userIds.student,
+      subject_tag: "mathematiques",
+      chunk_index: 0,
+      stable_chunk_id: "fixture-linked-p2-c0",
+      page_start: 2,
+      page_end: 2,
+      section_title: "Fractions partagees",
+      content: "Chaque ami recoit trois quarts lorsque 3 tartes sont partagees en 4.",
+      char_count: 72,
+      token_estimate: 18,
+      extraction_confidence: 0.98,
+      metadata: {
+        fixture_tag: FIXTURE.tag,
+        chunking_strategy: "fixture",
+      },
+    },
+    {
+      id: FIXTURE.ids.subjectResourceChunkUnlinked,
+      resource_id: FIXTURE.ids.subjectResourceUnlinked,
+      student_user_id: userIds.student,
+      subject_tag: "mathematiques",
+      chunk_index: 0,
+      stable_chunk_id: "fixture-unlinked-p1-c0",
+      page_start: 1,
+      page_end: 1,
+      section_title: "Private library-only",
+      content: "This unlinked subject resource chunk should not be visible to linked adults.",
+      char_count: 75,
+      token_estimate: 19,
+      extraction_confidence: 0.96,
+      metadata: {
+        fixture_tag: FIXTURE.tag,
+        chunking_strategy: "fixture",
+      },
+    },
+  ]);
+
+  if (resourceChunksError) {
+    throw resourceChunksError;
+  }
+
   const { error: workspaceError } = await admin.from("workspace_states").insert({
     id: FIXTURE.ids.workspaceState,
     conversation_id: FIXTURE.ids.conversation,

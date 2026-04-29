@@ -203,6 +203,67 @@ async function main() {
       assert(deleteData.id === temporaryConversationId, "Student delete did not remove temp row");
     });
 
+    await check("student manages own subject resources, links, and chunks", async () => {
+      const resources = await expectRows(
+        student.client
+          .from("subject_resources")
+          .select("id, original_filename")
+          .in("id", [
+            FIXTURE.ids.subjectResourceLinked,
+            FIXTURE.ids.subjectResourceUnlinked,
+          ])
+          .order("original_filename", { ascending: true }),
+        "Student subject resource query failed",
+      );
+
+      assert(resources.length === 2, `Student saw ${resources.length} subject resources instead of 2`);
+
+      const link = await expectMaybeSingle(
+        student.client
+          .from("conversation_resource_links")
+          .select("id, selected")
+          .eq("id", FIXTURE.ids.subjectResourceLink),
+        "Student could not read conversation resource link",
+      );
+
+      assert(link.selected === true, "Fixture resource link should start selected");
+
+      const { data: updatedLink, error: updateError } = await student.client
+        .from("conversation_resource_links")
+        .update({ selected: false })
+        .eq("id", FIXTURE.ids.subjectResourceLink)
+        .select("id, selected")
+        .single();
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      assert(updatedLink.selected === false, "Student could not update own resource link selection");
+
+      const { error: restoreLinkError } = await adminClient
+        .from("conversation_resource_links")
+        .update({ selected: true })
+        .eq("id", FIXTURE.ids.subjectResourceLink);
+
+      if (restoreLinkError) {
+        throw restoreLinkError;
+      }
+
+      const chunks = await expectRows(
+        student.client
+          .from("subject_resource_chunks")
+          .select("id, resource_id")
+          .in("id", [
+            FIXTURE.ids.subjectResourceChunkLinked,
+            FIXTURE.ids.subjectResourceChunkUnlinked,
+          ]),
+        "Student subject resource chunk query failed",
+      );
+
+      assert(chunks.length === 2, `Student saw ${chunks.length} chunks instead of 2`);
+    });
+
     await check("parent reads linked child user/profile/conversation", async () => {
       const childUser = await expectMaybeSingle(
         parent.client
@@ -291,6 +352,60 @@ async function main() {
       }
 
       assert(Array.isArray(data) && data.length === 0, "Parent update unexpectedly affected a row");
+    });
+
+    await check("parent only sees conversation-linked subject resources and chunks", async () => {
+      await expectMaybeSingle(
+        parent.client
+          .from("subject_resources")
+          .select("id, original_filename")
+          .eq("id", FIXTURE.ids.subjectResourceLinked),
+        "Parent could not read linked subject resource",
+      );
+
+      await expectNoRow(
+        parent.client
+          .from("subject_resources")
+          .select("id")
+          .eq("id", FIXTURE.ids.subjectResourceUnlinked),
+        "Parent unexpectedly saw unlinked subject resource",
+      );
+
+      await expectMaybeSingle(
+        parent.client
+          .from("conversation_resource_links")
+          .select("id, selected")
+          .eq("id", FIXTURE.ids.subjectResourceLink),
+        "Parent could not read linked conversation-resource row",
+      );
+
+      await expectMaybeSingle(
+        parent.client
+          .from("subject_resource_chunks")
+          .select("id, page_start")
+          .eq("id", FIXTURE.ids.subjectResourceChunkLinked),
+        "Parent could not read linked resource chunk",
+      );
+
+      await expectNoRow(
+        parent.client
+          .from("subject_resource_chunks")
+          .select("id")
+          .eq("id", FIXTURE.ids.subjectResourceChunkUnlinked),
+        "Parent unexpectedly saw unlinked subject resource chunk",
+      );
+
+      const { data, error } = await parent.client
+        .from("conversation_resource_links")
+        .update({ selected: false })
+        .eq("id", FIXTURE.ids.subjectResourceLink)
+        .select("id");
+
+      if (error) {
+        throw error;
+      }
+
+      assert(Array.isArray(data) && data.length === 0, "Parent update unexpectedly changed resource link");
     });
 
     await check("tutor reads linked child conversation", async () => {
@@ -388,6 +503,40 @@ async function main() {
       assert(deleteData.id === temporaryNoteId, "Tutor delete did not remove temp note");
     });
 
+    await check("tutor only sees conversation-linked subject resources and chunks", async () => {
+      await expectMaybeSingle(
+        tutor.client
+          .from("subject_resources")
+          .select("id, original_filename")
+          .eq("id", FIXTURE.ids.subjectResourceLinked),
+        "Tutor could not read linked subject resource",
+      );
+
+      await expectNoRow(
+        tutor.client
+          .from("subject_resources")
+          .select("id")
+          .eq("id", FIXTURE.ids.subjectResourceUnlinked),
+        "Tutor unexpectedly saw unlinked subject resource",
+      );
+
+      await expectMaybeSingle(
+        tutor.client
+          .from("subject_resource_chunks")
+          .select("id, page_start")
+          .eq("id", FIXTURE.ids.subjectResourceChunkLinked),
+        "Tutor could not read linked resource chunk",
+      );
+
+      await expectNoRow(
+        tutor.client
+          .from("subject_resource_chunks")
+          .select("id")
+          .eq("id", FIXTURE.ids.subjectResourceChunkUnlinked),
+        "Tutor unexpectedly saw unlinked subject resource chunk",
+      );
+    });
+
     await check("admin reads moderation events, audit logs, and subscriptions", async () => {
       await expectMaybeSingle(
         admin.client
@@ -412,6 +561,19 @@ async function main() {
           .eq("id", FIXTURE.ids.subscription),
         "Admin could not read subscription",
       );
+
+      const resources = await expectRows(
+        admin.client
+          .from("subject_resources")
+          .select("id")
+          .in("id", [
+            FIXTURE.ids.subjectResourceLinked,
+            FIXTURE.ids.subjectResourceUnlinked,
+          ]),
+        "Admin subject resource query failed",
+      );
+
+      assert(resources.length === 2, "Admin could not read all fixture subject resources");
     });
 
     await check("admin can update student conversation", async () => {

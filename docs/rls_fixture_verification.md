@@ -53,6 +53,7 @@ The seed script creates one safe demo dataset with:
 - one moderation event
 - one audit log row
 - one memory profile and multiple memory items
+- one linked subject resource, one unlinked subject resource, one conversation-resource link, and one chunk per resource
 
 It also ensures the canonical private buckets exist:
 
@@ -94,6 +95,10 @@ The verification script currently checks that:
 - tutor can create and delete own tutor notes
 - admin can read moderation events, audit logs, and subscriptions
 - admin can update a student conversation through RLS-backed authenticated access
+- student can read and manage own subject resources, conversation-resource links, and chunks
+- parent and tutor can read conversation-linked subject resources and chunks, but not the unlinked subject-library-only resource
+- parent cannot update the conversation-resource link selection
+- admin can read all fixture subject resources
 
 The student-flow smoke script currently checks that:
 
@@ -171,6 +176,9 @@ The tablet-emulation smoke script currently checks that:
 - 2026-03-11 local tablet-emulation smoke: success against a temporary local `next start` instance for `/app`, the subject-level homework launcher on `/app?view=homework&subject=...`, and `/app/conversations/[conversationId]`, with no horizontal overflow or detected sub-`44x44` controls on those checked student surfaces
 - 2026-03-11 local `npm run regress:mvp`: success across typecheck, lint, build, deterministic fixture reseed, hosted RLS verification, and the full non-device smoke suite
 - 2026-03-11 deployed billing verification: success on `https://ia-du-boulot.vercel.app` with real Lemon test-mode checkout open, completed payment, redirect back to `/app`, parent dashboard subscription visibility, Lemon confirmation email, and Lemon dashboard order logging
+- 2026-04-29 hosted subject-resource migration push: success for `20260428000500`, `20260428000600`, and the recursion-fix migration `20260429000700`
+- 2026-04-29 hosted reseed: success with linked and unlinked subject-resource fixtures
+- 2026-04-29 hosted RLS verification: `20` checks passed, `0` failed, including subject-resource, conversation-resource-link, and chunk visibility
 
 ## Scope Notes
 

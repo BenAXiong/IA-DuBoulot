@@ -50,6 +50,11 @@ export const FIXTURE = {
     auditLog: "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
     memoryItemStrength: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
     memoryItemWeakness: "ffffffff-ffff-4fff-8fff-ffffffffffff",
+    subjectResourceLinked: "12121212-1212-4212-8212-121212121212",
+    subjectResourceUnlinked: "13131313-1313-4313-8313-131313131313",
+    subjectResourceLink: "14141414-1414-4414-8414-141414141414",
+    subjectResourceChunkLinked: "15151515-1515-4515-8515-151515151515",
+    subjectResourceChunkUnlinked: "16161616-1616-4616-8616-161616161616",
   },
   buckets: {
     homeworkAttachments: "homework-attachments",
@@ -108,6 +113,11 @@ export async function listFixtureAuthUsers(adminClient) {
 
 export async function deleteFixtureRows(adminClient) {
   const fixedIdDeletes = [
+    ["subject_resource_chunks", FIXTURE.ids.subjectResourceChunkLinked],
+    ["subject_resource_chunks", FIXTURE.ids.subjectResourceChunkUnlinked],
+    ["conversation_resource_links", FIXTURE.ids.subjectResourceLink],
+    ["subject_resources", FIXTURE.ids.subjectResourceLinked],
+    ["subject_resources", FIXTURE.ids.subjectResourceUnlinked],
     ["moderation_events", FIXTURE.ids.moderationEvent],
     ["audit_logs", FIXTURE.ids.auditLog],
     ["session_summaries", FIXTURE.ids.summaryStudent],
