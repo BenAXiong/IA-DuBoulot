@@ -144,6 +144,7 @@ The learner-facing coach path now has one dedicated debug sink for successful re
 - table: `public.ai_generation_debug_captures`
 - scope: successful `coach_reply` generations only
 - stored fields: conversation and message references, request metadata, provider/model, prompt version, reply mode, raw successful provider text, final learner-visible text, usage snapshot, and lightweight coach metadata including requested model plus any fallback model
+- subject-resource retrieval diagnostics now live in `metadata.subjectResourceRetrieval` when selected subject resources were considered for the coach reply; the diagnostics include counts, token estimates, fallback state, and chunk refs, but not raw retrieved chunk text
 
 Current access model:
 
@@ -208,6 +209,7 @@ Current access model:
 - subject-resource cap note:
   - subject resources are extract-once and retrieved by stored chunks, so Pilot allows provider-extracted PDF/DOC/DOCX subject resources up to `50 MB` while chat-only PDF attachments keep their existing cap
   - measure the real impact through provider usage metadata plus stored `messages.input_tokens` and `messages.output_tokens` before raising caps again
+  - `npm run report:subject-resource-token-impact -- --days=14 --limit=500` summarizes successful coach turns from `ai_generation_debug_captures`, joins persisted assistant-message token counts when available, and compares turns with and without subject-resource retrieval diagnostics
 
 ### Session Summaries
 
@@ -286,6 +288,7 @@ Implementation rule:
 - the coach path no longer sends a second copy of extracted attachment text as extra Gemini user-content parts
 - when reviewed workspace extracted text exists, ordinary coach turns now include attachment names/statuses but omit full raw attachment excerpts; if the workspace source is empty, attachment extracted text still fills the gap
 - when a conversation has selected subject resources, the coach prompt now receives only top lexical chunk matches with page or section refs, not the whole subject PDF
+- successful coach-reply debug captures record subject-resource retrieval diagnostics alongside the real provider usage snapshot, so token impact can be measured after deployment without adding another schema table
 - use runtime provider metadata, especially prompt/input tokens, thinking/output tokens, effective model, and estimated cost, before raising broader monthly quotas or treating full-document context as a permanent default
 
 ## Artifact Reuse

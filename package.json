@@ -14,6 +14,7 @@
     "sync:prompt-registry": "node scripts/sync-prompt-registry.mjs",
     "verify:prompt-registry": "node scripts/sync-prompt-registry.mjs --check",
     "verify:subject-resource-retrieval": "node scripts/verify-subject-resource-retrieval.mjs",
+    "report:subject-resource-token-impact": "node --env-file=.env.local scripts/report-subject-resource-token-impact.mjs",
     "seed:rls-fixtures": "node --env-file=.env.local scripts/seed-rls-fixtures.mjs",
     "verify:rls-fixtures": "node --env-file=.env.local scripts/verify-rls-fixtures.mjs",
     "smoke:student-flow": "node --env-file=.env.local scripts/smoke-student-flow.mjs",

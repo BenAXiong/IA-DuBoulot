@@ -70,8 +70,28 @@ export type SubjectResourceRetrievalChunk = SubjectResourceChunkRecord & {
   score: number;
 };
 
+export type SubjectResourceRetrievalDiagnostics = {
+  selectedResourceCount: number;
+  candidateChunkCount: number;
+  scoredChunkCount: number;
+  returnedChunkCount: number;
+  queryTokenCount: number;
+  contextCharCount: number;
+  estimatedContextTokens: number;
+  fallbackToFirstChunks: boolean;
+  chunkRefs: Array<{
+    resourceId: string;
+    stableChunkId: string;
+    pageStart: number | null;
+    pageEnd: number | null;
+    tokenEstimate: number;
+    score: number;
+  }>;
+};
+
 export type SubjectResourceRetrievalResult = {
   contextText: string | null;
   chunks: SubjectResourceRetrievalChunk[];
   selectedResourceCount: number;
+  diagnostics: SubjectResourceRetrievalDiagnostics;
 };

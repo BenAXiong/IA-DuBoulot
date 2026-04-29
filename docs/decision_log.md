@@ -1687,3 +1687,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Treat the full subject-resource library as student/admin controlled. Parents and tutors can read only resources linked to conversations they are already allowed to review. Learners can unselect a resource for retrieval, unlink it from a conversation, or delete it from the subject library. Deleting a subject resource removes the row, raw extracted text, chunks, and conversation links; it removes private storage only when the subject resource owns that uploaded object. Resources promoted from chat attachments do not delete the original attachment storage.
 - Why: This keeps adult/tutor review consistent with existing conversation review access, avoids silent deletion of chat attachments, and gives learners enough lifecycle control without introducing parent/tutor management semantics too early.
 - Follow-up: Revisit adult/tutor subject-library browse or management only after a separate product decision, and include audit/notification expectations if adults ever gain mutation rights.
+
+### D-20260429-07 - Measure Subject-Resource Retrieval Impact Through Debug Captures And Stored Tokens
+
+- Date: 2026-04-29
+- Status: accepted
+- Related tasks: `P2.7.12`
+- Context: Subject resources now inject bounded retrieved chunks into coach context, but Pilot needs evidence about retrieval quality and token impact before embeddings, higher caps, or broader subject-doc use.
+- Decision: Add structured retrieval diagnostics to `retrieveSubjectResourceContextForCoach`, write them into successful `coach_reply` debug captures under `metadata.subjectResourceRetrieval`, and keep `messages.input_tokens` plus `messages.output_tokens` as the persisted real provider-token source. Add an operator report script that joins debug captures to assistant message token rows and compares turns with and without subject-resource retrieval.
+- Why: This gives a low-risk measurement loop without adding another schema table or changing learner behavior. Runtime logs can explain which chunks were selected, while stored messages keep the provider-reported token data needed for cost sizing.
+- Follow-up: After deployment, run `npm run report:subject-resource-token-impact -- --days=14 --limit=500` against production data before deciding whether lexical retrieval is good enough or embeddings are justified.

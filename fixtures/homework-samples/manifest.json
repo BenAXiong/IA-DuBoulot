@@ -19,6 +19,34 @@
         "This fixture guards the regression where only the front of a longer PDF is useful to the coach.",
         "The top retrieval result must come from page 6 or later for the court-circuit query."
       ]
+    },
+    {
+      "fixture_key": "middle_section_circuit_serie_fr",
+      "extracted_text_path": "fixtures/homework-samples/extracted/late-page-marker-circuit.txt",
+      "subject_tag": "physique-chimie",
+      "language_code": "fr",
+      "scenario": "middle-section retrieval",
+      "expected_query": "combien de boucles dans un circuit en serie",
+      "expected_marker": "une seule boucle",
+      "expected_top_page_min": 4,
+      "expected_top_page_max": 4,
+      "notes": [
+        "This fixture checks that ordinary section-level queries do not only hit the end-of-document summary."
+      ]
+    },
+    {
+      "fixture_key": "middle_section_ordre_dipoles_fr",
+      "extracted_text_path": "fixtures/homework-samples/extracted/late-page-marker-circuit.txt",
+      "subject_tag": "physique-chimie",
+      "language_code": "fr",
+      "scenario": "specific concept retrieval",
+      "expected_query": "est-ce que l'ordre des dipoles change l'energie fournie",
+      "expected_marker": "l'ordre des dipoles ne change pas l'energie",
+      "expected_top_page_min": 5,
+      "expected_top_page_max": 5,
+      "notes": [
+        "This fixture checks that a precise concept lands on the specific lesson page rather than the first matching overview."
+      ]
     }
   ],
   "samples": [

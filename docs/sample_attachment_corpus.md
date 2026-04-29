@@ -33,6 +33,8 @@ Contents:
 | Fixture key | Extracted text | Subject | Check |
 | --- | --- | --- | --- |
 | `late_page_marker_circuit_fr` | `fixtures/homework-samples/extracted/late-page-marker-circuit.txt` | `physique-chimie` | `npm run verify:subject-resource-retrieval` verifies that a `court-circuit` query ranks page 6 or later above front-loaded content |
+| `middle_section_circuit_serie_fr` | `fixtures/homework-samples/extracted/late-page-marker-circuit.txt` | `physique-chimie` | verifies that a `circuit en série` query lands on page 4 rather than the summary |
+| `middle_section_ordre_dipoles_fr` | `fixtures/homework-samples/extracted/late-page-marker-circuit.txt` | `physique-chimie` | verifies that a precise `ordre des dipôles` query lands on page 5 |
 
 ## Rules
 

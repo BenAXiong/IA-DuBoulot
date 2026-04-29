@@ -38,6 +38,7 @@ import {
   listSubjectResourceLibraryForStudent,
   retrieveSubjectResourceContextForCoach,
 } from "@/lib/server/subject-resources/service";
+import type { SubjectResourceRetrievalDiagnostics } from "@/lib/server/subject-resources/types";
 import { generateConversationSummaries } from "@/lib/server/summaries/service";
 import {
   moderateAssistantOutput,
@@ -1229,6 +1230,8 @@ export async function appendConversationTurn(input: {
   let successfulAiReply: GenerateCoachReplyResult | null = null;
   let nextConversationTitle = conversation.title;
   let subjectResourceContext: string | null = null;
+  let subjectResourceRetrievalDiagnostics: SubjectResourceRetrievalDiagnostics | null =
+    null;
   const hasSuccessfulAssistantReply = ((messages ?? []) as ConversationMessageRecord[]).some(
     (message) =>
       message.role === "assistant" &&
@@ -1247,6 +1250,7 @@ export async function appendConversationTurn(input: {
           queryText: studentMessageText,
         });
         subjectResourceContext = resourceRetrieval.contextText;
+        subjectResourceRetrievalDiagnostics = resourceRetrieval.diagnostics;
 
         if (resourceRetrieval.selectedResourceCount > 0) {
           logRuntimeInfo({
@@ -1259,11 +1263,7 @@ export async function appendConversationTurn(input: {
             targetStudentUserId: appUser.id,
             details: {
               conversationId: input.conversationId,
-              selectedResourceCount: resourceRetrieval.selectedResourceCount,
-              retrievedChunkCount: resourceRetrieval.chunks.length,
-              retrievedChunkIds: resourceRetrieval.chunks.map(
-                (chunk) => chunk.stable_chunk_id,
-              ),
+              ...resourceRetrieval.diagnostics,
             },
           });
         }
@@ -1589,6 +1589,7 @@ export async function appendConversationTurn(input: {
       coachingMode: successfulAiReply.coachingMode,
       asksForAttempt: successfulAiReply.asksForAttempt,
       usage: successfulAiReply.usage,
+      subjectResourceRetrieval: subjectResourceRetrievalDiagnostics,
     });
   }
 

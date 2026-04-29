@@ -92,16 +92,16 @@ The third slice adds retrieval v1 while keeping the learner library UI deferred:
 
 ## Slice 4
 
-The fourth slice adds a small regression fixture for the original late-page failure class:
+The fourth slice adds regression fixtures for the original retrieval failure classes:
 
 - add `late_page_marker_circuit_fr` to the sample attachment corpus as an extracted-text retrieval fixture
 - add `npm run verify:subject-resource-retrieval`
 - assert that a query about `court-circuit` ranks page 6 or later above front-loaded PDF content
+- add middle-section checks for `Circuit en série` and `Ordre des dipôles`, so ordinary section queries are not only tested against the end-of-document case
 
 ## Deferred
 
 - stronger section-aware chunking beyond the lightweight heading/title inference now in place
-- broader retrieval evaluation beyond the first late-page fixture
 - old-PDF backfill and weak-outline cleanup
 - embeddings
 - provider or local page-aware extraction fallback
@@ -146,6 +146,16 @@ The eighth slice adds Pilot lifecycle controls:
 - resource-owned storage is removed when the file was uploaded through the subject-resource path
 - chat-attachment storage is preserved when the subject resource was promoted from a chat attachment, because the original attachment still owns that object
 - adult/tutor visibility remains review-only and conversation-linked; adults and tutors do not get subject-library browse or deletion rights in this Pilot slice
+
+## Slice 9
+
+The ninth slice adds operational measurement before considering embeddings:
+
+- return structured retrieval diagnostics from `retrieveSubjectResourceContextForCoach`, including selected-resource count, candidate/scored/returned chunk counts, query token count, retrieval-context char/token estimates, fallback-to-first-chunks state, and top chunk refs without raw chunk text
+- write those diagnostics to successful `coach_reply` debug captures under `metadata.subjectResourceRetrieval`
+- keep `messages.input_tokens` and `messages.output_tokens` as the persisted real provider-token source for assistant turns
+- add `npm run report:subject-resource-token-impact` through [scripts/report-subject-resource-token-impact.mjs](../scripts/report-subject-resource-token-impact.mjs), which joins debug captures to persisted assistant messages and compares turns with and without subject-resource retrieval over a configurable window
+- keep the report as an operator measurement tool, not a learner-facing dashboard
 
 ## Pitfalls To Guard
 

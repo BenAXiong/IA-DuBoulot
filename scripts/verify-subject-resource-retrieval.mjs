@@ -86,11 +86,15 @@ async function main() {
     if (
       !topPage ||
       topPage.page < fixture.expected_top_page_min ||
+      (typeof fixture.expected_top_page_max === "number" &&
+        topPage.page > fixture.expected_top_page_max) ||
+      topPage.score <= 0 ||
       !normalizedTopContent.includes(expectedMarker)
     ) {
       failures.push({
         fixture_key: fixture.fixture_key,
         expected_top_page_min: fixture.expected_top_page_min,
+        expected_top_page_max: fixture.expected_top_page_max ?? null,
         expected_marker: fixture.expected_marker,
         actual_top_page: topPage?.page ?? null,
         actual_top_score: topPage?.score ?? null,

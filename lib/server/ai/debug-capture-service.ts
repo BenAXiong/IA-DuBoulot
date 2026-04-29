@@ -2,6 +2,7 @@ import "server-only";
 
 import type { AiUsageSnapshot } from "@/lib/server/ai/types";
 import { logRuntimeError } from "@/lib/server/audit/runtime-logger";
+import type { SubjectResourceRetrievalDiagnostics } from "@/lib/server/subject-resources/types";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 type RecordSuccessfulCoachReplyDebugCaptureInput = {
@@ -22,6 +23,7 @@ type RecordSuccessfulCoachReplyDebugCaptureInput = {
   coachingMode: string;
   asksForAttempt: boolean;
   usage: AiUsageSnapshot;
+  subjectResourceRetrieval: SubjectResourceRetrievalDiagnostics | null;
 };
 
 export async function recordSuccessfulCoachReplyDebugCaptureBestEffort(
@@ -55,6 +57,7 @@ export async function recordSuccessfulCoachReplyDebugCaptureBestEffort(
         requestedModelName: input.requestedModelName,
         fallbackModelName: input.fallbackModelName,
         usedFallback: input.requestedModelName !== input.modelName,
+        subjectResourceRetrieval: input.subjectResourceRetrieval,
       },
     });
 

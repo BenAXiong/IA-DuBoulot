@@ -1846,6 +1846,17 @@ export async function retrieveSubjectResourceContextForCoach(input: {
       contextText: null,
       chunks: [],
       selectedResourceCount: 0,
+      diagnostics: {
+        selectedResourceCount: 0,
+        candidateChunkCount: 0,
+        scoredChunkCount: 0,
+        returnedChunkCount: 0,
+        queryTokenCount: 0,
+        contextCharCount: 0,
+        estimatedContextTokens: 0,
+        fallbackToFirstChunks: false,
+        chunkRefs: [],
+      },
     };
   }
 
@@ -1938,19 +1949,40 @@ export async function retrieveSubjectResourceContextForCoach(input: {
 
       return a.chunk_index - b.chunk_index;
     });
+  const hasPositiveScore = scoredChunks.some((chunk) => chunk.score > 0);
   const selectedChunks =
-    scoredChunks.some((chunk) => chunk.score > 0)
+    hasPositiveScore
       ? scoredChunks
       : scoredChunks.slice().sort((a, b) => a.chunk_index - b.chunk_index);
   const topChunks = selectedChunks.slice(
     0,
     AI_CONTEXT_LIMITS.subjectResourceChunkCount,
   );
+  const contextText = formatRetrievedChunks(topChunks);
+  const contextCharCount = contextText?.length ?? 0;
 
   return {
-    contextText: formatRetrievedChunks(topChunks),
+    contextText,
     chunks: topChunks,
     selectedResourceCount: resourceIds.length,
+    diagnostics: {
+      selectedResourceCount: resourceIds.length,
+      candidateChunkCount: chunks.length,
+      scoredChunkCount: scoredChunks.length,
+      returnedChunkCount: topChunks.length,
+      queryTokenCount: tokens.length,
+      contextCharCount,
+      estimatedContextTokens: contextCharCount > 0 ? estimateTokens(contextText ?? "") : 0,
+      fallbackToFirstChunks: !hasPositiveScore,
+      chunkRefs: topChunks.map((chunk) => ({
+        resourceId: chunk.resource_id,
+        stableChunkId: chunk.stable_chunk_id,
+        pageStart: chunk.page_start,
+        pageEnd: chunk.page_end,
+        tokenEstimate: chunk.token_estimate,
+        score: chunk.score,
+      })),
+    },
   };
 }
 
