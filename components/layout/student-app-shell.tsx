@@ -8,6 +8,7 @@ import { ProfileAvatar } from "@/components/dashboard/parent/profile-avatar";
 import { DocumentLanguageSync } from "@/components/i18n/document-language-sync";
 import { AppToolbarControls } from "@/components/layout/app-toolbar-controls";
 import {
+  addConversationListUpsertedListener,
   addConversationTitleUpdatedListener,
   readStoredConversationTitle,
   type ConversationTitleUpdatedDetail,
@@ -174,6 +175,17 @@ function buildSubjectGroups(
 
       return left.subjectTag.localeCompare(right.subjectTag);
     });
+}
+
+function sortConversations(conversations: ListConversationSummary[]) {
+  return [...conversations].sort((left, right) => {
+    const leftDate =
+      left.last_message_at ?? left.completed_at ?? left.created_at ?? "";
+    const rightDate =
+      right.last_message_at ?? right.completed_at ?? right.created_at ?? "";
+
+    return rightDate.localeCompare(leftDate);
+  });
 }
 
 function buildHeaderContent(input: {
@@ -374,6 +386,7 @@ export function StudentAppShell({
   const [conversationHeaderOverrides, setConversationHeaderOverrides] = useState<
     Record<string, ConversationTitleUpdatedDetail>
   >({});
+  const [shellConversations, setShellConversations] = useState(conversations);
   const profileMenuCloseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
@@ -385,16 +398,16 @@ export function StudentAppShell({
     ? pathname.slice("/app/conversations/".length).split("/")[0] ?? null
     : null;
   const subjectGroups = useMemo(
-    () => buildSubjectGroups(conversations),
-    [conversations],
+    () => buildSubjectGroups(shellConversations),
+    [shellConversations],
   );
   const activeConversation = useMemo(
     () =>
       activeConversationId
-        ? conversations.find((conversation) => conversation.id === activeConversationId) ??
+        ? shellConversations.find((conversation) => conversation.id === activeConversationId) ??
           null
         : null,
-    [activeConversationId, conversations],
+    [activeConversationId, shellConversations],
   );
   const storedConversationHeaderOverride = activeConversationId
     ? readStoredConversationTitle(activeConversationId)
@@ -412,11 +425,24 @@ export function StudentAppShell({
     null;
 
   useEffect(() => {
+    setShellConversations(conversations);
+  }, [conversations]);
+
+  useEffect(() => {
     return addConversationTitleUpdatedListener((detail) => {
       setConversationHeaderOverrides((current) => ({
         ...current,
         [detail.conversationId]: detail,
       }));
+    });
+  }, []);
+
+  useEffect(() => {
+    return addConversationListUpsertedListener((conversation) => {
+      setShellConversations((current) => {
+        const withoutCurrent = current.filter((item) => item.id !== conversation.id);
+        return sortConversations([conversation, ...withoutCurrent]);
+      });
     });
   }, []);
   const headerContent = buildHeaderContent({

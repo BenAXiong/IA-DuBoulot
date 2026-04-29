@@ -1,6 +1,9 @@
 "use client";
 
+import type { ListConversationSummary } from "@/lib/server/conversations/types";
+
 const CONVERSATION_TITLE_UPDATED_EVENT = "student-conversation-title-updated";
+const CONVERSATION_LIST_UPSERTED_EVENT = "student-conversation-list-upserted";
 const SESSION_STORAGE_KEY_PREFIX = "student-conversation-title:";
 
 export type ConversationTitleUpdatedDetail = {
@@ -96,5 +99,42 @@ export function addConversationTitleUpdatedListener(
 
   return () => {
     window.removeEventListener(CONVERSATION_TITLE_UPDATED_EVENT, listener);
+  };
+}
+
+export function dispatchConversationListUpserted(
+  conversation: ListConversationSummary,
+) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.dispatchEvent(
+    new CustomEvent<ListConversationSummary>(CONVERSATION_LIST_UPSERTED_EVENT, {
+      detail: conversation,
+    }),
+  );
+}
+
+export function addConversationListUpsertedListener(
+  handler: (conversation: ListConversationSummary) => void,
+) {
+  if (typeof window === "undefined") {
+    return () => undefined;
+  }
+
+  const listener = (event: Event) => {
+    const customEvent = event as CustomEvent<ListConversationSummary>;
+    if (!customEvent.detail?.id) {
+      return;
+    }
+
+    handler(customEvent.detail);
+  };
+
+  window.addEventListener(CONVERSATION_LIST_UPSERTED_EVENT, listener);
+
+  return () => {
+    window.removeEventListener(CONVERSATION_LIST_UPSERTED_EVENT, listener);
   };
 }

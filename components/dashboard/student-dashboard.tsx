@@ -261,22 +261,14 @@ export async function StudentDashboard({
         </section>
       ) : selectedGroup ? (
         <section className="mx-auto grid w-full max-w-5xl gap-3 py-0.5">
-          <div className="grid gap-3">
-            <div className="min-w-0 space-y-1">
-              <h1 className="max-w-full break-words font-[family-name:var(--font-heading)] text-4xl leading-tight">
-                {formatSubjectDisplay(selectedGroup.subjectTag)}
-              </h1>
-            </div>
-
-            <StudentSubjectQuickStart
-              conversations={selectedGroup.conversations}
-              existingConversationCount={selectedGroup.conversations.length}
-              initialDraft={initialDraft}
-              initialSubjectResources={selectedSubjectResources}
-              languageCode={languageCode}
-              subjectTag={selectedGroup.subjectTag}
-            />
-          </div>
+          <StudentSubjectQuickStart
+            conversations={selectedGroup.conversations}
+            existingConversationCount={selectedGroup.conversations.length}
+            initialDraft={initialDraft}
+            initialSubjectResources={selectedSubjectResources}
+            languageCode={languageCode}
+            subjectTag={selectedGroup.subjectTag}
+          />
         </section>
       ) : (
         <section className="mx-auto grid w-full max-w-5xl gap-8 py-1">

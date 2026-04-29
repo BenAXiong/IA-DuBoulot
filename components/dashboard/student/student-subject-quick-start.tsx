@@ -10,6 +10,10 @@ import {
   formatDateLabel,
   getConversationStatusLabel,
 } from "@/components/dashboard/student/student-dashboard-presenters";
+import {
+  dispatchConversationListUpserted,
+  dispatchConversationTitleUpdated,
+} from "@/lib/conversations/conversation-title-sync";
 import { setPendingConversationBootstrap } from "@/lib/conversations/pending-bootstrap-store";
 import {
   extractClipboardFiles,
@@ -46,6 +50,7 @@ type CreateConversationShellResponse =
       ok: true;
       data: {
         conversationId: string;
+        conversation: ListConversationSummary;
       };
     }
   | {
@@ -395,12 +400,20 @@ export function StudentSubjectQuickStart({
           ? createPayload.data.conversationId
           : null;
 
-      if (!createResponse.ok || !conversationId) {
+      if (!createResponse.ok || !createPayload?.ok || !conversationId) {
         setErrorMessage(
           getRouteErrorMessage(createPayload) ?? copy.startError,
         );
         return;
       }
+
+      const createdConversation = createPayload.data.conversation;
+      dispatchConversationListUpserted(createdConversation);
+      dispatchConversationTitleUpdated({
+        conversationId,
+        title: createdConversation.title,
+        subjectTag: createdConversation.subject_tag,
+      });
 
       const uploadResults =
         stagedFiles.length > 0
