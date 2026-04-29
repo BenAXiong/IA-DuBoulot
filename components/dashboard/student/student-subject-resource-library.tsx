@@ -44,6 +44,8 @@ function getCopy(languageCode: UiLanguageCode) {
         pending: "pending",
         failed: "failed",
         unsupported: (name: string) => `${name} is not a supported subject source.`,
+        tooLarge: (name: string, limit: string) =>
+          `${name} is too large for subject sources. Limit: ${limit}.`,
         uploadError: "Unable to add this subject source.",
         chunks: (count: number) => `${count} chunk${count === 1 ? "" : "s"}`,
         pages: (count: number | null) => (count ? `${count}p` : "pages -"),
@@ -61,6 +63,8 @@ function getCopy(languageCode: UiLanguageCode) {
         pending: "pending",
         failed: "failed",
         unsupported: (name: string) => `${name} 不是支援的科目資料格式。`,
+        tooLarge: (name: string, limit: string) =>
+          `${name} 太大，無法作為科目資料來源。上限：${limit}。`,
         uploadError: "無法新增這個科目資料來源。",
         chunks: (count: number) => `${count} chunks`,
         pages: (count: number | null) => (count ? `${count}p` : "pages -"),
@@ -79,12 +83,23 @@ function getCopy(languageCode: UiLanguageCode) {
         failed: "failed",
         unsupported: (name: string) =>
           `${name} n'est pas un format pris en charge pour les ressources.`,
+        tooLarge: (name: string, limit: string) =>
+          `${name} est trop volumineux pour les ressources. Limite : ${limit}.`,
         uploadError: "Impossible d'ajouter cette ressource de matière.",
         chunks: (count: number) => `${count} chunk${count > 1 ? "s" : ""}`,
         pages: (count: number | null) => (count ? `${count}p` : "pages -"),
         outlineUnavailable: "Structure non disponible.",
       };
   }
+}
+
+function formatByteLimit(bytes: number, languageCode: UiLanguageCode) {
+  const megabytes = bytes / (1024 * 1024);
+  const value = Number.isInteger(megabytes)
+    ? String(megabytes)
+    : megabytes.toFixed(1);
+
+  return languageCode === "fr" ? `${value} Mo` : `${value} MB`;
 }
 
 function UploadIcon() {
@@ -172,8 +187,18 @@ export function StudentSubjectResourceLibrary({
         originalFilename: file.name,
       });
 
-      if (!policy || file.size > policy.policy.maxBytes) {
+      if (!policy) {
         errors.push(copy.unsupported(file.name));
+        continue;
+      }
+
+      if (file.size > policy.policy.maxBytes) {
+        errors.push(
+          copy.tooLarge(
+            file.name,
+            formatByteLimit(policy.policy.maxBytes, languageCode),
+          ),
+        );
         continue;
       }
 

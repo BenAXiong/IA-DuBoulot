@@ -98,6 +98,8 @@ Status note: add a focused auth-surface polish follow-up under `P1.3` for the fi
 - [x] P2.7.10 Improve PDF preview and outline formatting around real course sections/headings rather than pages alone.
 - [ ] P2.7.11 Define and implement resource lifecycle behavior: unlink, delete, purge raw text/chunks/links/storage, and adult/tutor visibility.
 - [ ] P2.7.12 Expand retrieval evaluation, observability, and token-impact measurement before considering embeddings.
+
+  Status note: subject-resource upload validation now distinguishes true unsupported formats from files that exceed the size cap. During Pilot, provider-extracted subject resources allow PDF/DOC/DOCX files up to `50 MB`, direct TXT/MD/JSON resources stay at `5 MB`, and ordinary chat-only attachment caps remain unchanged.
 - [ ] P2.8 Evaluate and design a durable conversation working-memory layer for active tutoring state, including assistant-generated questions, student answers, current correction targets, unresolved points, and explicit interactions with completion summaries, student memory profiles, subject-wide resources, and transcript-window compaction.
 
 Status note: the current MVP still runs one shared coaching workflow across subjects. The product already stores a `subject_tag`, shows recent-subject rollups, uses subject text inside prompts and summaries, and allows a custom subject through the intake `Other subject` path, but memory, prompts, and UI flows are not yet specialized by subject family. Pilot work should decide whether math/science/humanities/language-study need different coaching modes, and whether custom subjects stay free-text, become admin-curated, or need alias normalization.

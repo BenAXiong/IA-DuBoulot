@@ -205,6 +205,9 @@ Current access model:
 - fallback: attachment is kept, marked `failed`, and returned with a manual-review warning
 - diagnostics note:
   - extraction failures now preserve structured Gemini payload diagnostics from the shared JSON-generation helper, so logs can distinguish empty structured payloads, malformed JSON, finish reasons such as `MAX_TOKENS`, and missing candidate parts instead of collapsing everything into one generic provider-failure bucket
+- subject-resource cap note:
+  - subject resources are extract-once and retrieved by stored chunks, so Pilot allows provider-extracted PDF/DOC/DOCX subject resources up to `50 MB` while chat-only PDF attachments keep their existing cap
+  - measure the real impact through provider usage metadata plus stored `messages.input_tokens` and `messages.output_tokens` before raising caps again
 
 ### Session Summaries
 

@@ -1667,3 +1667,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Bump attachment extraction to `attachment-extraction-v3` and ask for `sourceOutline` values that prefer real course sections/headings, with page references only as secondary hints. Render stored outlines as compact section lists in both chat PDF details and subject-resource cards, and keep weak or missing outlines unavailable rather than replacing them with summaries.
 - Why: This improves learner preview value without widening live coach context, reprocessing old PDFs, or introducing a brittle full table-of-contents contract before retrieval evaluation matures.
 - Follow-up: Keep old-PDF reprocessing, deeper section-aware chunk splitting, and weak-outline validation/backfill under later `P2.7.11` or `P2.7.12` planning.
+
+### D-20260429-05 - Raise Subject-Resource Provider Document Caps During Pilot
+
+- Date: 2026-04-29
+- Status: accepted
+- Related tasks: `P2.7`, `P2.7.12`
+- Context: A real learner-facing subject-resource upload reported a workbook PDF as an unsupported format even though `.pdf` is supported. The client-side validator was using the same message for true unsupported types and files over the subject-resource size cap, and common course/workbook PDFs can exceed the old `20 MB` pilot limit.
+- Decision: Keep chat-only attachment caps unchanged, but raise provider-extracted subject-resource PDFs and Word documents to `50 MB` during Pilot measurement. Direct TXT/MD/JSON resources stay at `5 MB`. The shared private source bucket should allow the higher single-object cap, while each upload route continues enforcing its own stricter limits.
+- Why: Subject resources are extracted once, chunked, and reused by retrieval, so they have a different cost profile from chat-only attachments that can otherwise be repeatedly injected. A clearer file-too-large error also prevents size-limit failures from masquerading as format support bugs.
+- Follow-up: Track extraction reliability, storage use, and provider usage metadata before raising caps further; add lifecycle cleanup and broader retrieval observability under `P2.7.11` and `P2.7.12`.

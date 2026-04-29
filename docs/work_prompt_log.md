@@ -272,3 +272,4 @@ then close it as:
 | 2026-04-29 | 15:50 -> 16:08 | 0h18 | P2.7.10 | improve PDF preview and subject-resource outline formatting around real course sections/headings, then update feature-state docs | | |
 | 2026-04-29 | 16:11 -> 16:11 | 0h00 | P2.7 | confirm subject-wide upload docs are current and summarize feature state plus user-side test checklist | | |
 | 2026-04-29 | 17:29 -> 17:35 | 0h06 | P1 P2.1 P2.7.9 | move subject-view recent chats into the History tab, remove duplicate history title, and investigate stale left-rail subject counters after new homework creation | | |
+| 2026-04-29 | 17:37 -> 17:43 | 0h06 | P2.7 P2.7.12 | investigate why a PDF subject resource was rejected as an unsupported format, then split size-limit messaging from true format validation and adjust pilot upload caps if needed | | |

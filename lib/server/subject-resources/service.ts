@@ -28,6 +28,7 @@ import {
 } from "@/lib/server/uploads/constants";
 import {
   SUBJECT_RESOURCE_ALLOWED_MIME_TYPES,
+  SUBJECT_RESOURCE_MAX_OBJECT_UPLOAD_BYTES,
   SUBJECT_RESOURCE_POLICY_BY_MIME,
   resolveSubjectResourcePolicyInput,
   type SubjectResourceMimeType,
@@ -624,6 +625,7 @@ async function ensureSubjectResourceBucket() {
       HOMEWORK_ATTACHMENTS_BUCKET,
       {
         public: false,
+        fileSizeLimit: `${SUBJECT_RESOURCE_MAX_OBJECT_UPLOAD_BYTES}`,
         allowedMimeTypes: SUBJECT_RESOURCE_BUCKET_ALLOWED_MIME_TYPES,
       },
     );
@@ -638,6 +640,7 @@ async function ensureSubjectResourceBucket() {
   await supabase.storage
     .updateBucket(HOMEWORK_ATTACHMENTS_BUCKET, {
       public: false,
+      fileSizeLimit: `${SUBJECT_RESOURCE_MAX_OBJECT_UPLOAD_BYTES}`,
       allowedMimeTypes: SUBJECT_RESOURCE_BUCKET_ALLOWED_MIME_TYPES,
     })
     .catch(() => null);

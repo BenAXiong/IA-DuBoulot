@@ -59,6 +59,12 @@ Conversation-level guardrails:
 - max `5` attachments per conversation in MVP
 - soft total upload budget `50 MB` per conversation
 
+Subject-resource guardrails:
+
+- subject-resource PDFs and Word documents use the same private source bucket but a separate, extract-once upload path
+- Pilot subject-resource caps are `50 MB` for provider-extracted PDF/DOC/DOCX files and `5 MB` for direct TXT/MD/JSON text files
+- raising the subject-resource cap does not raise chat-only attachment caps; chat upload routes still enforce their own per-MIME and per-conversation limits
+
 ## Read And Write Access Rules
 
 - Uploads should be created through a server route that returns a signed upload target.
@@ -116,8 +122,8 @@ Cleanup rules:
 For `homework-attachments`:
 
 - private bucket
-- MIME restrictions should match the MVP allowlist
-- file-size limit should match the highest single-object route limit across the allowlist, while the upload service keeps enforcing the stricter per-MIME limits
+- MIME restrictions should include the route-level allowlists for chat attachments and subject resources that share the bucket
+- file-size limit should match the highest single-object route limit across those allowlists, while each upload service keeps enforcing the stricter per-flow and per-MIME limits
 
 For `processing-artifacts`:
 

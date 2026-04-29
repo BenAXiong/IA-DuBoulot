@@ -25,6 +25,7 @@ Current decisions:
 - Subject docs must have a dedicated upload UI outside the chat textarea/upload controls.
 - Do not silently promote chat attachments into subject resources during the Pilot.
 - Subject-doc upload should support at least PDF, TXT, MD, JSON, DOC, and DOCX when the extraction path supports them safely.
+- Subject-doc pilot upload caps are separate from chat-only attachment caps: provider-extracted PDF/DOC/DOCX resources allow up to `50 MB`, direct TXT/MD/JSON resources allow up to `5 MB`, and ordinary chat-only PDFs remain at the existing chat-attachment cap.
 - The learner-facing library and per-conversation toggles can be batched: the subject page and the live chat should both expose relevant subject docs, with chat-level selected/unselected state.
 - Older subject docs should be visible but not auto-selected for a new conversation unless the learner chooses them.
 - A subject doc uploaded from a subject/chat resource context can be selected for that current context, but that is different from promoting a chat-only attachment.
@@ -125,6 +126,15 @@ The sixth slice improves the preview and outline layer without reprocessing old 
 - improve direct TXT/MD/JSON outline detection with the same section-first heuristic
 - keep weak or missing outlines explicitly unavailable instead of substituting summaries
 - leave old PDFs untouched unless the learner uploads them again or a later backfill task is approved
+
+## Slice 7
+
+The seventh slice fixes the first larger-workbook upload failure:
+
+- split subject-resource upload validation so unsupported formats and files over the size cap produce different learner-facing messages
+- raise provider-extracted subject-resource caps to `50 MB` for PDFs and Word documents during Pilot measurement
+- keep direct text resources at `5 MB` and keep chat-only attachment caps unchanged
+- update the shared private source bucket file-size setting to match the subject-resource single-object cap, while server routes continue enforcing stricter per-flow limits
 
 ## Pitfalls To Guard
 
