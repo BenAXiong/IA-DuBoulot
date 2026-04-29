@@ -263,3 +263,4 @@ then close it as:
 | 2026-04-28 | 22:41 -> 22:48 | 0h07 | P2.7 | implement the next subject-wide upload slice: deterministic subject-resource chunk storage after extraction/reuse, without retrieval or learner toggles yet | | |
 | 2026-04-28 | 22:56 -> 23:05 | 0h09 | P2.7 | implement subject-resource retrieval v1 for selected conversation resources and inject bounded top chunks into the coach context | | |
 | 2026-04-28 | 23:11 -> 23:16 | 0h05 | P2.7 | add a small late-page retrieval fixture and verification script for the front-loaded PDF failure class | | |
+| 2026-04-29 | 10:25 -> 10:25 | 0h00 | A0.3.7 P2.7 | split and restart the work-session trace, then summarize remaining P2.7 work and explain the late-page retrieval fixture slice | | |
