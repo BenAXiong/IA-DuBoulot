@@ -1,10 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { StudentReplyModeSwitch } from "@/components/dashboard/student/student-reply-mode-switch";
 import { StudentSubjectResourceLibrary } from "@/components/dashboard/student/student-subject-resource-library";
 import { StudentUploadProgressRing } from "@/components/dashboard/student/student-upload-progress-ring";
+import {
+  formatDateLabel,
+  getConversationStatusLabel,
+} from "@/components/dashboard/student/student-dashboard-presenters";
 import { setPendingConversationBootstrap } from "@/lib/conversations/pending-bootstrap-store";
 import {
   extractClipboardFiles,
@@ -13,7 +18,10 @@ import {
   type StagedIntakeFile,
 } from "@/lib/intake/intake-config";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
-import type { StudentReplyMode } from "@/lib/server/conversations/types";
+import type {
+  ListConversationSummary,
+  StudentReplyMode,
+} from "@/lib/server/conversations/types";
 import type { SubjectResourceLibraryItem } from "@/lib/server/subject-resources/types";
 import {
   type ConversationUploadPhase,
@@ -30,6 +38,7 @@ type StudentSubjectQuickStartProps = {
   languageCode: UiLanguageCode;
   existingConversationCount?: number;
   initialSubjectResources?: SubjectResourceLibraryItem[];
+  conversations?: ListConversationSummary[];
 };
 
 type CreateConversationShellResponse =
@@ -72,6 +81,8 @@ type UploadProgressState = {
   totalPhases: number;
 };
 
+type SubjectQuickStartTab = "history" | "resources" | "instructions";
+
 function getQuickStartCopy(languageCode: UiLanguageCode) {
   switch (languageCode) {
     case "en":
@@ -87,6 +98,13 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
           "The file was added, but its text could not be extracted reliably. Your message was not sent automatically.",
         voice: "Voice input coming soon!",
         startError: "Unable to open the chat right now.",
+        tabs: {
+          history: "History",
+          resources: "Sources",
+          instructions: "Instructions",
+        },
+        noSubjectChats: "No discussion has been saved for this subject yet.",
+        noInstructions: "No subject instruction has been saved yet.",
       };
     case "zh":
       return {
@@ -100,6 +118,13 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
           "檔案已加入，但系統無法可靠地擷取文字。你的訊息沒有被自動送出。",
         voice: "語音輸入即將推出！",
         startError: "目前無法開啟聊天。",
+        tabs: {
+          history: "聊天",
+          resources: "資料來源",
+          instructions: "指示",
+        },
+        noSubjectChats: "這個科目目前還沒有已儲存的對話。",
+        noInstructions: "這個科目目前還沒有已儲存的指示。",
       };
     default:
       return {
@@ -114,6 +139,13 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
           "Le fichier a bien été ajouté, mais son texte n'a pas pu être extrait de façon fiable. Ton message n'a pas été envoyé automatiquement.",
         voice: "Saisie vocale bientôt !",
         startError: "Impossible d'ouvrir le chat pour l'instant.",
+        tabs: {
+          history: "Historique",
+          resources: "Ressources",
+          instructions: "Consignes",
+        },
+        noSubjectChats: "Aucune discussion enregistrée pour cette matière.",
+        noInstructions: "Aucune consigne enregistrée pour cette matière.",
       };
   }
 }
@@ -204,12 +236,53 @@ function SendIcon() {
   );
 }
 
+function renderConversationRows(input: {
+  conversations: ListConversationSummary[];
+  languageCode: UiLanguageCode;
+}) {
+  return (
+    <div className="divide-y divide-[color:var(--line)]">
+      {input.conversations.map((conversation) => (
+        <Link
+          className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 py-4 transition hover:bg-[color:var(--surface-strong)]"
+          href={`/app/conversations/${conversation.id}?subject=${encodeURIComponent(conversation.subject_tag)}`}
+          key={conversation.id}
+        >
+          <div className="min-w-0 space-y-1">
+            <h3 className="overflow-hidden text-ellipsis whitespace-nowrap font-[family-name:var(--font-heading)] text-xl leading-tight">
+              {conversation.title}
+            </h3>
+            <div className="flex flex-wrap items-center gap-2 text-sm text-[color:var(--ink-soft)]">
+              <span>
+                {getConversationStatusLabel(
+                  conversation.status,
+                  input.languageCode,
+                )}
+              </span>
+            </div>
+          </div>
+
+          <div className="shrink-0 text-sm text-[color:var(--ink-soft)]">
+            {formatDateLabel(
+              conversation.last_message_at ??
+                conversation.completed_at ??
+                conversation.created_at,
+              input.languageCode,
+            ) ?? ""}
+          </div>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
 export function StudentSubjectQuickStart({
   initialDraft = null,
   subjectTag,
   languageCode,
   existingConversationCount = 0,
   initialSubjectResources = [],
+  conversations = [],
 }: StudentSubjectQuickStartProps) {
   const router = useRouter();
   const copy = getQuickStartCopy(languageCode);
@@ -218,6 +291,7 @@ export function StudentSubjectQuickStart({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isStarting, setIsStarting] = useState(false);
   const [replyMode, setReplyMode] = useState<StudentReplyMode>("thinking");
+  const [activeTab, setActiveTab] = useState<SubjectQuickStartTab>("history");
   const [uploadProgress, setUploadProgress] = useState<UploadProgressState | null>(
     null,
   );
@@ -515,11 +589,65 @@ export function StudentSubjectQuickStart({
         ) : null}
       </form>
 
-      <StudentSubjectResourceLibrary
-        initialResources={initialSubjectResources}
-        languageCode={languageCode}
-        subjectTag={subjectTag}
-      />
+      <section className="grid gap-3">
+        <div
+          aria-label="Subject workspace"
+          className="flex flex-wrap gap-2"
+          role="tablist"
+        >
+          {(
+            [
+              ["history", copy.tabs.history],
+              ["resources", copy.tabs.resources],
+              ["instructions", copy.tabs.instructions],
+            ] as Array<[SubjectQuickStartTab, string]>
+          ).map(([tab, label]) => {
+            const selected = activeTab === tab;
+
+            return (
+              <button
+                aria-selected={selected}
+                className={`inline-flex min-h-10 items-center justify-center rounded-full px-4 text-sm font-medium transition ${
+                  selected
+                    ? "bg-[color:var(--foreground)] text-[color:var(--background)]"
+                    : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface)] hover:text-[color:var(--foreground)]"
+                }`}
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                role="tab"
+                type="button"
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div role="tabpanel">
+          {activeTab === "history" ? (
+            conversations.length === 0 ? (
+              <p className="text-sm leading-7 text-[color:var(--ink-soft)]">
+                {copy.noSubjectChats}
+              </p>
+            ) : (
+              renderConversationRows({
+                conversations,
+                languageCode,
+              })
+            )
+          ) : activeTab === "resources" ? (
+            <StudentSubjectResourceLibrary
+              initialResources={initialSubjectResources}
+              languageCode={languageCode}
+              subjectTag={subjectTag}
+            />
+          ) : (
+            <p className="text-sm leading-7 text-[color:var(--ink-soft)]">
+              {copy.noInstructions}
+            </p>
+          )}
+        </div>
+      </section>
     </div>
   );
 }

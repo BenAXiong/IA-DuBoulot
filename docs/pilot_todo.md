@@ -90,10 +90,10 @@ Status note: add a focused auth-surface polish follow-up under `P1.3` for the fi
 - [x] P2.7.6 Apply and verify the subject-resource migrations and RLS policies in hosted Supabase.
 - [x] P2.7.7 Build the learner-facing subject resource library UI for listing PDFs/resources by subject.
 - [x] P2.7.8 Add per-conversation resource selection/toggles backed by `conversation_resource_links.selected`.
-- [ ] P2.7.9 Clarify upload entry points and save semantics: chat-only attachment versus subject-level saved resource.
+- [x] P2.7.9 Clarify upload entry points and save semantics: chat-only attachment versus subject-level saved resource.
   - [x] Add the dedicated subject-resource upload entry point outside the chat attachment controls.
   - [x] Keep chat-only attachments separate from subject-resource uploads; no chat-to-subject promotion UI in this Pilot slice.
-  - [ ] Refine the below-composer subject page tabs for History, Resources, and Instructions once the first resource UI has been tried.
+  - [x] Refine the below-composer subject page tabs for History, Resources, and Instructions once the first resource UI has been tried.
 - [ ] P2.7.10 Improve PDF preview and outline formatting around real course sections/headings rather than pages alone.
 - [ ] P2.7.11 Define and implement resource lifecycle behavior: unlink, delete, purge raw text/chunks/links/storage, and adult/tutor visibility.
 - [ ] P2.7.12 Expand retrieval evaluation, observability, and token-impact measurement before considering embeddings.

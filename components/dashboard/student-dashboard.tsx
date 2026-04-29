@@ -269,29 +269,13 @@ export async function StudentDashboard({
             </div>
 
             <StudentSubjectQuickStart
+              conversations={selectedGroup.conversations}
               existingConversationCount={selectedGroup.conversations.length}
               initialDraft={initialDraft}
               initialSubjectResources={selectedSubjectResources}
               languageCode={languageCode}
               subjectTag={selectedGroup.subjectTag}
             />
-
-            <section className="grid gap-4">
-              <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
-                {copy.recentTitle}
-              </h2>
-
-              {selectedGroup.conversations.length === 0 ? (
-                <p className="text-sm leading-7 text-[color:var(--ink-soft)]">
-                  {copy.noSubjectChats}
-                </p>
-              ) : (
-                renderConversationRows({
-                  conversations: selectedGroup.conversations,
-                  languageCode,
-                })
-              )}
-            </section>
           </div>
         </section>
       ) : (

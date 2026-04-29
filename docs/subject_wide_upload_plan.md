@@ -113,7 +113,7 @@ The fifth slice adds the first learner-facing resource controls:
 - add a dedicated subject-resource upload entry point outside the chat attachment controls
 - support PDF, TXT, MD, JSON, DOC, and DOCX subject-resource uploads through the subject-resource path
 - keep chat-only attachments separate; no chat-to-subject promotion UI is implemented in this Pilot slice
-- keep the richer below-composer tab layout for History, Resources, and Instructions as a remaining `P2.7.9` UI refinement
+- organize the subject page area below the composer into History, Resources, and Instructions tabs so chat-only uploads and subject docs are visually separated
 
 ## Pitfalls To Guard
 
