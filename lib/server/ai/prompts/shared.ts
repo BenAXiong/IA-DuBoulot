@@ -21,7 +21,7 @@ export const CONVERSATION_TITLE_PROMPT_VERSION = "conversation-title-v2";
 export const STUDENT_SUMMARY_PROMPT_VERSION = "student-summary-v3";
 export const PARENT_SUMMARY_PROMPT_VERSION = "parent-summary-v2";
 export const TUTOR_SUMMARY_PROMPT_VERSION = "tutor-summary-v2";
-export const ATTACHMENT_EXTRACTION_PROMPT_VERSION = "attachment-extraction-v2";
+export const ATTACHMENT_EXTRACTION_PROMPT_VERSION = "attachment-extraction-v3";
 export const TRANSLATION_PROMPT_VERSION = "translation-v2";
 export const MEMORY_PROFILE_PROMPT_VERSION = "memory-profile-v2";
 

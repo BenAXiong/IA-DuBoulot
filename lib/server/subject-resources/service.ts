@@ -158,23 +158,58 @@ function buildDirectTextSummary(text: string) {
   return normalized ? normalized.slice(0, 280) : null;
 }
 
-function buildDirectTextOutline(text: string) {
-  const headings = text
-    .split("\n")
-    .map((line) => line.trim())
-    .filter((line) => {
-      if (!line || line.length > 140) {
-        return false;
-      }
+function normalizeDirectTextHeading(line: string) {
+  return line
+    .trim()
+    .replace(/^#{1,6}\s+/, "")
+    .replace(/^[-*]\s+/, "")
+    .replace(/^(?:page|p\.)\s+\d{1,3}\s*[:.-]\s*/i, "")
+    .trim();
+}
 
-      return (
-        /^#{1,6}\s+\S/.test(line) ||
-        /^(chapitre|partie|section|exercice|activit[eé]|m[eé]thode)\b/i.test(line) ||
-        /^\d+(?:[.)]|\s+-)\s+\S/.test(line)
-      );
-    })
-    .slice(0, 12)
-    .map((line) => line.replace(/^#{1,6}\s+/, ""));
+function isDirectTextHeading(line: string) {
+  const heading = normalizeDirectTextHeading(line);
+
+  if (
+    !heading ||
+    heading.length > 140 ||
+    /^(?:page|p\.)\s+\d{1,3}$/i.test(heading)
+  ) {
+    return false;
+  }
+
+  return (
+    /^#{1,6}\s+\S/.test(line) ||
+    /^(chapitre|partie|section|exercice|activit[eé]|m[eé]thode|cours|le[cç]on|notion|d[eé]finition|propri[eé]t[eé]|bilan|application)\b/i.test(
+      heading,
+    ) ||
+    /^[IVXLC]+[.)]\s+\S/.test(heading) ||
+    /^\d+(?:[.)]|\s+-)\s+\S/.test(heading)
+  );
+}
+
+function buildDirectTextOutline(text: string) {
+  const seen = new Set<string>();
+  const headings: string[] = [];
+
+  for (const line of text.split("\n")) {
+    if (!isDirectTextHeading(line)) {
+      continue;
+    }
+
+    const heading = normalizeDirectTextHeading(line);
+    const key = heading.toLocaleLowerCase();
+    if (seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+    headings.push(heading);
+
+    if (headings.length >= 12) {
+      break;
+    }
+  }
 
   return headings.length > 0 ? headings.join("\n") : null;
 }
@@ -298,19 +333,9 @@ function inferSectionTitle(content: string) {
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean);
-  const title = lines.find((line) => {
-    if (line.length > 120) {
-      return false;
-    }
+  const title = lines.find((line) => isDirectTextHeading(line));
 
-    return (
-      /^(chapitre|partie|section|exercice|activit[eé]|r[eé]sum[eé]|m[eé]thode)\b/i.test(line) ||
-      /^[IVX]+\.\s+\S/.test(line) ||
-      /^\d+(?:[.)]|\s+-)\s+\S/.test(line)
-    );
-  });
-
-  return title ?? null;
+  return title ? normalizeDirectTextHeading(title) : null;
 }
 
 function buildResourceChunks(resource: SubjectResourceRecord) {

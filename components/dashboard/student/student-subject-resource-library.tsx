@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { SourceOutlinePreview } from "@/components/dashboard/student/source-outline-preview";
 import { StudentUploadProgressRing } from "@/components/dashboard/student/student-upload-progress-ring";
 import { formatDateLabel } from "@/components/dashboard/student/student-dashboard-presenters";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
@@ -46,6 +47,7 @@ function getCopy(languageCode: UiLanguageCode) {
         uploadError: "Unable to add this subject source.",
         chunks: (count: number) => `${count} chunk${count === 1 ? "" : "s"}`,
         pages: (count: number | null) => (count ? `${count}p` : "pages -"),
+        outlineUnavailable: "No usable structure yet.",
       };
     case "zh":
       return {
@@ -62,6 +64,7 @@ function getCopy(languageCode: UiLanguageCode) {
         uploadError: "無法新增這個科目資料來源。",
         chunks: (count: number) => `${count} chunks`,
         pages: (count: number | null) => (count ? `${count}p` : "pages -"),
+        outlineUnavailable: "尚無可用結構。",
       };
     default:
       return {
@@ -79,6 +82,7 @@ function getCopy(languageCode: UiLanguageCode) {
         uploadError: "Impossible d'ajouter cette ressource de matière.",
         chunks: (count: number) => `${count} chunk${count > 1 ? "s" : ""}`,
         pages: (count: number | null) => (count ? `${count}p` : "pages -"),
+        outlineUnavailable: "Structure non disponible.",
       };
   }
 }
@@ -326,6 +330,11 @@ export function StudentSubjectResourceLibrary({
               typeof resource.metadata.source_summary === "string"
                 ? resource.metadata.source_summary
                 : null;
+            const outline =
+              typeof resource.metadata.source_outline === "string" &&
+              resource.metadata.source_outline.trim()
+                ? resource.metadata.source_outline.trim()
+                : null;
 
             return (
               <div
@@ -365,6 +374,14 @@ export function StudentSubjectResourceLibrary({
                   <p className="line-clamp-2 text-xs leading-5 text-[color:var(--ink-soft)]">
                     {summary}
                   </p>
+                ) : null}
+                {outline ? (
+                  <SourceOutlinePreview
+                    compact
+                    maxItems={4}
+                    outline={outline}
+                    unavailableLabel={copy.outlineUnavailable}
+                  />
                 ) : null}
               </div>
             );

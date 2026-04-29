@@ -269,3 +269,4 @@ then close it as:
 | 2026-04-29 | 11:31 -> 11:33 | 0h02 | P2.7 P6.1 | add subject-doc decision gates and log post-pilot chat-to-subject promotion as an optional future task | | |
 | 2026-04-29 | 11:34 -> 11:52 | 0h18 | P2.7.7 P2.7.8 P2.7.9 | implement the subject-doc library UI, per-conversation toggles, and dedicated subject-doc upload entry point separate from chat attachments | | |
 | 2026-04-29 | 11:53 -> 11:56 | 0h03 | P2.7.9 | finish the subject-page below-composer tabs for History, Resources, and Instructions so chat-only uploads and subject docs are visually separated | | |
+| 2026-04-29 | 15:50 -> 16:08 | 0h18 | P2.7.10 | improve PDF preview and subject-resource outline formatting around real course sections/headings, then update feature-state docs | | |

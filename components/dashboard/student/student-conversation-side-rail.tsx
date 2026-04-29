@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { SourceOutlinePreview } from "@/components/dashboard/student/source-outline-preview";
 import { StudentSubjectResourceLibrary } from "@/components/dashboard/student/student-subject-resource-library";
 import {
   getStudentWorkbenchCopy,
@@ -421,10 +422,12 @@ export function StudentConversationSideRail({
                                   <p className="text-[0.68rem] font-medium uppercase tracking-[0.16em] text-[color:var(--ink-soft)]">
                                     {copy.attachmentStructureLabel}
                                   </p>
-                                  <p className="whitespace-pre-line text-sm leading-5 text-[color:var(--foreground)]">
-                                    {sourceOutline ??
-                                      copy.attachmentStructureUnavailable}
-                                  </p>
+                                  <SourceOutlinePreview
+                                    outline={sourceOutline}
+                                    unavailableLabel={
+                                      copy.attachmentStructureUnavailable
+                                    }
+                                  />
                                 </div>
                               </div>
                             </div>

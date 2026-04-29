@@ -193,12 +193,14 @@ Current access model:
 
 ### Attachment Extraction
 
-- route: `POST /api/uploads/confirm`
-- prompt version: `attachment-extraction-v2`
+- route: `POST /api/uploads/confirm` and `POST /api/subject-resources/confirm`
+- prompt version: `attachment-extraction-v3`
 - current model: `gemini-2.5-flash`
 - context inputs:
   - uploaded file sent through Gemini file understanding
   - extraction instruction block
+- outline note:
+  - new extraction runs should prefer real course sections/headings for `sourceOutline`, using page refs as secondary hints and returning an empty outline when structure is weak
 - output cap: no dedicated output-token cap is currently applied
 - fallback: attachment is kept, marked `failed`, and returned with a manual-review warning
 - diagnostics note:

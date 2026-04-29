@@ -29,6 +29,7 @@ Current decisions:
 - Older subject docs should be visible but not auto-selected for a new conversation unless the learner chooses them.
 - A subject doc uploaded from a subject/chat resource context can be selected for that current context, but that is different from promoting a chat-only attachment.
 - Outlines and summaries are separate. If a structure outline is unavailable or poor, the UI should omit the outline or say structure is unavailable; it should not turn the outline into a summary.
+- New extraction prompts should prefer real course sections/headings for `sourceOutline`, with page refs as secondary hints, instead of defaulting to page-only tables.
 - Do not reprocess old PDFs solely to improve outlines during the current Pilot slice.
 
 Ask before implementing if a future change would:
@@ -98,7 +99,7 @@ The fourth slice adds a small regression fixture for the original late-page fail
 
 ## Deferred
 
-- stronger section-aware chunking and formatting improvements
+- stronger section-aware chunking beyond the lightweight heading/title inference now in place
 - broader retrieval evaluation beyond the first late-page fixture
 - old-PDF backfill and weak-outline cleanup
 - embeddings
@@ -114,6 +115,16 @@ The fifth slice adds the first learner-facing resource controls:
 - support PDF, TXT, MD, JSON, DOC, and DOCX subject-resource uploads through the subject-resource path
 - keep chat-only attachments separate; no chat-to-subject promotion UI is implemented in this Pilot slice
 - organize the subject page area below the composer into History, Resources, and Instructions tabs so chat-only uploads and subject docs are visually separated
+
+## Slice 6
+
+The sixth slice improves the preview and outline layer without reprocessing old files:
+
+- update `attachment-extraction-v3` so new `sourceOutline` values prefer real course titles, sections, methods, exercises, definitions, and other headings over page-only structures
+- render stored outlines as compact structured lists with optional page badges in both chat PDF details and subject-resource cards
+- improve direct TXT/MD/JSON outline detection with the same section-first heuristic
+- keep weak or missing outlines explicitly unavailable instead of substituting summaries
+- leave old PDFs untouched unless the learner uploads them again or a later backfill task is approved
 
 ## Pitfalls To Guard
 

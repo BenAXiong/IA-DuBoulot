@@ -1657,3 +1657,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Add explicit decision gates to `AGENTS.md` and `docs/subject_wide_upload_plan.md`. Subject docs are a separate concept from chat-only uploads, require dedicated UI outside the chat textarea, and must not be silently promoted from chat attachments during Pilot. A future chat-to-subject promotion action is logged only as an optional post-Pilot task.
 - Why: The user prefers follow-up questions over arbitrary product assumptions for learner mental model, persistence, visibility, deletion, and adult/tutor access choices.
 - Follow-up: Before implementing `P2.7.7` to `P2.7.10`, ask if any remaining UI placement or semantics are unclear instead of filling gaps by default.
+
+### D-20260429-04 - Prefer Section-First Source Outlines
+
+- Date: 2026-04-29
+- Status: accepted
+- Related tasks: `P2.7.10`
+- Context: The first PDF details dropdown and subject-resource cards could display stored outlines, but page-only outlines were less useful for course PDFs where learners recognize content by chapter, method, definition, or exercise headings.
+- Decision: Bump attachment extraction to `attachment-extraction-v3` and ask for `sourceOutline` values that prefer real course sections/headings, with page references only as secondary hints. Render stored outlines as compact section lists in both chat PDF details and subject-resource cards, and keep weak or missing outlines unavailable rather than replacing them with summaries.
+- Why: This improves learner preview value without widening live coach context, reprocessing old PDFs, or introducing a brittle full table-of-contents contract before retrieval evaluation matures.
+- Follow-up: Keep old-PDF reprocessing, deeper section-aware chunk splitting, and weak-outline validation/backfill under later `P2.7.11` or `P2.7.12` planning.
