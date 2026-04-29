@@ -1617,3 +1617,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Add an extracted-text-only retrieval fixture plus `npm run verify:subject-resource-retrieval`, asserting that a query about `court-circuit` ranks page 6 or later above early pages.
 - Why: This creates a small repeatable guard for the specific failure class before adding broader retrieval evaluation or UI toggles.
 - Follow-up: Replace this narrow script with a richer retrieval-quality suite once the resource library and section-aware chunking stabilize.
+
+### D-20260429-01 - Split P2.7 Into Subject-Wide Upload Subtasks
+
+- Date: 2026-04-29
+- Status: accepted
+- Related tasks: `P2.7`
+- Context: `P2.7` had grown into an umbrella covering schema, extraction reuse, chunking, retrieval, UI, lifecycle, RLS verification, observability, and tests. That made it too broad to track cleanly.
+- Decision: Keep `P2.7` as the umbrella and split the remaining work into `P2.7.1` through `P2.7.12`, marking the already-shipped plan, storage, chunking, retrieval v1, and late-page fixture slices complete.
+- Why: Smaller task IDs make future commits and sessions easier to audit, and separate product UI work from backend retrieval and safety checks.
+- Follow-up: Use the narrower subtask IDs in future commits, especially `P2.7.6` for hosted migration/RLS verification and `P2.7.7` to `P2.7.9` for learner-facing subject-wide upload UX.

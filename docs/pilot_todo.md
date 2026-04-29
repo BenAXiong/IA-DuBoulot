@@ -81,7 +81,19 @@ Status note: add a focused auth-surface polish follow-up under `P1.3` for the fi
 - [ ] P2.4 Map which conversation or coaching modes should exist per subject family, and decide which ones stay universal versus subject-specific before the pilot broadens.
 - [x] P2.5 Add a parent-created learner bootstrap path from the parent workspace while preserving the existing learner-created self-bootstrap flow.
 - [ ] P2.6 Merge the standalone onboarding page into account creation once sign-up can collect role, age-gating, and profile essentials in one pass.
-- [ ] P2.7 Design subject-wide learner resource libraries so longer-lived PDFs or notes can be attached at the subject level, toggled per conversation, and retrieved in a cost-safe way instead of being re-read wholesale on every request.
+- [ ] P2.7 Subject-wide upload/resource umbrella. Track implementation through the subtasks below; close only when the learner can understand, select, retrieve from, and safely manage subject-level resources in a pilot-ready way.
+- [x] P2.7.1 Document the subject-wide upload plan, target architecture, deferred risks, and slice boundaries.
+- [x] P2.7.2 Add durable subject-resource storage, conversation-resource links, PDF promotion after extraction, and same-student/same-subject hash reuse.
+- [x] P2.7.3 Add deterministic subject-resource chunk storage after extraction or reuse.
+- [x] P2.7.4 Add retrieval v1 so selected conversation resources inject only bounded top chunk excerpts into coach context.
+- [x] P2.7.5 Add the first late-page retrieval regression guard for the front-loaded PDF failure class.
+- [ ] P2.7.6 Apply and verify the subject-resource migrations and RLS policies in hosted Supabase.
+- [ ] P2.7.7 Build the learner-facing subject resource library UI for listing PDFs/resources by subject.
+- [ ] P2.7.8 Add per-conversation resource selection/toggles backed by `conversation_resource_links.selected`.
+- [ ] P2.7.9 Clarify upload entry points and save semantics: chat-only attachment versus subject-level saved resource.
+- [ ] P2.7.10 Improve PDF preview and outline formatting around real course sections/headings rather than pages alone.
+- [ ] P2.7.11 Define and implement resource lifecycle behavior: unlink, delete, purge raw text/chunks/links/storage, and adult/tutor visibility.
+- [ ] P2.7.12 Expand retrieval evaluation, observability, and token-impact measurement before considering embeddings.
 - [ ] P2.8 Evaluate and design a durable conversation working-memory layer for active tutoring state, including assistant-generated questions, student answers, current correction targets, unresolved points, and explicit interactions with completion summaries, student memory profiles, subject-wide resources, and transcript-window compaction.
 
 Status note: the current MVP still runs one shared coaching workflow across subjects. The product already stores a `subject_tag`, shows recent-subject rollups, uses subject text inside prompts and summaries, and allows a custom subject through the intake `Other subject` path, but memory, prompts, and UI flows are not yet specialized by subject family. Pilot work should decide whether math/science/humanities/language-study need different coaching modes, and whether custom subjects stay free-text, become admin-curated, or need alias normalization.
