@@ -136,6 +136,17 @@ The seventh slice fixes the first larger-workbook upload failure:
 - keep direct text resources at `5 MB` and keep chat-only attachment caps unchanged
 - update the shared private source bucket file-size setting to match the subject-resource single-object cap, while server routes continue enforcing stricter per-flow limits
 
+## Slice 8
+
+The eighth slice adds Pilot lifecycle controls:
+
+- `selected` remains the per-chat retrieval toggle
+- unlinking deletes the `conversation_resource_links` row for that chat, so the resource is no longer coach-visible or adult/tutor-visible through that conversation
+- deleting a subject resource removes the resource row plus cascaded chunks and conversation links, purging stored raw extracted text
+- resource-owned storage is removed when the file was uploaded through the subject-resource path
+- chat-attachment storage is preserved when the subject resource was promoted from a chat attachment, because the original attachment still owns that object
+- adult/tutor visibility remains review-only and conversation-linked; adults and tutors do not get subject-library browse or deletion rights in this Pilot slice
+
 ## Pitfalls To Guard
 
 - Extraction complete and coach-visible context are separate states.

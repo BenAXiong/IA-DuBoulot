@@ -608,6 +608,85 @@ export async function parseSubjectResourceSelectionRequest(
   };
 }
 
+export async function parseSubjectResourceLinkRequest(
+  request: Request,
+  languageCode: UiLanguageCode = "fr",
+) {
+  const copy = getStudentUploadServerCopy(languageCode);
+  let body: unknown;
+
+  try {
+    body = await request.json();
+  } catch (error) {
+    throw new AppError({
+      code: "bad_request",
+      message: copy.requestErrors.invalidJson,
+      status: 400,
+      cause: error,
+    });
+  }
+
+  const payload = requireBodyObject(body, languageCode);
+  const conversationId =
+    typeof payload.conversationId === "string" ? payload.conversationId.trim() : "";
+  const resourceId =
+    typeof payload.resourceId === "string" ? payload.resourceId.trim() : "";
+
+  if (!conversationId || !resourceId) {
+    throw new AppError({
+      code: "validation_error",
+      message: copy.requestErrors.invalidFields,
+      status: 400,
+      fieldErrors: {
+        resourceId: "Conversation and resource ids are required.",
+      },
+    });
+  }
+
+  return {
+    conversationId,
+    resourceId,
+  };
+}
+
+export async function parseSubjectResourceDeleteRequest(
+  request: Request,
+  languageCode: UiLanguageCode = "fr",
+) {
+  const copy = getStudentUploadServerCopy(languageCode);
+  let body: unknown;
+
+  try {
+    body = await request.json();
+  } catch (error) {
+    throw new AppError({
+      code: "bad_request",
+      message: copy.requestErrors.invalidJson,
+      status: 400,
+      cause: error,
+    });
+  }
+
+  const payload = requireBodyObject(body, languageCode);
+  const resourceId =
+    typeof payload.resourceId === "string" ? payload.resourceId.trim() : "";
+
+  if (!resourceId) {
+    throw new AppError({
+      code: "validation_error",
+      message: copy.requestErrors.invalidFields,
+      status: 400,
+      fieldErrors: {
+        resourceId: "Resource id is required.",
+      },
+    });
+  }
+
+  return {
+    resourceId,
+  };
+}
+
 async function ensureSubjectResourceBucket() {
   const supabase = createSupabaseAdminClient();
   const { data: buckets, error: listError } = await supabase.storage.listBuckets();
@@ -686,6 +765,34 @@ async function loadOwnedConversation(input: {
   }
 
   return conversation;
+}
+
+async function loadOwnedSubjectResource(input: {
+  resourceId: string;
+  studentUserId: string;
+}) {
+  const admin = createSupabaseAdminClient();
+  const { data: resource, error } = await admin
+    .from("subject_resources")
+    .select(SUBJECT_RESOURCE_SELECT)
+    .eq("id", input.resourceId)
+    .maybeSingle();
+
+  if (error) {
+    throw toServiceError("Unable to load the subject resource.", error);
+  }
+
+  const subjectResource = resource as SubjectResourceRecord | null;
+
+  if (!subjectResource || subjectResource.student_user_id !== input.studentUserId) {
+    throw new AppError({
+      code: "not_found",
+      message: "Subject resource not found.",
+      status: 404,
+    });
+  }
+
+  return subjectResource;
 }
 
 async function findSubjectResourceByHash(input: {
@@ -1443,6 +1550,119 @@ export async function setSubjectResourceConversationSelection(input: {
   return {
     resource: subjectResource,
     link,
+  };
+}
+
+export async function unlinkSubjectResourceFromConversation(input: {
+  context: AuthenticatedUserContext;
+  requestId: string;
+  route: string;
+  conversationId: string;
+  resourceId: string;
+}) {
+  const appUser = await requireStudentAppUser(input.context);
+  const admin = createSupabaseAdminClient();
+  const subjectResource = await loadOwnedSubjectResource({
+    resourceId: input.resourceId,
+    studentUserId: appUser.id,
+  });
+
+  await loadOwnedConversation({
+    conversationId: input.conversationId,
+    studentUserId: appUser.id,
+    subjectTag: subjectResource.subject_tag,
+  });
+
+  const { error } = await admin
+    .from("conversation_resource_links")
+    .delete()
+    .eq("conversation_id", input.conversationId)
+    .eq("resource_id", input.resourceId);
+
+  if (error) {
+    throw toServiceError("Unable to unlink the subject resource.", error);
+  }
+
+  logRuntimeInfo({
+    message: "Unlinked subject resource from conversation",
+    requestId: input.requestId,
+    route: input.route,
+    method: "DELETE",
+    actorUserId: appUser.id,
+    actorRole: "student",
+    targetStudentUserId: appUser.id,
+    details: {
+      conversationId: input.conversationId,
+      subjectResourceId: input.resourceId,
+    },
+  });
+
+  return {
+    conversationId: input.conversationId,
+    resourceId: input.resourceId,
+  };
+}
+
+export async function deleteSubjectResource(input: {
+  context: AuthenticatedUserContext;
+  requestId: string;
+  route: string;
+  resourceId: string;
+}) {
+  const appUser = await requireStudentAppUser(input.context);
+  const admin = createSupabaseAdminClient();
+  const subjectResource = await loadOwnedSubjectResource({
+    resourceId: input.resourceId,
+    studentUserId: appUser.id,
+  });
+  const ownsSourceStorage =
+    Boolean(subjectResource.source_storage_bucket) &&
+    Boolean(subjectResource.source_storage_path) &&
+    !subjectResource.source_attachment_id;
+
+  if (
+    ownsSourceStorage &&
+    subjectResource.source_storage_bucket &&
+    subjectResource.source_storage_path
+  ) {
+    const { error: storageError } = await admin.storage
+      .from(subjectResource.source_storage_bucket)
+      .remove([subjectResource.source_storage_path]);
+
+    if (storageError) {
+      throw toServiceError("Unable to purge subject resource storage.", storageError);
+    }
+  }
+
+  const { error: deleteError } = await admin
+    .from("subject_resources")
+    .delete()
+    .eq("id", subjectResource.id)
+    .eq("student_user_id", appUser.id);
+
+  if (deleteError) {
+    throw toServiceError("Unable to delete the subject resource.", deleteError);
+  }
+
+  logRuntimeInfo({
+    message: "Deleted subject resource",
+    requestId: input.requestId,
+    route: input.route,
+    method: "DELETE",
+    actorUserId: appUser.id,
+    actorRole: "student",
+    targetStudentUserId: appUser.id,
+    details: {
+      subjectResourceId: subjectResource.id,
+      subjectTag: subjectResource.subject_tag,
+      storagePurged: ownsSourceStorage,
+      linkedSourceAttachmentPreserved: Boolean(subjectResource.source_attachment_id),
+    },
+  });
+
+  return {
+    resourceId: subjectResource.id,
+    storagePurged: ownsSourceStorage,
   };
 }
 

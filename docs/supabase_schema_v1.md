@@ -56,6 +56,7 @@ This avoids a single giant session table and keeps later policy logic easier to 
 - `users.account_status` includes `pending_parent_approval` and `deletion_requested`
 - `users.deletion_requested_at` supports queued purge flows
 - learning-content tables cascade from student-owned roots, so purge jobs can delete account content cleanly
+- deleting a subject resource cascades its chunks and conversation links; storage cleanup is service-owned because promoted chat attachments and resource-owned uploads have different storage ownership
 - `subscriptions`, `audit_logs`, `moderation_events`, and the server-owned `ai_generation_debug_captures` table are structured so limited operational/debug records can survive separately when necessary
 - the current successful-coach debug capture schema addition lives in [`supabase/migrations/20260408000400_ai_generation_debug_captures.sql`](../supabase/migrations/20260408000400_ai_generation_debug_captures.sql)
 - the first subject-wide resource schema addition lives in [`supabase/migrations/20260428000500_subject_resources.sql`](../supabase/migrations/20260428000500_subject_resources.sql)

@@ -17,7 +17,7 @@ Current local status:
 
 - `lib/server/ai/` now contains the first Gemini-backed provider adapter plus prompt modules
 - `lib/server/uploads/` now contains the signed-upload, confirm, extraction, and read-access service layer
-- `lib/server/subject-resources/` now contains the durable subject-resource helper layer for promoting ready PDF extractions, linking them to conversations, creating deterministic chunks, and retrieving bounded lexical chunk context for coach replies
+- `lib/server/subject-resources/` now contains the durable subject-resource helper layer for promoting ready PDF extractions, linking/unlinking them to conversations, deleting subject resources with cascaded chunks/links/raw text, creating deterministic chunks, and retrieving bounded lexical chunk context for coach replies
 - `lib/server/moderation/`, `lib/server/summaries/`, and `lib/server/translations/` now exist in code
 - `lib/server/oversight/` now contains parent/tutor/admin read services plus tutor-note mutation handling
 - `lib/server/privacy/` now owns the `/app/settings` snapshot plus queued deletion request flow

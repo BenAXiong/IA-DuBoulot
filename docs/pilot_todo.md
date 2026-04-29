@@ -96,8 +96,10 @@ Status note: add a focused auth-surface polish follow-up under `P1.3` for the fi
   - [x] Keep chat-only attachments separate from subject-resource uploads; no chat-to-subject promotion UI in this Pilot slice.
   - [x] Refine the below-composer subject page tabs for History, Resources, and Instructions once the first resource UI has been tried.
 - [x] P2.7.10 Improve PDF preview and outline formatting around real course sections/headings rather than pages alone.
-- [ ] P2.7.11 Define and implement resource lifecycle behavior: unlink, delete, purge raw text/chunks/links/storage, and adult/tutor visibility.
+- [x] P2.7.11 Define and implement resource lifecycle behavior: unlink, delete, purge raw text/chunks/links/storage, and adult/tutor visibility.
 - [ ] P2.7.12 Expand retrieval evaluation, observability, and token-impact measurement before considering embeddings.
+
+  Status note: `P2.7.11` keeps the full subject-resource library student/admin controlled. Parents and tutors only see subject resources through conversation links they can already review. Learners can now unselect a resource for retrieval, unlink it from the current conversation, or delete it from the subject library; deletion cascades stored chunks and conversation links, purges raw extracted text by deleting the row, and removes private storage only for resource-owned uploads rather than promoted chat attachments.
 
   Status note: subject-resource upload validation now distinguishes true unsupported formats from files that exceed the size cap. During Pilot, provider-extracted subject resources allow PDF/DOC/DOCX files up to `50 MB`, direct TXT/MD/JSON resources stay at `5 MB`, and ordinary chat-only attachment caps remain unchanged.
 - [ ] P2.8 Evaluate and design a durable conversation working-memory layer for active tutoring state, including assistant-generated questions, student answers, current correction targets, unresolved points, and explicit interactions with completion summaries, student memory profiles, subject-wide resources, and transcript-window compaction.

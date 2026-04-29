@@ -23,6 +23,7 @@ Related: [README](../README.md) | [Implementation plan](implementation_plan.md) 
 | Tutor-student links | request/view own links | approve/revoke for linked child | request/view own links | manage all, audited | Parent approval required for under-13 |
 | Conversations and messages | create/read/update own | read linked child | read linked child | read/manage, audited | No parent/tutor editing of student chat |
 | Attachments and extracted text | upload/read/delete own session files | read linked child | read linked child | read/manage, audited | Storage cleanup must follow deletion rules |
+| Subject resources and chunks | upload/read/select/unlink/delete own subject resources | read only when linked to a visible conversation | read only when linked to a visible conversation | read/manage, audited | Full subject library stays student/admin controlled; deleting a promoted resource does not delete the original chat attachment |
 | Workspace state | create/read/update own | read linked child | read linked child | read/manage, audited | Parent/tutor are review-only |
 | Session summaries | read own | read linked child | read linked child | read/manage, audited | Summary variants may differ by role |
 | Student memory items | read own relevant items | read linked child | read linked child summary signals | read/manage, audited | System-generated; user edits are limited |

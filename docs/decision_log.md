@@ -1677,3 +1677,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Keep chat-only attachment caps unchanged, but raise provider-extracted subject-resource PDFs and Word documents to `50 MB` during Pilot measurement. Direct TXT/MD/JSON resources stay at `5 MB`. The shared private source bucket should allow the higher single-object cap, while each upload route continues enforcing its own stricter limits.
 - Why: Subject resources are extracted once, chunked, and reused by retrieval, so they have a different cost profile from chat-only attachments that can otherwise be repeatedly injected. A clearer file-too-large error also prevents size-limit failures from masquerading as format support bugs.
 - Follow-up: Track extraction reliability, storage use, and provider usage metadata before raising caps further; add lifecycle cleanup and broader retrieval observability under `P2.7.11` and `P2.7.12`.
+
+### D-20260429-06 - Keep Subject-Resource Lifecycle Student-Owned And Conversation-Linked
+
+- Date: 2026-04-29
+- Status: accepted
+- Related tasks: `P2.7.11`
+- Context: Subject resources now have learner-facing list, upload, selection, preview, and retrieval behavior, but deletion and adult/tutor visibility needed an explicit rule before Pilot use.
+- Decision: Treat the full subject-resource library as student/admin controlled. Parents and tutors can read only resources linked to conversations they are already allowed to review. Learners can unselect a resource for retrieval, unlink it from a conversation, or delete it from the subject library. Deleting a subject resource removes the row, raw extracted text, chunks, and conversation links; it removes private storage only when the subject resource owns that uploaded object. Resources promoted from chat attachments do not delete the original attachment storage.
+- Why: This keeps adult/tutor review consistent with existing conversation review access, avoids silent deletion of chat attachments, and gives learners enough lifecycle control without introducing parent/tutor management semantics too early.
+- Follow-up: Revisit adult/tutor subject-library browse or management only after a separate product decision, and include audit/notification expectations if adults ever gain mutation rights.

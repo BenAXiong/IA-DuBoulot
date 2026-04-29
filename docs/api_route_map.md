@@ -79,6 +79,12 @@ These routes reserve storage locations, confirm uploaded files, and trigger extr
 | `/api/uploads/extract` | `POST` | server-triggered or student | request text extraction for an attachment | should enqueue or async-trigger later |
 | `/api/attachments/[attachmentId]/access` | `GET` | visible role | mint short-lived read access for an attachment | required because buckets stay private |
 | `/api/attachments/[attachmentId]` | `DELETE` | student owner | remove an uploaded file from an active conversation | deletes the attachment record and storage object; hidden workspace text stays untouched for now |
+| `/api/subject-resources` | `GET` | student | list subject resources for a subject | can include current conversation link/selection state |
+| `/api/subject-resources` | `POST` | student | create a subject-resource upload record + signed upload target | subject-resource caps are separate from chat-only attachment caps |
+| `/api/subject-resources` | `DELETE` | student owner | delete a subject resource from the subject library | deletes raw extracted text, chunks, and all conversation links; purges storage only when the resource owns the storage object |
+| `/api/subject-resources/confirm` | `POST` | student | confirm a subject-resource upload and extract/reuse text | can link and select the resource for the current conversation |
+| `/api/subject-resources/selection` | `PATCH` | student owner | select or unselect a resource for one conversation | controls retrieval, but keeps the conversation-resource link |
+| `/api/subject-resources/selection` | `DELETE` | student owner | unlink a resource from one conversation | removes the conversation-resource link and therefore removes adult/tutor visibility through that conversation |
 
 ### Conversations And Workspace
 
@@ -178,6 +184,9 @@ app/api/attachments/[attachmentId]/route.ts
 app/api/uploads/create/route.ts
 app/api/uploads/confirm/route.ts
 app/api/uploads/extract/route.ts
+app/api/subject-resources/route.ts
+app/api/subject-resources/confirm/route.ts
+app/api/subject-resources/selection/route.ts
 app/api/privacy/deletion-requests/route.ts
 app/api/telemetry/events/route.ts
 app/api/conversations/route.ts

@@ -40,6 +40,8 @@ function getCopy(languageCode: UiLanguageCode) {
         uploading: "Adding...",
         selected: "Used in this chat",
         unselected: "Not used",
+        unlink: "Unlink",
+        delete: "Delete",
         ready: "ready",
         pending: "pending",
         failed: "failed",
@@ -47,6 +49,9 @@ function getCopy(languageCode: UiLanguageCode) {
         tooLarge: (name: string, limit: string) =>
           `${name} is too large for subject sources. Limit: ${limit}.`,
         uploadError: "Unable to add this subject source.",
+        confirmUnlink: (name: string) => `Remove ${name} from this chat?`,
+        confirmDelete: (name: string) =>
+          `Delete ${name} from subject sources and linked chats?`,
         chunks: (count: number) => `${count} chunk${count === 1 ? "" : "s"}`,
         pages: (count: number | null) => (count ? `${count}p` : "pages -"),
         outlineUnavailable: "No usable structure yet.",
@@ -59,6 +64,8 @@ function getCopy(languageCode: UiLanguageCode) {
         uploading: "正在新增...",
         selected: "此聊天會使用",
         unselected: "未使用",
+        unlink: "取消連結",
+        delete: "刪除",
         ready: "ready",
         pending: "pending",
         failed: "failed",
@@ -66,6 +73,9 @@ function getCopy(languageCode: UiLanguageCode) {
         tooLarge: (name: string, limit: string) =>
           `${name} 太大，無法作為科目資料來源。上限：${limit}。`,
         uploadError: "無法新增這個科目資料來源。",
+        confirmUnlink: (name: string) => `要從這個聊天移除 ${name} 嗎？`,
+        confirmDelete: (name: string) =>
+          `要從科目資料來源與已連結的聊天刪除 ${name} 嗎？`,
         chunks: (count: number) => `${count} chunks`,
         pages: (count: number | null) => (count ? `${count}p` : "pages -"),
         outlineUnavailable: "尚無可用結構。",
@@ -78,6 +88,8 @@ function getCopy(languageCode: UiLanguageCode) {
         uploading: "Ajout...",
         selected: "Utilisée ici",
         unselected: "Non utilisée",
+        unlink: "Détacher",
+        delete: "Supprimer",
         ready: "ready",
         pending: "pending",
         failed: "failed",
@@ -86,6 +98,10 @@ function getCopy(languageCode: UiLanguageCode) {
         tooLarge: (name: string, limit: string) =>
           `${name} est trop volumineux pour les ressources. Limite : ${limit}.`,
         uploadError: "Impossible d'ajouter cette ressource de matière.",
+        confirmUnlink: (name: string) =>
+          `Détacher ${name} de cette discussion ?`,
+        confirmDelete: (name: string) =>
+          `Supprimer ${name} des ressources et des discussions liées ?`,
         chunks: (count: number) => `${count} chunk${count > 1 ? "s" : ""}`,
         pages: (count: number | null) => (count ? `${count}p` : "pages -"),
         outlineUnavailable: "Structure non disponible.",
@@ -308,6 +324,99 @@ export function StudentSubjectResourceLibrary({
     });
   }
 
+  function unlinkResource(resource: SubjectResourceLibraryItem) {
+    if (!conversationId || !resource.link) {
+      return;
+    }
+
+    if (!window.confirm(copy.confirmUnlink(resource.original_filename))) {
+      return;
+    }
+
+    setPendingResourceId(resource.id);
+    startTransition(async () => {
+      try {
+        const response = await fetch("/api/subject-resources/selection", {
+          method: "DELETE",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            conversationId,
+            resourceId: resource.id,
+          }),
+        });
+        const payload = (await response.json().catch(() => null)) as
+          | {
+              ok?: boolean;
+              error?: {
+                message?: string;
+              };
+            }
+          | null;
+
+        if (!response.ok || !payload?.ok) {
+          throw new Error(payload?.error?.message ?? copy.uploadError);
+        }
+
+        mergeResource({
+          ...resource,
+          selected: false,
+          link: null,
+        });
+        setErrorMessage(null);
+      } catch (error) {
+        setErrorMessage(
+          error instanceof Error ? error.message : copy.uploadError,
+        );
+      } finally {
+        setPendingResourceId(null);
+      }
+    });
+  }
+
+  function deleteResource(resource: SubjectResourceLibraryItem) {
+    if (!window.confirm(copy.confirmDelete(resource.original_filename))) {
+      return;
+    }
+
+    setPendingResourceId(resource.id);
+    startTransition(async () => {
+      try {
+        const response = await fetch("/api/subject-resources", {
+          method: "DELETE",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            resourceId: resource.id,
+          }),
+        });
+        const payload = (await response.json().catch(() => null)) as
+          | {
+              ok?: boolean;
+              error?: {
+                message?: string;
+              };
+            }
+          | null;
+
+        if (!response.ok || !payload?.ok) {
+          throw new Error(payload?.error?.message ?? copy.uploadError);
+        }
+
+        setResources((current) => current.filter((item) => item.id !== resource.id));
+        setErrorMessage(null);
+      } catch (error) {
+        setErrorMessage(
+          error instanceof Error ? error.message : copy.uploadError,
+        );
+      } finally {
+        setPendingResourceId(null);
+      }
+    });
+  }
+
   return (
     <section className={`grid gap-3 ${compact ? "" : "py-1"}`}>
       <input
@@ -408,6 +517,26 @@ export function StudentSubjectResourceLibrary({
                     unavailableLabel={copy.outlineUnavailable}
                   />
                 ) : null}
+                <div className="flex flex-wrap items-center gap-2">
+                  {conversationId && resource.link ? (
+                    <button
+                      className="rounded-full border border-[color:var(--line)] px-3 py-1 text-xs font-medium text-[color:var(--ink-soft)] transition hover:text-[color:var(--foreground)] disabled:cursor-not-allowed disabled:opacity-50"
+                      disabled={isUpdating || disabled}
+                      onClick={() => unlinkResource(resource)}
+                      type="button"
+                    >
+                      {copy.unlink}
+                    </button>
+                  ) : null}
+                  <button
+                    className="rounded-full border border-[#c95f44]/35 px-3 py-1 text-xs font-medium text-[#c95f44] transition hover:border-[#c95f44] disabled:cursor-not-allowed disabled:opacity-50"
+                    disabled={isUpdating || disabled}
+                    onClick={() => deleteResource(resource)}
+                    type="button"
+                  >
+                    {copy.delete}
+                  </button>
+                </div>
               </div>
             );
           })}

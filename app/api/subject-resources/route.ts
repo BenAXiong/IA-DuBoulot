@@ -3,8 +3,10 @@ import { requireAuthenticatedUserContext } from "@/lib/server/auth/authorization
 import { withRouteErrorHandling } from "@/lib/server/errors/with-route-error-handling";
 import {
   createSubjectResourceUploadTarget,
+  deleteSubjectResource,
   listSubjectResourceLibrary,
   parseCreateSubjectResourceTargetRequest,
+  parseSubjectResourceDeleteRequest,
 } from "@/lib/server/subject-resources/service";
 
 export const GET = withRouteErrorHandling(async (request) => {
@@ -52,4 +54,26 @@ export const POST = withRouteErrorHandling(async (request, { requestId }) => {
       status: 201,
     },
   );
+});
+
+export const DELETE = withRouteErrorHandling(async (request, { requestId }) => {
+  const context = await requireAuthenticatedUserContext();
+  const payload = await parseSubjectResourceDeleteRequest(
+    request,
+    context.appUser?.preferred_ui_language ?? "fr",
+  );
+  const result = await deleteSubjectResource({
+    context,
+    requestId,
+    route: "/api/subject-resources",
+    ...payload,
+  });
+
+  return NextResponse.json({
+    ok: true,
+    data: {
+      requestId,
+      ...result,
+    },
+  });
 });
