@@ -98,12 +98,22 @@ The fourth slice adds a small regression fixture for the original late-page fail
 
 ## Deferred
 
-- learner-facing subject resource library and per-chat toggles
 - stronger section-aware chunking and formatting improvements
 - broader retrieval evaluation beyond the first late-page fixture
 - old-PDF backfill and weak-outline cleanup
 - embeddings
 - provider or local page-aware extraction fallback
+
+## Slice 5
+
+The fifth slice adds the first learner-facing resource controls:
+
+- list subject resources on the subject page and inside the live chat side rail
+- add per-conversation selected/unselected toggles backed by `conversation_resource_links.selected`
+- add a dedicated subject-resource upload entry point outside the chat attachment controls
+- support PDF, TXT, MD, JSON, DOC, and DOCX subject-resource uploads through the subject-resource path
+- keep chat-only attachments separate; no chat-to-subject promotion UI is implemented in this Pilot slice
+- keep the richer below-composer tab layout for History, Resources, and Instructions as a remaining `P2.7.9` UI refinement
 
 ## Pitfalls To Guard
 

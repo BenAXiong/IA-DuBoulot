@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { StudentReplyModeSwitch } from "@/components/dashboard/student/student-reply-mode-switch";
+import { StudentSubjectResourceLibrary } from "@/components/dashboard/student/student-subject-resource-library";
 import { StudentUploadProgressRing } from "@/components/dashboard/student/student-upload-progress-ring";
 import { setPendingConversationBootstrap } from "@/lib/conversations/pending-bootstrap-store";
 import {
@@ -13,6 +14,7 @@ import {
 } from "@/lib/intake/intake-config";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type { StudentReplyMode } from "@/lib/server/conversations/types";
+import type { SubjectResourceLibraryItem } from "@/lib/server/subject-resources/types";
 import {
   type ConversationUploadPhase,
   uploadConversationFiles,
@@ -27,6 +29,7 @@ type StudentSubjectQuickStartProps = {
   subjectTag: string;
   languageCode: UiLanguageCode;
   existingConversationCount?: number;
+  initialSubjectResources?: SubjectResourceLibraryItem[];
 };
 
 type CreateConversationShellResponse =
@@ -206,6 +209,7 @@ export function StudentSubjectQuickStart({
   subjectTag,
   languageCode,
   existingConversationCount = 0,
+  initialSubjectResources = [],
 }: StudentSubjectQuickStartProps) {
   const router = useRouter();
   const copy = getQuickStartCopy(languageCode);
@@ -427,87 +431,95 @@ export function StudentSubjectQuickStart({
   }
 
   return (
-    <form
-      className="grid gap-2 rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-2"
-      onSubmit={handleSubmit}
-    >
-      <input
-        accept={INTAKE_ACCEPT_ATTR}
-        className="hidden"
-        multiple
-        onChange={handleFilePick}
-        ref={fileInputRef}
-        type="file"
-      />
+    <div className="grid gap-4">
+      <form
+        className="grid gap-2 rounded-[1.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-2"
+        onSubmit={handleSubmit}
+      >
+        <input
+          accept={INTAKE_ACCEPT_ATTR}
+          className="hidden"
+          multiple
+          onChange={handleFilePick}
+          ref={fileInputRef}
+          type="file"
+        />
 
-      <textarea
-        className="student-chat-textarea min-h-6 resize-none appearance-none border-0 bg-transparent px-1 py-0 text-sm leading-5 placeholder:text-[color:var(--ink-soft)]"
-        onChange={(event) => setDraft(event.target.value)}
-        onKeyDown={handleComposerKeyDown}
-        onPaste={handleComposerPaste}
-        placeholder={copy.placeholder}
-        value={draft}
-      />
+        <textarea
+          className="student-chat-textarea min-h-6 resize-none appearance-none border-0 bg-transparent px-1 py-0 text-sm leading-5 placeholder:text-[color:var(--ink-soft)]"
+          onChange={(event) => setDraft(event.target.value)}
+          onKeyDown={handleComposerKeyDown}
+          onPaste={handleComposerPaste}
+          placeholder={copy.placeholder}
+          value={draft}
+        />
 
-      <div className="flex items-center justify-between gap-3 px-0.5">
-        <div className="flex min-w-0 items-center gap-2">
+        <div className="flex items-center justify-between gap-3 px-0.5">
+          <div className="flex min-w-0 items-center gap-2">
+            <button
+              aria-label={copy.addSources}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={isStarting}
+              onClick={() => fileInputRef.current?.click()}
+              title={copy.addSources}
+              type="button"
+            >
+              <PlusIcon />
+            </button>
+            <StudentReplyModeSwitch
+              disabled={isStarting}
+              languageCode={languageCode}
+              mode={replyMode}
+              onModeChange={setReplyMode}
+            />
+            <button
+              aria-label={copy.voice}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] focus:shadow-none focus-visible:shadow-none"
+              disabled
+              title={copy.voice}
+              type="button"
+            >
+              <MicIcon />
+            </button>
+            {stagedFiles.length > 0 ? (
+              <span className="truncate text-xs text-[color:var(--ink-soft)]">
+                {copy.attachmentsReady(stagedFiles.length)}
+              </span>
+            ) : null}
+          </div>
+
           <button
-            aria-label={copy.addSources}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
-            disabled={isStarting}
-            onClick={() => fileInputRef.current?.click()}
-            title={copy.addSources}
-            type="button"
+            aria-label={
+              isStarting && stagedFiles.length > 0
+                ? copy.preparingUpload
+                : isStarting
+                  ? copy.sending
+                  : copy.submit
+            }
+            className="inline-flex h-8 w-8 items-center justify-center text-[color:var(--foreground)] transition hover:text-[color:var(--accent)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-40"
+            disabled={isStarting || draft.trim().length === 0}
+            type="submit"
           >
-            <PlusIcon />
+            {isStarting && stagedFiles.length > 0 ? (
+              <StudentUploadProgressRing
+                completedSegments={getUploadProgressSegments(uploadProgress)}
+              />
+            ) : (
+              <SendIcon />
+            )}
           </button>
-          <StudentReplyModeSwitch
-            disabled={isStarting}
-            languageCode={languageCode}
-            mode={replyMode}
-            onModeChange={setReplyMode}
-          />
-          <button
-            aria-label={copy.voice}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] focus:shadow-none focus-visible:shadow-none"
-            disabled
-            title={copy.voice}
-            type="button"
-          >
-            <MicIcon />
-          </button>
-          {stagedFiles.length > 0 ? (
-            <span className="truncate text-xs text-[color:var(--ink-soft)]">
-              {copy.attachmentsReady(stagedFiles.length)}
-            </span>
-          ) : null}
         </div>
 
-        <button
-          aria-label={
-            isStarting && stagedFiles.length > 0
-              ? copy.preparingUpload
-              : isStarting
-                ? copy.sending
-                : copy.submit
-          }
-          className="inline-flex h-8 w-8 items-center justify-center text-[color:var(--foreground)] transition hover:text-[color:var(--accent)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-40"
-          disabled={isStarting || draft.trim().length === 0}
-          type="submit"
-        >
-          {isStarting && stagedFiles.length > 0 ? (
-            <StudentUploadProgressRing
-              completedSegments={getUploadProgressSegments(uploadProgress)}
-            />
-          ) : (
-            <SendIcon />
-          )}
-        </button>
-      </div>
+        {errorMessage ? (
+          <p className="px-1 text-xs leading-5 text-[#c95f44]">{errorMessage}</p>
+        ) : null}
+      </form>
 
-      {errorMessage ? (
-        <p className="px-1 text-xs leading-5 text-[#c95f44]">{errorMessage}</p>
-      ) : null}
-    </form>
+      <StudentSubjectResourceLibrary
+        initialResources={initialSubjectResources}
+        languageCode={languageCode}
+        subjectTag={subjectTag}
+      />
+    </div>
   );
 }

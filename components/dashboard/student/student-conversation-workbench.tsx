@@ -984,6 +984,7 @@ export function StudentConversationWorkbench({
               disabled={isUploading}
               isCompleted={conversation.status === "completed"}
               isCompleting={isCompleting}
+              conversationId={conversation.id}
               languageCode={languageCode}
               onComplete={completeSession}
               onRegenerateSummary={() =>
@@ -997,6 +998,8 @@ export function StudentConversationWorkbench({
                 void retryAttachmentExtraction(attachmentId);
               }}
               retryingAttachmentId={retryingAttachmentId}
+              subjectResources={detail.subjectResources}
+              subjectTag={conversation.subject_tag}
               summaries={summaries}
             />
           </div>

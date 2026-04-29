@@ -18,6 +18,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 
 ## Current Decisions
 
+### D-20260429-01 - Subject Resources Get Dedicated Uploads And Explicit Chat Selection
+
+- Date: 2026-04-29
+- Status: accepted
+- Related tasks: `P2.7.7`, `P2.7.8`, `P2.7.9`
+- Context: The subject-resource schema, chunking, and retrieval existed, but learners still had no durable subject library UI and no explicit way to choose which subject docs should feed a given chat. Chat attachment upload controls also risked being mistaken for the subject-doc path.
+- Decision: Add a learner-facing subject-resource library on subject pages and in the live chat rail, add selected/unselected toggles backed by `conversation_resource_links.selected`, and add a dedicated subject-resource upload API/UI path for PDF, TXT, MD, JSON, DOC, and DOCX. Keep chat-only attachments separate and do not add chat-to-subject promotion in this Pilot slice.
+- Why: This makes extraction-complete, library-visible, and coach-selected states explicit. It also preserves the product distinction that homework attachments are temporary chat material while subject resources are long-lived subject docs.
+- Follow-up: Finish the `P2.7.9` below-composer tab layout for History, Resources, and Instructions, then define lifecycle/delete/purge behavior under `P2.7.11`.
+
 ### D-20260428-05 - Add Durable Subject Resources Before Retrieval
 
 - Date: 2026-04-28

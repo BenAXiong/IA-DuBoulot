@@ -58,6 +58,12 @@ export type SubjectResourceReuseResult = {
   chunks: SubjectResourceChunkRecord[];
 };
 
+export type SubjectResourceLibraryItem = SubjectResourceRecord & {
+  selected: boolean;
+  link: ConversationResourceLinkRecord | null;
+  chunk_count: number;
+};
+
 export type SubjectResourceRetrievalChunk = SubjectResourceChunkRecord & {
   resource_filename: string;
   resource_summary: string | null;

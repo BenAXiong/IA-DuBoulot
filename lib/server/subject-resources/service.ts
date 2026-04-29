@@ -1,11 +1,41 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { getStudentUploadServerCopy } from "@/lib/i18n/student-flow-copy";
 import type { ConversationAttachmentRecord } from "@/lib/server/ai/types";
+import { getAiProvider } from "@/lib/server/ai/provider";
+import { logRuntimeInfo } from "@/lib/server/audit/runtime-logger";
+import {
+  requireActiveAppUser,
+  requireAppUserContext,
+  requireAppUserRole,
+} from "@/lib/server/auth/authorization";
+import type { AuthenticatedUserContext, UiLanguageCode } from "@/lib/server/auth/types";
 import type { ConversationRecord } from "@/lib/server/conversations/types";
+import { AppError } from "@/lib/server/errors/app-error";
+import {
+  moderateExtraction,
+  recordModerationEvent,
+} from "@/lib/server/moderation/service";
+import {
+  assertStudentUsageActionAllowed,
+  recordStudentAiUsageBestEffort,
+  recordStudentUsageDeltaBestEffort,
+} from "@/lib/server/usage/service";
+import {
+  ALLOWED_ATTACHMENT_RULES,
+  HOMEWORK_ATTACHMENTS_BUCKET,
+} from "@/lib/server/uploads/constants";
+import {
+  SUBJECT_RESOURCE_ALLOWED_MIME_TYPES,
+  SUBJECT_RESOURCE_POLICY_BY_MIME,
+  resolveSubjectResourcePolicyInput,
+  type SubjectResourceMimeType,
+} from "@/lib/subject-resources/subject-resource-policy";
 import type {
   ConversationResourceLinkRecord,
   SubjectResourceChunkRecord,
+  SubjectResourceLibraryItem,
   SubjectResourceRetrievalChunk,
   SubjectResourceRetrievalResult,
   SubjectResourceRecord,
@@ -15,6 +45,8 @@ import {
   AI_CONTEXT_LIMITS,
   truncateForAiContext,
 } from "@/lib/server/ai/guardrails";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const SUBJECT_RESOURCE_SELECT =
   "id, student_user_id, created_by_user_id, subject_tag, source_attachment_id, source_conversation_id, source_storage_bucket, source_storage_path, attachment_kind, mime_type, original_filename, byte_size, page_count, extraction_status, raw_extracted_text, source_language, sha256, metadata, created_at, updated_at";
@@ -22,9 +54,42 @@ const CONVERSATION_RESOURCE_LINK_SELECT =
   "id, conversation_id, resource_id, created_by_user_id, selected, created_at, updated_at";
 const SUBJECT_RESOURCE_CHUNK_SELECT =
   "id, resource_id, student_user_id, subject_tag, chunk_index, stable_chunk_id, page_start, page_end, section_title, content, char_count, token_estimate, extraction_confidence, metadata, created_at, updated_at";
+const CONVERSATION_SELECT =
+  "id, student_user_id, created_by_user_id, title, subject_tag, status, graded_homework, assignment_text, edited_extracted_text, source_language, last_message_at, completed_at, created_at, updated_at";
 const CHUNKER_VERSION = "subject-resource-chunker-v1";
 const MAX_CHUNK_CHARS = 3200;
 const CHUNK_OVERLAP_CHARS = 240;
+const MAX_SUBJECT_TAG_LENGTH = 60;
+const SUBJECT_RESOURCE_BUCKET_ALLOWED_MIME_TYPES = Array.from(
+  new Set([
+    ...Object.keys(ALLOWED_ATTACHMENT_RULES),
+    ...SUBJECT_RESOURCE_ALLOWED_MIME_TYPES,
+  ]),
+);
+
+function toServiceError(message: string, cause: unknown) {
+  return new AppError({
+    code: "service_unavailable",
+    message,
+    status: 503,
+    retryable: true,
+    cause,
+  });
+}
+
+function requireBodyObject(body: unknown, languageCode: UiLanguageCode) {
+  const copy = getStudentUploadServerCopy(languageCode);
+
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    throw new AppError({
+      code: "bad_request",
+      message: copy.requestErrors.expectedObject,
+      status: 400,
+    });
+  }
+
+  return body as Record<string, unknown>;
+}
 
 function normalizeMetadata(metadata: unknown): Record<string, unknown> {
   return metadata && typeof metadata === "object" && !Array.isArray(metadata)
@@ -48,6 +113,70 @@ function metadataBoolean(metadata: Record<string, unknown>, key: string) {
 
 function normalizeText(text: string) {
   return text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").trim();
+}
+
+function normalizeSubjectTag(value: string) {
+  const normalized = value.trim();
+  return normalized.length > 0 ? normalized : null;
+}
+
+function buildStoragePath(input: {
+  studentUserId: string;
+  subjectTag: string;
+  resourceId: string;
+  mimeType: SubjectResourceMimeType;
+}) {
+  const extension = SUBJECT_RESOURCE_POLICY_BY_MIME[input.mimeType].extension;
+  const normalizedSubject = input.subjectTag
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/[^a-z0-9_-]+/gi, "-")
+    .replace(/^-+|-+$/g, "")
+    .toLowerCase() || "subject";
+
+  return [
+    "student",
+    input.studentUserId,
+    "subject",
+    normalizedSubject,
+    "resource",
+    input.resourceId,
+    `source.${extension}`,
+  ].join("/");
+}
+
+async function sha256Hex(blob: Blob) {
+  const buffer = await blob.arrayBuffer();
+  const digest = await crypto.subtle.digest("SHA-256", buffer);
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function buildDirectTextSummary(text: string) {
+  const normalized = text.replace(/\s+/g, " ").trim();
+  return normalized ? normalized.slice(0, 280) : null;
+}
+
+function buildDirectTextOutline(text: string) {
+  const headings = text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => {
+      if (!line || line.length > 140) {
+        return false;
+      }
+
+      return (
+        /^#{1,6}\s+\S/.test(line) ||
+        /^(chapitre|partie|section|exercice|activit[eé]|m[eé]thode)\b/i.test(line) ||
+        /^\d+(?:[.)]|\s+-)\s+\S/.test(line)
+      );
+    })
+    .slice(0, 12)
+    .map((line) => line.replace(/^#{1,6}\s+/, ""));
+
+  return headings.length > 0 ? headings.join("\n") : null;
 }
 
 function estimateTokens(text: string) {
@@ -309,6 +438,984 @@ export async function ensureSubjectResourceChunks(input: {
   }
 
   return replaceSubjectResourceChunks(input);
+}
+
+export async function parseCreateSubjectResourceTargetRequest(
+  request: Request,
+  languageCode: UiLanguageCode = "fr",
+) {
+  const copy = getStudentUploadServerCopy(languageCode);
+  let body: unknown;
+
+  try {
+    body = await request.json();
+  } catch (error) {
+    throw new AppError({
+      code: "bad_request",
+      message: copy.requestErrors.invalidJson,
+      status: 400,
+      cause: error,
+    });
+  }
+
+  const payload = requireBodyObject(body, languageCode);
+  const subjectTag = typeof payload.subjectTag === "string" ? payload.subjectTag : "";
+  const originalFilename =
+    typeof payload.originalFilename === "string" ? payload.originalFilename : "";
+  const mimeType = typeof payload.mimeType === "string" ? payload.mimeType : "";
+  const byteSize =
+    typeof payload.byteSize === "number" ? payload.byteSize : Number.NaN;
+
+  if (!normalizeSubjectTag(subjectTag) || subjectTag.length > MAX_SUBJECT_TAG_LENGTH) {
+    throw new AppError({
+      code: "validation_error",
+      message: copy.requestErrors.invalidFields,
+      status: 400,
+      fieldErrors: {
+        subjectTag: "Subject is required.",
+      },
+    });
+  }
+
+  if (!originalFilename.trim()) {
+    throw new AppError({
+      code: "validation_error",
+      message: copy.requestErrors.invalidFields,
+      status: 400,
+      fieldErrors: {
+        originalFilename: copy.validation.originalFilenameRequired,
+      },
+    });
+  }
+
+  return {
+    subjectTag: subjectTag.trim(),
+    originalFilename: originalFilename.trim(),
+    mimeType: mimeType.trim(),
+    byteSize,
+  };
+}
+
+export async function parseConfirmSubjectResourceRequest(
+  request: Request,
+  languageCode: UiLanguageCode = "fr",
+) {
+  const copy = getStudentUploadServerCopy(languageCode);
+  let body: unknown;
+
+  try {
+    body = await request.json();
+  } catch (error) {
+    throw new AppError({
+      code: "bad_request",
+      message: copy.requestErrors.invalidJson,
+      status: 400,
+      cause: error,
+    });
+  }
+
+  const payload = requireBodyObject(body, languageCode);
+  const resourceId =
+    typeof payload.resourceId === "string" ? payload.resourceId.trim() : "";
+  const conversationId =
+    typeof payload.conversationId === "string" ? payload.conversationId.trim() : null;
+  const selected = payload.selected === false ? false : true;
+
+  if (!resourceId) {
+    throw new AppError({
+      code: "validation_error",
+      message: copy.requestErrors.invalidFields,
+      status: 400,
+      fieldErrors: {
+        resourceId: "Resource id is required.",
+      },
+    });
+  }
+
+  return {
+    resourceId,
+    conversationId,
+    selected,
+  };
+}
+
+export async function parseSubjectResourceSelectionRequest(
+  request: Request,
+  languageCode: UiLanguageCode = "fr",
+) {
+  const copy = getStudentUploadServerCopy(languageCode);
+  let body: unknown;
+
+  try {
+    body = await request.json();
+  } catch (error) {
+    throw new AppError({
+      code: "bad_request",
+      message: copy.requestErrors.invalidJson,
+      status: 400,
+      cause: error,
+    });
+  }
+
+  const payload = requireBodyObject(body, languageCode);
+  const conversationId =
+    typeof payload.conversationId === "string" ? payload.conversationId.trim() : "";
+  const resourceId =
+    typeof payload.resourceId === "string" ? payload.resourceId.trim() : "";
+  const selected = payload.selected === true;
+
+  if (!conversationId || !resourceId) {
+    throw new AppError({
+      code: "validation_error",
+      message: copy.requestErrors.invalidFields,
+      status: 400,
+      fieldErrors: {
+        resourceId: "Conversation and resource ids are required.",
+      },
+    });
+  }
+
+  return {
+    conversationId,
+    resourceId,
+    selected,
+  };
+}
+
+async function ensureSubjectResourceBucket() {
+  const supabase = createSupabaseAdminClient();
+  const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+
+  if (listError) {
+    throw toServiceError("Unable to list storage buckets.", listError);
+  }
+
+  const exists = (buckets ?? []).some(
+    (bucket) => bucket.name === HOMEWORK_ATTACHMENTS_BUCKET,
+  );
+
+  if (!exists) {
+    const { error: createError } = await supabase.storage.createBucket(
+      HOMEWORK_ATTACHMENTS_BUCKET,
+      {
+        public: false,
+        allowedMimeTypes: SUBJECT_RESOURCE_BUCKET_ALLOWED_MIME_TYPES,
+      },
+    );
+
+    if (createError) {
+      throw toServiceError("Unable to create the subject resource bucket.", createError);
+    }
+
+    return;
+  }
+
+  await supabase.storage
+    .updateBucket(HOMEWORK_ATTACHMENTS_BUCKET, {
+      public: false,
+      allowedMimeTypes: SUBJECT_RESOURCE_BUCKET_ALLOWED_MIME_TYPES,
+    })
+    .catch(() => null);
+}
+
+async function requireStudentAppUser(context: AuthenticatedUserContext) {
+  const appUser = requireAppUserContext(context);
+  requireAppUserRole(appUser, ["student"]);
+  requireActiveAppUser(appUser);
+  return appUser;
+}
+
+async function loadOwnedConversation(input: {
+  conversationId: string;
+  studentUserId: string;
+  subjectTag?: string | null;
+}) {
+  const admin = createSupabaseAdminClient();
+  const { data: conversation, error } = await admin
+    .from("conversations")
+    .select(CONVERSATION_SELECT)
+    .eq("id", input.conversationId)
+    .maybeSingle<ConversationRecord>();
+
+  if (error) {
+    throw toServiceError("Unable to load the conversation.", error);
+  }
+
+  if (!conversation || conversation.student_user_id !== input.studentUserId) {
+    throw new AppError({
+      code: "not_found",
+      message: "Conversation not found.",
+      status: 404,
+    });
+  }
+
+  if (input.subjectTag && conversation.subject_tag !== input.subjectTag) {
+    throw new AppError({
+      code: "validation_error",
+      message: "This resource belongs to another subject.",
+      status: 400,
+    });
+  }
+
+  return conversation;
+}
+
+async function findSubjectResourceByHash(input: {
+  supabase: SupabaseClient;
+  studentUserId: string;
+  subjectTag: string;
+  sha256: string;
+}) {
+  const { data, error } = await input.supabase
+    .from("subject_resources")
+    .select(SUBJECT_RESOURCE_SELECT)
+    .eq("student_user_id", input.studentUserId)
+    .eq("subject_tag", input.subjectTag)
+    .eq("sha256", input.sha256)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return (data as SubjectResourceRecord | null) ?? null;
+}
+
+async function maybeLinkResourceToConversation(input: {
+  supabase: SupabaseClient;
+  conversationId: string | null;
+  resource: SubjectResourceRecord;
+  createdByUserId: string;
+  selected: boolean;
+}) {
+  if (!input.conversationId) {
+    return null;
+  }
+
+  await loadOwnedConversation({
+    conversationId: input.conversationId,
+    studentUserId: input.resource.student_user_id,
+    subjectTag: input.resource.subject_tag,
+  });
+
+  const { data, error } = await input.supabase
+    .from("conversation_resource_links")
+    .upsert(
+      {
+        conversation_id: input.conversationId,
+        resource_id: input.resource.id,
+        created_by_user_id: input.createdByUserId,
+        selected: input.selected,
+      },
+      { onConflict: "conversation_id,resource_id" },
+    )
+    .select(CONVERSATION_RESOURCE_LINK_SELECT)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data as ConversationResourceLinkRecord;
+}
+
+function buildSubjectResourceWarningMessage(
+  resource: SubjectResourceRecord,
+  languageCode: UiLanguageCode,
+) {
+  const metadata = normalizeMetadata(resource.metadata);
+
+  if (resource.extraction_status === "failed") {
+    return getStudentUploadServerCopy(languageCode).warnings.extractionFailed;
+  }
+
+  if (
+    metadata.needs_manual_review === true ||
+    (typeof metadata.ocr_confidence === "number" && metadata.ocr_confidence < 0.55)
+  ) {
+    return getStudentUploadServerCopy(languageCode).warnings.extractionPartial;
+  }
+
+  return null;
+}
+
+export async function listSubjectResourceLibrary(input: {
+  context: AuthenticatedUserContext;
+  subjectTag: string;
+  conversationId?: string | null;
+}): Promise<SubjectResourceLibraryItem[]> {
+  const appUser = await requireStudentAppUser(input.context);
+
+  return listSubjectResourceLibraryForStudent({
+    studentUserId: appUser.id,
+    subjectTag: input.subjectTag,
+    conversationId: input.conversationId,
+  });
+}
+
+export async function listSubjectResourceLibraryForStudent(input: {
+  studentUserId: string;
+  subjectTag: string;
+  conversationId?: string | null;
+}): Promise<SubjectResourceLibraryItem[]> {
+  const subjectTag = normalizeSubjectTag(input.subjectTag);
+
+  if (!subjectTag) {
+    return [];
+  }
+
+  if (input.conversationId) {
+    await loadOwnedConversation({
+      conversationId: input.conversationId,
+      studentUserId: input.studentUserId,
+      subjectTag,
+    });
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { data: resources, error: resourcesError } = await supabase
+    .from("subject_resources")
+    .select(SUBJECT_RESOURCE_SELECT)
+    .eq("student_user_id", input.studentUserId)
+    .eq("subject_tag", subjectTag)
+    .order("updated_at", { ascending: false });
+
+  if (resourcesError) {
+    throw toServiceError("Unable to list subject resources.", resourcesError);
+  }
+
+  const subjectResources = (resources ?? []) as SubjectResourceRecord[];
+  const resourceIds = subjectResources.map((resource) => resource.id);
+  const [linksResult, chunksResult] =
+    input.conversationId && resourceIds.length > 0
+      ? await Promise.all([
+          supabase
+            .from("conversation_resource_links")
+            .select(CONVERSATION_RESOURCE_LINK_SELECT)
+            .eq("conversation_id", input.conversationId)
+            .in("resource_id", resourceIds),
+          supabase
+            .from("subject_resource_chunks")
+            .select("resource_id")
+            .in("resource_id", resourceIds),
+        ])
+      : resourceIds.length > 0
+        ? [
+            { data: [], error: null },
+            await supabase
+              .from("subject_resource_chunks")
+              .select("resource_id")
+              .in("resource_id", resourceIds),
+          ]
+        : [
+            { data: [], error: null },
+            { data: [], error: null },
+          ];
+
+  if (linksResult.error) {
+    throw toServiceError("Unable to list conversation resource links.", linksResult.error);
+  }
+
+  if (chunksResult.error) {
+    throw toServiceError("Unable to count subject resource chunks.", chunksResult.error);
+  }
+
+  const linksByResourceId = new Map(
+    ((linksResult.data ?? []) as ConversationResourceLinkRecord[]).map((link) => [
+      link.resource_id,
+      link,
+    ]),
+  );
+  const chunkCounts = ((chunksResult.data ?? []) as Array<{ resource_id: string }>).reduce(
+    (acc, chunk) => acc.set(chunk.resource_id, (acc.get(chunk.resource_id) ?? 0) + 1),
+    new Map<string, number>(),
+  );
+
+  return subjectResources.map((resource) => {
+    const link = linksByResourceId.get(resource.id) ?? null;
+    return {
+      ...resource,
+      selected: link?.selected ?? false,
+      link,
+      chunk_count: chunkCounts.get(resource.id) ?? 0,
+    };
+  });
+}
+
+export async function createSubjectResourceUploadTarget(input: {
+  context: AuthenticatedUserContext;
+  requestId: string;
+  route: string;
+  subjectTag: string;
+  originalFilename: string;
+  mimeType: string;
+  byteSize: number;
+}) {
+  const appUser = await requireStudentAppUser(input.context);
+  const copy = getStudentUploadServerCopy(appUser.preferred_ui_language);
+  const subjectTag = normalizeSubjectTag(input.subjectTag);
+
+  if (!subjectTag || subjectTag.length > MAX_SUBJECT_TAG_LENGTH) {
+    throw new AppError({
+      code: "validation_error",
+      message: copy.requestErrors.invalidFields,
+      status: 400,
+      fieldErrors: {
+        subjectTag: "Subject is required.",
+      },
+    });
+  }
+
+  await assertStudentUsageActionAllowed({
+    studentUserId: appUser.id,
+    action: "create_upload",
+    languageCode: appUser.preferred_ui_language,
+  });
+
+  const resolvedInput = resolveSubjectResourcePolicyInput({
+    mimeType: input.mimeType,
+    originalFilename: input.originalFilename,
+  });
+
+  if (!resolvedInput) {
+    throw new AppError({
+      code: "validation_error",
+      message: copy.requestErrors.invalidFields,
+      status: 400,
+      fieldErrors: {
+        mimeType: copy.validation.unsupportedFileType,
+      },
+    });
+  }
+
+  if (!Number.isFinite(input.byteSize) || input.byteSize <= 0) {
+    throw new AppError({
+      code: "validation_error",
+      message: copy.requestErrors.invalidFields,
+      status: 400,
+      fieldErrors: {
+        byteSize: copy.validation.fileSizePositive,
+      },
+    });
+  }
+
+  if (input.byteSize > resolvedInput.policy.maxBytes) {
+    throw new AppError({
+      code: "validation_error",
+      message: copy.requestErrors.invalidFields,
+      status: 400,
+      fieldErrors: {
+        byteSize: copy.validation.fileTooLarge(
+          Math.round(resolvedInput.policy.maxBytes / (1024 * 1024)),
+        ),
+      },
+    });
+  }
+
+  await ensureSubjectResourceBucket();
+
+  const admin = createSupabaseAdminClient();
+  const resourceId = crypto.randomUUID();
+  const storagePath = buildStoragePath({
+    studentUserId: appUser.id,
+    subjectTag,
+    resourceId,
+    mimeType: resolvedInput.resolvedMimeType,
+  });
+  const { data: resource, error: insertError } = await admin
+    .from("subject_resources")
+    .insert({
+      id: resourceId,
+      student_user_id: appUser.id,
+      created_by_user_id: appUser.id,
+      subject_tag: subjectTag,
+      source_storage_bucket: HOMEWORK_ATTACHMENTS_BUCKET,
+      source_storage_path: storagePath,
+      attachment_kind: resolvedInput.policy.attachmentKind,
+      mime_type: resolvedInput.resolvedMimeType,
+      original_filename: input.originalFilename.trim(),
+      byte_size: input.byteSize,
+      extraction_status: "pending",
+      sha256: `pending:${resourceId}`,
+      metadata: {
+        client_extension: input.originalFilename.includes(".")
+          ? input.originalFilename.split(".").pop()?.toLowerCase() ?? ""
+          : "",
+        upload_context: "subject_resource",
+      },
+    })
+    .select(SUBJECT_RESOURCE_SELECT)
+    .single();
+
+  if (insertError) {
+    throw toServiceError("Unable to create the subject resource shell.", insertError);
+  }
+
+  const { data: signedUpload, error: signedUploadError } = await admin.storage
+    .from(HOMEWORK_ATTACHMENTS_BUCKET)
+    .createSignedUploadUrl(storagePath);
+
+  if (signedUploadError || !signedUpload?.token) {
+    throw toServiceError(
+      "Unable to create the signed subject resource upload target.",
+      signedUploadError,
+    );
+  }
+
+  await recordStudentUsageDeltaBestEffort({
+    studentUserId: appUser.id,
+    delta: {
+      uploads: 1,
+    },
+  });
+
+  logRuntimeInfo({
+    message: "Created subject resource upload target",
+    requestId: input.requestId,
+    route: input.route,
+    method: "POST",
+    actorUserId: appUser.id,
+    actorRole: "student",
+    targetStudentUserId: appUser.id,
+    details: {
+      subjectResourceId: resourceId,
+      subjectTag,
+      mimeType: resolvedInput.resolvedMimeType,
+    },
+  });
+
+  return {
+    resource: resource as SubjectResourceRecord,
+    uploadTarget: {
+      bucket: HOMEWORK_ATTACHMENTS_BUCKET,
+      path: storagePath,
+      token: signedUpload.token,
+    },
+  };
+}
+
+export async function confirmSubjectResourceUpload(input: {
+  context: AuthenticatedUserContext;
+  requestId: string;
+  route: string;
+  resourceId: string;
+  conversationId: string | null;
+  selected: boolean;
+}) {
+  const appUser = await requireStudentAppUser(input.context);
+  const admin = createSupabaseAdminClient();
+  const { data: resourceRow, error: resourceError } = await admin
+    .from("subject_resources")
+    .select(SUBJECT_RESOURCE_SELECT)
+    .eq("id", input.resourceId)
+    .maybeSingle();
+
+  if (resourceError) {
+    throw toServiceError("Unable to load the subject resource.", resourceError);
+  }
+
+  const pendingResource = resourceRow as SubjectResourceRecord | null;
+
+  if (!pendingResource || pendingResource.student_user_id !== appUser.id) {
+    throw new AppError({
+      code: "not_found",
+      message: "Subject resource not found.",
+      status: 404,
+    });
+  }
+
+  if (pendingResource.extraction_status === "ready") {
+    const link = await maybeLinkResourceToConversation({
+      supabase: admin,
+      conversationId: input.conversationId,
+      resource: pendingResource,
+      createdByUserId: appUser.id,
+      selected: input.selected,
+    });
+    const chunks = await ensureSubjectResourceChunks({
+      supabase: admin,
+      resource: pendingResource,
+    });
+
+    return {
+      resource: pendingResource,
+      link,
+      chunkCount: chunks.length,
+      warningMessage: buildSubjectResourceWarningMessage(
+        pendingResource,
+        appUser.preferred_ui_language,
+      ),
+    };
+  }
+
+  if (!pendingResource.source_storage_bucket || !pendingResource.source_storage_path) {
+    throw new AppError({
+      code: "validation_error",
+      message: "Subject resource storage metadata is missing.",
+      status: 400,
+    });
+  }
+
+  const { data: objectInfo, error: infoError } = await admin.storage
+    .from(pendingResource.source_storage_bucket)
+    .info(pendingResource.source_storage_path);
+
+  if (infoError || !objectInfo) {
+    throw toServiceError("Uploaded subject resource is not available yet.", infoError);
+  }
+
+  const objectSize =
+    typeof objectInfo.size === "number"
+      ? objectInfo.size
+      : Number(objectInfo.size ?? 0);
+
+  if (!objectSize || objectSize !== pendingResource.byte_size) {
+    throw new AppError({
+      code: "conflict",
+      message: getStudentUploadServerCopy(appUser.preferred_ui_language).access
+        .attachmentSizeMismatch,
+      status: 409,
+    });
+  }
+
+  const { data: fileBlob, error: downloadError } = await admin.storage
+    .from(pendingResource.source_storage_bucket)
+    .download(pendingResource.source_storage_path);
+
+  if (downloadError || !fileBlob) {
+    throw toServiceError("Unable to read the uploaded subject resource.", downloadError);
+  }
+
+  const sha256 = await sha256Hex(fileBlob);
+  const existingResource = await findSubjectResourceByHash({
+    supabase: admin,
+    studentUserId: appUser.id,
+    subjectTag: pendingResource.subject_tag,
+    sha256,
+  });
+
+  if (existingResource && existingResource.id !== pendingResource.id) {
+    await admin.storage
+      .from(pendingResource.source_storage_bucket)
+      .remove([pendingResource.source_storage_path])
+      .catch(() => null);
+    const { error: deletePendingError } = await admin
+      .from("subject_resources")
+      .delete()
+      .eq("id", pendingResource.id);
+
+    if (deletePendingError) {
+      logRuntimeInfo({
+        message: "Unable to delete duplicate pending subject resource",
+        requestId: input.requestId,
+        route: input.route,
+        method: "POST",
+        actorUserId: appUser.id,
+        actorRole: "student",
+        targetStudentUserId: appUser.id,
+        details: {
+          subjectResourceId: pendingResource.id,
+          duplicateSubjectResourceId: existingResource.id,
+          reason: deletePendingError.message,
+        },
+      });
+    }
+
+    const link = await maybeLinkResourceToConversation({
+      supabase: admin,
+      conversationId: input.conversationId,
+      resource: existingResource,
+      createdByUserId: appUser.id,
+      selected: input.selected,
+    });
+    const chunks =
+      existingResource.extraction_status === "ready"
+        ? await ensureSubjectResourceChunks({
+            supabase: admin,
+            resource: existingResource,
+          })
+        : [];
+
+    return {
+      resource: existingResource,
+      link,
+      chunkCount: chunks.length,
+      warningMessage: buildSubjectResourceWarningMessage(
+        existingResource,
+        appUser.preferred_ui_language,
+      ),
+    };
+  }
+
+  const policy = SUBJECT_RESOURCE_POLICY_BY_MIME[
+    pendingResource.mime_type as SubjectResourceMimeType
+  ];
+  const baseMetadata = normalizeMetadata(pendingResource.metadata);
+  let extractedText: string | null = null;
+  let sourceLanguage: UiLanguageCode | null = appUser.ai_help_language;
+  let pageCount: number | null = null;
+  let extractionMetadata: Record<string, unknown> = {};
+
+  if (policy?.extractionPath === "direct_text") {
+    extractedText = normalizeText(await fileBlob.text());
+    extractionMetadata = {
+      extraction_engine: "direct_text",
+      extraction_version: "direct-text-v1",
+      ocr_confidence: 1,
+      detected_language: sourceLanguage,
+      needs_manual_review: false,
+      source_summary: buildDirectTextSummary(extractedText),
+      source_outline: buildDirectTextOutline(extractedText),
+    };
+  } else {
+    const aiProvider = getAiProvider();
+
+    try {
+      const extraction = await aiProvider.extractAttachmentText({
+        attachmentId: pendingResource.id,
+        originalFilename: pendingResource.original_filename,
+        mimeType: pendingResource.mime_type,
+        byteSize: pendingResource.byte_size,
+        fileBlob,
+        requestContext: {
+          requestId: input.requestId,
+          route: input.route,
+          actorUserId: appUser.id,
+          actorRole: "student",
+          conversationId: input.conversationId ?? undefined,
+          attachmentId: pendingResource.id,
+          studentUserId: appUser.id,
+        },
+      });
+
+      extractedText = normalizeText(extraction.extractedText ?? "");
+      sourceLanguage = extraction.detectedLanguage;
+      pageCount = extraction.pageCountEstimate;
+      extractionMetadata = {
+        extraction_engine: "gemini_file_understanding",
+        extraction_version: extraction.promptVersion,
+        ocr_confidence: extraction.confidenceScore,
+        detected_language: extraction.detectedLanguage,
+        needs_manual_review: extraction.needsManualReview,
+        source_summary: extraction.sourceSummary?.trim() || null,
+        source_outline: extraction.sourceOutline?.trim() || null,
+      };
+
+      await recordStudentAiUsageBestEffort({
+        studentUserId: appUser.id,
+        usage: extraction.usage,
+      });
+    } catch (error) {
+      const { data: failedResource, error: updateError } = await admin
+        .from("subject_resources")
+        .update({
+          extraction_status: "failed",
+          raw_extracted_text: null,
+          sha256,
+          metadata: {
+            ...baseMetadata,
+            sha256,
+            extraction_engine: "gemini_file_understanding",
+            extraction_error: "provider_failure",
+            needs_manual_review: true,
+          },
+        })
+        .eq("id", pendingResource.id)
+        .select(SUBJECT_RESOURCE_SELECT)
+        .single();
+
+      if (updateError) {
+        throw toServiceError("Unable to persist subject resource extraction failure.", updateError);
+      }
+
+      const failed = failedResource as SubjectResourceRecord;
+      const link = await maybeLinkResourceToConversation({
+        supabase: admin,
+        conversationId: input.conversationId,
+        resource: failed,
+        createdByUserId: appUser.id,
+        selected: false,
+      });
+
+      logRuntimeInfo({
+        message: "Subject resource provider extraction failed",
+        requestId: input.requestId,
+        route: input.route,
+        method: "POST",
+        actorUserId: appUser.id,
+        actorRole: "student",
+        targetStudentUserId: appUser.id,
+        details: {
+          subjectResourceId: failed.id,
+          subjectTag: failed.subject_tag,
+          reason: error instanceof Error ? error.message : "provider_failure",
+        },
+      });
+
+      return {
+        resource: failed,
+        link,
+        chunkCount: 0,
+        warningMessage: buildSubjectResourceWarningMessage(
+          failed,
+          appUser.preferred_ui_language,
+        ),
+      };
+    }
+  }
+
+  const moderation = moderateExtraction(extractedText ?? "");
+  await recordModerationEvent({
+    source: "attachment_extraction",
+    result: moderation,
+    actorUserId: appUser.id,
+    actorRole: "student",
+    conversationId: input.conversationId,
+    attachmentId: pendingResource.id,
+    requestContext: {
+      requestId: input.requestId,
+      route: input.route,
+      actorUserId: appUser.id,
+      actorRole: "student",
+      conversationId: input.conversationId ?? undefined,
+      attachmentId: pendingResource.id,
+      studentUserId: appUser.id,
+    },
+    textPreview: extractedText?.slice(0, 200) ?? null,
+  });
+
+  const shouldFailExtraction = !extractedText || moderation.status === "blocked";
+  const { data: updatedResource, error: updateError } = await admin
+    .from("subject_resources")
+    .update({
+      extraction_status: shouldFailExtraction ? "failed" : "ready",
+      raw_extracted_text: shouldFailExtraction ? null : extractedText,
+      source_language: sourceLanguage,
+      page_count: pageCount,
+      sha256,
+      metadata: {
+        ...baseMetadata,
+        sha256,
+        ...extractionMetadata,
+        needs_manual_review:
+          shouldFailExtraction || extractionMetadata.needs_manual_review === true,
+      },
+    })
+    .eq("id", pendingResource.id)
+    .select(SUBJECT_RESOURCE_SELECT)
+    .single();
+
+  if (updateError) {
+    throw toServiceError("Unable to persist subject resource extraction.", updateError);
+  }
+
+  const resource = updatedResource as SubjectResourceRecord;
+  const link = await maybeLinkResourceToConversation({
+    supabase: admin,
+    conversationId: input.conversationId,
+    resource,
+    createdByUserId: appUser.id,
+    selected: input.selected && resource.extraction_status === "ready",
+  });
+  const chunks =
+    resource.extraction_status === "ready"
+      ? await replaceSubjectResourceChunks({
+          supabase: admin,
+          resource,
+        })
+      : [];
+
+  logRuntimeInfo({
+    message: "Confirmed subject resource upload",
+    requestId: input.requestId,
+    route: input.route,
+    method: "POST",
+    actorUserId: appUser.id,
+    actorRole: "student",
+    targetStudentUserId: appUser.id,
+    details: {
+      subjectResourceId: resource.id,
+      subjectTag: resource.subject_tag,
+      extractionStatus: resource.extraction_status,
+      chunkCount: chunks.length,
+      linkedConversationId: input.conversationId,
+    },
+  });
+
+  return {
+    resource,
+    link,
+    chunkCount: chunks.length,
+    warningMessage: buildSubjectResourceWarningMessage(
+      resource,
+      appUser.preferred_ui_language,
+    ),
+  };
+}
+
+export async function setSubjectResourceConversationSelection(input: {
+  context: AuthenticatedUserContext;
+  requestId: string;
+  route: string;
+  conversationId: string;
+  resourceId: string;
+  selected: boolean;
+}) {
+  const appUser = await requireStudentAppUser(input.context);
+  const admin = createSupabaseAdminClient();
+  const { data: resource, error: resourceError } = await admin
+    .from("subject_resources")
+    .select(SUBJECT_RESOURCE_SELECT)
+    .eq("id", input.resourceId)
+    .maybeSingle();
+
+  if (resourceError) {
+    throw toServiceError("Unable to load subject resource for selection.", resourceError);
+  }
+
+  const subjectResource = resource as SubjectResourceRecord | null;
+
+  if (!subjectResource || subjectResource.student_user_id !== appUser.id) {
+    throw new AppError({
+      code: "not_found",
+      message: "Subject resource not found.",
+      status: 404,
+    });
+  }
+
+  await loadOwnedConversation({
+    conversationId: input.conversationId,
+    studentUserId: appUser.id,
+    subjectTag: subjectResource.subject_tag,
+  });
+
+  const link = await maybeLinkResourceToConversation({
+    supabase: admin,
+    conversationId: input.conversationId,
+    resource: subjectResource,
+    createdByUserId: appUser.id,
+    selected: input.selected && subjectResource.extraction_status === "ready",
+  });
+
+  logRuntimeInfo({
+    message: "Updated subject resource selection",
+    requestId: input.requestId,
+    route: input.route,
+    method: "PATCH",
+    actorUserId: appUser.id,
+    actorRole: "student",
+    targetStudentUserId: appUser.id,
+    details: {
+      conversationId: input.conversationId,
+      subjectResourceId: input.resourceId,
+      selected: link?.selected ?? false,
+    },
+  });
+
+  return {
+    resource: subjectResource,
+    link,
+  };
 }
 
 const LEXICAL_STOPWORDS = new Set([

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { StudentSubjectResourceLibrary } from "@/components/dashboard/student/student-subject-resource-library";
 import {
   getStudentWorkbenchCopy,
   getWeaknessTagLabel,
@@ -9,10 +10,14 @@ import {
 import type { ConversationAttachmentRecord } from "@/lib/server/ai/types";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import type { SessionSummaryRecord } from "@/lib/server/conversations/types";
+import type { SubjectResourceLibraryItem } from "@/lib/server/subject-resources/types";
 
 type StudentConversationSideRailProps = {
   attachments: ConversationAttachmentRecord[];
+  conversationId: string;
   languageCode: UiLanguageCode;
+  subjectResources: SubjectResourceLibraryItem[];
+  subjectTag: string;
   summaries: SessionSummaryRecord[];
   isCompleted?: boolean;
   disabled?: boolean;
@@ -131,7 +136,10 @@ function isRetriableAttachmentFailure(attachment: ConversationAttachmentRecord) 
 
 export function StudentConversationSideRail({
   attachments,
+  conversationId,
   languageCode,
+  subjectResources,
+  subjectTag,
   summaries,
   isCompleted = false,
   disabled = false,
@@ -261,9 +269,14 @@ export function StudentConversationSideRail({
               <SectionChevron open={subjectUploadsOpen} />
             </button>
             {subjectUploadsOpen ? (
-              <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-                {copy.subjectUploadsPlaceholder}
-              </p>
+              <StudentSubjectResourceLibrary
+                compact
+                conversationId={conversationId}
+                disabled={disabled}
+                initialResources={subjectResources}
+                languageCode={languageCode}
+                subjectTag={subjectTag}
+              />
             ) : null}
           </section>
 

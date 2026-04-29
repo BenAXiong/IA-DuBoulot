@@ -2,6 +2,7 @@ import "server-only";
 
 import type { IntakeAttachmentCategory } from "@/lib/intake/intake-config";
 import type { ConversationAttachmentRecord } from "@/lib/server/ai/types";
+import type { SubjectResourceLibraryItem } from "@/lib/server/subject-resources/types";
 import type {
   AppUserRecord,
   AuthenticatedUserContext,
@@ -118,6 +119,7 @@ export type ConversationDetail = {
   workspace: WorkspaceStateRecord | null;
   messages: ConversationMessageRecord[];
   attachments: ConversationAttachmentRecord[];
+  subjectResources: SubjectResourceLibraryItem[];
   summaries: SessionSummaryRecord[];
 };
 

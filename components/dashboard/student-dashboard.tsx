@@ -9,6 +9,7 @@ import {
 } from "@/components/dashboard/student/student-dashboard-presenters";
 import { loadStudentDashboardSnapshot } from "@/lib/server/student-dashboard/student-dashboard-service";
 import { listVisibleConversations } from "@/lib/server/conversations/conversation-service";
+import { listSubjectResourceLibrary } from "@/lib/server/subject-resources/service";
 import type {
   AppUserRecord,
   AuthenticatedUserContext,
@@ -194,6 +195,12 @@ export async function StudentDashboard({
         conversations: [],
       }
     : null;
+  const selectedSubjectResources = selectedGroup
+    ? await listSubjectResourceLibrary({
+        context,
+        subjectTag: selectedGroup.subjectTag,
+      })
+    : [];
 
   return (
     <div className="grid gap-8">
@@ -264,6 +271,7 @@ export async function StudentDashboard({
             <StudentSubjectQuickStart
               existingConversationCount={selectedGroup.conversations.length}
               initialDraft={initialDraft}
+              initialSubjectResources={selectedSubjectResources}
               languageCode={languageCode}
               subjectTag={selectedGroup.subjectTag}
             />

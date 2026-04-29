@@ -34,7 +34,10 @@ import type {
 } from "@/lib/server/ai/types";
 import { getAiProvider } from "@/lib/server/ai/provider";
 import { refreshStudentMemoryFromConversationCompletion } from "@/lib/server/memory/service";
-import { retrieveSubjectResourceContextForCoach } from "@/lib/server/subject-resources/service";
+import {
+  listSubjectResourceLibraryForStudent,
+  retrieveSubjectResourceContextForCoach,
+} from "@/lib/server/subject-resources/service";
 import { generateConversationSummaries } from "@/lib/server/summaries/service";
 import {
   moderateAssistantOutput,
@@ -1034,8 +1037,13 @@ export async function loadConversationDetail(input: {
     conversationId: input.conversationId,
   });
 
-  const [workspaceResult, messagesResult, attachmentsResult, summariesResult] =
-    await Promise.all([
+  const [
+    workspaceResult,
+    messagesResult,
+    attachmentsResult,
+    summariesResult,
+    subjectResourcesResult,
+  ] = await Promise.all([
     supabase
       .from("workspace_states")
       .select(WORKSPACE_SELECT)
@@ -1056,6 +1064,13 @@ export async function loadConversationDetail(input: {
       .select(SUMMARY_SELECT)
       .eq("conversation_id", input.conversationId)
       .order("created_at", { ascending: false }),
+    input.viewer.role === "student"
+      ? listSubjectResourceLibraryForStudent({
+          studentUserId: input.viewer.id,
+          subjectTag: conversation.subject_tag,
+          conversationId: input.conversationId,
+        })
+      : Promise.resolve([]),
   ]);
 
   if (workspaceResult.error) {
@@ -1103,6 +1118,7 @@ export async function loadConversationDetail(input: {
     workspace: workspaceResult.data ?? null,
     messages: (messagesResult.data ?? []) as ConversationMessageRecord[],
     attachments: (attachmentsResult.data ?? []) as ConversationAttachmentRecord[],
+    subjectResources: subjectResourcesResult,
     summaries: (summariesResult.data ?? []) as SessionSummaryRecord[],
   };
 }
