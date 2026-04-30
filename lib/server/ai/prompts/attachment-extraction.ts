@@ -16,6 +16,7 @@ export function buildAttachmentExtractionPrompt(input: {
       "Retourne un JSON valide avec extractedText, detectedLanguage, confidenceScore, needsManualReview, pageCountEstimate, sourceSummary et sourceOutline.",
       "sourceSummary doit etre un resume court du contenu du document.",
       "sourceOutline doit etre une structure courte et utile du document: prefere les vrais titres de cours, chapitres, parties, methodes, exercices, definitions ou sections dans l'ordre logique.",
+      "Pour sourceOutline, conserve les numeros ou prefixes visibles des vrais titres quand ils existent, par exemple I -, II -, A., 1. ou Exercice 4. Ne cree pas de numerotation artificielle si elle n'est pas visible dans le document.",
       "Pour sourceOutline, retourne un item par ligne. Ajoute une reference de page seulement si elle aide, par exemple: Circuit electrique - pages 1-2.",
       "N'utilise une structure page par page que si aucun titre ou section de cours n'est identifiable. Si la structure est faible ou absente, retourne une chaine vide plutot qu'un resume de remplacement.",
       "confidenceScore doit etre un nombre entre 0 et 1.",

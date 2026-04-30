@@ -16,7 +16,6 @@ function cleanOutlineLine(line: string) {
   return line
     .trim()
     .replace(/^[-*]\s+/, "")
-    .replace(/^\d+[.)]\s+/, "")
     .trim();
 }
 

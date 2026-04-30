@@ -283,3 +283,4 @@ then close it as:
 | 2026-04-30 | 08:57 -> 09:03 | 0h06 | P1.3 P2.7.9 | fix main homework landing tabs so global recent chats do not display under Resources or Instructions | | |
 | 2026-04-30 | 09:54 -> 09:55 | 0h01 | P1.3 P2.7.9 | disable per-subject master-instructions tab and add coming-soon hover tooltip | | |
 | 2026-04-30 | 09:56 -> 09:57 | 0h01 | P1.3 P2.7.9 | sync subject-resource library display when the selected subject changes | | |
+| 2026-04-30 | 10:06 -> 10:11 | 0h05 | P1.3 P2.7.10 | compact subject-resource preview cards and inspect outline numbering/page badges | | |

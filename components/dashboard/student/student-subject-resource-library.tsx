@@ -42,9 +42,11 @@ function getCopy(languageCode: UiLanguageCode) {
         unselected: "Not used",
         unlink: "Unlink",
         delete: "Delete",
-        ready: "ready",
-        pending: "pending",
-        failed: "failed",
+        summaryLabel: "Summary",
+        structureLabel: "Contents",
+        resourceInfoLabel: "About this source",
+        resourceInfo:
+          "Banban can use selected subject sources by retrieving the most relevant passages, without resending the whole file every turn.",
         unsupported: (name: string) => `${name} is not a supported subject source.`,
         tooLarge: (name: string, limit: string) =>
           `${name} is too large for subject sources. Limit: ${limit}.`,
@@ -52,7 +54,6 @@ function getCopy(languageCode: UiLanguageCode) {
         confirmUnlink: (name: string) => `Remove ${name} from this chat?`,
         confirmDelete: (name: string) =>
           `Delete ${name} from subject sources and linked chats?`,
-        chunks: (count: number) => `${count} chunk${count === 1 ? "" : "s"}`,
         pages: (count: number | null) => (count ? `${count}p` : "pages -"),
         outlineUnavailable: "No usable structure yet.",
       };
@@ -66,9 +67,11 @@ function getCopy(languageCode: UiLanguageCode) {
         unselected: "未使用",
         unlink: "取消連結",
         delete: "刪除",
-        ready: "ready",
-        pending: "pending",
-        failed: "failed",
+        summaryLabel: "摘要",
+        structureLabel: "內容",
+        resourceInfoLabel: "關於這個來源",
+        resourceInfo:
+          "選取科目資料後，banban 會擷取最相關的段落使用，不會每次都重新送出整份檔案。",
         unsupported: (name: string) => `${name} 不是支援的科目資料格式。`,
         tooLarge: (name: string, limit: string) =>
           `${name} 太大，無法作為科目資料來源。上限：${limit}。`,
@@ -76,7 +79,6 @@ function getCopy(languageCode: UiLanguageCode) {
         confirmUnlink: (name: string) => `要從這個聊天移除 ${name} 嗎？`,
         confirmDelete: (name: string) =>
           `要從科目資料來源與已連結的聊天刪除 ${name} 嗎？`,
-        chunks: (count: number) => `${count} chunks`,
         pages: (count: number | null) => (count ? `${count}p` : "pages -"),
         outlineUnavailable: "尚無可用結構。",
       };
@@ -90,9 +92,11 @@ function getCopy(languageCode: UiLanguageCode) {
         unselected: "Non utilisée",
         unlink: "Détacher",
         delete: "Supprimer",
-        ready: "ready",
-        pending: "pending",
-        failed: "failed",
+        summaryLabel: "Résumé",
+        structureLabel: "Contenu",
+        resourceInfoLabel: "À propos de cette ressource",
+        resourceInfo:
+          "Banban peut utiliser les ressources sélectionnées en récupérant les passages utiles, sans renvoyer tout le fichier à chaque message.",
         unsupported: (name: string) =>
           `${name} n'est pas un format pris en charge pour les ressources.`,
         tooLarge: (name: string, limit: string) =>
@@ -102,7 +106,6 @@ function getCopy(languageCode: UiLanguageCode) {
           `Détacher ${name} de cette discussion ?`,
         confirmDelete: (name: string) =>
           `Supprimer ${name} des ressources et des discussions liées ?`,
-        chunks: (count: number) => `${count} chunk${count > 1 ? "s" : ""}`,
         pages: (count: number | null) => (count ? `${count}p` : "pages -"),
         outlineUnavailable: "Structure non disponible.",
       };
@@ -132,6 +135,34 @@ function UploadIcon() {
   );
 }
 
+function InfoIcon() {
+  return (
+    <svg aria-hidden="true" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
+      <path
+        d="M12 11.25v5M12 7.75h.01M20 12a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
+function ChevronIcon() {
+  return (
+    <svg aria-hidden="true" className="h-3.5 w-3.5 transition group-open/details:rotate-90" fill="none" viewBox="0 0 24 24">
+      <path
+        d="m9 6 6 6-6 6"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
 function getProgressSegments(progress: UploadProgressState | null): 1 | 2 | 3 {
   if (!progress) {
     return 1;
@@ -144,20 +175,6 @@ function getProgressSegments(progress: UploadProgressState | null): 1 | 2 | 3 {
       return 2;
     case "extract":
       return 3;
-  }
-}
-
-function getStatusLabel(
-  status: SubjectResourceLibraryItem["extraction_status"],
-  copy: ReturnType<typeof getCopy>,
-) {
-  switch (status) {
-    case "ready":
-      return copy.ready;
-    case "failed":
-      return copy.failed;
-    default:
-      return copy.pending;
   }
 }
 
@@ -479,7 +496,7 @@ export function StudentSubjectResourceLibrary({
 
             return (
               <div
-                className="grid gap-2 rounded-[0.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-3"
+                className="group/card grid gap-2 rounded-[0.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-3"
                 key={resource.id}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -487,12 +504,20 @@ export function StudentSubjectResourceLibrary({
                     <p className="truncate text-sm font-medium text-[color:var(--foreground)]">
                       {resource.original_filename}
                     </p>
-                    <p className="mt-1 text-xs text-[color:var(--ink-soft)]">
-                      {getStatusLabel(resource.extraction_status, copy)} ·{" "}
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2 text-xs text-[color:var(--ink-soft)]">
+                    <span>
                       {copy.pages(resource.page_count)} ·{" "}
-                      {copy.chunks(resource.chunk_count)} ·{" "}
                       {formatDateLabel(resource.updated_at, languageCode)}
-                    </p>
+                    </span>
+                    <button
+                      aria-label={copy.resourceInfoLabel}
+                      className="inline-flex h-6 w-6 items-center justify-center rounded-full opacity-0 transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)] group-hover/card:opacity-100 focus-visible:opacity-100"
+                      title={copy.resourceInfo}
+                      type="button"
+                    >
+                      <InfoIcon />
+                    </button>
                   </div>
 
                   {conversationId ? (
@@ -512,17 +537,31 @@ export function StudentSubjectResourceLibrary({
                   ) : null}
                 </div>
                 {summary ? (
-                  <p className="line-clamp-2 text-xs leading-5 text-[color:var(--ink-soft)]">
-                    {summary}
-                  </p>
+                  <details className="group/details rounded-[0.5rem] border border-[color:var(--line)]/80 bg-[color:var(--surface-strong)] px-2.5 py-2">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-2 text-xs font-medium text-[color:var(--foreground)] [&::-webkit-details-marker]:hidden">
+                      <span>{copy.summaryLabel}</span>
+                      <ChevronIcon />
+                    </summary>
+                    <p className="mt-2 text-xs leading-5 text-[color:var(--ink-soft)]">
+                      {summary}
+                    </p>
+                  </details>
                 ) : null}
                 {outline ? (
-                  <SourceOutlinePreview
-                    compact
-                    maxItems={4}
-                    outline={outline}
-                    unavailableLabel={copy.outlineUnavailable}
-                  />
+                  <details className="group/details rounded-[0.5rem] border border-[color:var(--line)]/80 bg-[color:var(--surface-strong)] px-2.5 py-2">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-2 text-xs font-medium text-[color:var(--foreground)] [&::-webkit-details-marker]:hidden">
+                      <span>{copy.structureLabel}</span>
+                      <ChevronIcon />
+                    </summary>
+                    <div className="mt-2">
+                      <SourceOutlinePreview
+                        compact
+                        maxItems={6}
+                        outline={outline}
+                        unavailableLabel={copy.outlineUnavailable}
+                      />
+                    </div>
+                  </details>
                 ) : null}
                 <div className="flex flex-wrap items-center gap-2">
                   {conversationId && resource.link ? (

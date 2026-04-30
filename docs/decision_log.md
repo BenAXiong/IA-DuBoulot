@@ -1697,3 +1697,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Add structured retrieval diagnostics to `retrieveSubjectResourceContextForCoach`, write them into successful `coach_reply` debug captures under `metadata.subjectResourceRetrieval`, and keep `messages.input_tokens` plus `messages.output_tokens` as the persisted real provider-token source. Add an operator report script that joins debug captures to assistant message token rows and compares turns with and without subject-resource retrieval.
 - Why: This gives a low-risk measurement loop without adding another schema table or changing learner behavior. Runtime logs can explain which chunks were selected, while stored messages keep the provider-reported token data needed for cost sizing.
 - Follow-up: After deployment, run `npm run report:subject-resource-token-impact -- --days=14 --limit=500` against production data before deciding whether lexical retrieval is good enough or embeddings are justified.
+
+### D-20260430-01 - Keep Subject-Resource Preview Metadata Learner-Facing
+
+- Date: 2026-04-30
+- Status: accepted
+- Related tasks: `P1.3`, `P2.7.10`
+- Context: Subject-resource cards showed implementation-facing readiness and chunk counts beside filename metadata, while summaries and outlines made cards tall even when the learner only needed a quick scan.
+- Decision: Keep only page count and date as always-visible card metadata, move summary and structure into separate collapsible sections, and bump attachment extraction to `attachment-extraction-v4` so future `sourceOutline` values preserve visible course heading numbering where present.
+- Why: This makes the resource library easier to scan and keeps internal retrieval implementation details out of the learner UI without losing preview access.
+- Follow-up: Existing stored outlines are not reprocessed by this slice; old resources will only gain preserved numbering if they are re-extracted or uploaded again.
