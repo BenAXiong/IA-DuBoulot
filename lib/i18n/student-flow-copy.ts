@@ -1464,6 +1464,8 @@ export function getStudentUploadServerCopy(languageCode: UiLanguageCode) {
         fileSizePositive: "La taille du fichier doit être supérieure à zéro.",
         fileTooLarge: (maxMb: number) =>
           `Ce fichier dépasse la limite de ${maxMb} Mo pour ce type de document.`,
+        subjectResourceFileTooLarge:
+          "Les fichiers de ressources ne doivent pas dépasser 20MB ; mets ton abonnement à niveau pour obtenir des uploads illimités.",
         attachmentLimit:
           "Cette session a déjà atteint la limite de pièces jointes.",
         uploadBudgetExceeded:
@@ -1505,6 +1507,8 @@ export function getStudentUploadServerCopy(languageCode: UiLanguageCode) {
         fileSizePositive: "File size must be greater than zero.",
         fileTooLarge: (maxMb: number) =>
           `This file exceeds the ${maxMb} MB limit for this file type.`,
+        subjectResourceFileTooLarge:
+          "The resources files size shouldn't exceed 20MB, please upgrade your subscription to get unlimited uploads.",
         attachmentLimit:
           "This session already reached the attachment limit.",
         uploadBudgetExceeded:
@@ -1542,6 +1546,8 @@ export function getStudentUploadServerCopy(languageCode: UiLanguageCode) {
         fileSizePositive: "檔案大小必須大於零。",
         fileTooLarge: (maxMb: number) =>
           `這個檔案超過此類型 ${maxMb} MB 的大小上限。`,
+        subjectResourceFileTooLarge:
+          "資料來源檔案大小不能超過 20MB；請升級訂閱以取得不限量上傳。",
         attachmentLimit: "這個課程已達附件數量上限。",
         uploadBudgetExceeded: "這次上傳會超過這個課程的上傳預算。",
       },

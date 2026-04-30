@@ -285,3 +285,4 @@ then close it as:
 | 2026-04-30 | 09:56 -> 09:57 | 0h01 | P1.3 P2.7.9 | sync subject-resource library display when the selected subject changes | | |
 | 2026-04-30 | 10:06 -> 10:11 | 0h05 | P1.3 P2.7.10 | compact subject-resource preview cards and inspect outline numbering/page badges | | |
 | 2026-04-30 | 10:17 -> 10:19 | 0h02 | P1.3 P2.7.10 | stabilize subject-view scrollbar gutter when resource sections expand | | |
+| 2026-04-30 | 10:21 -> 10:27 | 0h06 | P2.7 P2.7.12 P1.3 | lower subject-resource per-file cap to 20 MB and clarify oversize messaging | | |

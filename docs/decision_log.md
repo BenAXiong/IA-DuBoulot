@@ -1707,3 +1707,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Keep only page count and date as always-visible card metadata, move summary and structure into separate collapsible sections, and bump attachment extraction to `attachment-extraction-v4` so future `sourceOutline` values preserve visible course heading numbering where present.
 - Why: This makes the resource library easier to scan and keeps internal retrieval implementation details out of the learner UI without losing preview access.
 - Follow-up: Existing stored outlines are not reprocessed by this slice; old resources will only gain preserved numbering if they are re-extracted or uploaded again.
+
+### D-20260430-02 - Tighten Subject-Resource File Cap Back To 20 MB
+
+- Date: 2026-04-30
+- Status: accepted
+- Related tasks: `P1.3`, `P2.7`, `P2.7.12`
+- Context: Subject resources had been raised to `50 MB` to troubleshoot workbook uploads, but the Pilot product direction now wants a smaller learner-facing per-file cap with an upgrade-oriented oversize message.
+- Decision: Set provider-extracted subject-resource PDF/DOC/DOCX files back to a `20 MB` per-file cap, keep direct TXT/MD/JSON resources at `5 MB`, and surface a dedicated oversize message instead of the generic per-type size error.
+- Why: This keeps subject-resource costs and extraction risk bounded while preserving clearer learner feedback for files that exceed the cap.
+- Follow-up: There is still no dedicated subject-library total byte cap or subject-resource count cap; add one later if Pilot usage shows storage or extraction abuse risk beyond the general upload-count quota.

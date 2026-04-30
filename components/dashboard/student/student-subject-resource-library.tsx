@@ -48,8 +48,8 @@ function getCopy(languageCode: UiLanguageCode) {
         resourceInfo:
           "Banban can use selected subject sources by retrieving the most relevant passages, without resending the whole file every turn.",
         unsupported: (name: string) => `${name} is not a supported subject source.`,
-        tooLarge: (name: string, limit: string) =>
-          `${name} is too large for subject sources. Limit: ${limit}.`,
+        tooLarge: () =>
+          "The resources files size shouldn't exceed 20MB, please upgrade your subscription to get unlimited uploads.",
         uploadError: "Unable to add this subject source.",
         confirmUnlink: (name: string) => `Remove ${name} from this chat?`,
         confirmDelete: (name: string) =>
@@ -73,8 +73,8 @@ function getCopy(languageCode: UiLanguageCode) {
         resourceInfo:
           "選取科目資料後，banban 會擷取最相關的段落使用，不會每次都重新送出整份檔案。",
         unsupported: (name: string) => `${name} 不是支援的科目資料格式。`,
-        tooLarge: (name: string, limit: string) =>
-          `${name} 太大，無法作為科目資料來源。上限：${limit}。`,
+        tooLarge: () =>
+          "資料來源檔案大小不能超過 20MB；請升級訂閱以取得不限量上傳。",
         uploadError: "無法新增這個科目資料來源。",
         confirmUnlink: (name: string) => `要從這個聊天移除 ${name} 嗎？`,
         confirmDelete: (name: string) =>
@@ -99,8 +99,8 @@ function getCopy(languageCode: UiLanguageCode) {
           "Banban peut utiliser les ressources sélectionnées en récupérant les passages utiles, sans renvoyer tout le fichier à chaque message.",
         unsupported: (name: string) =>
           `${name} n'est pas un format pris en charge pour les ressources.`,
-        tooLarge: (name: string, limit: string) =>
-          `${name} est trop volumineux pour les ressources. Limite : ${limit}.`,
+        tooLarge: () =>
+          "Les fichiers de ressources ne doivent pas dépasser 20MB ; mets ton abonnement à niveau pour obtenir des uploads illimités.",
         uploadError: "Impossible d'ajouter cette ressource de matière.",
         confirmUnlink: (name: string) =>
           `Détacher ${name} de cette discussion ?`,
@@ -110,15 +110,6 @@ function getCopy(languageCode: UiLanguageCode) {
         outlineUnavailable: "Structure non disponible.",
       };
   }
-}
-
-function formatByteLimit(bytes: number, languageCode: UiLanguageCode) {
-  const megabytes = bytes / (1024 * 1024);
-  const value = Number.isInteger(megabytes)
-    ? String(megabytes)
-    : megabytes.toFixed(1);
-
-  return languageCode === "fr" ? `${value} Mo` : `${value} MB`;
 }
 
 function UploadIcon() {
@@ -233,12 +224,7 @@ export function StudentSubjectResourceLibrary({
       }
 
       if (file.size > policy.policy.maxBytes) {
-        errors.push(
-          copy.tooLarge(
-            file.name,
-            formatByteLimit(policy.policy.maxBytes, languageCode),
-          ),
-        );
+        errors.push(copy.tooLarge());
         continue;
       }
 

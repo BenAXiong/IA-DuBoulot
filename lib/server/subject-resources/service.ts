@@ -1040,9 +1040,7 @@ export async function createSubjectResourceUploadTarget(input: {
       message: copy.requestErrors.invalidFields,
       status: 400,
       fieldErrors: {
-        byteSize: copy.validation.fileTooLarge(
-          Math.round(resolvedInput.policy.maxBytes / (1024 * 1024)),
-        ),
+        byteSize: copy.validation.subjectResourceFileTooLarge,
       },
     });
   }
