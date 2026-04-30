@@ -6,11 +6,15 @@ import {
   getIntakeSubjectOptions,
 } from "@/lib/i18n/student-flow-copy";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
+import type { ListConversationSummary } from "@/lib/server/conversations/types";
+import type { SubjectResourceLibraryItem } from "@/lib/server/subject-resources/types";
 
 type StudentFirstHomeworkLauncherProps = {
   initialDraft?: string | null;
   knownSubjects?: string[];
+  conversations?: ListConversationSummary[];
   subjectCounts?: Record<string, number>;
+  subjectResourcesBySubject?: Record<string, SubjectResourceLibraryItem[]>;
   languageCode: UiLanguageCode;
 };
 
@@ -46,7 +50,9 @@ function formatSubjectDisplay(subject: string) {
 export function StudentFirstHomeworkLauncher({
   initialDraft = null,
   knownSubjects = [],
+  conversations = [],
   subjectCounts = {},
+  subjectResourcesBySubject = {},
   languageCode,
 }: StudentFirstHomeworkLauncherProps) {
   const copy = getFirstHomeworkCopy(languageCode);
@@ -88,6 +94,10 @@ export function StudentFirstHomeworkLauncher({
     resolvedSelectedSubject === "autre"
       ? customSubject.trim()
       : resolvedSelectedSubject;
+  const selectedSubjectConversations = conversations.filter(
+    (conversation) =>
+      conversation.subject_tag.toLowerCase() === resolvedSubjectTag.toLowerCase(),
+  );
 
   return (
     <div className="grid gap-4">
@@ -128,7 +138,11 @@ export function StudentFirstHomeworkLauncher({
         <StudentSubjectQuickStart
           existingConversationCount={subjectCounts[resolvedSubjectTag] ?? 0}
           initialDraft={initialDraft}
+          initialSubjectResources={
+            subjectResourcesBySubject[resolvedSubjectTag] ?? []
+          }
           languageCode={languageCode}
+          conversations={selectedSubjectConversations}
           subjectTag={resolvedSubjectTag}
         />
       ) : null}
