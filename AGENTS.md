@@ -41,27 +41,28 @@ Read these in order before any substantial implementation work:
 17. [docs/student_workbench_v1.md](docs/student_workbench_v1.md) when chat, workspace, or student coaching surfaces are in scope
 18. [docs/student_history_summary_v1.md](docs/student_history_summary_v1.md) when history, completion, or summary work is in scope
 19. [docs/student_memory_profile_v1.md](docs/student_memory_profile_v1.md) when memory, durable pedagogical context, or profile-retention work is in scope
-20. [docs/invitation_flows_v1.md](docs/invitation_flows_v1.md) when auth, parent, or tutor link work is in scope
-21. [docs/oversight_surfaces_v1.md](docs/oversight_surfaces_v1.md) when parent, tutor, adult review, tutor-note, or admin-audit work is in scope
-22. [docs/privacy_controls_v1.md](docs/privacy_controls_v1.md) when settings, billing/privacy controls, or deletion work is in scope
-23. [docs/service_interfaces.md](docs/service_interfaces.md)
-24. [docs/ai_ops_economics_v1.md](docs/ai_ops_economics_v1.md) when AI, prompt, usage, cost, or billing-policy work is in scope
-25. [docs/telemetry_feature_controls_v1.md](docs/telemetry_feature_controls_v1.md) when analytics, runtime telemetry, or risky integration flags are in scope
-26. [docs/error_audit_conventions.md](docs/error_audit_conventions.md)
-27. [docs/storage_attachment_rules.md](docs/storage_attachment_rules.md)
-28. [docs/rls_fixture_verification.md](docs/rls_fixture_verification.md) when auth, schema, or RLS work is in scope
-29. [docs/smoke_checklist_v1.md](docs/smoke_checklist_v1.md) when QA, demo readiness, or launch-readiness work is in scope
-30. [docs/founder_walkthrough_v1.md](docs/founder_walkthrough_v1.md) when demo prep or external walkthrough work is in scope
-31. [docs/launch_checklist_v1.md](docs/launch_checklist_v1.md) when launch-candidate or beta-readiness work is in scope
-32. [docs/pilot_todo.md](docs/pilot_todo.md) when pilot hardening, UX polish, or post-MVP release planning is in scope
-33. [docs/sample_attachment_corpus.md](docs/sample_attachment_corpus.md) when upload, extraction, or demo fixture work is in scope
-34. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
-35. [docs/mvp_todo.md](docs/mvp_todo.md)
-36. [docs/mvp_timeline.md](docs/mvp_timeline.md)
-37. [docs/decision_log.md](docs/decision_log.md)
-38. [docs/work_sessions.md](docs/work_sessions.md)
-39. [docs/work_prompt_log.md](docs/work_prompt_log.md) when the experimental prompt-level trace is active
-40. The relevant code, SQL, prompt, or UI files for the task being worked on
+20. [docs/subject_docs_feature_v1.md](docs/subject_docs_feature_v1.md) when subject docs/resources, subject-wide uploads, resource retrieval, or subject-resource lifecycle work is in scope
+21. [docs/invitation_flows_v1.md](docs/invitation_flows_v1.md) when auth, parent, or tutor link work is in scope
+22. [docs/oversight_surfaces_v1.md](docs/oversight_surfaces_v1.md) when parent, tutor, adult review, tutor-note, or admin-audit work is in scope
+23. [docs/privacy_controls_v1.md](docs/privacy_controls_v1.md) when settings, billing/privacy controls, or deletion work is in scope
+24. [docs/service_interfaces.md](docs/service_interfaces.md)
+25. [docs/ai_ops_economics_v1.md](docs/ai_ops_economics_v1.md) when AI, prompt, usage, cost, or billing-policy work is in scope
+26. [docs/telemetry_feature_controls_v1.md](docs/telemetry_feature_controls_v1.md) when analytics, runtime telemetry, or risky integration flags are in scope
+27. [docs/error_audit_conventions.md](docs/error_audit_conventions.md)
+28. [docs/storage_attachment_rules.md](docs/storage_attachment_rules.md)
+29. [docs/rls_fixture_verification.md](docs/rls_fixture_verification.md) when auth, schema, or RLS work is in scope
+30. [docs/smoke_checklist_v1.md](docs/smoke_checklist_v1.md) when QA, demo readiness, or launch-readiness work is in scope
+31. [docs/founder_walkthrough_v1.md](docs/founder_walkthrough_v1.md) when demo prep or external walkthrough work is in scope
+32. [docs/launch_checklist_v1.md](docs/launch_checklist_v1.md) when launch-candidate or beta-readiness work is in scope
+33. [docs/pilot_todo.md](docs/pilot_todo.md) when pilot hardening, UX polish, or post-MVP release planning is in scope
+34. [docs/sample_attachment_corpus.md](docs/sample_attachment_corpus.md) when upload, extraction, or demo fixture work is in scope
+35. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
+36. [docs/mvp_todo.md](docs/mvp_todo.md)
+37. [docs/mvp_timeline.md](docs/mvp_timeline.md)
+38. [docs/decision_log.md](docs/decision_log.md)
+39. [docs/work_sessions.md](docs/work_sessions.md)
+40. [docs/work_prompt_log.md](docs/work_prompt_log.md) when the experimental prompt-level trace is active
+41. The relevant code, SQL, prompt, or UI files for the task being worked on
 
 If a file above is outdated, update it before or alongside the code change that depends on it.
 

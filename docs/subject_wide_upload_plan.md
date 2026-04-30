@@ -1,6 +1,6 @@
 # Subject-Wide Upload Plan
 
-Related: [README](../README.md) | [Pilot_todo](pilot_todo.md) | [Storage and attachment rules](storage_attachment_rules.md) | [Student workbench V1](student_workbench_v1.md) | [AI ops and economics V1](ai_ops_economics_v1.md) | [Supabase schema V1](supabase_schema_v1.md)
+Related: [README](../README.md) | [Pilot_todo](pilot_todo.md) | [Subject docs feature V1](subject_docs_feature_v1.md) | [Storage and attachment rules](storage_attachment_rules.md) | [Student workbench V1](student_workbench_v1.md) | [AI ops and economics V1](ai_ops_economics_v1.md) | [Supabase schema V1](supabase_schema_v1.md)
 
 ## Purpose
 
@@ -132,7 +132,7 @@ The fifth slice adds the first learner-facing resource controls:
 
 The sixth slice improves the preview and outline layer without reprocessing old files:
 
-- update `attachment-extraction-v3` so new `sourceOutline` values prefer real course titles, sections, methods, exercises, definitions, and other headings over page-only structures
+- update `attachment-extraction-v4` so new `sourceOutline` values prefer real course titles, sections, methods, exercises, definitions, visible numbering, and other headings over page-only structures
 - render stored outlines as compact structured lists with optional page badges in both chat PDF details and subject-resource cards
 - improve direct TXT/MD/JSON outline detection with the same section-first heuristic
 - keep weak or missing outlines explicitly unavailable instead of substituting summaries
