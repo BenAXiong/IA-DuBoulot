@@ -318,6 +318,14 @@ Manual pilot QA:
 
 `P2.7.1` through `P2.7.12` are implemented. The umbrella `P2.7` remains open until pilot testing confirms the learner can understand, select, retrieve from, and safely manage subject docs with acceptable reliability and cost.
 
+Remaining Pilot closure tasks:
+
+- Run the full real-doc flow with PDF, DOC, DOCX, TXT, MD, and JSON resources: upload, preview, preselect for the first prompt, select/unselect in a live chat, ask a retrieval-dependent question, unlink, delete, and confirm adult/tutor visibility remains conversation-linked.
+- After deployment, run `npm run report:subject-resource-token-impact -- --days=14 --limit=500` against production data and review whether subject-resource retrieval materially changes token usage.
+- Review real chat retrieval quality, especially late-page and middle-section questions, before deciding whether lexical retrieval is enough for Pilot or should move to `P6.2`.
+- Decide whether the subject library needs a total byte cap or per-subject/per-student resource-count cap beyond the current per-file caps and general upload quota.
+- Track extraction failures on large or highly structured PDFs/workbooks, especially Sésamath-like files, and decide whether they need provider/local fallback or remain out of Pilot scope.
+
 Post-pilot candidates:
 
 - `P6.1`: optional explicit chat-to-subject promotion from the workspace
