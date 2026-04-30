@@ -58,6 +58,8 @@ function getCopy(languageCode: UiLanguageCode) {
           `Use ${name} for the first message in the next chat`,
         useForCurrentChat: (name: string) =>
           `Use ${name} in this conversation`,
+        currentChatTooltip:
+          "This document will be accessed by Banban during the conversation. Click here to save credits if Banban doesn't need the information.",
         unsupported: (name: string) => `${name} is not a supported subject source.`,
         tooLarge: () =>
           "The resources files size shouldn't exceed 20MB, please upgrade your subscription to get unlimited uploads.",
@@ -86,6 +88,8 @@ function getCopy(languageCode: UiLanguageCode) {
         useForFirstPrompt: (name: string) =>
           `在下一個聊天的第一則訊息中使用 ${name}`,
         useForCurrentChat: (name: string) => `在這個聊天中使用 ${name}`,
+        currentChatTooltip:
+          "Banban 會在這段對話中讀取這份文件。如果 Banban 不需要這些資訊，請點這裡以節省額度。",
         unsupported: (name: string) => `${name} 不是支援的科目資料格式。`,
         tooLarge: () =>
           "資料來源檔案大小不能超過 20MB；請升級訂閱以取得不限量上傳。",
@@ -115,6 +119,8 @@ function getCopy(languageCode: UiLanguageCode) {
           `Utiliser ${name} dès le premier message du prochain chat`,
         useForCurrentChat: (name: string) =>
           `Utiliser ${name} dans cette discussion`,
+        currentChatTooltip:
+          "Banban consultera ce document pendant la discussion. Clique ici pour économiser des crédits si Banban n'a pas besoin de ces informations.",
         unsupported: (name: string) =>
           `${name} n'est pas un format pris en charge pour les ressources.`,
         tooLarge: () =>
@@ -582,6 +588,21 @@ export function StudentSubjectResourceLibrary({
                         type="checkbox"
                       />
                     ) : null}
+                    {conversationId && selectionVariant === "checkbox" ? (
+                      <input
+                        aria-label={copy.useForCurrentChat(
+                          resource.original_filename,
+                        )}
+                        checked={conversationSelected}
+                        className="mt-0.5 h-4 w-4 shrink-0 rounded border-[color:var(--line)] accent-[color:var(--accent)] disabled:cursor-not-allowed disabled:opacity-40"
+                        disabled={!canSelect || isUpdating || disabled}
+                        onChange={(event) =>
+                          updateSelection(resource, event.target.checked)
+                        }
+                        title={copy.currentChatTooltip}
+                        type="checkbox"
+                      />
+                    ) : null}
                     <div className="min-w-0">
                       <p
                         className="truncate text-sm font-medium text-[color:var(--foreground)]"
@@ -603,20 +624,7 @@ export function StudentSubjectResourceLibrary({
                     </button>
                   </div>
 
-                  {conversationId && selectionVariant === "checkbox" ? (
-                    <input
-                      aria-label={copy.useForCurrentChat(
-                        resource.original_filename,
-                      )}
-                      checked={conversationSelected}
-                      className="mt-0.5 h-4 w-4 shrink-0 rounded border-[color:var(--line)] accent-[color:var(--accent)] disabled:cursor-not-allowed disabled:opacity-40"
-                      disabled={!canSelect || isUpdating || disabled}
-                      onChange={(event) =>
-                        updateSelection(resource, event.target.checked)
-                      }
-                      type="checkbox"
-                    />
-                  ) : conversationId ? (
+                  {conversationId && selectionVariant !== "checkbox" ? (
                     <button
                       aria-pressed={conversationSelected}
                       className={`shrink-0 rounded-full border px-3 py-1 text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${
