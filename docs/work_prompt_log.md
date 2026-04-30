@@ -294,3 +294,4 @@ then close it as:
 | 2026-04-30 | 20:36 -> 20:47 | 0h11 | P2.7 | cap subject docs by plan: two per subject for paid users and one total for free users | | |
 | 2026-04-30 | 21:11 -> 21:18 | 0h07 | P1.3 P2.7 | mark subject-doc QA/retrieval review done and simplify workspace subject-resource selection UI | | |
 | 2026-04-30 | 21:23 -> 21:24 | 0h01 | P1.3 P2.7 | move workspace subject-resource checkbox beside the doc title and add credit-saving tooltip | | |
+| 2026-04-30 | 21:29 -> 21:31 | 0h02 | P2.7 | trim subject-resource conversation toggle checks and response payload | | |

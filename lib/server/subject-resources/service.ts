@@ -1550,17 +1550,44 @@ export async function setSubjectResourceConversationSelection(input: {
 }) {
   const appUser = await requireStudentAppUser(input.context);
   const admin = createSupabaseAdminClient();
-  const { data: resource, error: resourceError } = await admin
-    .from("subject_resources")
-    .select(SUBJECT_RESOURCE_SELECT)
-    .eq("id", input.resourceId)
-    .maybeSingle();
+  const [resourceResult, conversationResult] = await Promise.all([
+    admin
+      .from("subject_resources")
+      .select("id, student_user_id, subject_tag, extraction_status")
+      .eq("id", input.resourceId)
+      .maybeSingle<{
+        id: string;
+        student_user_id: string;
+        subject_tag: string;
+        extraction_status: SubjectResourceRecord["extraction_status"];
+      }>(),
+    admin
+      .from("conversations")
+      .select("id, student_user_id, subject_tag")
+      .eq("id", input.conversationId)
+      .maybeSingle<{
+        id: string;
+        student_user_id: string;
+        subject_tag: string | null;
+      }>(),
+  ]);
 
-  if (resourceError) {
-    throw toServiceError("Unable to load subject resource for selection.", resourceError);
+  if (resourceResult.error) {
+    throw toServiceError(
+      "Unable to load subject resource for selection.",
+      resourceResult.error,
+    );
   }
 
-  const subjectResource = resource as SubjectResourceRecord | null;
+  if (conversationResult.error) {
+    throw toServiceError(
+      "Unable to load conversation for subject resource selection.",
+      conversationResult.error,
+    );
+  }
+
+  const subjectResource = resourceResult.data;
+  const conversation = conversationResult.data;
 
   if (!subjectResource || subjectResource.student_user_id !== appUser.id) {
     throw new AppError({
@@ -1570,19 +1597,40 @@ export async function setSubjectResourceConversationSelection(input: {
     });
   }
 
-  await loadOwnedConversation({
-    conversationId: input.conversationId,
-    studentUserId: appUser.id,
-    subjectTag: subjectResource.subject_tag,
-  });
+  if (!conversation || conversation.student_user_id !== appUser.id) {
+    throw new AppError({
+      code: "not_found",
+      message: "Conversation not found.",
+      status: 404,
+    });
+  }
 
-  const link = await maybeLinkResourceToConversation({
-    supabase: admin,
-    conversationId: input.conversationId,
-    resource: subjectResource,
-    createdByUserId: appUser.id,
-    selected: input.selected && subjectResource.extraction_status === "ready",
-  });
+  if (conversation.subject_tag !== subjectResource.subject_tag) {
+    throw new AppError({
+      code: "validation_error",
+      message: "This resource belongs to another subject.",
+      status: 400,
+    });
+  }
+
+  const selected = input.selected && subjectResource.extraction_status === "ready";
+  const { data: link, error: linkError } = await admin
+    .from("conversation_resource_links")
+    .upsert(
+      {
+        conversation_id: input.conversationId,
+        resource_id: input.resourceId,
+        created_by_user_id: appUser.id,
+        selected,
+      },
+      { onConflict: "conversation_id,resource_id" },
+    )
+    .select("resource_id, selected")
+    .single<{ resource_id: string; selected: boolean }>();
+
+  if (linkError) {
+    throw toServiceError("Unable to update subject resource selection.", linkError);
+  }
 
   logRuntimeInfo({
     message: "Updated subject resource selection",
@@ -1595,13 +1643,13 @@ export async function setSubjectResourceConversationSelection(input: {
     details: {
       conversationId: input.conversationId,
       subjectResourceId: input.resourceId,
-      selected: link?.selected ?? false,
+      selected: link.selected,
     },
   });
 
   return {
-    resource: subjectResource,
-    link,
+    resourceId: link.resource_id,
+    selected: link.selected,
   };
 }
 

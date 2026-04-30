@@ -125,6 +125,8 @@ Status note: add a focused auth-surface polish follow-up under `P1.3` for the fi
 
   Status note: the workspace/live-chat subject-resource section is now selection-only. Upload and delete remain available only from the subject view, while the workspace uses compact checkboxes to enable/disable ready resources for the current conversation.
 
+  Status note: subject-resource enable/disable now uses a narrower server path. The route still checks active student access, resource ownership, conversation ownership, subject match, and readiness, but it does so with small parallel reads and returns only `resourceId + selected` instead of full resource/link records.
+
   Remaining Pilot closure work before closing the `P2.7` umbrella:
   - [x] Run the real-doc flow with PDF resources: upload, preview, preselect for the first prompt, select/unselect in a live chat, ask a retrieval-dependent question, unlink/delete from the subject view, and confirm adult/tutor visibility remains conversation-linked.
   - [ ] Run the remaining non-PDF format smoke for DOC, DOCX, TXT, MD, and JSON resources.

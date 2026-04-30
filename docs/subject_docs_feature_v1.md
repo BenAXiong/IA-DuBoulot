@@ -151,7 +151,7 @@ Routes:
 - `POST /api/subject-resources`: reserve a subject-resource upload target after enforcing subject-doc count caps
 - `DELETE /api/subject-resources`: delete a subject resource and purge owned storage
 - `POST /api/subject-resources/confirm`: confirm upload, extract, store text/metadata, chunk, and optionally link to a conversation
-- `PATCH /api/subject-resources/selection`: update the `selected` retrieval toggle for one conversation
+- `PATCH /api/subject-resources/selection`: update the `selected` retrieval toggle for one conversation after narrow ownership/subject/readiness checks; returns only `resourceId + selected`
 - `DELETE /api/subject-resources/selection`: unlink a resource from one conversation
 
 Core service files:

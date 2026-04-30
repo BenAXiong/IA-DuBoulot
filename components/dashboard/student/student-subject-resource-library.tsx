@@ -368,7 +368,8 @@ export function StudentSubjectResourceLibrary({
           | {
               ok?: boolean;
               data?: {
-                link?: SubjectResourceLibraryItem["link"];
+                resourceId?: string;
+                selected?: boolean;
               };
               error?: {
                 message?: string;
@@ -376,14 +377,24 @@ export function StudentSubjectResourceLibrary({
             }
           | null;
 
-        if (!response.ok || !payload?.ok || !payload.data?.link) {
+        if (
+          !response.ok ||
+          !payload?.ok ||
+          payload.data?.resourceId !== resource.id ||
+          typeof payload.data.selected !== "boolean"
+        ) {
           throw new Error(payload?.error?.message ?? copy.uploadError);
         }
 
         mergeResource({
           ...resource,
-          selected: payload.data.link.selected,
-          link: payload.data.link,
+          selected: payload.data.selected,
+          link: resource.link
+            ? {
+                ...resource.link,
+                selected: payload.data.selected,
+              }
+            : resource.link,
         });
         setErrorMessage(null);
       } catch (error) {

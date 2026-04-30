@@ -25,8 +25,8 @@ export const PATCH = withRouteErrorHandling(async (request, { requestId }) => {
     ok: true,
     data: {
       requestId,
-      resource: result.resource,
-      link: result.link,
+      resourceId: result.resourceId,
+      selected: result.selected,
     },
   });
 });
