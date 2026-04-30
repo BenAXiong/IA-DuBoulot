@@ -44,7 +44,7 @@ Ask before implementing if a future change would:
 
 ## Task Breakdown
 
-`P2.7` is now an umbrella task in [Pilot_todo](pilot_todo.md), split into smaller subject-wide upload subtasks:
+`P2.7` is complete for the first Pilot-ready subject-doc version. It remains documented here as implementation history and is split into the completed subject-wide upload subtasks below:
 
 - `P2.7.1` plan and architecture documentation
 - `P2.7.2` durable resource storage, conversation links, promotion, and hash reuse
@@ -77,11 +77,11 @@ The second slice adds durable chunk storage without changing coach prompt behavi
 - create deterministic chunks after successful PDF extraction or same-hash reuse
 - prefer explicit page markers when present, otherwise use page-count estimates or document-length splits
 - store chunk index, stable chunk ID, page range, optional section title, character count, token estimate, extraction confidence, and chunker metadata
-- keep retrieval, learner toggles, and coach-context injection deferred
+- at that point, keep retrieval, learner toggles, and coach-context injection deferred to later completed slices
 
 ## Slice 3
 
-The third slice adds retrieval v1 while keeping the learner library UI deferred:
+The third slice added retrieval v1 while keeping the learner library UI deferred until later completed slices:
 
 - read only resources selected through `conversation_resource_links`
 - lexically rank stored chunks against the current learner message
@@ -106,6 +106,7 @@ The fourth slice adds regression fixtures for the original retrieval failure cla
 - optional chat-to-subject promotion from the workspace
 - old-PDF backfill and weak-outline cleanup only if explicitly approved after Pilot evidence
 - provider or local page-aware extraction fallback
+- broader non-PDF smoke coverage and production token-impact reporting after enough real use exists
 
 ## Post-Pilot Candidate Tasks
 
@@ -116,6 +117,9 @@ These follow-ups are tracked in [Pilot_todo](pilot_todo.md) under `P6` so they d
 - `P6.3`: stronger section-aware chunking around course structure rather than page estimates alone
 - `P6.4`: decide whether old-PDF backfill is worth the cost and operational risk
 - `P6.5`: implement old-PDF backfill only if approved, as a bounded operator/admin job
+- `P6.6`: broader non-PDF smoke for DOC, DOCX, TXT, MD, and JSON resources
+- `P6.7`: production subject-resource token-impact report once enough real selected-resource turns exist
+- `P6.8`: extraction failure tracking and fallback decision for large or highly structured PDFs/workbooks
 
 ## Slice 5
 

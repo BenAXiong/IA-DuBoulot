@@ -44,7 +44,7 @@ Why:
 - `messages`: chronological chat turns
 - `attachments`: uploaded files and raw extraction output
 - `subject_resources`: reusable subject-level uploaded source text promoted from successful PDF extraction
-- `subject_resource_chunks`: deterministic text chunks for reusable subject resources, ready for later retrieval
+- `subject_resource_chunks`: deterministic text chunks used by selected subject-resource retrieval
 - `conversation_resource_links`: explicit links between a conversation and selected subject resources
 - `workspace_states`: the editable side-panel state
 - `session_summaries`: audience-specific summary outputs

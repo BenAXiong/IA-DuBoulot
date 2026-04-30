@@ -319,13 +319,15 @@ Manual pilot QA:
 
 ## Current Status
 
-`P2.7.1` through `P2.7.12` are implemented. The umbrella `P2.7` remains open until pilot testing confirms the learner can understand, select, retrieve from, and safely manage subject docs with acceptable reliability and cost.
+`P2.7` is complete for the first Pilot-ready subject-doc version. `P2.7.1` through `P2.7.12` are implemented, and the feature now supports the core learner path: upload subject docs from the subject view, inspect summaries/structure, preselect ready docs before the first prompt, toggle ready docs in a live conversation, retrieve bounded chunks in coach context, and delete/unlink resources with the documented visibility rules.
 
-Remaining Pilot closure tasks:
+Completion boundary:
 
-- Run the remaining non-PDF format smoke for DOC, DOCX, TXT, MD, and JSON resources.
-- After deployment, run `npm run report:subject-resource-token-impact -- --days=14 --limit=500` against production data and review whether subject-resource retrieval materially changes token usage.
-- Track extraction failures on large or highly structured PDFs/workbooks, especially Sésamath-like files, and decide whether they need provider/local fallback or remain out of Pilot scope.
+- `P2.7` covers the first version, not every future resource-management enhancement.
+- The first version is intentionally lexical-retrieval based; embeddings and reranking are post-pilot candidates.
+- The first version uses deterministic page-aware/light-heading chunking; stronger section-aware chunking is post-pilot.
+- The first version does not reprocess old PDFs solely for better outlines.
+- The first version keeps chat-only attachments separate and has no chat-to-subject promotion UI.
 
 Post-pilot candidates:
 
@@ -334,3 +336,6 @@ Post-pilot candidates:
 - `P6.3`: stronger section-aware chunking around course structure
 - `P6.4`: decide whether old-PDF backfill is worth it
 - `P6.5`: implement old-PDF backfill only if approved
+- `P6.6`: broader non-PDF format smoke for DOC, DOCX, TXT, MD, and JSON resources
+- `P6.7`: production token-impact report once enough selected-resource turns exist
+- `P6.8`: large/structured PDF extraction failure tracking and fallback decision
