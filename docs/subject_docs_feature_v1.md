@@ -64,7 +64,9 @@ Subject page:
 2. The below-composer tabs show `History`, `Resources`, and a disabled coming-soon `Instructions` tab.
 3. `Resources` lists subject docs for the selected subject and updates when the subject changes.
 4. Learner uploads a subject doc from the dedicated `Add` control.
-5. Ready resources show compact metadata, summary and structure collapsibles, and delete controls.
+5. Existing subject docs are unchecked by default, but the learner can tick ready docs before starting a new chat.
+6. Checked docs are linked to the newly created conversation before the first prompt is auto-sent, so retrieval can use them immediately.
+7. Ready resources show compact metadata, summary and structure collapsibles, and delete controls.
 
 Live homework chat:
 
@@ -217,6 +219,7 @@ Current UI rules:
 - subject resources live under the `Resources` tab, not under `History` or the chat textarea
 - `History` is the only tab that renders recent chats
 - the disabled `Instructions` tab shows a coming-soon tooltip
+- ready resources can be preselected from the subject view with a checkbox before the first prompt; existing docs remain unchecked by default
 - resource cards show learner-facing metadata only: pages and date
 - readiness and chunk counts are internal and should not be displayed to learners
 - summary and content structure live in dedicated collapsible sections
@@ -291,12 +294,14 @@ Manual pilot QA:
 2. Upload a PDF over `20 MB`; confirm the upgrade-oriented oversize message appears before upload.
 3. Upload TXT, MD, JSON, DOC, and DOCX samples; confirm validation and extraction behavior.
 4. Switch subject pills while the `Resources` tab is active; confirm the list updates.
-5. Expand summary and structure; confirm layout remains stable and no horizontal shrink occurs.
-6. Select a resource in a live chat; ask about a late-page or middle-section marker; confirm the coach can use the relevant content.
-7. Unselect the resource; confirm retrieval no longer includes it.
-8. Unlink the resource from the chat; confirm it remains in the subject library.
-9. Delete a resource; confirm it disappears from library and conversation links.
-10. Review the conversation as parent/tutor; confirm only conversation-linked resources are visible.
+5. Tick a ready resource in the subject view, send the first prompt, and confirm the first coach reply can retrieve from that resource.
+6. Leave another ready resource unticked, send the first prompt, and confirm it is not selected in the new chat.
+7. Expand summary and structure; confirm layout remains stable and no horizontal shrink occurs.
+8. Select a resource in a live chat; ask about a late-page or middle-section marker; confirm the coach can use the relevant content.
+9. Unselect the resource; confirm retrieval no longer includes it.
+10. Unlink the resource from the chat; confirm it remains in the subject library.
+11. Delete a resource; confirm it disappears from library and conversation links.
+12. Review the conversation as parent/tutor; confirm only conversation-linked resources are visible.
 
 ## Known Pitfalls
 
@@ -320,4 +325,3 @@ Post-pilot candidates:
 - `P6.3`: stronger section-aware chunking around course structure
 - `P6.4`: decide whether old-PDF backfill is worth it
 - `P6.5`: implement old-PDF backfill only if approved
-

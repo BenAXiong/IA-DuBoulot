@@ -61,6 +61,21 @@ type CreateConversationShellResponse =
       };
     };
 
+type SubjectResourceSelectionResponse =
+  | {
+      ok: true;
+      data: {
+        link?: unknown;
+      };
+    }
+  | {
+      ok?: false;
+      error?: {
+        message?: string;
+        fieldErrors?: Record<string, string>;
+      };
+    };
+
 type WorkspaceRouteResponse =
   | {
       ok: true;
@@ -182,6 +197,20 @@ function getWorkspaceRouteErrorMessage(payload: WorkspaceRouteResponse | null) {
   return fieldError ?? payload.error?.message ?? null;
 }
 
+function getSubjectResourceSelectionErrorMessage(
+  payload: SubjectResourceSelectionResponse | null,
+) {
+  if (!payload || payload.ok) {
+    return null;
+  }
+
+  const fieldError = payload.error?.fieldErrors
+    ? Object.values(payload.error.fieldErrors)[0]
+    : null;
+
+  return fieldError ?? payload.error?.message ?? null;
+}
+
 function getUploadProgressSegments(
   progress: UploadProgressState | null,
 ): 1 | 2 | 3 {
@@ -289,6 +318,8 @@ function renderSubjectTabPanel(input: {
   conversations: ListConversationSummary[];
   initialSubjectResources: SubjectResourceLibraryItem[];
   languageCode: UiLanguageCode;
+  preselectedResourceIds: string[];
+  onPreselectedResourceIdsChange: (resourceIds: string[]) => void;
   subjectTag: string;
   copy: ReturnType<typeof getQuickStartCopy>;
 }) {
@@ -297,6 +328,8 @@ function renderSubjectTabPanel(input: {
       <StudentSubjectResourceLibrary
         initialResources={input.initialSubjectResources}
         languageCode={input.languageCode}
+        onPreselectedResourceIdsChange={input.onPreselectedResourceIdsChange}
+        preselectedResourceIds={input.preselectedResourceIds}
         subjectTag={input.subjectTag}
       />
     );
@@ -338,6 +371,9 @@ export function StudentSubjectQuickStart({
   const [isStarting, setIsStarting] = useState(false);
   const [replyMode, setReplyMode] = useState<StudentReplyMode>("thinking");
   const [activeTab, setActiveTab] = useState<SubjectQuickStartTab>("history");
+  const [preselectedResourceIds, setPreselectedResourceIds] = useState<string[]>(
+    [],
+  );
   const [uploadProgress, setUploadProgress] = useState<UploadProgressState | null>(
     null,
   );
@@ -345,7 +381,20 @@ export function StudentSubjectQuickStart({
 
   useEffect(() => {
     setDraft(initialDraft ?? "");
+    setPreselectedResourceIds([]);
   }, [initialDraft, subjectTag]);
+
+  useEffect(() => {
+    const readyResourceIds = new Set(
+      initialSubjectResources
+        .filter((resource) => resource.extraction_status === "ready")
+        .map((resource) => resource.id),
+    );
+
+    setPreselectedResourceIds((current) =>
+      current.filter((resourceId) => readyResourceIds.has(resourceId)),
+    );
+  }, [initialSubjectResources]);
 
   function handleComposerKeyDown(
     event: React.KeyboardEvent<HTMLTextAreaElement>,
@@ -456,6 +505,37 @@ export function StudentSubjectQuickStart({
         subjectTag: createdConversation.subject_tag,
       });
 
+      if (preselectedResourceIds.length > 0) {
+        await Promise.all(
+          preselectedResourceIds.map(async (resourceId) => {
+            const selectionResponse = await fetch(
+              "/api/subject-resources/selection",
+              {
+                method: "PATCH",
+                headers: {
+                  "content-type": "application/json",
+                },
+                body: JSON.stringify({
+                  conversationId,
+                  resourceId,
+                  selected: true,
+                }),
+              },
+            );
+            const selectionPayload = (await selectionResponse
+              .json()
+              .catch(() => null)) as SubjectResourceSelectionResponse | null;
+
+            if (!selectionResponse.ok || !selectionPayload?.ok) {
+              throw new Error(
+                getSubjectResourceSelectionErrorMessage(selectionPayload) ??
+                  copy.startError,
+              );
+            }
+          }),
+        );
+      }
+
       const uploadResults =
         stagedFiles.length > 0
           ? await uploadConversationFiles({
@@ -526,6 +606,7 @@ export function StudentSubjectQuickStart({
         launchErrorMessage,
       });
       setStagedFiles([]);
+      setPreselectedResourceIds([]);
       setDraft("");
       router.push(
         `/app/conversations/${conversationId}?subject=${encodeURIComponent(subjectTag)}`,
@@ -545,6 +626,7 @@ export function StudentSubjectQuickStart({
           launchErrorMessage: message,
         });
         setStagedFiles([]);
+        setPreselectedResourceIds([]);
         router.push(
           `/app/conversations/${conversationId}?subject=${encodeURIComponent(subjectTag)}`,
         );
@@ -699,6 +781,8 @@ export function StudentSubjectQuickStart({
             conversations,
             initialSubjectResources,
             languageCode,
+            onPreselectedResourceIdsChange: setPreselectedResourceIds,
+            preselectedResourceIds,
             subjectTag,
             copy,
           })}

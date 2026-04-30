@@ -288,3 +288,4 @@ then close it as:
 | 2026-04-30 | 10:21 -> 10:27 | 0h06 | P2.7 P2.7.12 P1.3 | lower subject-resource per-file cap to 20 MB and clarify oversize messaging | | |
 | 2026-04-30 | 10:29 -> 10:29 | 0h00 | P2.7 P6.1 P6.2 P6.3 P6.4 P6.5 | summarize remaining subject-doc work | | |
 | 2026-04-30 | 10:35 -> 10:38 | 0h03 | P2.7 | create a consolidated subject-docs feature reference doc | | |
+| 2026-04-30 | 10:53 -> 10:56 | 0h03 | P2.7 P2.7.8 P2.7.9 | preselect subject docs from subject view for the first prompt | | |

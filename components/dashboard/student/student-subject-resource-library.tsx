@@ -20,6 +20,8 @@ type StudentSubjectResourceLibraryProps = {
   languageCode: UiLanguageCode;
   initialResources: SubjectResourceLibraryItem[];
   conversationId?: string | null;
+  preselectedResourceIds?: string[];
+  onPreselectedResourceIdsChange?: (resourceIds: string[]) => void;
   compact?: boolean;
   disabled?: boolean;
 };
@@ -47,6 +49,8 @@ function getCopy(languageCode: UiLanguageCode) {
         resourceInfoLabel: "About this source",
         resourceInfo:
           "Banban can use selected subject sources by retrieving the most relevant passages, without resending the whole file every turn.",
+        useForFirstPrompt: (name: string) =>
+          `Use ${name} for the first message in the next chat`,
         unsupported: (name: string) => `${name} is not a supported subject source.`,
         tooLarge: () =>
           "The resources files size shouldn't exceed 20MB, please upgrade your subscription to get unlimited uploads.",
@@ -72,6 +76,8 @@ function getCopy(languageCode: UiLanguageCode) {
         resourceInfoLabel: "關於這個來源",
         resourceInfo:
           "選取科目資料後，banban 會擷取最相關的段落使用，不會每次都重新送出整份檔案。",
+        useForFirstPrompt: (name: string) =>
+          `在下一個聊天的第一則訊息中使用 ${name}`,
         unsupported: (name: string) => `${name} 不是支援的科目資料格式。`,
         tooLarge: () =>
           "資料來源檔案大小不能超過 20MB；請升級訂閱以取得不限量上傳。",
@@ -97,6 +103,8 @@ function getCopy(languageCode: UiLanguageCode) {
         resourceInfoLabel: "À propos de cette ressource",
         resourceInfo:
           "Banban peut utiliser les ressources sélectionnées en récupérant les passages utiles, sans renvoyer tout le fichier à chaque message.",
+        useForFirstPrompt: (name: string) =>
+          `Utiliser ${name} dès le premier message du prochain chat`,
         unsupported: (name: string) =>
           `${name} n'est pas un format pris en charge pour les ressources.`,
         tooLarge: () =>
@@ -174,6 +182,8 @@ export function StudentSubjectResourceLibrary({
   languageCode,
   initialResources,
   conversationId = null,
+  preselectedResourceIds = [],
+  onPreselectedResourceIdsChange,
   compact = false,
   disabled = false,
 }: StudentSubjectResourceLibraryProps) {
@@ -193,6 +203,23 @@ export function StudentSubjectResourceLibrary({
     setUploadProgress(null);
     setPendingResourceId(null);
   }, [initialResources, subjectTag]);
+
+  function setPreselectedResource(resourceId: string, selected: boolean) {
+    if (!onPreselectedResourceIdsChange) {
+      return;
+    }
+
+    if (selected) {
+      onPreselectedResourceIdsChange(
+        Array.from(new Set([...preselectedResourceIds, resourceId])),
+      );
+      return;
+    }
+
+    onPreselectedResourceIdsChange(
+      preselectedResourceIds.filter((id) => id !== resourceId),
+    );
+  }
 
   function mergeResource(resource: SubjectResourceLibraryItem) {
     setResources((current) => {
@@ -416,6 +443,7 @@ export function StudentSubjectResourceLibrary({
         }
 
         setResources((current) => current.filter((item) => item.id !== resource.id));
+        setPreselectedResource(resource.id, false);
         setErrorMessage(null);
       } catch (error) {
         setErrorMessage(
@@ -466,7 +494,12 @@ export function StudentSubjectResourceLibrary({
       ) : (
         <div className="grid gap-2">
           {resources.map((resource) => {
-            const selected = resource.selected;
+            const conversationSelected = resource.selected;
+            const preselected = preselectedResourceIds.includes(resource.id);
+            const canPreselect =
+              !conversationId &&
+              Boolean(onPreselectedResourceIdsChange) &&
+              resource.extraction_status === "ready";
             const canSelect =
               Boolean(conversationId) && resource.extraction_status === "ready";
             const isUpdating = pendingResourceId === resource.id;
@@ -486,10 +519,26 @@ export function StudentSubjectResourceLibrary({
                 key={resource.id}
               >
                 <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-[color:var(--foreground)]">
-                      {resource.original_filename}
-                    </p>
+                  <div className="flex min-w-0 items-start gap-2">
+                    {!conversationId && onPreselectedResourceIdsChange ? (
+                      <input
+                        aria-label={copy.useForFirstPrompt(
+                          resource.original_filename,
+                        )}
+                        checked={preselected}
+                        className="mt-0.5 h-4 w-4 shrink-0 rounded border-[color:var(--line)] accent-[color:var(--accent)] disabled:cursor-not-allowed disabled:opacity-40"
+                        disabled={!canPreselect || disabled}
+                        onChange={(event) =>
+                          setPreselectedResource(resource.id, event.target.checked)
+                        }
+                        type="checkbox"
+                      />
+                    ) : null}
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-[color:var(--foreground)]">
+                        {resource.original_filename}
+                      </p>
+                    </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-2 text-xs text-[color:var(--ink-soft)]">
                     <span>
@@ -508,17 +557,19 @@ export function StudentSubjectResourceLibrary({
 
                   {conversationId ? (
                     <button
-                      aria-pressed={selected}
+                      aria-pressed={conversationSelected}
                       className={`shrink-0 rounded-full border px-3 py-1 text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${
-                        selected
+                        conversationSelected
                           ? "border-[color:var(--foreground)] bg-[color:var(--foreground)] text-[color:var(--background)]"
                           : "border-[color:var(--line)] bg-transparent text-[color:var(--ink-soft)] hover:text-[color:var(--foreground)]"
                       }`}
                       disabled={!canSelect || isUpdating || disabled}
-                      onClick={() => updateSelection(resource, !selected)}
+                      onClick={() =>
+                        updateSelection(resource, !conversationSelected)
+                      }
                       type="button"
                     >
-                      {selected ? copy.selected : copy.unselected}
+                      {conversationSelected ? copy.selected : copy.unselected}
                     </button>
                   ) : null}
                 </div>

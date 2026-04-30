@@ -1717,3 +1717,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Set provider-extracted subject-resource PDF/DOC/DOCX files back to a `20 MB` per-file cap, keep direct TXT/MD/JSON resources at `5 MB`, and surface a dedicated oversize message instead of the generic per-type size error.
 - Why: This keeps subject-resource costs and extraction risk bounded while preserving clearer learner feedback for files that exceed the cap.
 - Follow-up: There is still no dedicated subject-library total byte cap or subject-resource count cap; add one later if Pilot usage shows storage or extraction abuse risk beyond the general upload-count quota.
+
+### D-20260430-03 - Let Learners Preselect Subject Docs For First Prompt
+
+- Date: 2026-04-30
+- Status: accepted
+- Related tasks: `P2.7`, `P2.7.8`, `P2.7.9`
+- Context: Subject docs were visible on the subject page, but selection was only possible after entering a live conversation. That meant a learner could not make an existing subject doc available to the first auto-sent prompt from the subject view.
+- Decision: Add unchecked-by-default checkboxes for ready subject docs in the subject-view resource library. When the learner starts a chat, checked docs are linked to the new conversation with `selected = true` before the first prompt is auto-sent.
+- Why: This keeps old resources opt-in while allowing the first coach reply to use explicitly chosen subject docs.
+- Follow-up: Validate in Pilot whether learners understand the checkbox as "use this in the next chat" and whether the same affordance should appear in any other start surface.
