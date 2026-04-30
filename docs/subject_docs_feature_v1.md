@@ -73,10 +73,10 @@ Subject page:
 Live homework chat:
 
 1. The side rail exposes subject resources for the current subject.
-2. The learner can select/unselect a resource for the current conversation.
+2. The learner can enable/disable a ready resource for the current conversation with a compact checkbox.
 3. Selected resources are linked through `conversation_resource_links.selected`.
 4. Coach context retrieves only bounded top chunks from selected resources.
-5. The learner can unlink a resource from the current conversation without deleting it from the subject library.
+5. Upload and delete actions are not available in the workspace/live-chat section; those management actions remain in the subject view.
 
 Lifecycle:
 
@@ -233,6 +233,7 @@ Student:
 
 - owns the full subject-resource library for their own account
 - can upload, list, select, unselect, unlink, and delete their resources
+- manages upload and delete from the subject view; uses the workspace/live-chat section only to enable or disable resources for the current conversation
 
 Parent/tutor:
 
@@ -299,9 +300,9 @@ Manual pilot QA:
 5. Tick a ready resource in the subject view, send the first prompt, and confirm the first coach reply can retrieve from that resource.
 6. Leave another ready resource unticked, send the first prompt, and confirm it is not selected in the new chat.
 7. Expand summary and structure; confirm layout remains stable and no horizontal shrink occurs.
-8. Select a resource in a live chat; ask about a late-page or middle-section marker; confirm the coach can use the relevant content.
+8. Enable a resource in a live chat; ask about a late-page or middle-section marker; confirm the coach can use the relevant content.
 9. Unselect the resource; confirm retrieval no longer includes it.
-10. Unlink the resource from the chat; confirm it remains in the subject library.
+10. Confirm upload/delete actions are absent from the workspace subject-resource section and remain available from the subject view.
 11. Delete a resource; confirm it disappears from library and conversation links.
 12. Review the conversation as parent/tutor; confirm only conversation-linked resources are visible.
 
@@ -322,9 +323,8 @@ Manual pilot QA:
 
 Remaining Pilot closure tasks:
 
-- Run the full real-doc flow with PDF, DOC, DOCX, TXT, MD, and JSON resources: upload, preview, preselect for the first prompt, select/unselect in a live chat, ask a retrieval-dependent question, unlink, delete, and confirm adult/tutor visibility remains conversation-linked.
+- Run the remaining non-PDF format smoke for DOC, DOCX, TXT, MD, and JSON resources.
 - After deployment, run `npm run report:subject-resource-token-impact -- --days=14 --limit=500` against production data and review whether subject-resource retrieval materially changes token usage.
-- Review real chat retrieval quality, especially late-page and middle-section questions, before deciding whether lexical retrieval is enough for Pilot or should move to `P6.2`.
 - Track extraction failures on large or highly structured PDFs/workbooks, especially Sésamath-like files, and decide whether they need provider/local fallback or remain out of Pilot scope.
 
 Post-pilot candidates:

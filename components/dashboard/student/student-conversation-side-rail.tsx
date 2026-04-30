@@ -271,11 +271,16 @@ export function StudentConversationSideRail({
             </button>
             {subjectUploadsOpen ? (
               <StudentSubjectResourceLibrary
+                allowDelete={false}
+                allowUploads={false}
                 compact
                 conversationId={conversationId}
                 disabled={disabled}
                 initialResources={subjectResources}
                 languageCode={languageCode}
+                selectionVariant="checkbox"
+                showHeader={false}
+                showVisibleMetadata={false}
                 subjectTag={subjectTag}
               />
             ) : null}

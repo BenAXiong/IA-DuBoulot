@@ -24,6 +24,11 @@ type StudentSubjectResourceLibraryProps = {
   onPreselectedResourceIdsChange?: (resourceIds: string[]) => void;
   compact?: boolean;
   disabled?: boolean;
+  allowDelete?: boolean;
+  allowUploads?: boolean;
+  selectionVariant?: "button" | "checkbox";
+  showHeader?: boolean;
+  showVisibleMetadata?: boolean;
 };
 
 type UploadProgressState = {
@@ -48,9 +53,11 @@ function getCopy(languageCode: UiLanguageCode) {
         structureLabel: "Contents",
         resourceInfoLabel: "About this source",
         resourceInfo:
-          "Banban can use selected subject sources by retrieving the most relevant passages, without resending the whole file every turn.",
+          "Banban has analyzed and memorized this document, enable it here if you want Banban to access its content.",
         useForFirstPrompt: (name: string) =>
           `Use ${name} for the first message in the next chat`,
+        useForCurrentChat: (name: string) =>
+          `Use ${name} in this conversation`,
         unsupported: (name: string) => `${name} is not a supported subject source.`,
         tooLarge: () =>
           "The resources files size shouldn't exceed 20MB, please upgrade your subscription to get unlimited uploads.",
@@ -75,9 +82,10 @@ function getCopy(languageCode: UiLanguageCode) {
         structureLabel: "內容",
         resourceInfoLabel: "關於這個來源",
         resourceInfo:
-          "選取科目資料後，banban 會擷取最相關的段落使用，不會每次都重新送出整份檔案。",
+          "Banban 已分析並記住這份文件；如果你希望 Banban 使用其中內容，請在這裡啟用。",
         useForFirstPrompt: (name: string) =>
           `在下一個聊天的第一則訊息中使用 ${name}`,
+        useForCurrentChat: (name: string) => `在這個聊天中使用 ${name}`,
         unsupported: (name: string) => `${name} 不是支援的科目資料格式。`,
         tooLarge: () =>
           "資料來源檔案大小不能超過 20MB；請升級訂閱以取得不限量上傳。",
@@ -102,9 +110,11 @@ function getCopy(languageCode: UiLanguageCode) {
         structureLabel: "Contenu",
         resourceInfoLabel: "À propos de cette ressource",
         resourceInfo:
-          "Banban peut utiliser les ressources sélectionnées en récupérant les passages utiles, sans renvoyer tout le fichier à chaque message.",
+          "Banban a analysé et mémorisé ce document ; active-le ici si tu veux que Banban accède à son contenu.",
         useForFirstPrompt: (name: string) =>
           `Utiliser ${name} dès le premier message du prochain chat`,
+        useForCurrentChat: (name: string) =>
+          `Utiliser ${name} dans cette discussion`,
         unsupported: (name: string) =>
           `${name} n'est pas un format pris en charge pour les ressources.`,
         tooLarge: () =>
@@ -186,6 +196,11 @@ export function StudentSubjectResourceLibrary({
   onPreselectedResourceIdsChange,
   compact = false,
   disabled = false,
+  allowDelete = true,
+  allowUploads = true,
+  selectionVariant = "button",
+  showHeader = true,
+  showVisibleMetadata = true,
 }: StudentSubjectResourceLibraryProps) {
   const copy = getCopy(languageCode);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -223,8 +238,11 @@ export function StudentSubjectResourceLibrary({
 
   function mergeResource(resource: SubjectResourceLibraryItem) {
     setResources((current) => {
-      const without = current.filter((item) => item.id !== resource.id);
-      return [resource, ...without];
+      if (!current.some((item) => item.id === resource.id)) {
+        return [resource, ...current];
+      }
+
+      return current.map((item) => (item.id === resource.id ? resource : item));
     });
   }
 
@@ -315,6 +333,17 @@ export function StudentSubjectResourceLibrary({
       return;
     }
 
+    const previousResource = resource;
+    mergeResource({
+      ...resource,
+      selected,
+      link: resource.link
+        ? {
+            ...resource.link,
+            selected,
+          }
+        : resource.link,
+    });
     setPendingResourceId(resource.id);
     startTransition(async () => {
       try {
@@ -352,6 +381,7 @@ export function StudentSubjectResourceLibrary({
         });
         setErrorMessage(null);
       } catch (error) {
+        mergeResource(previousResource);
         setErrorMessage(
           error instanceof Error ? error.message : copy.uploadError,
         );
@@ -466,26 +496,36 @@ export function StudentSubjectResourceLibrary({
         type="file"
       />
 
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="font-[family-name:var(--font-heading)] text-xl leading-tight">
-          {copy.title}
-        </h2>
-        <button
-          className="inline-flex min-h-9 items-center justify-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--surface)] px-3 text-sm font-medium text-[color:var(--foreground)] transition hover:border-[color:var(--foreground)]/30 hover:bg-[color:var(--surface-strong)] disabled:cursor-not-allowed disabled:opacity-60"
-          disabled={disabled || isPending}
-          onClick={() => fileInputRef.current?.click()}
-          type="button"
-        >
-          {isPending && uploadProgress ? (
-            <StudentUploadProgressRing
-              completedSegments={getProgressSegments(uploadProgress)}
-            />
+      {showHeader || allowUploads ? (
+        <div className="flex items-center justify-between gap-3">
+          {showHeader ? (
+            <h2 className="font-[family-name:var(--font-heading)] text-xl leading-tight">
+              {copy.title}
+            </h2>
           ) : (
-            <UploadIcon />
+            <span aria-hidden="true" />
           )}
-          <span>{isPending && uploadProgress ? copy.uploading : copy.upload}</span>
-        </button>
-      </div>
+          {allowUploads ? (
+            <button
+              className="inline-flex min-h-9 items-center justify-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--surface)] px-3 text-sm font-medium text-[color:var(--foreground)] transition hover:border-[color:var(--foreground)]/30 hover:bg-[color:var(--surface-strong)] disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={disabled || isPending}
+              onClick={() => fileInputRef.current?.click()}
+              type="button"
+            >
+              {isPending && uploadProgress ? (
+                <StudentUploadProgressRing
+                  completedSegments={getProgressSegments(uploadProgress)}
+                />
+              ) : (
+                <UploadIcon />
+              )}
+              <span>
+                {isPending && uploadProgress ? copy.uploading : copy.upload}
+              </span>
+            </button>
+          ) : null}
+        </div>
+      ) : null}
 
       {resources.length === 0 ? (
         <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
@@ -503,6 +543,14 @@ export function StudentSubjectResourceLibrary({
             const canSelect =
               Boolean(conversationId) && resource.extraction_status === "ready";
             const isUpdating = pendingResourceId === resource.id;
+            const resourceMetaTitle = `${copy.pages(resource.page_count)} · ${
+              formatDateLabel(resource.updated_at, languageCode) ?? ""
+            }`;
+            const showResourceActions =
+              allowDelete ||
+              (Boolean(conversationId) &&
+                Boolean(resource.link) &&
+                selectionVariant === "button");
             const summary =
               typeof resource.metadata.source_summary === "string"
                 ? resource.metadata.source_summary
@@ -535,16 +583,16 @@ export function StudentSubjectResourceLibrary({
                       />
                     ) : null}
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-[color:var(--foreground)]">
+                      <p
+                        className="truncate text-sm font-medium text-[color:var(--foreground)]"
+                        title={resourceMetaTitle}
+                      >
                         {resource.original_filename}
                       </p>
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-2 text-xs text-[color:var(--ink-soft)]">
-                    <span>
-                      {copy.pages(resource.page_count)} ·{" "}
-                      {formatDateLabel(resource.updated_at, languageCode)}
-                    </span>
+                    {showVisibleMetadata ? <span>{resourceMetaTitle}</span> : null}
                     <button
                       aria-label={copy.resourceInfoLabel}
                       className="inline-flex h-6 w-6 items-center justify-center rounded-full opacity-0 transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)] group-hover/card:opacity-100 focus-visible:opacity-100"
@@ -555,7 +603,20 @@ export function StudentSubjectResourceLibrary({
                     </button>
                   </div>
 
-                  {conversationId ? (
+                  {conversationId && selectionVariant === "checkbox" ? (
+                    <input
+                      aria-label={copy.useForCurrentChat(
+                        resource.original_filename,
+                      )}
+                      checked={conversationSelected}
+                      className="mt-0.5 h-4 w-4 shrink-0 rounded border-[color:var(--line)] accent-[color:var(--accent)] disabled:cursor-not-allowed disabled:opacity-40"
+                      disabled={!canSelect || isUpdating || disabled}
+                      onChange={(event) =>
+                        updateSelection(resource, event.target.checked)
+                      }
+                      type="checkbox"
+                    />
+                  ) : conversationId ? (
                     <button
                       aria-pressed={conversationSelected}
                       className={`shrink-0 rounded-full border px-3 py-1 text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${
@@ -600,26 +661,32 @@ export function StudentSubjectResourceLibrary({
                     </div>
                   </details>
                 ) : null}
-                <div className="flex flex-wrap items-center gap-2">
-                  {conversationId && resource.link ? (
-                    <button
-                      className="rounded-full border border-[color:var(--line)] px-3 py-1 text-xs font-medium text-[color:var(--ink-soft)] transition hover:text-[color:var(--foreground)] disabled:cursor-not-allowed disabled:opacity-50"
-                      disabled={isUpdating || disabled}
-                      onClick={() => unlinkResource(resource)}
-                      type="button"
-                    >
-                      {copy.unlink}
-                    </button>
-                  ) : null}
-                  <button
-                    className="rounded-full border border-[#c95f44]/35 px-3 py-1 text-xs font-medium text-[#c95f44] transition hover:border-[#c95f44] disabled:cursor-not-allowed disabled:opacity-50"
-                    disabled={isUpdating || disabled}
-                    onClick={() => deleteResource(resource)}
-                    type="button"
-                  >
-                    {copy.delete}
-                  </button>
-                </div>
+                {showResourceActions ? (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {conversationId &&
+                    resource.link &&
+                    selectionVariant === "button" ? (
+                      <button
+                        className="rounded-full border border-[color:var(--line)] px-3 py-1 text-xs font-medium text-[color:var(--ink-soft)] transition hover:text-[color:var(--foreground)] disabled:cursor-not-allowed disabled:opacity-50"
+                        disabled={isUpdating || disabled}
+                        onClick={() => unlinkResource(resource)}
+                        type="button"
+                      >
+                        {copy.unlink}
+                      </button>
+                    ) : null}
+                    {allowDelete ? (
+                      <button
+                        className="rounded-full border border-[#c95f44]/35 px-3 py-1 text-xs font-medium text-[#c95f44] transition hover:border-[#c95f44] disabled:cursor-not-allowed disabled:opacity-50"
+                        disabled={isUpdating || disabled}
+                        onClick={() => deleteResource(resource)}
+                        type="button"
+                      >
+                        {copy.delete}
+                      </button>
+                    ) : null}
+                  </div>
+                ) : null}
               </div>
             );
           })}
