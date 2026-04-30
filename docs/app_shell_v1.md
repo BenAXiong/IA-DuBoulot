@@ -138,6 +138,7 @@ Why:
 - the subject quick-start now creates a bare conversation shell, uploads any staged files, sends the learner's first real message, and only then routes into `/app/conversations/[conversationId]`, so the main student view behaves more like a chat launcher than a wizard entry
 - the student subject view and live conversation surface now both use a true right-side panel treatment instead of floating cards, so the workspace reads like a split main pane rather than a dashboard grid
 - only the live conversation route keeps that right-side panel; the subject-selection view returns to a single main column until a real chat exists
+- the live conversation route opts out of the authenticated shell's generic centered `max-w-7xl` content canvas so the workbench can fill the available main pane; do not reintroduce negative right-margin or article right-padding compensation around the workbench rail, because that creates duplicate gutters on the right side of the chat UI
 - on desktop, the student sidebar now keeps a viewport-height column independent from main-pane scroll, so the left rail behaves like a true app navigation pane instead of stretching with the homework content
 
 ## iPad Validation

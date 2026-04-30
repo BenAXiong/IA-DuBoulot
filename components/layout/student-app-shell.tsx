@@ -809,7 +809,11 @@ export function StudentAppShell({
           }`}
         >
           <header className="sticky top-0 z-20 min-h-[3.25rem] border-b border-[color:var(--line)] bg-[color:var(--background)]/88 px-3 py-0 backdrop-blur sm:px-4">
-            <div className="mx-auto flex min-h-[3.25rem] w-full max-w-7xl items-center justify-between gap-4">
+            <div
+              className={`mx-auto flex min-h-[3.25rem] w-full items-center justify-between gap-4 ${
+                isConversationRoute ? "max-w-none" : "max-w-7xl"
+              }`}
+            >
               <div className="flex min-w-0 items-center">
                 <div className="flex min-w-0 flex-col justify-center">
                   <p className="truncate text-xs uppercase tracking-[0.18em] text-[color:var(--ink-muted)]">
@@ -834,13 +838,17 @@ export function StudentAppShell({
           </header>
 
           <div
-            className={`flex-1 px-4 py-4 sm:px-5 lg:px-6 ${
-              isConversationRoute ? "min-h-0 overflow-hidden" : ""
+            className={`flex-1 ${
+              isConversationRoute
+                ? "min-h-0 overflow-hidden px-0 py-0"
+                : "px-4 py-4 sm:px-5 lg:px-6"
             }`}
           >
             <div
-              className={`mx-auto w-full max-w-7xl ${
-                isConversationRoute ? "h-full min-h-0" : ""
+              className={`w-full ${
+                isConversationRoute
+                  ? "h-full min-h-0 max-w-none"
+                  : "mx-auto max-w-7xl"
               }`}
             >
               {children}

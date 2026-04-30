@@ -882,13 +882,13 @@ export function StudentConversationWorkbench({
       />
 
       <section
-        className="grid min-h-0 flex-1 gap-0 overflow-hidden xl:-my-4 xl:-mr-8 xl:h-full xl:flex-1 xl:items-start xl:[grid-template-columns:minmax(0,1fr)_var(--student-rail-width)] xl:[grid-template-rows:minmax(0,1fr)]"
+        className="grid min-h-0 flex-1 gap-0 overflow-hidden xl:h-full xl:flex-1 xl:items-start xl:[grid-template-columns:minmax(0,1fr)_var(--student-rail-width)] xl:[grid-template-rows:minmax(0,1fr)]"
         ref={sectionRef}
         style={{
           ["--student-rail-width" as string]: `${railWidth}px`,
         }}
       >
-        <article className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden py-1 xl:h-full xl:py-4 xl:pr-8">
+        <article className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden py-1 xl:h-full xl:py-4">
           <div
             className="student-scrollbar-hidden min-h-0 flex-1 overflow-y-auto pt-1"
             onScroll={updateTranscriptPositionState}
