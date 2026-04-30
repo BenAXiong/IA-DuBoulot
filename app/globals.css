@@ -227,6 +227,7 @@ html[data-theme="warm"] {
 
 html {
   scroll-behavior: smooth;
+  scrollbar-gutter: stable;
 }
 
 body {
