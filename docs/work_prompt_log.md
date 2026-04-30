@@ -281,3 +281,4 @@ then close it as:
 | 2026-04-29 | 22:20 -> 22:23 | 0h03 | P1.3 P2.7.9 | fix subject-page tab content so recent chats only display inside the active History tab | | |
 | 2026-04-30 | 08:53 -> 08:53 | 0h00 | A0.3.7 | close the 2026-04-29 evening work session at 22:23 and reopen a fresh execution trace | | |
 | 2026-04-30 | 08:57 -> 09:03 | 0h06 | P1.3 P2.7.9 | fix main homework landing tabs so global recent chats do not display under Resources or Instructions | | |
+| 2026-04-30 | 09:54 -> 09:55 | 0h01 | P1.3 P2.7.9 | disable per-subject master-instructions tab and add coming-soon hover tooltip | | |

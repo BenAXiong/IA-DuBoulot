@@ -108,6 +108,7 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
           resources: "Sources",
           instructions: "Instructions",
         },
+        masterInstructionsSoon: "Master instructions available soon!",
         noSubjectChats: "No discussion has been saved for this subject yet.",
         noInstructions: "No subject instruction has been saved yet.",
       };
@@ -128,6 +129,7 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
           resources: "資料來源",
           instructions: "指示",
         },
+        masterInstructionsSoon: "主指示功能即將推出！",
         noSubjectChats: "這個科目目前還沒有已儲存的對話。",
         noInstructions: "這個科目目前還沒有已儲存的指示。",
       };
@@ -149,6 +151,7 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
           resources: "Ressources",
           instructions: "Consignes",
         },
+        masterInstructionsSoon: "Consignes principales bientôt disponibles !",
         noSubjectChats: "Aucune discussion enregistrée pour cette matière.",
         noInstructions: "Aucune consigne enregistrée pour cette matière.",
       };
@@ -654,22 +657,38 @@ export function StudentSubjectQuickStart({
             ] as Array<[SubjectQuickStartTab, string]>
           ).map(([tab, label]) => {
             const selected = activeTab === tab;
-
-            return (
+            const disabled = tab === "instructions";
+            const button = (
               <button
+                aria-disabled={disabled}
                 aria-selected={selected}
                 className={`inline-flex min-h-10 items-center justify-center rounded-full px-4 text-sm font-medium transition ${
-                  selected
-                    ? "bg-[color:var(--foreground)] text-[color:var(--background)]"
-                    : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface)] hover:text-[color:var(--foreground)]"
+                  disabled
+                    ? "cursor-not-allowed text-[color:var(--ink-muted)] opacity-60"
+                    : selected
+                      ? "bg-[color:var(--foreground)] text-[color:var(--background)]"
+                      : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface)] hover:text-[color:var(--foreground)]"
                 }`}
+                disabled={disabled}
                 key={tab}
-                onClick={() => setActiveTab(tab)}
+                onClick={() => {
+                  if (!disabled) {
+                    setActiveTab(tab);
+                  }
+                }}
                 role="tab"
                 type="button"
               >
                 {label}
               </button>
+            );
+
+            return disabled ? (
+              <span key={tab} title={copy.masterInstructionsSoon}>
+                {button}
+              </span>
+            ) : (
+              button
             );
           })}
         </div>
