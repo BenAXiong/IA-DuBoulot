@@ -108,6 +108,8 @@ Status note: add a focused auth-surface polish follow-up under `P1.3` for the fi
   Status note: the subject-page area below the quick-start composer is a true tabbed panel. `History` is the only tab that should render recent chats; `Resources` renders the subject-resource library, and `Instructions` renders the future instructions placeholder without also showing recent chats. This applies to both the selected-subject route and the main homework landing with subject pills.
 
   Status note: the per-subject master-instructions tab is disabled during this Pilot slice and shows a coming-soon tooltip on hover instead of opening an empty placeholder panel.
+
+  Status note: the subject-resource library display now resyncs when the learner changes subject pills, so the active `Resources` tab does not keep stale resources from the previously selected subject.
 - [ ] P2.8 Evaluate and design a durable conversation working-memory layer for active tutoring state, including assistant-generated questions, student answers, current correction targets, unresolved points, and explicit interactions with completion summaries, student memory profiles, subject-wide resources, and transcript-window compaction.
 
 Status note: the current MVP still runs one shared coaching workflow across subjects. The product already stores a `subject_tag`, shows recent-subject rollups, uses subject text inside prompts and summaries, and allows a custom subject through the intake `Other subject` path, but memory, prompts, and UI flows are not yet specialized by subject family. Pilot work should decide whether math/science/humanities/language-study need different coaching modes, and whether custom subjects stay free-text, become admin-curated, or need alias normalization.

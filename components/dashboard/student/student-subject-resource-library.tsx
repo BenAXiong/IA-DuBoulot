@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { SourceOutlinePreview } from "@/components/dashboard/student/source-outline-preview";
 import { StudentUploadProgressRing } from "@/components/dashboard/student/student-upload-progress-ring";
 import { formatDateLabel } from "@/components/dashboard/student/student-dashboard-presenters";
@@ -178,6 +178,13 @@ export function StudentSubjectResourceLibrary({
   );
   const [pendingResourceId, setPendingResourceId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    setResources(initialResources);
+    setErrorMessage(null);
+    setUploadProgress(null);
+    setPendingResourceId(null);
+  }, [initialResources, subjectTag]);
 
   function mergeResource(resource: SubjectResourceLibraryItem) {
     setResources((current) => {
