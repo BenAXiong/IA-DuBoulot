@@ -888,7 +888,7 @@ export function StudentConversationWorkbench({
           ["--student-rail-width" as string]: `${railWidth}px`,
         }}
       >
-        <article className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden py-1 xl:h-full xl:py-4">
+        <article className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden px-4 py-1 sm:px-6 xl:h-full xl:px-8 xl:py-4">
           <div
             className="student-scrollbar-hidden min-h-0 flex-1 overflow-y-auto pt-1"
             onScroll={updateTranscriptPositionState}

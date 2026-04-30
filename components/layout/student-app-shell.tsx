@@ -778,6 +778,7 @@ export function StudentAppShell({
       className={`bg-[color:var(--background)] ${
         isConversationRoute ? "h-screen overflow-hidden" : "min-h-screen"
       }`}
+      data-conversation-route={isConversationRoute ? "true" : undefined}
       lang={languageCode}
     >
       <DocumentLanguageSync languageCode={languageCode} />
