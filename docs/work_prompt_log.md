@@ -279,3 +279,4 @@ then close it as:
 | 2026-04-29 | 22:13 -> 22:14 | 0h01 | P6.1 P6.2 P6.3 P6.4 P6.5 | log post-pilot subject-resource follow-ups for embeddings, stronger section chunking, chat-to-subject promotion, and optional old-PDF backfill | | |
 | 2026-04-29 | 22:16 -> 22:19 | 0h03 | P2.7 P3.3 | inspect failed subject-resource extraction screenshot and local Sésamath workbook PDF characteristics | | |
 | 2026-04-29 | 22:20 -> 22:23 | 0h03 | P1.3 P2.7.9 | fix subject-page tab content so recent chats only display inside the active History tab | | |
+| 2026-04-30 | 08:53 -> 08:53 | 0h00 | A0.3.7 | close the 2026-04-29 evening work session at 22:23 and reopen a fresh execution trace | | |
