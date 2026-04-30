@@ -299,3 +299,4 @@ then close it as:
 | 2026-04-30 | 21:45 -> 21:47 | 0h02 | P1.3 P2.7 | fix workspace spacing regression and investigate remaining right-edge black gutter | | |
 | 2026-04-30 | 21:51 -> 21:57 | 0h06 | P1.3 P2.7 | triage reported production workspace spacing screenshot against current source and Vercel aliases | | |
 | 2026-04-30 | 22:03 -> 22:07 | 0h04 | P2.7 P6.6 P6.7 P6.8 | close the first subject-doc feature version, move remaining non-blocking work to the post-pilot backlog, and refresh docs | | |
+| 2026-04-30 | 22:08 -> 22:10 | 0h02 | P1.3 | swap the live composer send icon to a dim upload ring as soon as clipboard or file upload starts | | |

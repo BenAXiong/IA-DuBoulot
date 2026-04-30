@@ -212,10 +212,14 @@ export function StudentConversationComposer({
             onClick={onSendMessage}
             type="button"
           >
-            {isUploading && uploadProgress ? (
-              <StudentUploadProgressRing
-                completedSegments={getCompletedUploadSegments(uploadProgress)}
-              />
+            {isUploading ? (
+              <span className={uploadProgress ? undefined : "opacity-60"}>
+                <StudentUploadProgressRing
+                  completedSegments={
+                    uploadProgress ? getCompletedUploadSegments(uploadProgress) : 1
+                  }
+                />
+              </span>
             ) : (
               <SendIcon />
             )}
