@@ -61,6 +61,8 @@ const CHUNKER_VERSION = "subject-resource-chunker-v1";
 const MAX_CHUNK_CHARS = 3200;
 const CHUNK_OVERLAP_CHARS = 240;
 const MAX_SUBJECT_TAG_LENGTH = 60;
+const SUBJECT_RESOURCE_FREE_TOTAL_LIMIT = 1;
+const SUBJECT_RESOURCE_PAID_PER_SUBJECT_LIMIT = 2;
 const SUBJECT_RESOURCE_BUCKET_ALLOWED_MIME_TYPES = Array.from(
   new Set([
     ...Object.keys(ALLOWED_ATTACHMENT_RULES),
@@ -725,6 +727,29 @@ async function ensureSubjectResourceBucket() {
     .catch(() => null);
 }
 
+async function countSubjectResourcesForCap(input: {
+  studentUserId: string;
+  subjectTag?: string;
+}) {
+  const admin = createSupabaseAdminClient();
+  let query = admin
+    .from("subject_resources")
+    .select("id", { count: "exact", head: true })
+    .eq("student_user_id", input.studentUserId);
+
+  if (input.subjectTag) {
+    query = query.eq("subject_tag", input.subjectTag);
+  }
+
+  const { count, error } = await query;
+
+  if (error) {
+    throw toServiceError("Unable to count subject resources.", error);
+  }
+
+  return count ?? 0;
+}
+
 async function requireStudentAppUser(context: AuthenticatedUserContext) {
   const appUser = requireAppUserContext(context);
   requireAppUserRole(appUser, ["student"]);
@@ -1001,7 +1026,7 @@ export async function createSubjectResourceUploadTarget(input: {
     });
   }
 
-  await assertStudentUsageActionAllowed({
+  const usageSnapshot = await assertStudentUsageActionAllowed({
     studentUserId: appUser.id,
     action: "create_upload",
     languageCode: appUser.preferred_ui_language,
@@ -1041,6 +1066,35 @@ export async function createSubjectResourceUploadTarget(input: {
       status: 400,
       fieldErrors: {
         byteSize: copy.validation.subjectResourceFileTooLarge,
+      },
+    });
+  }
+
+  const hasPaidSubjectDocAccess = usageSnapshot.quota.hasPaidSubscription;
+  const existingSubjectResourceCount = await countSubjectResourcesForCap({
+    studentUserId: appUser.id,
+    subjectTag: hasPaidSubjectDocAccess ? subjectTag : undefined,
+  });
+  const subjectResourceLimit = hasPaidSubjectDocAccess
+    ? SUBJECT_RESOURCE_PAID_PER_SUBJECT_LIMIT
+    : SUBJECT_RESOURCE_FREE_TOTAL_LIMIT;
+
+  if (existingSubjectResourceCount >= subjectResourceLimit) {
+    throw new AppError({
+      code: "conflict",
+      message: hasPaidSubjectDocAccess
+        ? copy.validation.subjectResourceLimitReachedPaid
+        : copy.validation.subjectResourceLimitReachedFree,
+      status: 409,
+      fieldErrors: {
+        subjectResources: hasPaidSubjectDocAccess
+          ? copy.validation.subjectResourceLimitReachedPaid
+          : copy.validation.subjectResourceLimitReachedFree,
+      },
+      details: {
+        existingSubjectResourceCount,
+        subjectResourceLimit,
+        scope: hasPaidSubjectDocAccess ? "subject" : "student",
       },
     });
   }

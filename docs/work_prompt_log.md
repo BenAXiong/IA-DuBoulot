@@ -291,3 +291,4 @@ then close it as:
 | 2026-04-30 | 10:53 -> 10:56 | 0h03 | P2.7 P2.7.8 P2.7.9 | preselect subject docs from subject view for the first prompt | | |
 | 2026-04-30 | 11:11 -> 11:13 | 0h02 | P2.7 P6.1 P6.2 P6.3 P6.4 P6.5 | log remaining subject-doc pilot closure work under P2.7 and confirm post-pilot items are already tracked | | |
 | 2026-04-30 | 20:34 -> 20:34 | 0h00 | A0.3.7 | close the 2026-04-30 morning work session at 11:13 and reopen a fresh execution trace | | |
+| 2026-04-30 | 20:36 -> 20:47 | 0h11 | P2.7 | cap subject docs by plan: two per subject for paid users and one total for free users | | |

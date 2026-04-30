@@ -24,6 +24,7 @@ The implementation name is `subject resources` because that is the database and 
 - A subject doc uploaded from a subject or chat resource context can be selected for that context immediately.
 - Selected subject docs are retrieved by chunks; the full file is not sent wholesale to the coach each turn.
 - Outlines and summaries are separate. If the outline is weak or unavailable, the UI should say structure is unavailable or omit it, not replace the outline with a summary.
+- Paid-access students can keep up to `2` subject docs per subject. Free/trial students can keep `1` subject doc across all subjects. Pending and failed resource shells count until deleted.
 
 Ask the user before changing any of these rules:
 
@@ -50,7 +51,8 @@ Subject-doc upload support:
 Current quota behavior:
 
 - no dedicated subject-library total byte cap
-- no dedicated per-subject resource-count cap
+- paid-access students can keep `2` subject docs per subject
+- free/trial students can keep `1` subject doc across all subjects
 - upload actions still count against the general usage quota
 - current general usage quotas are `40` uploads for trial and `240` uploads for paid
 
@@ -146,7 +148,7 @@ Schema migrations:
 Routes:
 
 - `GET /api/subject-resources`: list the library for a subject, optionally with conversation link state
-- `POST /api/subject-resources`: reserve a subject-resource upload target
+- `POST /api/subject-resources`: reserve a subject-resource upload target after enforcing subject-doc count caps
 - `DELETE /api/subject-resources`: delete a subject resource and purge owned storage
 - `POST /api/subject-resources/confirm`: confirm upload, extract, store text/metadata, chunk, and optionally link to a conversation
 - `PATCH /api/subject-resources/selection`: update the `selected` retrieval toggle for one conversation
@@ -323,7 +325,6 @@ Remaining Pilot closure tasks:
 - Run the full real-doc flow with PDF, DOC, DOCX, TXT, MD, and JSON resources: upload, preview, preselect for the first prompt, select/unselect in a live chat, ask a retrieval-dependent question, unlink, delete, and confirm adult/tutor visibility remains conversation-linked.
 - After deployment, run `npm run report:subject-resource-token-impact -- --days=14 --limit=500` against production data and review whether subject-resource retrieval materially changes token usage.
 - Review real chat retrieval quality, especially late-page and middle-section questions, before deciding whether lexical retrieval is enough for Pilot or should move to `P6.2`.
-- Decide whether the subject library needs a total byte cap or per-subject/per-student resource-count cap beyond the current per-file caps and general upload quota.
 - Track extraction failures on large or highly structured PDFs/workbooks, especially Sésamath-like files, and decide whether they need provider/local fallback or remain out of Pilot scope.
 
 Post-pilot candidates:

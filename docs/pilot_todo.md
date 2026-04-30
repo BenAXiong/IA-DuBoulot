@@ -121,11 +121,13 @@ Status note: add a focused auth-surface polish follow-up under `P1.3` for the fi
 
   Status note: ready subject docs can now be checked from the subject view before starting a new chat. Checked docs are linked to the newly created conversation with `selected = true` before the first prompt is auto-sent, while existing docs remain unchecked by default.
 
+  Status note: subject-doc count caps are now enforced when creating a subject-resource upload target. Paid-access students can keep up to `2` subject docs per subject; free/trial students can keep `1` subject doc across all subjects. Pending and failed shells count until deleted so users cannot bypass the cap by reserving uploads.
+
   Remaining Pilot closure work before closing the `P2.7` umbrella:
   - [ ] Run the full real-doc flow with PDF, DOC, DOCX, TXT, MD, and JSON resources: upload, preview, preselect for the first prompt, select/unselect in a live chat, ask a retrieval-dependent question, unlink, delete, and confirm adult/tutor visibility remains conversation-linked.
   - [ ] After deployment, run `npm run report:subject-resource-token-impact -- --days=14 --limit=500` against production data and review whether subject-resource retrieval materially changes token usage.
   - [ ] Review real chat retrieval quality, especially late-page and middle-section questions, before deciding whether lexical retrieval is enough for Pilot or should move to `P6.2`.
-  - [ ] Decide whether the subject library needs a total byte cap or per-subject/per-student resource-count cap beyond the current per-file caps and general upload quota.
+  - [x] Decide whether the subject library needs a total byte cap or per-subject/per-student resource-count cap beyond the current per-file caps and general upload quota.
   - [ ] Track extraction failures on large or highly structured PDFs/workbooks, especially Sésamath-like files, and decide whether they need provider/local fallback or remain out of Pilot scope.
   - [ ] Keep post-pilot candidates tracked under `P6.1` through `P6.5`; do not fold embeddings, stronger section chunking, optional chat-to-subject promotion, or old-PDF backfill into the Pilot closure unless explicitly re-scoped.
 - [ ] P2.8 Evaluate and design a durable conversation working-memory layer for active tutoring state, including assistant-generated questions, student answers, current correction targets, unresolved points, and explicit interactions with completion summaries, student memory profiles, subject-wide resources, and transcript-window compaction.

@@ -62,7 +62,8 @@ Conversation-level guardrails:
 Subject-resource guardrails:
 
 - subject-resource PDFs and Word documents use the same private source bucket but a separate, extract-once upload path
-- Pilot subject-resource caps are `50 MB` for provider-extracted PDF/DOC/DOCX files and `5 MB` for direct TXT/MD/JSON text files
+- Pilot subject-resource file-size caps are `20 MB` for provider-extracted PDF/DOC/DOCX files and `5 MB` for direct TXT/MD/JSON text files
+- Pilot subject-resource count caps are `2` docs per subject for paid-access students and `1` doc across all subjects for free/trial students
 - raising the subject-resource cap does not raise chat-only attachment caps; chat upload routes still enforce their own per-MIME and per-conversation limits
 - deleting a subject resource purges the storage object only when the resource was uploaded through the subject-resource path; resources promoted from chat attachments preserve the original chat attachment object
 

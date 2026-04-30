@@ -208,6 +208,7 @@ Current access model:
   - extraction failures now preserve structured Gemini payload diagnostics from the shared JSON-generation helper, so logs can distinguish empty structured payloads, malformed JSON, finish reasons such as `MAX_TOKENS`, and missing candidate parts instead of collapsing everything into one generic provider-failure bucket
 - subject-resource cap note:
   - Pilot subject resources currently allow provider-extracted PDF/DOC/DOCX files up to `20 MB` per file while direct TXT/MD/JSON files remain capped at `5 MB`
+  - paid-access students can keep `2` subject docs per subject; free/trial students can keep `1` subject doc across all subjects
   - there is no dedicated subject-library total byte cap yet; upload actions still count against the general usage quota
   - measure the real impact through provider usage metadata plus stored `messages.input_tokens` and `messages.output_tokens` before changing caps again
   - `npm run report:subject-resource-token-impact -- --days=14 --limit=500` summarizes successful coach turns from `ai_generation_debug_captures`, joins persisted assistant-message token counts when available, and compares turns with and without subject-resource retrieval diagnostics

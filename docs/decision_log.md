@@ -18,6 +18,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 
 ## Current Decisions
 
+### D-20260430-01 - Cap Subject Docs By Paid Or Free Access
+
+- Date: 2026-04-30
+- Status: accepted
+- Related tasks: `P2.7`
+- Context: Subject docs are long-lived resources, so per-file size caps and monthly upload counters are not enough to control persistent storage, extraction, retrieval surface area, or free-tier behavior.
+- Decision: Enforce subject-doc count caps at subject-resource upload-target creation: paid-access students can keep up to `2` subject docs per subject, while free/trial students can keep `1` subject doc across all subjects. Pending and failed resource shells count toward the cap until deleted, because they still occupy library/storage state and otherwise create a bypass around the signed-upload flow.
+- Why: This gives the Pilot a small, predictable subject-resource library without building a full storage entitlement system yet. It keeps the learner-visible rule simple and limits provider/retrieval cost exposure.
+- Follow-up: Revisit broader storage entitlements after Pilot evidence; the current policy is a count cap, not a total byte cap.
+
 ### D-20260429-01 - Subject Resources Get Dedicated Uploads And Explicit Chat Selection
 
 - Date: 2026-04-29
