@@ -67,7 +67,7 @@ The student role no longer inherits the generic authenticated-shell rhythm used 
 
 Current shell behavior:
 
-- left rail owns the enabled Homework entry plus subject-filter navigation
+- left rail owns the existing Dashboard entry, the enabled Homework entry, and subject-filter navigation
 - `Homework` is the only real student activity today
 - `Recap`, `Exams`, `Forward`, and `Explore` are visible but disabled placeholder modes held in the shell so future learning tools can grow without another shell rewrite
 - the bottom profile dock shows placeholder avatar, learner name, and plan label by default; the settings/sign-out actions now open from a hover or focus menu instead of staying permanently visible

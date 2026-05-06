@@ -37,15 +37,16 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
   switch (languageCode) {
     case "en":
       return {
+        dashboard: "Dashboard",
         homework: "Homework",
         forward: "Forward",
-        maps: "Recap",
+        maps: "Recaps",
         tests: "Exams",
         explore: "Explore",
         forwardHint: "Peek into what's next",
-        mapsHint: "Mindmaps - Maps your knowledge",
-        testsHint: "Tests - Drill and improve your grades",
-        exploreHint: "Dive deeper into topics that you enjoy",
+        mapsHint: "Map your knowledge",
+        testsHint: "Drill and improve your grades",
+        exploreHint: "Dive deeper",
         addSubject: "Add subject",
         noSubjects: "No subject yet",
         profileSettings: "Profile & settings",
@@ -67,6 +68,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
       };
     case "zh":
       return {
+        dashboard: "總覽",
         homework: "作業",
         forward: "Forward",
         maps: "回顧",
@@ -97,14 +99,15 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
       };
     default:
       return {
+        dashboard: "Tableau",
         homework: "Devoirs",
         forward: "Poursuivre",
         maps: "Récap",
         tests: "Tests",
         explore: "Explorer",
-        forwardHint: "Regarde ce qui vient ensuite",
-        mapsHint: "Mindmaps - Cartographie tes connaissances",
-        testsHint: "Entraîne-toi et améliore tes notes",
+        forwardHint: "Pour aller plus loin",
+        mapsHint: "Cartographie tes connaissances",
+        testsHint: "Eméliore tes notes",
         exploreHint: "Approfondis les sujets que tu aimes",
         addSubject: "Ajouter une matière",
         noSubjects: "Aucune matière pour l'instant",
@@ -255,6 +258,20 @@ function buildHeaderContent(input: {
   };
 }
 
+function HomeIcon() {
+  return (
+    <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
+      <path
+        d="M4.75 10.75 12 5l7.25 5.75v8a1 1 0 0 1-1 1h-3.5v-5.25h-5.5V19.75h-3.5a1 1 0 0 1-1-1v-8Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.7"
+      />
+    </svg>
+  );
+}
+
 function HomeworkIcon() {
   return (
     <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
@@ -401,10 +418,10 @@ function DisabledRailItem({
   return (
     <div
       aria-disabled="true"
-      className={`flex cursor-not-allowed items-center ${
+      className={`flex cursor-wait items-center ${
         collapsed ? "justify-center" : "gap-3"
       } rounded-2xl px-3 py-2.5 text-sm font-medium text-[color:var(--ink-muted)] opacity-60`}
-      title={collapsed ? label : undefined}
+      title="Coming soon!"
     >
       {icon}
       {!collapsed ? (
@@ -581,6 +598,19 @@ export function StudentAppShell({
 
       <nav className={`flex-1 overflow-y-auto py-4 ${desktopSidebarPadding}`}>
         <div className="grid gap-2">
+          <Link
+            className={`flex items-center ${sidebarCollapsed ? "justify-center" : "gap-3"} rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
+              activeView === "homework"
+                ? "bg-[color:var(--surface-strong)] text-[color:var(--foreground)]"
+                : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
+            }`}
+            href="/app?view=homework"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <HomeIcon />
+            {!sidebarCollapsed ? <span>{copy.dashboard}</span> : null}
+          </Link>
+
           {sidebarCollapsed ? (
             <Link
               className={`flex items-center justify-center rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
@@ -632,7 +662,7 @@ export function StudentAppShell({
 
                       return (
                         <div
-                          className={`group/item flex items-center gap-1 rounded-[1rem] px-1 transition ${
+                          className={`group/item flex items-center gap-1 rounded-[1rem] px-1 pr-1.5 transition ${
                             isActive
                               ? "text-[color:var(--foreground)]"
                               : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
@@ -681,6 +711,7 @@ export function StudentAppShell({
             icon={<TestIcon />}
             label={copy.tests}
           />
+          <div className="mx-3 my-1 h-px bg-[color:var(--line)]" />
           <DisabledRailItem
             collapsed={sidebarCollapsed}
             hint={copy.forwardHint}

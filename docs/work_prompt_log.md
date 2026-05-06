@@ -303,3 +303,4 @@ then close it as:
 | 2026-05-05 | 22:34 -> 22:35 | 0h01 | A0.3.7 | close the 2026-04-30 work session at 22:10 and reopen a fresh execution trace | | |
 | 2026-05-06 | 16:59 -> 17:00 | 0h01 | A0.3.7 | cancel the mistaken 2026-05-05 22:34 work-session reopen and open a fresh execution trace | | |
 | 2026-05-06 | 17:01 -> 17:06 | 0h05 | P1.3 | reorder the student left rail, disable future sections, swap Forward to a rocket icon, and align the Homework chevron | | |
+| 2026-05-06 | 17:18 -> 17:19 | 0h01 | P1.3 | restore the Dashboard rail row, add a divider after Tests, and give disabled rail sections a wait cursor with coming-soon tooltip | | |
