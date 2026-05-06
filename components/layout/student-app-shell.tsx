@@ -104,7 +104,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
       };
     default:
       return {
-        dashboard: "Tableau",
+        dashboard: "Dashboard",
         homework: "Devoirs",
         forward: "Poursuivre",
         maps: "Récap",
@@ -122,7 +122,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
         trialPlan: "Accès Starter",
         familyPlan: "Accès Family",
         pageTitles: {
-          dashboard: "Tableau",
+          dashboard: "Dashboard",
           homework: "Devoirs",
           selectSubject: "Choisis une matière",
           forward: "Forward",

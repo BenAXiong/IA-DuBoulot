@@ -11,7 +11,7 @@ Capture the first real student home screen so future sessions can extend it with
 This document started with `A3.1.1` to `A3.1.3` and now also records the later student-shell redesign:
 
 - student-owned `/app` shell with a collapsible subject rail
-- distinct Dashboard view with cards for the left-rail learning sections
+- distinct Dashboard view with a wide Homework row plus a two-column grid for the other left-rail learning sections
 - homework-focused home view with recent conversations grouped by subject-tag filters
 - disabled placeholder activity slots for future `Recap`, `Exams`, `Forward`, and `Explore` surfaces
 - subject-level quick-start that now opens the live chat directly
@@ -74,7 +74,7 @@ Current shell behavior:
 - `Recap`, `Exams`, `Forward`, and `Explore` are visible but disabled placeholder modes held in the shell so future learning tools can grow without another shell rewrite; their descriptions are hover-revealed in already-reserved space so the left rail does not shift when hovered
 - the bottom profile dock shows placeholder avatar, learner name, and plan label by default; the settings/sign-out actions now open from a hover or focus menu instead of staying permanently visible
 - the top bar is intentionally quiet, slimmer than the earlier MVP chrome, and keeps only a simple eyebrow-and-title pair plus the smaller language/theme utility controls
-- the Dashboard view is separate from Homework: `/app` or `view=dashboard` shows cards for Homework, Recap, Exams/Tests, Forward, and Explore, while `view=homework` owns subject selection and chat launch
+- the Dashboard view is separate from Homework: `/app` or `view=dashboard` shows a full-width Homework row with subject links on the right, then a two-column grid for Recap, Exams/Tests, Forward, and Explore; `view=homework` owns subject selection and chat launch
 
 Current boundary:
 

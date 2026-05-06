@@ -34,22 +34,22 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         homeworkTitle: "Select a subject",
         homeworkBody: "Pick a subject and jump straight into the chat.",
         homeworkCardTitle: "Homework",
-        homeworkCardBody: "Open a subject and continue a homework chat.",
+        homeworkCardBody: "Start from a subject, add useful sources, and keep the homework conversation moving.",
         noSubjectTitle: "No homework yet",
         noSubjectBody:
           "Choose the subject here and ask banban for advices.\nDon't forget to upload any class content or practice material that banban will need to help you!",
         forwardTitle: "Forward",
         forwardBody:
-          "This space is reserved for future forward-looking guidance on what may come next and how to prepare for it at a high level.",
+          "Preview what is coming next in class and build the basics before it feels rushed.",
         mapsTitle: "Recaps",
         mapsBody:
-          "This space is reserved for future knowledge maps. Homework remains the main learner experience for now.",
+          "Turn recent lessons into clean summaries and visual maps that make revision easier.",
         testsTitle: "Exams",
         testsBody:
-          "This space is reserved for future quiz practice. Homework remains the main learner experience for now.",
+          "Practice with focused questions, spot fragile points, and prepare with less guesswork.",
         exploreTitle: "Explore",
         exploreBody:
-          "This space is reserved for deeper dives into topics the learner enjoys.",
+          "Follow interesting ideas beyond the assignment and connect them to what you already know.",
         comingSoon: "Coming soon",
         needsAttention: "Open learner settings",
         subjectResourceUploadQuotaReached:
@@ -63,21 +63,21 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         homeworkTitle: "選擇科目",
         homeworkBody: "選一個科目，直接開始或回到對話。",
         homeworkCardTitle: "作業",
-        homeworkCardBody: "打開科目，繼續作業對話。",
+        homeworkCardBody: "從科目開始，加入需要的資料，繼續完成作業對話。",
         noSubjectTitle: "還沒有作業",
         noSubjectBody:
           "先在這裡選擇科目，再向 banban 詢問建議。\n別忘了上傳 banban 需要的課堂內容或練習資料，才能更好地幫助你！",
         forwardTitle: "Forward",
         forwardBody:
-          "這裡會保留給未來的前瞻引導功能，幫學生先看接下來可能會學什麼，以及如何做高層次準備。",
+          "先看看課堂接下來可能會學什麼，提前打好基礎。",
         mapsTitle: "回顧",
         mapsBody:
-          "這裡會保留給未來的知識地圖功能。目前學生的主要體驗仍以作業為主。",
+          "把最近的課程整理成摘要和知識圖，讓複習更清楚。",
         testsTitle: "考試",
         testsBody:
-          "這裡會保留給未來的測驗練習功能。目前學生的主要體驗仍以作業為主。",
+          "用有針對性的題目練習，找出不穩的地方，準備更踏實。",
         exploreTitle: "探索",
-        exploreBody: "這裡會保留給深入探索學生喜歡主題的功能。",
+        exploreBody: "延伸探索你感興趣的主題，並連回已經學過的內容。",
         comingSoon: "即將推出",
         needsAttention: "打開設定",
         subjectResourceUploadQuotaReached: "這個帳號的上傳額度已達上限。",
@@ -85,27 +85,27 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
     default:
       return {
         homeworkEyebrow: "Devoirs",
-        dashboardTitle: "Tableau",
+        dashboardTitle: "Dashboard",
         dashboardBody: "Choisis l'espace de travail que tu veux ouvrir.",
         homeworkTitle: "Choisis une matière",
         homeworkBody: "Choisis une matière et entre directement dans la discussion.",
         homeworkCardTitle: "Devoirs",
-        homeworkCardBody: "Ouvre une matière et continue une discussion de devoir.",
+        homeworkCardBody: "Pars d'une matière, ajoute les sources utiles, et avance dans ton devoir.",
         noSubjectTitle: "Aucun devoir pour l'instant",
         noSubjectBody:
           "Choisis la matière ici et demande conseil à banban.\nN'oublie pas d'ajouter les supports de cours ou les exercices dont banban aura besoin pour t'aider !",
         forwardTitle: "Poursuivre",
         forwardBody:
-          "Cet espace est réservé à une future guidance d'anticipation pour voir ce qui pourrait venir ensuite et comment s'y préparer à grands traits.",
+          "Aperçois ce qui arrive ensuite en cours et prépare les bases avant d'être pressé.",
         mapsTitle: "Récap",
         mapsBody:
-          "Cet espace est réservé aux futures cartes de connaissances. Pour l'instant, l'expérience élève reste centrée sur les devoirs.",
+          "Transforme tes dernières leçons en résumés clairs et en cartes faciles à réviser.",
         testsTitle: "Tests",
         testsBody:
-          "Cet espace est réservé aux futurs quiz. Pour l'instant, l'expérience élève reste centrée sur les devoirs.",
+          "Entraîne-toi avec des questions ciblées, repère les points fragiles, et révise plus sereinement.",
         exploreTitle: "Explorer",
         exploreBody:
-          "Cet espace est réservé aux explorations plus poussées des sujets que tu aimes.",
+          "Approfondis les sujets qui t'intéressent et relie-les à ce que tu sais déjà.",
         comingSoon: "Bientôt",
         needsAttention: "Ouvrir les réglages",
         subjectResourceUploadQuotaReached:
@@ -161,6 +161,54 @@ function DashboardActivityCard({
   );
 }
 
+function formatSubjectDisplay(subject: string) {
+  const trimmed = subject.trim();
+  if (!trimmed) {
+    return subject;
+  }
+
+  return `${trimmed.charAt(0).toUpperCase()}${trimmed.slice(1)}`;
+}
+
+function DashboardHomeworkCard({
+  title,
+  body,
+  subjects,
+}: {
+  title: string;
+  body: string;
+  subjects: Array<{
+    label: string;
+    subjectTag: string;
+  }>;
+}) {
+  return (
+    <section className="grid gap-4 rounded-[1rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-4 sm:grid-cols-[minmax(0,1fr)_minmax(16rem,0.9fr)] sm:items-center">
+      <Link
+        className="grid gap-3 transition hover:text-[color:var(--accent)]"
+        href="/app?view=homework"
+      >
+        <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
+          {title}
+        </h2>
+        <p className="text-sm leading-6 text-[color:var(--ink-soft)]">{body}</p>
+      </Link>
+
+      <div className="flex flex-wrap justify-start gap-2 sm:justify-end">
+        {subjects.map((subject) => (
+          <Link
+            className="inline-flex min-h-9 items-center justify-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-3 text-sm font-medium text-[color:var(--foreground)] transition hover:border-[color:var(--accent)] hover:text-[color:var(--accent)]"
+            href={`/app?view=homework&subject=${encodeURIComponent(subject.subjectTag)}`}
+            key={subject.subjectTag}
+          >
+            {subject.label}
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function buildSubjectGroups(conversations: ListConversationSummary[]) {
   const groups = new Map<string, ListConversationSummary[]>();
 
@@ -195,14 +243,26 @@ export async function StudentDashboard({
   const languageCode = appUser.preferred_ui_language;
   const copy = getStudentHubCopy(languageCode);
   const subjectGroups = buildSubjectGroups(conversations);
+  const intakeSubjectOptions = getIntakeSubjectOptions(languageCode);
   const dashboardSubjectTags = Array.from(
     new Set([
-      ...getIntakeSubjectOptions(languageCode)
+      ...intakeSubjectOptions
         .map((option) => option.value)
         .filter((value) => value !== "autre"),
       ...subjectGroups.map((group) => group.subjectTag),
     ]),
   );
+  const dashboardCardSubjectTags =
+    subjectGroups.length > 0
+      ? subjectGroups.map((group) => group.subjectTag)
+      : dashboardSubjectTags;
+  const dashboardCardSubjects = dashboardCardSubjectTags.map((subjectTag) => ({
+    subjectTag,
+    label:
+      intakeSubjectOptions.find(
+        (option) => option.value.toLowerCase() === subjectTag.toLowerCase(),
+      )?.label ?? formatSubjectDisplay(subjectTag),
+  }));
   const subjectCounts = Object.fromEntries(
     subjectGroups.map((group) => [group.subjectTag, group.conversations.length]),
   );
@@ -266,32 +326,34 @@ export async function StudentDashboard({
             </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            <DashboardActivityCard
+          <div className="grid gap-3">
+            <DashboardHomeworkCard
               body={copy.homeworkCardBody}
-              href="/app?view=homework"
+              subjects={dashboardCardSubjects}
               title={copy.homeworkCardTitle}
             />
-            <DashboardActivityCard
-              badge={copy.comingSoon}
-              body={copy.mapsBody}
-              title={copy.mapsTitle}
-            />
-            <DashboardActivityCard
-              badge={copy.comingSoon}
-              body={copy.testsBody}
-              title={copy.testsTitle}
-            />
-            <DashboardActivityCard
-              badge={copy.comingSoon}
-              body={copy.forwardBody}
-              title={copy.forwardTitle}
-            />
-            <DashboardActivityCard
-              badge={copy.comingSoon}
-              body={copy.exploreBody}
-              title={copy.exploreTitle}
-            />
+            <div className="grid gap-3 md:grid-cols-2">
+              <DashboardActivityCard
+                badge={copy.comingSoon}
+                body={copy.mapsBody}
+                title={copy.mapsTitle}
+              />
+              <DashboardActivityCard
+                badge={copy.comingSoon}
+                body={copy.testsBody}
+                title={copy.testsTitle}
+              />
+              <DashboardActivityCard
+                badge={copy.comingSoon}
+                body={copy.forwardBody}
+                title={copy.forwardTitle}
+              />
+              <DashboardActivityCard
+                badge={copy.comingSoon}
+                body={copy.exploreBody}
+                title={copy.exploreTitle}
+              />
+            </div>
           </div>
         </section>
       ) : view === "forward" ? (
