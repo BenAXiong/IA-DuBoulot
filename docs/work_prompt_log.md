@@ -309,3 +309,4 @@ then close it as:
 | 2026-05-06 | 18:10 -> 18:13 | 0h03 | P1.3 P2.7 | tighten future-section rail spacing and move subject-resource info/delete controls into the requested header positions | | |
 | 2026-05-06 | 18:20 -> 18:24 | 0h04 | P2.7 | disable subject-page add-resource when the account upload quota is exhausted and show an informational tooltip | | |
 | 2026-05-06 | 18:27 -> 18:32 | 0h05 | P1.3 | split the student Dashboard view from Homework and render dashboard cards for the left-rail learning sections | | |
+| 2026-05-07 | 00:17 -> 00:17 | 0h00 | A0.3.7 | close the previous work session at 18:32 and reopen the execution trace | | |
