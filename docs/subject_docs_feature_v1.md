@@ -55,6 +55,7 @@ Current quota behavior:
 - free/trial students can keep `1` subject doc across all subjects
 - upload actions still count against the general usage quota
 - current general usage quotas are `40` uploads for trial and `240` uploads for paid
+- when the account's general upload quota is exhausted, the subject-page `Add` resource button is disabled and explains the quota state on hover; route-level quota enforcement remains the source of truth
 
 The learner-facing oversize message for subject docs is upgrade-oriented and specific to the subject-resource path. Chat-only attachment limits remain separate.
 
@@ -66,6 +67,7 @@ Subject page:
 2. The below-composer tabs show `History`, `Resources`, and a disabled coming-soon `Instructions` tab.
 3. `Resources` lists subject docs for the selected subject and updates when the subject changes.
 4. Learner uploads a subject doc from the dedicated `Add` control.
+   - If the account upload quota is exhausted, the `Add` control stays visible but disabled with an informational tooltip.
 5. Existing subject docs are unchecked by default, but the learner can tick ready docs before starting a new chat.
 6. Checked docs are linked to the newly created conversation before the first prompt is auto-sent, so retrieval can use them immediately.
 7. Ready resources show compact metadata, summary and structure collapsibles, and delete controls.

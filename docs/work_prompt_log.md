@@ -307,3 +307,4 @@ then close it as:
 | 2026-05-06 | 17:39 -> 17:43 | 0h04 | P1.3 | replace subject row plus actions with aligned chevrons that expand recent conversation titles and add the Homework divider | | |
 | 2026-05-06 | 17:58 -> 18:01 | 0h03 | P1.3 | align future-section labels with icons and reveal their descriptions only on hover without changing rail height | | |
 | 2026-05-06 | 18:10 -> 18:13 | 0h03 | P1.3 P2.7 | tighten future-section rail spacing and move subject-resource info/delete controls into the requested header positions | | |
+| 2026-05-06 | 18:20 -> 18:24 | 0h04 | P2.7 | disable subject-page add-resource when the account upload quota is exhausted and show an informational tooltip | | |

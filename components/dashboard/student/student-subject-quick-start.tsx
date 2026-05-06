@@ -43,6 +43,7 @@ type StudentSubjectQuickStartProps = {
   existingConversationCount?: number;
   initialSubjectResources?: SubjectResourceLibraryItem[];
   conversations?: ListConversationSummary[];
+  subjectResourceUploadDisabledReason?: string | null;
 };
 
 type CreateConversationShellResponse =
@@ -320,6 +321,7 @@ function renderSubjectTabPanel(input: {
   languageCode: UiLanguageCode;
   preselectedResourceIds: string[];
   onPreselectedResourceIdsChange: (resourceIds: string[]) => void;
+  subjectResourceUploadDisabledReason?: string | null;
   subjectTag: string;
   copy: ReturnType<typeof getQuickStartCopy>;
 }) {
@@ -331,6 +333,7 @@ function renderSubjectTabPanel(input: {
         onPreselectedResourceIdsChange={input.onPreselectedResourceIdsChange}
         preselectedResourceIds={input.preselectedResourceIds}
         subjectTag={input.subjectTag}
+        uploadDisabledReason={input.subjectResourceUploadDisabledReason}
       />
     );
   }
@@ -362,6 +365,7 @@ export function StudentSubjectQuickStart({
   existingConversationCount = 0,
   initialSubjectResources = [],
   conversations = [],
+  subjectResourceUploadDisabledReason = null,
 }: StudentSubjectQuickStartProps) {
   const router = useRouter();
   const copy = getQuickStartCopy(languageCode);
@@ -783,6 +787,7 @@ export function StudentSubjectQuickStart({
             languageCode,
             onPreselectedResourceIdsChange: setPreselectedResourceIds,
             preselectedResourceIds,
+            subjectResourceUploadDisabledReason,
             subjectTag,
             copy,
           })}

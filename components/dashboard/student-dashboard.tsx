@@ -44,6 +44,8 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         testsBody:
           "This space is reserved for future quiz practice. Homework remains the main learner experience for now.",
         needsAttention: "Open learner settings",
+        subjectResourceUploadQuotaReached:
+          "The upload quota for this account has been reached.",
       };
     case "zh":
       return {
@@ -63,6 +65,7 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         testsBody:
           "這裡會保留給未來的測驗練習功能。目前學生的主要體驗仍以作業為主。",
         needsAttention: "打開設定",
+        subjectResourceUploadQuotaReached: "這個帳號的上傳額度已達上限。",
       };
     default:
       return {
@@ -82,6 +85,8 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         testsBody:
           "Cet espace est réservé aux futurs quiz. Pour l'instant, l'expérience élève reste centrée sur les devoirs.",
         needsAttention: "Ouvrir les réglages",
+        subjectResourceUploadQuotaReached:
+          "Le quota d'uploads de ce compte est atteint.",
       };
   }
 }
@@ -143,6 +148,10 @@ export async function StudentDashboard({
         subjectTag: selectedGroup.subjectTag,
       })
     : [];
+  const subjectResourceUploadDisabledReason =
+    (snapshot.usage.quota.uploads.remaining ?? 0) <= 0
+      ? copy.subjectResourceUploadQuotaReached
+      : null;
   const subjectResourcesBySubject = Object.fromEntries(
     await Promise.all(
       dashboardSubjectTags.map(async (subjectTag) => [
@@ -220,6 +229,9 @@ export async function StudentDashboard({
             initialDraft={initialDraft}
             initialSubjectResources={selectedSubjectResources}
             languageCode={languageCode}
+            subjectResourceUploadDisabledReason={
+              subjectResourceUploadDisabledReason
+            }
             subjectTag={selectedGroup.subjectTag}
           />
         </section>
@@ -249,6 +261,9 @@ export async function StudentDashboard({
                 conversations={conversations}
                 subjectCounts={subjectCounts}
                 subjectResourcesBySubject={subjectResourcesBySubject}
+                subjectResourceUploadDisabledReason={
+                  subjectResourceUploadDisabledReason
+                }
               />
             </article>
           ) : (
@@ -261,6 +276,9 @@ export async function StudentDashboard({
                   conversations={conversations}
                   subjectCounts={subjectCounts}
                   subjectResourcesBySubject={subjectResourcesBySubject}
+                  subjectResourceUploadDisabledReason={
+                    subjectResourceUploadDisabledReason
+                  }
                 />
               </article>
             </>

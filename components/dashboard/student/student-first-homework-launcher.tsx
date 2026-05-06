@@ -15,6 +15,7 @@ type StudentFirstHomeworkLauncherProps = {
   conversations?: ListConversationSummary[];
   subjectCounts?: Record<string, number>;
   subjectResourcesBySubject?: Record<string, SubjectResourceLibraryItem[]>;
+  subjectResourceUploadDisabledReason?: string | null;
   languageCode: UiLanguageCode;
 };
 
@@ -53,6 +54,7 @@ export function StudentFirstHomeworkLauncher({
   conversations = [],
   subjectCounts = {},
   subjectResourcesBySubject = {},
+  subjectResourceUploadDisabledReason = null,
   languageCode,
 }: StudentFirstHomeworkLauncherProps) {
   const copy = getFirstHomeworkCopy(languageCode);
@@ -143,6 +145,7 @@ export function StudentFirstHomeworkLauncher({
           }
           languageCode={languageCode}
           conversations={selectedSubjectConversations}
+          subjectResourceUploadDisabledReason={subjectResourceUploadDisabledReason}
           subjectTag={resolvedSubjectTag}
         />
       ) : null}

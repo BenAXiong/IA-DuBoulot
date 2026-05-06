@@ -29,6 +29,7 @@ type StudentSubjectResourceLibraryProps = {
   selectionVariant?: "button" | "checkbox";
   showHeader?: boolean;
   showVisibleMetadata?: boolean;
+  uploadDisabledReason?: string | null;
 };
 
 type UploadProgressState = {
@@ -207,6 +208,7 @@ export function StudentSubjectResourceLibrary({
   selectionVariant = "button",
   showHeader = true,
   showVisibleMetadata = true,
+  uploadDisabledReason = null,
 }: StudentSubjectResourceLibraryProps) {
   const copy = getCopy(languageCode);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -523,23 +525,29 @@ export function StudentSubjectResourceLibrary({
             <span aria-hidden="true" />
           )}
           {allowUploads ? (
-            <button
-              className="inline-flex min-h-9 items-center justify-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--surface)] px-3 text-sm font-medium text-[color:var(--foreground)] transition hover:border-[color:var(--foreground)]/30 hover:bg-[color:var(--surface-strong)] disabled:cursor-not-allowed disabled:opacity-60"
-              disabled={disabled || isPending}
-              onClick={() => fileInputRef.current?.click()}
-              type="button"
+            <span
+              className="inline-flex"
+              title={uploadDisabledReason ?? undefined}
             >
-              {isPending && uploadProgress ? (
-                <StudentUploadProgressRing
-                  completedSegments={getProgressSegments(uploadProgress)}
-                />
-              ) : (
-                <UploadIcon />
-              )}
-              <span>
-                {isPending && uploadProgress ? copy.uploading : copy.upload}
-              </span>
-            </button>
+              <button
+                className="inline-flex min-h-9 items-center justify-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--surface)] px-3 text-sm font-medium text-[color:var(--foreground)] transition hover:border-[color:var(--foreground)]/30 hover:bg-[color:var(--surface-strong)] disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={disabled || isPending || Boolean(uploadDisabledReason)}
+                onClick={() => fileInputRef.current?.click()}
+                title={uploadDisabledReason ?? copy.upload}
+                type="button"
+              >
+                {isPending && uploadProgress ? (
+                  <StudentUploadProgressRing
+                    completedSegments={getProgressSegments(uploadProgress)}
+                  />
+                ) : (
+                  <UploadIcon />
+                )}
+                <span>
+                  {isPending && uploadProgress ? copy.uploading : copy.upload}
+                </span>
+              </button>
+            </span>
           ) : null}
         </div>
       ) : null}

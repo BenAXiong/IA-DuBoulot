@@ -119,6 +119,8 @@ Status note: add a focused auth-surface polish follow-up under `P1.3` for the fi
 
   Status note: subject-resource oversize handling now uses a `20 MB` per-file cap for provider-extracted PDFs and Word documents and shows a dedicated upgrade-oriented message when a learner tries to upload a larger resource. There is still no dedicated subject-library total byte cap; upload actions continue to count against the general usage quota.
 
+  Status note: the subject-page `Add` resource control now reflects the general upload quota from the student dashboard snapshot. When `usage.quota.uploads.remaining` is exhausted, the button stays visible but disabled with a localized hover explanation; server-side quota checks still enforce the final upload decision.
+
   Status note: [Subject docs feature V1](subject_docs_feature_v1.md) now consolidates the purpose, product contract, data model, API/service surface, extraction/chunking/retrieval behavior, UI rules, access model, observability, tests, pitfalls, and remaining post-pilot work for subject docs. Keep [Subject-wide upload plan](subject_wide_upload_plan.md) as implementation history and task-slice context.
 
   Status note: ready subject docs can now be checked from the subject view before starting a new chat. Checked docs are linked to the newly created conversation with `selected = true` before the first prompt is auto-sent, while existing docs remain unchecked by default.
