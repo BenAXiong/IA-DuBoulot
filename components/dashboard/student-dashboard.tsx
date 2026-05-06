@@ -361,11 +361,7 @@ export async function StudentDashboard({
       ...subjectGroups.map((group) => group.subjectTag),
     ]),
   );
-  const dashboardCardSubjectTags =
-    subjectGroups.length > 0
-      ? subjectGroups.map((group) => group.subjectTag)
-      : dashboardSubjectTags;
-  const dashboardCardSubjects = dashboardCardSubjectTags.map((subjectTag) => ({
+  const dashboardCardSubjects = dashboardSubjectTags.map((subjectTag) => ({
     subjectTag,
     label:
       intakeSubjectOptions.find(

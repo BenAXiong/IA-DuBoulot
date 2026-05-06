@@ -312,3 +312,4 @@ then close it as:
 | 2026-05-07 | 00:17 -> 00:17 | 0h00 | A0.3.7 | close the previous work session at 18:32 and reopen the execution trace | | |
 | 2026-05-07 | 00:32 -> 00:37 | 0h05 | P1.3 | replace dashboard card copy with product-facing descriptions and restructure the dashboard card grid | | |
 | 2026-05-07 | 00:59 -> 01:02 | 0h03 | P1.3 | add dashboard card icons, adjust the Homework card copy, and arrange subject chips in three right-aligned rows | | |
+| 2026-05-07 | 01:15 -> 01:16 | 0h01 | P1.3 | show all configured subjects on the Dashboard Homework card even when some subjects have no conversations yet | | |
