@@ -69,6 +69,7 @@ Current shell behavior:
 
 - left rail owns the existing Dashboard entry, the enabled Homework entry, and subject-filter navigation
 - `Homework` is the only real student activity today
+- subject row chevrons reveal the latest five conversation titles for that subject, with `...` when more exist, and opening one subject subsection closes the previous one
 - `Recap`, `Exams`, `Forward`, and `Explore` are visible but disabled placeholder modes held in the shell so future learning tools can grow without another shell rewrite
 - the bottom profile dock shows placeholder avatar, learner name, and plan label by default; the settings/sign-out actions now open from a hover or focus menu instead of staying permanently visible
 - the top bar is intentionally quiet, slimmer than the earlier MVP chrome, and keeps only a simple eyebrow-and-title pair plus the smaller language/theme utility controls
@@ -87,6 +88,7 @@ Current role:
 
 - when the learner has no existing subject tags yet, the empty homework state now renders a real first-homework launcher with subject selection instead of a self-link back to the same page
 - when the learner already has subjects, the root homework view still exposes subject creation and selection directly, so the left rail no longer needs a separate root Homework `+` affordance
+- the left rail uses chevrons, not `+`, for Homework expansion and per-subject recent-conversation expansion
 - the root homework view now always keeps the subject pills launcher visible, so adding a new subject is part of the normal homework home rather than a separate hidden URL state
 - the subject quick-start on `/app?view=homework&subject=...` creates a bare conversation shell
 - it can now complete the real upload-plus-extraction pass before the first learner prompt is handed off to the live chat

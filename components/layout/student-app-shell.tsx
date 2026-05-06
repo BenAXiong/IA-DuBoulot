@@ -33,6 +33,9 @@ type SubjectGroup = {
   conversations: ListConversationSummary[];
 };
 
+const HOURGLASS_CURSOR =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M6 3h12M6 21h12M8 3v5a4 4 0 0 0 8 0V3M8 21v-5a4 4 0 0 1 8 0v5M8 8l8 8'/%3E%3C/svg%3E\") 12 12, wait";
+
 function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"]) {
   switch (languageCode) {
     case "en":
@@ -107,7 +110,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
         explore: "Explorer",
         forwardHint: "Pour aller plus loin",
         mapsHint: "Cartographie tes connaissances",
-        testsHint: "Eméliore tes notes",
+        testsHint: "Améliore tes notes",
         exploreHint: "Approfondis les sujets que tu aimes",
         addSubject: "Ajouter une matière",
         noSubjects: "Aucune matière pour l'instant",
@@ -377,19 +380,6 @@ function PanelIcon() {
   );
 }
 
-function PlusIcon() {
-  return (
-    <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
-      <path
-        d="M12 5v14M5 12h14"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="1.8"
-      />
-    </svg>
-  );
-}
-
 function ChevronIcon() {
   return (
     <svg aria-hidden="true" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
@@ -418,9 +408,10 @@ function DisabledRailItem({
   return (
     <div
       aria-disabled="true"
-      className={`flex cursor-wait items-center ${
+      className={`flex items-center ${
         collapsed ? "justify-center" : "gap-3"
       } rounded-2xl px-3 py-2.5 text-sm font-medium text-[color:var(--ink-muted)] opacity-60`}
+      style={{ cursor: HOURGLASS_CURSOR }}
       title="Coming soon!"
     >
       {icon}
@@ -447,6 +438,7 @@ export function StudentAppShell({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [homeworkExpanded, setHomeworkExpanded] = useState(true);
+  const [expandedSubjectTag, setExpandedSubjectTag] = useState<string | null>(null);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [conversationHeaderOverrides, setConversationHeaderOverrides] = useState<
     Record<string, ConversationTitleUpdatedDetail>
@@ -638,7 +630,15 @@ export function StudentAppShell({
                 <button
                   aria-expanded={homeworkExpanded}
                   className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[color:var(--ink-muted)] transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
-                  onClick={() => setHomeworkExpanded((value) => !value)}
+                  onClick={() => {
+                    const nextValue = !homeworkExpanded;
+
+                    setHomeworkExpanded(nextValue);
+
+                    if (!nextValue) {
+                      setExpandedSubjectTag(null);
+                    }
+                  }}
                   title={copy.homework}
                   type="button"
                 >
@@ -659,37 +659,77 @@ export function StudentAppShell({
                   <div className="grid gap-1 pl-7">
                     {subjectGroups.map((group) => {
                       const isActive = selectedSubject === group.subjectTag;
+                      const isSubjectExpanded =
+                        expandedSubjectTag === group.subjectTag;
+                      const recentConversations = sortConversations(
+                        group.conversations,
+                      ).slice(0, 5);
 
                       return (
-                        <div
-                          className={`group/item flex items-center gap-1 rounded-[1rem] px-1 pr-1.5 transition ${
-                            isActive
-                              ? "text-[color:var(--foreground)]"
-                              : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
-                          }`}
-                          key={group.subjectTag}
-                        >
-                          <Link
-                            className="flex min-w-0 flex-1 items-center justify-between rounded-[1rem] px-2 py-1.5 text-sm"
-                            href={`/app?view=homework&subject=${encodeURIComponent(group.subjectTag)}`}
-                            onClick={() => setSidebarOpen(false)}
+                        <div className="grid gap-1" key={group.subjectTag}>
+                          <div
+                            className={`group/item flex items-center gap-1 rounded-[1rem] pl-1 pr-3 transition ${
+                              isActive
+                                ? "text-[color:var(--foreground)]"
+                                : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
+                            }`}
                           >
-                            <span className="truncate">
-                              {capitalizeSubjectLabel(group.subjectTag)}
-                            </span>
-                            <span className="text-xs text-[color:var(--ink-muted)]">
-                              {group.count}
-                            </span>
-                          </Link>
-                          <Link
-                            aria-label={`${copy.addSubject}: ${capitalizeSubjectLabel(group.subjectTag)}`}
-                            className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[color:var(--ink-muted)] opacity-0 transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)] group-hover/item:opacity-100 focus-visible:opacity-100"
-                            href={`/app?view=homework&subject=${encodeURIComponent(group.subjectTag)}`}
-                            onClick={() => setSidebarOpen(false)}
-                            title={copy.addSubject}
-                          >
-                            <PlusIcon />
-                          </Link>
+                            <Link
+                              className="flex min-w-0 flex-1 items-center justify-between rounded-[1rem] px-2 py-1.5 text-sm"
+                              href={`/app?view=homework&subject=${encodeURIComponent(group.subjectTag)}`}
+                              onClick={() => setSidebarOpen(false)}
+                            >
+                              <span className="truncate">
+                                {capitalizeSubjectLabel(group.subjectTag)}
+                              </span>
+                              <span className="text-xs text-[color:var(--ink-muted)]">
+                                {group.count}
+                              </span>
+                            </Link>
+                            <button
+                              aria-expanded={isSubjectExpanded}
+                              aria-label={capitalizeSubjectLabel(group.subjectTag)}
+                              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[color:var(--ink-muted)] transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
+                              onClick={() => {
+                                setExpandedSubjectTag((current) =>
+                                  current === group.subjectTag
+                                    ? null
+                                    : group.subjectTag,
+                                );
+                              }}
+                              title={capitalizeSubjectLabel(group.subjectTag)}
+                              type="button"
+                            >
+                              <span
+                                className={`transition ${
+                                  isSubjectExpanded ? "rotate-90" : ""
+                                }`}
+                              >
+                                <ChevronIcon />
+                              </span>
+                            </button>
+                          </div>
+
+                          {isSubjectExpanded ? (
+                            <div className="grid gap-0.5 pl-3 pr-3">
+                              {recentConversations.map((conversation) => (
+                                <Link
+                                  className="truncate rounded-[0.8rem] px-2 py-1 text-xs leading-5 text-[color:var(--ink-muted)] transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
+                                  href={`/app/conversations/${conversation.id}`}
+                                  key={conversation.id}
+                                  onClick={() => setSidebarOpen(false)}
+                                >
+                                  {conversation.title.trim() ||
+                                    copy.pageTitles.conversation}
+                                </Link>
+                              ))}
+                              {group.conversations.length > 5 ? (
+                                <p className="px-2 text-xs leading-5 text-[color:var(--ink-muted)]">
+                                  ...
+                                </p>
+                              ) : null}
+                            </div>
+                          ) : null}
                         </div>
                       );
                     })}
@@ -699,6 +739,7 @@ export function StudentAppShell({
             </div>
           )}
 
+          <div className="mx-3 my-1 h-px bg-[color:var(--line)]" />
           <DisabledRailItem
             collapsed={sidebarCollapsed}
             hint={copy.mapsHint}
