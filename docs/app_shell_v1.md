@@ -79,12 +79,12 @@ Rules:
 - authenticated app routes may honor the short-lived `ia_ui_lang` cookie as an immediate UI-language override during the refresh triggered by the authenticated language menu, so the visible server-rendered copy can switch before the slower profile write fully completes
 - the authenticated shell should not surface pilot badges, literal route hints, or other implementation-facing framing on the main role dashboards
 - the student role now owns its own chat-first shell rhythm through `components/layout/student-app-shell.tsx`: collapsible left subject rail, minimal top bar, profile dock, and a quieter page canvas than the original generic `/app` chrome
-- the student shell now carries four learner activity entries in the left rail: `Dashboard`, `Forward`, `Maps`, and `Tests`; only `Dashboard` is a real workflow today, while the others remain intentional placeholders until the pilot decides which tools deserve a full product surface
+- the student shell now carries five learner activity entries in the left rail: `Homework`/`Devoirs`, `Recap`, `Exams`/`Tests`, `Forward`/`Poursuivre`, and `Explore`/`Explorer`; only `Homework` is enabled today, while the others remain visible disabled placeholders until the pilot decides which tools deserve a full product surface
 - the student shell header now uses a simple eyebrow-and-title pattern instead of helper subtitles that describe the interface itself
 - the left student rail no longer shows a divider under the wordmark block; its top strip should visually match the main-pane header height without introducing a second header rule
 - the learner profile dock no longer shows a permanent outlined account section; the dock stays minimal by default, and the profile/settings/sign-out menu stays open while hovered with a short close grace period
 - the student shell top strips are intentionally slimmer than the earlier MVP shell, and the utility/collapse icons should use the same smaller outline-free treatment instead of looking like a second layer of heavy controls
-- the left rail now uses `Dashboard` as the top student entry instead of repeating `Homework`, while the sidebar header itself keeps only the animated `bb` mark and collapse control
+- the left rail now starts directly with `Homework` instead of a separate `Dashboard` entry, while the sidebar header itself keeps only the animated `bb` mark and collapse control
 - the parent role now suppresses the generic desktop shell sidebar and instead lets the dashboard own a parent-specific information architecture: account and billing dock, pending parent-approval requests, a learner-creation panel, and linked-learners rail on the left, with grouped weekly and recent activity on the right
 
 ## Role Dashboard Variants
@@ -133,7 +133,7 @@ Why:
 - the student shell now treats subjects as filter views over existing `subject_tag` values and uses `/app/settings` only for the minimal account surface, so the main `/app` page can behave more like a chat workspace than a control center
 - on the live student conversation route, the shell header now uses the subject as the eyebrow and shows the current conversation title on the second line; the first successful learner turn still attempts a dedicated AI title summary, but if that pass misses the server now applies a deterministic fallback title so the header should not remain stuck on `Subject_###` except during the very first pending round trip
 - the subject rail now keeps only subject filters and counters; recent conversation lists stay in the main content area instead of expanding inside the sidebar
-- the homework block in the student rail now keeps a hover `+` entry point for creating or selecting a subject directly from the same root homework view, and the Homework heading itself returns the learner to that root view instead of exposing a second subject-creation mode
+- the homework block in the student rail keeps the Homework heading as the only enabled learner entry. The old root Homework `+` affordance is removed; the expand/collapse chevron now occupies the same right action column as the per-subject `+` controls.
 - the profile dock now defaults to a minimal identity row with no outline, while settings and sign-out live in a hover/focus menu above it
 - the subject quick-start now creates a bare conversation shell, uploads any staged files, sends the learner's first real message, and only then routes into `/app/conversations/[conversationId]`, so the main student view behaves more like a chat launcher than a wizard entry
 - the student subject view and live conversation surface now both use a true right-side panel treatment instead of floating cards, so the workspace reads like a split main pane rather than a dashboard grid

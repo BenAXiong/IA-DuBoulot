@@ -12,8 +12,7 @@ This document started with `A3.1.1` to `A3.1.3` and now also records the later s
 
 - student-owned `/app` shell with a collapsible subject rail
 - homework-focused home view with recent conversations grouped by subject-tag filters
-- placeholder `Forward` activity slot for future "what may come next" guidance
-- placeholder `Maps` and `Tests` activity slots
+- disabled placeholder activity slots for future `Recap`, `Exams`, `Forward`, and `Explore` surfaces
 - subject-level quick-start that now opens the live chat directly
 - legacy `/app/new` compatibility redirect into the homework dashboard
 - learner-owned profile editing and deletion controls live on `/app/settings`
@@ -68,10 +67,9 @@ The student role no longer inherits the generic authenticated-shell rhythm used 
 
 Current shell behavior:
 
-- left rail owns activity switching and subject-filter navigation, with `Dashboard` as the top student entry
+- left rail owns the enabled Homework entry plus subject-filter navigation
 - `Homework` is the only real student activity today
-- `Forward` is a placeholder mode for future high-level guidance about what notions may come next
-- `Maps` and `Tests` are placeholder modes held in the shell so future learning tools can grow without another shell rewrite
+- `Recap`, `Exams`, `Forward`, and `Explore` are visible but disabled placeholder modes held in the shell so future learning tools can grow without another shell rewrite
 - the bottom profile dock shows placeholder avatar, learner name, and plan label by default; the settings/sign-out actions now open from a hover or focus menu instead of staying permanently visible
 - the top bar is intentionally quiet, slimmer than the earlier MVP chrome, and keeps only a simple eyebrow-and-title pair plus the smaller language/theme utility controls
 
@@ -88,7 +86,7 @@ The main learner entry now happens from the subject view itself.
 Current role:
 
 - when the learner has no existing subject tags yet, the empty homework state now renders a real first-homework launcher with subject selection instead of a self-link back to the same page
-- when the learner already has subjects, the root homework view now still exposes subject creation and selection directly, so the `+` affordance in the left rail simply returns to the same homework surface instead of opening a separate launcher mode
+- when the learner already has subjects, the root homework view still exposes subject creation and selection directly, so the left rail no longer needs a separate root Homework `+` affordance
 - the root homework view now always keeps the subject pills launcher visible, so adding a new subject is part of the normal homework home rather than a separate hidden URL state
 - the subject quick-start on `/app?view=homework&subject=...` creates a bare conversation shell
 - it can now complete the real upload-plus-extraction pass before the first learner prompt is handed off to the live chat

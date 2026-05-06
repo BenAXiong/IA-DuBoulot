@@ -37,14 +37,15 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
   switch (languageCode) {
     case "en":
       return {
-        dashboard: "Dashboard",
         homework: "Homework",
         forward: "Forward",
-        maps: "Maps",
-        tests: "Tests",
-        forwardHint: "Preview what comes next",
-        mapsHint: "Knowledge maps, later",
-        testsHint: "Quiz mode, later",
+        maps: "Recap",
+        tests: "Exams",
+        explore: "Explore",
+        forwardHint: "Peek into what's next",
+        mapsHint: "Mindmaps - Maps your knowledge",
+        testsHint: "Tests - Drill and improve your grades",
+        exploreHint: "Dive deeper into topics that you enjoy",
         addSubject: "Add subject",
         noSubjects: "No subject yet",
         profileSettings: "Profile & settings",
@@ -66,14 +67,15 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
       };
     case "zh":
       return {
-        dashboard: "總覽",
         homework: "作業",
         forward: "Forward",
-        maps: "地圖",
-        tests: "測驗",
-        forwardHint: "預覽接下來會學什麼",
-        mapsHint: "知識地圖，之後推出",
-        testsHint: "測驗模式，之後推出",
+        maps: "回顧",
+        tests: "考試",
+        explore: "探索",
+        forwardHint: "先看看接下來會學什麼",
+        mapsHint: "心智圖 - 整理你的知識",
+        testsHint: "測驗 - 練習並提高成績",
+        exploreHint: "深入探索你喜歡的主題",
         addSubject: "新增科目",
         noSubjects: "還沒有科目",
         profileSettings: "個人檔案與設定",
@@ -95,14 +97,15 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
       };
     default:
       return {
-        dashboard: "Tableau",
         homework: "Devoirs",
-        forward: "Forward",
-        maps: "Cartes",
+        forward: "Poursuivre",
+        maps: "Récap",
         tests: "Tests",
-        forwardHint: "Voir ce qui vient ensuite",
-        mapsHint: "Cartes, plus tard",
-        testsHint: "Quiz, plus tard",
+        explore: "Explorer",
+        forwardHint: "Regarde ce qui vient ensuite",
+        mapsHint: "Mindmaps - Cartographie tes connaissances",
+        testsHint: "Entraîne-toi et améliore tes notes",
+        exploreHint: "Approfondis les sujets que tu aimes",
         addSubject: "Ajouter une matière",
         noSubjects: "Aucune matière pour l'instant",
         profileSettings: "Profil et réglages",
@@ -252,20 +255,6 @@ function buildHeaderContent(input: {
   };
 }
 
-function HomeIcon() {
-  return (
-    <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
-      <path
-        d="M4.75 10.75 12 5l7.25 5.75v8a1 1 0 0 1-1 1h-3.5v-5.25h-5.5V19.75h-3.5a1 1 0 0 1-1-1v-8Z"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.7"
-      />
-    </svg>
-  );
-}
-
 function HomeworkIcon() {
   return (
     <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
@@ -317,11 +306,38 @@ function ForwardIcon() {
   return (
     <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
       <path
-        d="M6 12h9.5M12.5 6.5 18 12l-5.5 5.5"
+        d="M13.25 14.75c3.2-1.4 5.25-4.2 5.75-8.5.08-.67-.5-1.25-1.17-1.17-4.3.5-7.1 2.55-8.5 5.75l-3.08.92 2.5 2.5-1 3 3-.95 2.5 2.5.9-3.05Z"
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
+        strokeWidth="1.55"
+      />
+      <path
+        d="M14.75 8.25h.01M6.5 17.5l-2 2M8 19l-1 1"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.55"
+      />
+    </svg>
+  );
+}
+
+function ExploreIcon() {
+  return (
+    <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
+      <circle
+        cx="12"
+        cy="12"
+        r="7.25"
+        stroke="currentColor"
         strokeWidth="1.7"
+      />
+      <path
+        d="m14.5 9.5-1.35 3.65L9.5 14.5l1.35-3.65L14.5 9.5Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
       />
     </svg>
   );
@@ -368,6 +384,38 @@ function ChevronIcon() {
         strokeWidth="1.8"
       />
     </svg>
+  );
+}
+
+function DisabledRailItem({
+  collapsed,
+  icon,
+  label,
+  hint,
+}: {
+  collapsed: boolean;
+  icon: React.ReactNode;
+  label: string;
+  hint: string;
+}) {
+  return (
+    <div
+      aria-disabled="true"
+      className={`flex cursor-not-allowed items-center ${
+        collapsed ? "justify-center" : "gap-3"
+      } rounded-2xl px-3 py-2.5 text-sm font-medium text-[color:var(--ink-muted)] opacity-60`}
+      title={collapsed ? label : undefined}
+    >
+      {icon}
+      {!collapsed ? (
+        <div className="min-w-0">
+          <p>{label}</p>
+          <p className="truncate text-xs text-[color:var(--ink-muted)]">
+            {hint}
+          </p>
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -533,19 +581,6 @@ export function StudentAppShell({
 
       <nav className={`flex-1 overflow-y-auto py-4 ${desktopSidebarPadding}`}>
         <div className="grid gap-2">
-          <Link
-            className={`flex items-center ${sidebarCollapsed ? "justify-center" : "gap-3"} rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
-              activeView === "homework"
-                ? "bg-[color:var(--surface-strong)] text-[color:var(--foreground)]"
-                : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
-            }`}
-            href="/app?view=homework"
-            onClick={() => setSidebarOpen(false)}
-          >
-            <HomeIcon />
-            {!sidebarCollapsed ? <span>{copy.dashboard}</span> : null}
-          </Link>
-
           {sidebarCollapsed ? (
             <Link
               className={`flex items-center justify-center rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
@@ -562,38 +597,27 @@ export function StudentAppShell({
           ) : (
             <div className="group grid gap-1">
               <div className="flex items-center justify-between gap-3 px-3 py-2.5">
-                <div className="flex min-w-0 flex-1 items-center gap-1.5">
-                  <Link
-                    className="flex min-w-0 flex-1 items-center gap-1.5 text-sm font-medium text-[color:var(--foreground)]"
-                    href="/app?view=homework"
-                    onClick={() => setSidebarOpen(false)}
-                  >
-                    <HomeworkIcon />
-                    <span>{copy.homework}</span>
-                  </Link>
-                  <button
-                    aria-expanded={homeworkExpanded}
-                    className="inline-flex h-7 w-7 items-center justify-center rounded-full text-[color:var(--ink-muted)] transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
-                    onClick={() => setHomeworkExpanded((value) => !value)}
-                    title={copy.homework}
-                    type="button"
-                  >
-                    <span
-                      className={`transition ${homeworkExpanded ? "rotate-90" : ""}`}
-                    >
-                      <ChevronIcon />
-                    </span>
-                  </button>
-                </div>
                 <Link
-                  aria-label={copy.addSubject}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] opacity-0 transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)] group-hover:opacity-100 focus-visible:opacity-100"
+                  className="flex min-w-0 flex-1 items-center gap-1.5 text-sm font-medium text-[color:var(--foreground)]"
                   href="/app?view=homework"
                   onClick={() => setSidebarOpen(false)}
-                  title={copy.addSubject}
                 >
-                  <PlusIcon />
+                  <HomeworkIcon />
+                  <span>{copy.homework}</span>
                 </Link>
+                <button
+                  aria-expanded={homeworkExpanded}
+                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[color:var(--ink-muted)] transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
+                  onClick={() => setHomeworkExpanded((value) => !value)}
+                  title={copy.homework}
+                  type="button"
+                >
+                  <span
+                    className={`transition ${homeworkExpanded ? "rotate-90" : ""}`}
+                  >
+                    <ChevronIcon />
+                  </span>
+                </button>
               </div>
 
               {homeworkExpanded ? (
@@ -645,65 +669,30 @@ export function StudentAppShell({
             </div>
           )}
 
-          <Link
-            className={`flex items-center ${sidebarCollapsed ? "justify-center" : "gap-3"} rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
-              activeView === "forward"
-                ? "bg-[color:var(--surface-strong)] text-[color:var(--foreground)]"
-                : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
-            }`}
-            href="/app?view=forward"
-            onClick={() => setSidebarOpen(false)}
-          >
-            <ForwardIcon />
-            {!sidebarCollapsed ? (
-              <div className="min-w-0">
-                <p>{copy.forward}</p>
-                <p className="truncate text-xs text-[color:var(--ink-muted)]">
-                  {copy.forwardHint}
-                </p>
-              </div>
-            ) : null}
-          </Link>
-
-          <Link
-            className={`flex items-center ${sidebarCollapsed ? "justify-center" : "gap-3"} rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
-              activeView === "maps"
-                ? "bg-[color:var(--surface-strong)] text-[color:var(--foreground)]"
-                : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
-            }`}
-            href="/app?view=maps"
-            onClick={() => setSidebarOpen(false)}
-          >
-            <MapIcon />
-            {!sidebarCollapsed ? (
-              <div className="min-w-0">
-                <p>{copy.maps}</p>
-                <p className="truncate text-xs text-[color:var(--ink-muted)]">
-                  {copy.mapsHint}
-                </p>
-              </div>
-            ) : null}
-          </Link>
-
-          <Link
-            className={`flex items-center ${sidebarCollapsed ? "justify-center" : "gap-3"} rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
-              activeView === "tests"
-                ? "bg-[color:var(--surface-strong)] text-[color:var(--foreground)]"
-                : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
-            }`}
-            href="/app?view=tests"
-            onClick={() => setSidebarOpen(false)}
-          >
-            <TestIcon />
-            {!sidebarCollapsed ? (
-              <div className="min-w-0">
-                <p>{copy.tests}</p>
-                <p className="truncate text-xs text-[color:var(--ink-muted)]">
-                  {copy.testsHint}
-                </p>
-              </div>
-            ) : null}
-          </Link>
+          <DisabledRailItem
+            collapsed={sidebarCollapsed}
+            hint={copy.mapsHint}
+            icon={<MapIcon />}
+            label={copy.maps}
+          />
+          <DisabledRailItem
+            collapsed={sidebarCollapsed}
+            hint={copy.testsHint}
+            icon={<TestIcon />}
+            label={copy.tests}
+          />
+          <DisabledRailItem
+            collapsed={sidebarCollapsed}
+            hint={copy.forwardHint}
+            icon={<ForwardIcon />}
+            label={copy.forward}
+          />
+          <DisabledRailItem
+            collapsed={sidebarCollapsed}
+            hint={copy.exploreHint}
+            icon={<ExploreIcon />}
+            label={copy.explore}
+          />
         </div>
       </nav>
 
