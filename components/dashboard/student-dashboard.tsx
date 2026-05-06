@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { StudentFirstHomeworkLauncher } from "@/components/dashboard/student/student-first-homework-launcher";
 import { StudentSubjectQuickStart } from "@/components/dashboard/student/student-subject-quick-start";
 import {
@@ -34,7 +35,8 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         homeworkTitle: "Select a subject",
         homeworkBody: "Pick a subject and jump straight into the chat.",
         homeworkCardTitle: "Homework",
-        homeworkCardBody: "Start from a subject, add useful sources, and keep the homework conversation moving.",
+        homeworkCardBody:
+          "Check your answers and get step-by-step guidance on the tough parts.",
         noSubjectTitle: "No homework yet",
         noSubjectBody:
           "Choose the subject here and ask banban for advices.\nDon't forget to upload any class content or practice material that banban will need to help you!",
@@ -63,7 +65,7 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         homeworkTitle: "選擇科目",
         homeworkBody: "選一個科目，直接開始或回到對話。",
         homeworkCardTitle: "作業",
-        homeworkCardBody: "從科目開始，加入需要的資料，繼續完成作業對話。",
+        homeworkCardBody: "檢查你的答案，並一步步攻克卡住的地方。",
         noSubjectTitle: "還沒有作業",
         noSubjectBody:
           "先在這裡選擇科目，再向 banban 詢問建議。\n別忘了上傳 banban 需要的課堂內容或練習資料，才能更好地幫助你！",
@@ -90,7 +92,8 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         homeworkTitle: "Choisis une matière",
         homeworkBody: "Choisis une matière et entre directement dans la discussion.",
         homeworkCardTitle: "Devoirs",
-        homeworkCardBody: "Pars d'une matière, ajoute les sources utiles, et avance dans ton devoir.",
+        homeworkCardBody:
+          "Vérifie tes réponses et avance pas à pas sur les passages difficiles.",
         noSubjectTitle: "Aucun devoir pour l'instant",
         noSubjectBody:
           "Choisis la matière ici et demande conseil à banban.\nN'oublie pas d'ajouter les supports de cours ou les exercices dont banban aura besoin pour t'aider !",
@@ -114,14 +117,112 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
   }
 }
 
+function DashboardIconFrame({ children }: { children: ReactNode }) {
+  return (
+    <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] text-[color:var(--foreground)]">
+      {children}
+    </span>
+  );
+}
+
+function HomeworkIcon() {
+  return (
+    <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24">
+      <path
+        d="M4.75 7.75a2 2 0 0 1 2-2h3.1l1.35 1.5h6.05a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2H6.75a2 2 0 0 1-2-2v-9Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.7"
+      />
+    </svg>
+  );
+}
+
+function MapIcon() {
+  return (
+    <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24">
+      <path
+        d="M4.75 6.5 9.5 4.75l5 1.75 4.75-1.75v12.75L14.5 19.25l-5-1.75-4.75 1.75V6.5Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.7"
+      />
+      <path
+        d="M9.5 4.75v12.75M14.5 6.5v12.75"
+        stroke="currentColor"
+        strokeWidth="1.7"
+      />
+    </svg>
+  );
+}
+
+function TestIcon() {
+  return (
+    <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24">
+      <path
+        d="M8.25 4.75h7.5M10 4.75v4.5l-4.5 7a4.75 4.75 0 0 0 4 7h5a4.75 4.75 0 0 0 4-7l-4.5-7v-4.5"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.7"
+      />
+    </svg>
+  );
+}
+
+function ForwardIcon() {
+  return (
+    <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24">
+      <path
+        d="M13.25 14.75c3.2-1.4 5.25-4.2 5.75-8.5.08-.67-.5-1.25-1.17-1.17-4.3.5-7.1 2.55-8.5 5.75l-3.08.92 2.5 2.5-1 3 3-.95 2.5 2.5.9-3.05Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.55"
+      />
+      <path
+        d="M14.75 8.25h.01M6.5 17.5l-2 2M8 19l-1 1"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.55"
+      />
+    </svg>
+  );
+}
+
+function ExploreIcon() {
+  return (
+    <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24">
+      <circle
+        cx="12"
+        cy="12"
+        r="7.25"
+        stroke="currentColor"
+        strokeWidth="1.7"
+      />
+      <path
+        d="m14.5 9.5-1.35 3.65L9.5 14.5l1.35-3.65L14.5 9.5Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+    </svg>
+  );
+}
+
 function DashboardActivityCard({
   title,
   body,
+  icon,
   href,
   badge,
 }: {
   title: string;
   body: string;
+  icon: ReactNode;
   href?: string;
   badge?: string;
 }) {
@@ -130,9 +231,12 @@ function DashboardActivityCard({
   const content = (
     <>
       <div className="flex items-start justify-between gap-3">
-        <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
-          {title}
-        </h2>
+        <div className="flex min-w-0 items-center gap-3">
+          <DashboardIconFrame>{icon}</DashboardIconFrame>
+          <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
+            {title}
+          </h2>
+        </div>
         {badge ? (
           <span className="shrink-0 rounded-full border border-[color:var(--line)] px-2.5 py-1 text-xs font-medium text-[color:var(--ink-soft)]">
             {badge}
@@ -173,10 +277,12 @@ function formatSubjectDisplay(subject: string) {
 function DashboardHomeworkCard({
   title,
   body,
+  icon,
   subjects,
 }: {
   title: string;
   body: string;
+  icon: ReactNode;
   subjects: Array<{
     label: string;
     subjectTag: string;
@@ -188,16 +294,19 @@ function DashboardHomeworkCard({
         className="grid gap-3 transition hover:text-[color:var(--accent)]"
         href="/app?view=homework"
       >
-        <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
-          {title}
-        </h2>
+        <div className="flex items-center gap-3">
+          <DashboardIconFrame>{icon}</DashboardIconFrame>
+          <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
+            {title}
+          </h2>
+        </div>
         <p className="text-sm leading-6 text-[color:var(--ink-soft)]">{body}</p>
       </Link>
 
-      <div className="flex flex-wrap justify-start gap-2 sm:justify-end">
+      <div className="grid max-w-full grid-flow-col grid-rows-3 justify-end gap-2 overflow-x-auto">
         {subjects.map((subject) => (
           <Link
-            className="inline-flex min-h-9 items-center justify-center rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-3 text-sm font-medium text-[color:var(--foreground)] transition hover:border-[color:var(--accent)] hover:text-[color:var(--accent)]"
+            className="inline-flex min-h-9 items-center justify-center whitespace-nowrap rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-3 text-sm font-medium text-[color:var(--foreground)] transition hover:border-[color:var(--accent)] hover:text-[color:var(--accent)]"
             href={`/app?view=homework&subject=${encodeURIComponent(subject.subjectTag)}`}
             key={subject.subjectTag}
           >
@@ -329,6 +438,7 @@ export async function StudentDashboard({
           <div className="grid gap-3">
             <DashboardHomeworkCard
               body={copy.homeworkCardBody}
+              icon={<HomeworkIcon />}
               subjects={dashboardCardSubjects}
               title={copy.homeworkCardTitle}
             />
@@ -336,21 +446,25 @@ export async function StudentDashboard({
               <DashboardActivityCard
                 badge={copy.comingSoon}
                 body={copy.mapsBody}
+                icon={<MapIcon />}
                 title={copy.mapsTitle}
               />
               <DashboardActivityCard
                 badge={copy.comingSoon}
                 body={copy.testsBody}
+                icon={<TestIcon />}
                 title={copy.testsTitle}
               />
               <DashboardActivityCard
                 badge={copy.comingSoon}
                 body={copy.forwardBody}
+                icon={<ForwardIcon />}
                 title={copy.forwardTitle}
               />
               <DashboardActivityCard
                 badge={copy.comingSoon}
                 body={copy.exploreBody}
+                icon={<ExploreIcon />}
                 title={copy.exploreTitle}
               />
             </div>
