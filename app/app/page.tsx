@@ -22,7 +22,7 @@ async function renderRoleDashboard(
   appUser: AppUserRecord,
   email: string | null,
   context: AuthenticatedUserContext,
-  studentView: "homework" | "maps" | "tests" | "forward",
+  studentView: "dashboard" | "homework" | "maps" | "tests" | "forward",
   selectedSubject: string | null,
   initialDraft: string | null,
 ) {
@@ -96,15 +96,22 @@ export default async function AppHomePage({
   const legacyNewSubjectMode = getSearchParam(resolvedSearchParams, "newSubject");
   const studentViewParam = getSearchParam(resolvedSearchParams, "view");
   const studentView =
+    studentViewParam === "dashboard" ||
+    studentViewParam === "homework" ||
     studentViewParam === "maps" ||
     studentViewParam === "tests" ||
     studentViewParam === "forward"
       ? studentViewParam
-      : "homework";
+      : selectedSubject
+        ? "homework"
+        : "dashboard";
 
   if (legacyNewSubjectMode) {
     const nextSearchParams = new URLSearchParams();
-    nextSearchParams.set("view", studentView);
+    nextSearchParams.set(
+      "view",
+      studentView === "dashboard" ? "homework" : studentView,
+    );
 
     if (selectedSubject) {
       nextSearchParams.set("subject", selectedSubject);

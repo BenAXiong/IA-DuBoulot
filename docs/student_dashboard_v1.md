@@ -11,6 +11,7 @@ Capture the first real student home screen so future sessions can extend it with
 This document started with `A3.1.1` to `A3.1.3` and now also records the later student-shell redesign:
 
 - student-owned `/app` shell with a collapsible subject rail
+- distinct Dashboard view with cards for the left-rail learning sections
 - homework-focused home view with recent conversations grouped by subject-tag filters
 - disabled placeholder activity slots for future `Recap`, `Exams`, `Forward`, and `Explore` surfaces
 - subject-level quick-start that now opens the live chat directly
@@ -67,12 +68,13 @@ The student role no longer inherits the generic authenticated-shell rhythm used 
 
 Current shell behavior:
 
-- left rail owns the existing Dashboard entry, the enabled Homework entry, and subject-filter navigation
+- left rail owns the distinct Dashboard entry, the enabled Homework entry, and subject-filter navigation
 - `Homework` is the only real student activity today
 - subject row chevrons reveal the latest five conversation titles for that subject, with `...` when more exist, and opening one subject subsection closes the previous one
 - `Recap`, `Exams`, `Forward`, and `Explore` are visible but disabled placeholder modes held in the shell so future learning tools can grow without another shell rewrite; their descriptions are hover-revealed in already-reserved space so the left rail does not shift when hovered
 - the bottom profile dock shows placeholder avatar, learner name, and plan label by default; the settings/sign-out actions now open from a hover or focus menu instead of staying permanently visible
 - the top bar is intentionally quiet, slimmer than the earlier MVP chrome, and keeps only a simple eyebrow-and-title pair plus the smaller language/theme utility controls
+- the Dashboard view is separate from Homework: `/app` or `view=dashboard` shows cards for Homework, Recap, Exams/Tests, Forward, and Explore, while `view=homework` owns subject selection and chat launch
 
 Current boundary:
 
@@ -89,7 +91,7 @@ Current role:
 - when the learner has no existing subject tags yet, the empty homework state now renders a real first-homework launcher with subject selection instead of a self-link back to the same page
 - when the learner already has subjects, the root homework view still exposes subject creation and selection directly, so the left rail no longer needs a separate root Homework `+` affordance
 - the left rail uses chevrons, not `+`, for Homework expansion and per-subject recent-conversation expansion
-- the root homework view now always keeps the subject pills launcher visible, so adding a new subject is part of the normal homework home rather than a separate hidden URL state
+- the root homework view now always keeps the subject pills launcher visible, so adding a new subject is part of the normal homework home rather than the top-level Dashboard card grid
 - the subject quick-start on `/app?view=homework&subject=...` creates a bare conversation shell
 - it can now complete the real upload-plus-extraction pass before the first learner prompt is handed off to the live chat
 - while the subject quick-start is preparing a chat that already has staged files, its submit control now reuses the same tiered ring language as the live composer for the first `prepare` stage instead of flashing a different loading affordance

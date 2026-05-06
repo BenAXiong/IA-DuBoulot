@@ -1737,3 +1737,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Add unchecked-by-default checkboxes for ready subject docs in the subject-view resource library. When the learner starts a chat, checked docs are linked to the new conversation with `selected = true` before the first prompt is auto-sent.
 - Why: This keeps old resources opt-in while allowing the first coach reply to use explicitly chosen subject docs.
 - Follow-up: Validate in Pilot whether learners understand the checkbox as "use this in the next chat" and whether the same affordance should appear in any other start surface.
+
+### D-20260506-01 - Split Student Dashboard From Homework View
+
+- Date: 2026-05-06
+- Status: accepted
+- Related tasks: `P1.3`
+- Context: The left rail exposed both `Dashboard` and `Homework`, but both resolved to the same homework subject-selection view. This made the Dashboard row misleading and left no neutral overview surface for the learner activity sections.
+- Decision: Make `dashboard` a distinct student view. `/app` defaults to the Dashboard card grid, `view=homework` owns subject selection and chat launch, and subject links continue to include `view=homework&subject=...`.
+- Why: This matches the visible navigation model without changing the working homework flow. It also gives future Recap, Exams, Forward, and Explore features a stable overview surface before they become full routes.
+- Follow-up: Pilot walkthroughs should decide whether the Dashboard card grid is useful enough to keep, or whether learners prefer landing directly in Homework once the broader activity modes exist.

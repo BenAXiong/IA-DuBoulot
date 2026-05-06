@@ -25,7 +25,7 @@ type StudentAppShellProps = {
   conversations: ListConversationSummary[];
 };
 
-type StudentView = "homework" | "maps" | "tests" | "forward";
+type StudentView = "dashboard" | "homework" | "maps" | "tests" | "forward";
 
 type SubjectGroup = {
   subjectTag: string;
@@ -58,6 +58,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
         trialPlan: "Starter plan",
         familyPlan: "Family plan",
         pageTitles: {
+          dashboard: "Dashboard",
           homework: "Homework",
           selectSubject: "Select a subject",
           forward: "Forward",
@@ -89,6 +90,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
         trialPlan: "入門方案",
         familyPlan: "Family 方案",
         pageTitles: {
+          dashboard: "總覽",
           homework: "作業",
           selectSubject: "選擇科目",
           forward: "Forward",
@@ -120,6 +122,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
         trialPlan: "Accès Starter",
         familyPlan: "Accès Family",
         pageTitles: {
+          dashboard: "Tableau",
           homework: "Devoirs",
           selectSubject: "Choisis une matière",
           forward: "Forward",
@@ -151,12 +154,21 @@ function capitalizeSubjectLabel(subject: string) {
   return formatSubjectDisplay(subject) ?? subject;
 }
 
-function readActiveView(value: string | null): StudentView {
-  if (value === "maps" || value === "tests" || value === "forward") {
+function readActiveView(
+  value: string | null,
+  selectedSubject: string | null,
+): StudentView {
+  if (
+    value === "dashboard" ||
+    value === "homework" ||
+    value === "maps" ||
+    value === "tests" ||
+    value === "forward"
+  ) {
     return value;
   }
 
-  return "homework";
+  return selectedSubject ? "homework" : "dashboard";
 }
 
 function buildSubjectGroups(
@@ -231,6 +243,13 @@ function buildHeaderContent(input: {
     return {
       eyebrow: input.copy.pageTitles.homework,
       title: formatSubjectDisplay(input.selectedSubject) ?? input.selectedSubject,
+    };
+  }
+
+  if (input.view === "dashboard") {
+    return {
+      eyebrow: input.copy.pageTitles.dashboard,
+      title: input.copy.pageTitles.dashboard,
     };
   }
 
@@ -453,8 +472,8 @@ export function StudentAppShell({
   );
   const languageCode = appUser.preferred_ui_language;
   const copy = getStudentShellCopy(languageCode);
-  const activeView = readActiveView(searchParams.get("view"));
   const selectedSubject = searchParams.get("subject")?.trim() || null;
+  const activeView = readActiveView(searchParams.get("view"), selectedSubject);
   const activeConversationId = pathname.startsWith("/app/conversations/")
     ? pathname.slice("/app/conversations/".length).split("/")[0] ?? null
     : null;
@@ -596,11 +615,11 @@ export function StudentAppShell({
         <div className="grid gap-2">
           <Link
             className={`flex items-center ${sidebarCollapsed ? "justify-center" : "gap-3"} rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
-              activeView === "homework"
+              activeView === "dashboard"
                 ? "bg-[color:var(--surface-strong)] text-[color:var(--foreground)]"
                 : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
             }`}
-            href="/app?view=homework"
+            href="/app?view=dashboard"
             onClick={() => setSidebarOpen(false)}
           >
             <HomeIcon />
