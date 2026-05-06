@@ -744,31 +744,33 @@ export function StudentAppShell({
           )}
 
           <div className="mx-3 my-1 h-px bg-[color:var(--line)]" />
-          <DisabledRailItem
-            collapsed={sidebarCollapsed}
-            hint={copy.mapsHint}
-            icon={<MapIcon />}
-            label={copy.maps}
-          />
-          <DisabledRailItem
-            collapsed={sidebarCollapsed}
-            hint={copy.testsHint}
-            icon={<TestIcon />}
-            label={copy.tests}
-          />
-          <div className="mx-3 my-1 h-px bg-[color:var(--line)]" />
-          <DisabledRailItem
-            collapsed={sidebarCollapsed}
-            hint={copy.forwardHint}
-            icon={<ForwardIcon />}
-            label={copy.forward}
-          />
-          <DisabledRailItem
-            collapsed={sidebarCollapsed}
-            hint={copy.exploreHint}
-            icon={<ExploreIcon />}
-            label={copy.explore}
-          />
+          <div className="grid gap-0.5">
+            <DisabledRailItem
+              collapsed={sidebarCollapsed}
+              hint={copy.mapsHint}
+              icon={<MapIcon />}
+              label={copy.maps}
+            />
+            <DisabledRailItem
+              collapsed={sidebarCollapsed}
+              hint={copy.testsHint}
+              icon={<TestIcon />}
+              label={copy.tests}
+            />
+            <div className="mx-3 my-1 h-px bg-[color:var(--line)]" />
+            <DisabledRailItem
+              collapsed={sidebarCollapsed}
+              hint={copy.forwardHint}
+              icon={<ForwardIcon />}
+              label={copy.forward}
+            />
+            <DisabledRailItem
+              collapsed={sidebarCollapsed}
+              hint={copy.exploreHint}
+              icon={<ExploreIcon />}
+              label={copy.explore}
+            />
+          </div>
         </div>
       </nav>
 

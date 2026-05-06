@@ -222,7 +222,7 @@ Current UI rules:
 - `History` is the only tab that renders recent chats
 - the disabled `Instructions` tab shows a coming-soon tooltip
 - ready resources can be preselected from the subject view with a checkbox before the first prompt; existing docs remain unchecked by default
-- resource cards show learner-facing metadata only: pages and date
+- resource cards show learner-facing metadata only: pages and date; the info icon sits beside the resource filename, and subject-view deletion sits in the title line beside the page/date metadata
 - readiness and chunk counts are internal and should not be displayed to learners
 - summary and content structure live in dedicated collapsible sections
 - outline page pills appear only when the stored outline line includes a recognizable page marker such as `p.2`, `page 2`, or `pages 2-3`

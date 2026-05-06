@@ -306,3 +306,4 @@ then close it as:
 | 2026-05-06 | 17:18 -> 17:19 | 0h01 | P1.3 | restore the Dashboard rail row, add a divider after Tests, and give disabled rail sections a wait cursor with coming-soon tooltip | | |
 | 2026-05-06 | 17:39 -> 17:43 | 0h04 | P1.3 | replace subject row plus actions with aligned chevrons that expand recent conversation titles and add the Homework divider | | |
 | 2026-05-06 | 17:58 -> 18:01 | 0h03 | P1.3 | align future-section labels with icons and reveal their descriptions only on hover without changing rail height | | |
+| 2026-05-06 | 18:10 -> 18:13 | 0h03 | P1.3 P2.7 | tighten future-section rail spacing and move subject-resource info/delete controls into the requested header positions | | |

@@ -564,10 +564,9 @@ export function StudentSubjectResourceLibrary({
               formatDateLabel(resource.updated_at, languageCode) ?? ""
             }`;
             const showResourceActions =
-              allowDelete ||
-              (Boolean(conversationId) &&
-                Boolean(resource.link) &&
-                selectionVariant === "button");
+              Boolean(conversationId) &&
+              Boolean(resource.link) &&
+              selectionVariant === "button";
             const summary =
               typeof resource.metadata.source_summary === "string"
                 ? resource.metadata.source_summary
@@ -614,25 +613,35 @@ export function StudentSubjectResourceLibrary({
                         type="checkbox"
                       />
                     ) : null}
-                    <div className="min-w-0">
+                    <div className="flex min-w-0 items-center gap-1.5">
                       <p
-                        className="truncate text-sm font-medium text-[color:var(--foreground)]"
+                        className="min-w-0 truncate text-sm font-medium text-[color:var(--foreground)]"
                         title={resourceMetaTitle}
                       >
                         {resource.original_filename}
                       </p>
+                      <button
+                        aria-label={copy.resourceInfoLabel}
+                        className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[color:var(--ink-soft)] opacity-0 transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)] group-hover/card:opacity-100 focus-visible:opacity-100"
+                        title={copy.resourceInfo}
+                        type="button"
+                      >
+                        <InfoIcon />
+                      </button>
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-2 text-xs text-[color:var(--ink-soft)]">
                     {showVisibleMetadata ? <span>{resourceMetaTitle}</span> : null}
-                    <button
-                      aria-label={copy.resourceInfoLabel}
-                      className="inline-flex h-6 w-6 items-center justify-center rounded-full opacity-0 transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)] group-hover/card:opacity-100 focus-visible:opacity-100"
-                      title={copy.resourceInfo}
-                      type="button"
-                    >
-                      <InfoIcon />
-                    </button>
+                    {allowDelete ? (
+                      <button
+                        className="rounded-full border border-[#c95f44]/35 px-3 py-1 text-xs font-medium text-[#c95f44] transition hover:border-[#c95f44] disabled:cursor-not-allowed disabled:opacity-50"
+                        disabled={isUpdating || disabled}
+                        onClick={() => deleteResource(resource)}
+                        type="button"
+                      >
+                        {copy.delete}
+                      </button>
+                    ) : null}
                   </div>
 
                   {conversationId && selectionVariant !== "checkbox" ? (
@@ -692,16 +701,6 @@ export function StudentSubjectResourceLibrary({
                         type="button"
                       >
                         {copy.unlink}
-                      </button>
-                    ) : null}
-                    {allowDelete ? (
-                      <button
-                        className="rounded-full border border-[#c95f44]/35 px-3 py-1 text-xs font-medium text-[#c95f44] transition hover:border-[#c95f44] disabled:cursor-not-allowed disabled:opacity-50"
-                        disabled={isUpdating || disabled}
-                        onClick={() => deleteResource(resource)}
-                        type="button"
-                      >
-                        {copy.delete}
                       </button>
                     ) : null}
                   </div>
