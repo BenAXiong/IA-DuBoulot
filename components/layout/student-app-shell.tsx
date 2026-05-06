@@ -408,21 +408,25 @@ function DisabledRailItem({
   return (
     <div
       aria-disabled="true"
-      className={`flex items-center ${
-        collapsed ? "justify-center" : "gap-3"
+      className={`group/disabled-rail ${
+        collapsed ? "flex items-center justify-center" : "grid"
       } rounded-2xl px-3 py-2.5 text-sm font-medium text-[color:var(--ink-muted)] opacity-60`}
       style={{ cursor: HOURGLASS_CURSOR }}
       title="Coming soon!"
     >
-      {icon}
-      {!collapsed ? (
-        <div className="min-w-0">
-          <p>{label}</p>
-          <p className="truncate text-xs text-[color:var(--ink-muted)]">
+      {collapsed ? (
+        icon
+      ) : (
+        <>
+          <div className="flex min-w-0 items-center gap-3">
+            {icon}
+            <p className="truncate">{label}</p>
+          </div>
+          <p className="min-h-4 truncate pl-7 text-xs leading-4 text-[color:var(--ink-muted)] opacity-0 transition-opacity group-hover/disabled-rail:opacity-100">
             {hint}
           </p>
-        </div>
-      ) : null}
+        </>
+      )}
     </div>
   );
 }

@@ -70,7 +70,7 @@ Current shell behavior:
 - left rail owns the existing Dashboard entry, the enabled Homework entry, and subject-filter navigation
 - `Homework` is the only real student activity today
 - subject row chevrons reveal the latest five conversation titles for that subject, with `...` when more exist, and opening one subject subsection closes the previous one
-- `Recap`, `Exams`, `Forward`, and `Explore` are visible but disabled placeholder modes held in the shell so future learning tools can grow without another shell rewrite
+- `Recap`, `Exams`, `Forward`, and `Explore` are visible but disabled placeholder modes held in the shell so future learning tools can grow without another shell rewrite; their descriptions are hover-revealed in already-reserved space so the left rail does not shift when hovered
 - the bottom profile dock shows placeholder avatar, learner name, and plan label by default; the settings/sign-out actions now open from a hover or focus menu instead of staying permanently visible
 - the top bar is intentionally quiet, slimmer than the earlier MVP chrome, and keeps only a simple eyebrow-and-title pair plus the smaller language/theme utility controls
 
