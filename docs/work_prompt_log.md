@@ -314,7 +314,8 @@ then close it as:
 | 2026-05-07 | 00:59 -> 01:02 | 0h03 | P1.3 | add dashboard card icons, adjust the Homework card copy, and arrange subject chips in three right-aligned rows | | |
 | 2026-05-07 | 01:15 -> 01:16 | 0h01 | P1.3 | show all configured subjects on the Dashboard Homework card even when some subjects have no conversations yet | | |
 | 2026-05-07 | 09:18 -> 09:19 | 0h01 | A0.3.7 | close the active work session at 01:16 and reopen a fresh execution trace | | |
-| 2026-05-07 | 09:33 -> 09:33 | 0h00 | A0.3.7 | synthesize current project goals, shipped features, open blockers, and future directions for LLM advisory context | | |
+| 2026-05-07 | 09:33 -> 09:34 | 0h01 | A0.3.7 | synthesize current project goals, shipped features, open blockers, and future directions for LLM advisory context | | |
 | 2026-05-07 | 10:32 -> 10:35 | 0h03 | P1.3 | create a paste-ready public landing page revamp brief and link it from the source-of-truth docs | | |
-| 2026-05-07 | 15:18 -> 15:18 | 0h00 | A0.3.7 P1.3 | close the public landing brief-prep session at 11:56 and reopen a fresh execution trace while specs are still being drafted | | |
-| 2026-05-07 | 17:14 -> 20:36 | 3h22 | P1.3 | revamp the public landing page from the new brief, including navbar and identity-specific first-visitor content | | |
+| 2026-05-07 | 15:18 -> 15:19 | 0h01 | A0.3.7 P1.3 | close the public landing brief-prep session at 11:56 and reopen a fresh execution trace while specs are still being drafted | | |
+| 2026-05-07 | 17:14 -> 17:36 | 0h22 | P1.3 | revamp the public landing page from the new brief, including navbar and identity-specific first-visitor content | | |
+| 2026-05-07 | 20:43 -> 20:43 | 0h00 | A0.3.7 P1.3 | close the landing revamp work session at 17:36 and reopen a fresh execution trace | | |
