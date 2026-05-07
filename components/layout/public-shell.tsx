@@ -1,16 +1,13 @@
-import Link from "next/link";
 import { DocumentLanguageSync } from "@/components/i18n/document-language-sync";
-import { LanguageMenu } from "@/components/layout/language-menu";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { PublicHeader } from "@/components/layout/public-header";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import { getPublicShellCopy } from "@/lib/i18n/ui-copy";
-import { withUiLanguage } from "@/lib/i18n/ui-language";
 
 type PublicShellProps = {
   children: React.ReactNode;
   currentHref: string;
   languageCode: UiLanguageCode;
-  headerVariant?: "default" | "hud";
+  headerVariant?: "default" | "hud" | "landing";
   showAuthLink?: boolean;
   showFooter?: boolean;
 };
@@ -24,7 +21,6 @@ export function PublicShell({
   showFooter = true,
 }: PublicShellProps) {
   const copy = getPublicShellCopy(languageCode);
-  const isHudHeader = headerVariant === "hud";
 
   return (
     <div
@@ -35,45 +31,13 @@ export function PublicShell({
       <div className="pointer-events-none absolute inset-0 -z-10 muted-grid opacity-35" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[radial-gradient(circle_at_top,rgba(203,95,44,0.17),transparent_62%)]" />
 
-      <header className={isHudHeader ? "px-4 pt-4 sm:px-6 lg:px-8" : "px-5 py-5 sm:px-8 lg:px-12"}>
-        <div
-          className={
-            isHudHeader
-              ? "mx-auto flex max-w-6xl items-center justify-between gap-4"
-              : "shell-panel shell-panel--allow-overflow mx-auto flex max-w-[92rem] flex-wrap items-center justify-between gap-4 rounded-[2rem] px-5 py-4 sm:px-6"
-          }
-        >
-          <Link
-            className={isHudHeader ? "flex items-center gap-2.5" : "flex items-center gap-3"}
-            href={withUiLanguage("/", languageCode)}
-          >
-            <span className={isHudHeader ? "brand-mark brand-mark--mini" : "brand-mark"} />
-            <p className={`brand-wordmark text-[color:var(--foreground)] ${isHudHeader ? "text-xs" : "text-sm"}`}>
-              IA DuBoulot
-            </p>
-          </Link>
-
-          <div className={isHudHeader ? "flex items-center gap-1" : "flex flex-wrap items-center gap-2"}>
-            <ThemeToggle
-              languageCode={languageCode}
-              variant={isHudHeader ? "minimal" : "default"}
-            />
-            <LanguageMenu
-              currentHref={currentHref}
-              languageCode={languageCode}
-              variant={isHudHeader ? "minimal" : "default"}
-            />
-            {showAuthLink ? (
-              <Link
-                className="button-base button-primary interactive-card"
-                href={withUiLanguage("/auth", languageCode)}
-              >
-                {copy.openApp}
-              </Link>
-            ) : null}
-          </div>
-        </div>
-      </header>
+      <PublicHeader
+        currentHref={currentHref}
+        languageCode={languageCode}
+        openAppLabel={copy.openApp}
+        showAuthLink={showAuthLink}
+        variant={headerVariant}
+      />
 
       {children}
 

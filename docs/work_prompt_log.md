@@ -317,3 +317,4 @@ then close it as:
 | 2026-05-07 | 09:33 -> 09:33 | 0h00 | A0.3.7 | synthesize current project goals, shipped features, open blockers, and future directions for LLM advisory context | | |
 | 2026-05-07 | 10:32 -> 10:35 | 0h03 | P1.3 | create a paste-ready public landing page revamp brief and link it from the source-of-truth docs | | |
 | 2026-05-07 | 15:18 -> 15:18 | 0h00 | A0.3.7 P1.3 | close the public landing brief-prep session at 11:56 and reopen a fresh execution trace while specs are still being drafted | | |
+| 2026-05-07 | 17:14 -> 20:36 | 3h22 | P1.3 | revamp the public landing page from the new brief, including navbar and identity-specific first-visitor content | | |

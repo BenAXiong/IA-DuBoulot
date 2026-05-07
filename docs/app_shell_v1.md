@@ -21,6 +21,8 @@ as unrelated one-off layouts.
 Code:
 
 - `components/layout/public-shell.tsx`
+- `components/layout/public-header.tsx`
+- home route body: `components/landing/public-landing-page.tsx`
 - landing-revamp working brief: `docs/public_landing_page_revamp_brief.md`
 
 Current routes using it:
@@ -38,13 +40,15 @@ Rules:
 - pricing remains intentionally provisional while the MVP still exposes only one wired Family monthly plan
 - the shell now carries the active UI language through shared dictionaries and a small client-side `document.documentElement.lang` sync instead of hardcoded French-only chrome
 - the shared theme layer now defaults to the operating-system light or dark preference, but MVP chrome may expose one simple light-or-dark icon toggle when that improves usability without reopening the old preset/custom theme lab
-- the landing route now keeps operator and deep-link shortcuts behind a floating helper button so the user-facing page can stay calmer than the previous toolbox-style entry
+- the landing route no longer shows the old floating helper button; first-time visitor entry points now live in the full-width landing navbar and role-specific CTAs
 - the public chrome now uses a compact globe-menu language selector instead of always-visible inline language pills, and the control geometry must stay unclipped at small shell sizes
 - the public shell no longer renders the subtitle under the wordmark on `/`, and the top bar now runs nearly the full landing width instead of staying on the narrower `6xl` rail
 - the home route may opt out of the shared public footer when a page-owned closing CTA gives a cleaner public narrative than the heavier shell footer
 - the auth route may also opt out of the shared public footer when a viewport-fit form layout is more important than repeating public narrative copy below the fold
 - the home route now also uses a wider canvas with centered hero and closing CTA copy, while the product-story body alternates `1 preview + 3 glass cards` rows so future GIFs can scale without collapsing text legibility
 - the current landing media frames now use neutral moving placeholder GIFs from public sources, stored locally in `public/landing/`, so the layout can be judged with real motion before actual product captures are ready
+- the home route now uses a landing-specific full-width public header that hides on scroll down and returns on scroll up, without forcing that behavior onto auth, pricing, onboarding, or invite routes
+- the home route hero is identity-aware through an instant client-side Student, Parent, or Tutor chooser; Parent is the default first view for the current revamp, Student feature content intentionally remains empty until its copy is written, and Tutor keeps the previous landing feature copy as placeholder content
 - the shared primary CTA now uses a slow background-position drift, so motion stays at the token layer instead of becoming page-local decoration
 - the auth route now uses a compact viewport-fit layout with a mini HUD-style header, a single centered auth card, and a stable-width segmented `Sign in` or `New user` switch as the first visible block; any explanatory copy above the toggle should stay absent unless real testing shows it is needed
 - the onboarding route now also opts out of the shared public footer and keeps only the remaining profile-essential fields that sign-up does not yet own; role selection stays in account creation and the standalone onboarding route is now a transitional step rather than a destination to enrich further
