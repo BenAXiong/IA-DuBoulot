@@ -34,6 +34,13 @@ type HeroCopy = {
   title: string;
 };
 
+type LandingFeatureSectionData = {
+  cards: CardCopy[];
+  description: string;
+  media: string;
+  title: string;
+};
+
 const heroCopy: Record<Audience, HeroCopy> = {
   student: {
     body: "Get step-by-step help with your homework, drill for exams, and explore the topics you like. banban's BigBrain keeps track of what needs strengthening, then prepares practice around the hard parts.",
@@ -76,28 +83,28 @@ const audienceLabels: Array<{ label: string; value: Audience }> = [
   { label: "Tutor", value: "tutor" },
 ];
 
-const parentComparison = [
+const parentFeatureSections: LandingFeatureSectionData[] = [
   {
-    body: [
-      "The learner uploads exercises, and the AI answers diligently.",
-      "The learner copies the answer, while mistakes stay hidden.",
-      "The parent sees finished homework, not understanding.",
-      "The learner becomes more dependent over time.",
+    cards: [
+      {
+        body: "The learner uploads exercises, the AI answers diligently, and finished homework can hide whether the idea was understood.",
+        title: "When AI becomes a shortcut.",
+      },
+      {
+        body: "banban guides the student through steps, gives hints before answers, and makes weak spots visible enough to practice.",
+        title: "When AI becomes a coach.",
+      },
+      {
+        body: "Parents get a clearer view of struggles and next steps without hovering over every message or taking the work over.",
+        title: "What changes for adults.",
+      },
     ],
-    title: "When AI becomes a shortcut",
+    description:
+      "A side-by-side comparison of generic AI help and banban's coaching frame: same homework, very different learning outcome.",
+    media: "/landing/abstract-flow-1.gif",
+    title:
+      "AI should not replace the learner's thinking. It should help them build it.",
   },
-  {
-    body: [
-      "The student is guided through steps, with hints before answers.",
-      "Weak spots become visible and targetable.",
-      "Practice adapts to the learner instead of repeating the same worksheet.",
-      "Adults can follow progress without hovering.",
-    ],
-    title: "When AI becomes a coach",
-  },
-];
-
-const parentFeatureSections = [
   {
     cards: [
       {
@@ -113,6 +120,9 @@ const parentFeatureSections = [
         title: "Ace the exams.",
       },
     ],
+    description:
+      "The everyday workspace stays useful right away, then becomes more valuable as subjects, course files, and recurring weak spots accumulate.",
+    media: "/landing/abstract-flow-2.gif",
     title: "Organized workspace - useful every day, improving with time.",
   },
   {
@@ -130,6 +140,9 @@ const parentFeatureSections = [
         title: "Mastery for anything, anytime.",
       },
     ],
+    description:
+      "banban's memory layer is meant to turn repeated friction into better practice, not just a one-off answer to tonight's question.",
+    media: "/landing/abstract-flow-3.gif",
     title: "Long-term support with banban's BigBrain.",
   },
   {
@@ -147,6 +160,9 @@ const parentFeatureSections = [
         title: "Let curiosity guide learning.",
       },
     ],
+    description:
+      "Homework is the first use case, but the same learning companion can support revision maps, next-unit previews, and curiosity-led exploration.",
+    media: "/landing/abstract-flow-1.gif",
     title: "Learning modes beyond cram and drill.",
   },
 ];
@@ -184,13 +200,17 @@ function FeatureCard({ body, title }: CardCopy) {
 
 function MediaFrame({
   alt,
+  className = "",
   src,
 }: {
   alt: string;
+  className?: string;
   src: string;
 }) {
   return (
-    <div className="relative min-h-[18rem] overflow-hidden rounded-[1.5rem] border border-[color:var(--line)] bg-[#0b1020] shadow-[var(--shadow-soft)] sm:min-h-[20rem]">
+    <div
+      className={`relative min-h-[18rem] overflow-hidden rounded-[1.5rem] border border-[color:var(--line)] bg-[#0b1020] shadow-[var(--shadow-soft)] sm:min-h-[20rem] ${className}`}
+    >
       <Image
         alt={alt}
         className="h-full w-full object-cover"
@@ -200,6 +220,34 @@ function MediaFrame({
         unoptimized
       />
     </div>
+  );
+}
+
+function LandingFeatureSection({
+  cards,
+  description,
+  media,
+  title,
+}: LandingFeatureSectionData) {
+  return (
+    <section className="grid gap-6">
+      <div className="max-w-5xl">
+        <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight sm:text-4xl">
+          {title}
+        </h2>
+        <p className="mt-4 max-w-3xl text-base leading-7 text-[color:var(--ink-soft)]">
+          {description}
+        </p>
+      </div>
+      <div className="grid items-stretch gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(19rem,1fr)]">
+        <MediaFrame alt={title} className="lg:min-h-[31rem]" src={media} />
+        <div className="grid gap-4">
+          {cards.map((card) => (
+            <FeatureCard body={card.body} key={card.title} title={card.title} />
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -284,51 +332,8 @@ function HeroVisual({ audience }: { audience: Audience }) {
 function ParentFeatures() {
   return (
     <div id="for-parents" className="grid gap-16 sm:gap-20">
-      <section className="grid gap-6">
-        <div className="mx-auto max-w-4xl text-center">
-          <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight sm:text-5xl">
-            AI should not replace the learner&apos;s thinking. It should help them build it.
-          </h2>
-        </div>
-
-        <div className="grid gap-5 lg:grid-cols-2">
-          {parentComparison.map((card) => (
-            <article
-              className="shell-card rounded-[1.5rem] p-5 sm:p-6"
-              key={card.title}
-            >
-              <h3 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
-                {card.title}
-              </h3>
-              <ul className="mt-5 grid gap-3 text-sm leading-6 text-[color:var(--ink-soft)]">
-                {card.body.map((item) => (
-                  <li className="flex gap-3" key={item}>
-                    <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--highlight)]" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </article>
-          ))}
-        </div>
-
-        <MediaFrame
-          alt="Side-by-side comparison preview"
-          src="/landing/abstract-flow-1.gif"
-        />
-      </section>
-
       {parentFeatureSections.map((section) => (
-        <section className="grid gap-6" key={section.title}>
-          <h2 className="max-w-5xl font-[family-name:var(--font-heading)] text-3xl leading-tight sm:text-4xl">
-            {section.title}
-          </h2>
-          <div className="grid gap-4 md:grid-cols-3">
-            {section.cards.map((card) => (
-              <FeatureCard body={card.body} key={card.title} title={card.title} />
-            ))}
-          </div>
-        </section>
+        <LandingFeatureSection key={section.title} {...section} />
       ))}
     </div>
   );
@@ -339,19 +344,25 @@ function TutorFeatures({
 }: {
   tutorPlaceholder: TutorPlaceholderCopy;
 }) {
-  const rows = [
+  const rows: LandingFeatureSectionData[] = [
     {
       cards: tutorPlaceholder.featureCards,
+      description:
+        "Before the tutoring session begins, banban can surface the recent learning context: what the student tried, where they stalled, and what probably needs attention first.",
       media: "/landing/abstract-flow-1.gif",
       title: "Prepare with the context already in hand.",
     },
     {
       cards: tutorPlaceholder.contentCards,
+      description:
+        "Session history gives tutors a cleaner starting point than asking the student to reconstruct every missing step from memory.",
       media: "/landing/abstract-flow-2.gif",
       title: "Use session history as a starting point.",
     },
     {
       cards: tutorPlaceholder.sharingCards,
+      description:
+        "Linked summaries, review history, and private tutor notes help tutoring stay continuous from one meeting to the next.",
       media: "/landing/abstract-flow-3.gif",
       title: "Keep follow-up organized across sessions.",
     },
@@ -359,26 +370,8 @@ function TutorFeatures({
 
   return (
     <div className="grid gap-16 sm:gap-20">
-      {rows.map((row, index) => (
-        <section
-          className="grid items-stretch gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(22rem,0.9fr)]"
-          key={row.title}
-        >
-          <div className={index % 2 === 1 ? "lg:order-2" : ""}>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--ink-muted)]">
-              Tutor placeholder
-            </p>
-            <h2 className="mt-2 font-[family-name:var(--font-heading)] text-3xl leading-tight sm:text-4xl">
-              {row.title}
-            </h2>
-            <div className="mt-5 grid gap-4">
-              {row.cards.map((card) => (
-                <FeatureCard body={card.body} key={card.title} title={card.title} />
-              ))}
-            </div>
-          </div>
-          <MediaFrame alt={row.title} src={row.media} />
-        </section>
+      {rows.map((row) => (
+        <LandingFeatureSection key={row.title} {...row} />
       ))}
     </div>
   );

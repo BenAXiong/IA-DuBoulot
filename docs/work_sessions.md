@@ -92,4 +92,4 @@ Use `OPEN` for the unfinished side of an active session.
 | 2026-05-07 | 00:17 -> 01:16 | 0h59 | A0.3.7 P1.3 | close the 2026-05-06 work session at 18:32, reopen a fresh execution trace, and polish the student Dashboard cards with product-facing copy, matching icons, and the Homework subject row layout |
 | 2026-05-07 | 09:18 -> 11:56 | 2h38 | A0.3.7 P1.3 | close the 2026-05-07 dashboard-polish session at 01:16, reopen a fresh execution trace, and prepare the public landing page revamp brief |
 | 2026-05-07 | 15:18 -> 17:36 | 2h18 | A0.3.7 P1.3 | close the public landing brief-prep session at 11:56, reopen a fresh execution trace, and revamp the public landing page from the identity-aware brief |
-| 2026-05-07 | 20:43 -> OPEN | OPEN | A0.3.7 P1.3 | close the landing revamp session at 17:36 and reopen a fresh execution trace |
+| 2026-05-07 | 20:43 -> OPEN | OPEN | A0.3.7 P1.3 | close the landing revamp session at 17:36, reopen a fresh execution trace, and standardize landing feature sections around a large GIF plus three cards for Parent and Tutor views |

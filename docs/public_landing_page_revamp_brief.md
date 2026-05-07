@@ -35,9 +35,9 @@ Students, Parents and Tutors each have a dedicated interface, displayed accordin
 
 Only the Navbar is not identity-dependent.
 Navbar: full width, hidden on scrolldown, visible on scroll up.
-Title: *
-1st CTA: *
-Features: *
+Title:
+1st CTA:
+Features: default layout with a section title and description, a large GIF/demo occupying about two-thirds of the desktop width, and three adjacent cards with titles and descriptions.
 
 
 ## Title & 1st CTA

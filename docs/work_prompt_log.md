@@ -319,3 +319,4 @@ then close it as:
 | 2026-05-07 | 15:18 -> 15:19 | 0h01 | A0.3.7 P1.3 | close the public landing brief-prep session at 11:56 and reopen a fresh execution trace while specs are still being drafted | | |
 | 2026-05-07 | 17:14 -> 17:36 | 0h22 | P1.3 | revamp the public landing page from the new brief, including navbar and identity-specific first-visitor content | | |
 | 2026-05-07 | 20:43 -> 20:43 | 0h00 | A0.3.7 P1.3 | close the landing revamp work session at 17:36 and reopen a fresh execution trace | | |
+| 2026-05-07 | 20:49 -> 20:57 | 0h08 | P1.3 | standardize landing feature sections around a large GIF plus three cards and adapt Parent/Tutor views | | |
