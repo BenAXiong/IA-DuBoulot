@@ -24,6 +24,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Sample attachment corpus](docs/sample_attachment_corpus.md)
 - [API route map](docs/api_route_map.md)
 - [App shell V1](docs/app_shell_v1.md)
+- [Public landing page revamp brief](docs/public_landing_page_revamp_brief.md)
 - [Frontend foundations V1](docs/frontend_foundations_v1.md)
 - [Student dashboard V1](docs/student_dashboard_v1.md)
 - [Student intake V1](docs/student_intake_v1.md)

@@ -1,6 +1,6 @@
 # App Shell V1
 
-Related: [README](../README.md) | [MVP to-do list](mvp_todo.md) | [API route map](api_route_map.md) | [Invitation flows V1](invitation_flows_v1.md) | [Privacy controls V1](privacy_controls_v1.md) | [Service interfaces](service_interfaces.md)
+Related: [README](../README.md) | [MVP to-do list](mvp_todo.md) | [API route map](api_route_map.md) | [Public landing page revamp brief](public_landing_page_revamp_brief.md) | [Invitation flows V1](invitation_flows_v1.md) | [Privacy controls V1](privacy_controls_v1.md) | [Service interfaces](service_interfaces.md)
 
 ## Purpose
 
@@ -21,6 +21,7 @@ as unrelated one-off layouts.
 Code:
 
 - `components/layout/public-shell.tsx`
+- landing-revamp working brief: `docs/public_landing_page_revamp_brief.md`
 
 Current routes using it:
 
