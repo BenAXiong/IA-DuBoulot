@@ -29,7 +29,6 @@ type PublicLandingPageProps = {
 type HeroCopy = {
   body: string;
   cta: string;
-  eyebrow: string;
   overlayBody?: string[];
   overlayTitle?: string;
   role: LandingAudience;
@@ -47,14 +46,12 @@ const heroCopy: Record<LandingAudience, HeroCopy> = {
   student: {
     body: "Get step-by-step help with your homework, drill for exams, and explore the topics you like. banban's BigBrain keeps track of what needs strengthening, then prepares practice around the hard parts.",
     cta: "Sign up for free",
-    eyebrow: "For students",
     role: "student",
     title: "Meet banban, your AI homework coach.",
   },
   parent: {
     body: "banban is designed to coach your child through learning and Socratic questioning instead of simply giving answers. It helps with homework, revision, writing, and practice while building a long-term picture of the areas that need support.",
     cta: "Create a free parent account",
-    eyebrow: "For parents",
     overlayBody: [
       "Parents can review session summaries, visible struggles, and progress signals without reading every private exchange by default.",
       "Linked accounts make it easier to know whether your child is stuck, finished, or drifting away from the year's curriculum.",
@@ -67,7 +64,6 @@ const heroCopy: Record<LandingAudience, HeroCopy> = {
   tutor: {
     body: "banban gives tutors a clearer view of linked students' homework sessions, summaries, weak points, and learning patterns, so tutoring time can be more focused, personal, and effective.",
     cta: "Create a free tutor account",
-    eyebrow: "For tutors",
     overlayBody: [
       "Tutors can review linked student sessions and tutor-focused summaries when access has been explicitly granted.",
       "Tutor notes stay private to the tutor, while student learning data remains bounded by the same visibility rules as the rest of the product.",
@@ -224,23 +220,24 @@ function MediaFrame({
 
 function LandingFeatureSection({
   cards,
-  description,
   media,
   title,
-}: LandingFeatureSectionData) {
+  reverse = false,
+}: LandingFeatureSectionData & { reverse?: boolean }) {
   return (
     <section className="grid gap-6">
-      <div className="max-w-5xl">
+      <div className="mx-auto max-w-5xl text-center">
         <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight sm:text-4xl">
           {title}
         </h2>
-        <p className="mt-4 max-w-3xl text-base leading-7 text-[color:var(--ink-soft)]">
-          {description}
-        </p>
       </div>
       <div className="grid items-stretch gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(19rem,1fr)]">
-        <MediaFrame alt={title} className="lg:min-h-[31rem]" src={media} />
-        <div className="grid gap-4">
+        <MediaFrame
+          alt={title}
+          className={`lg:min-h-[31rem] ${reverse ? "lg:order-2" : ""}`}
+          src={media}
+        />
+        <div className={`grid gap-4 ${reverse ? "lg:order-1" : ""}`}>
           {cards.map((card) => (
             <FeatureCard body={card.body} key={card.title} title={card.title} />
           ))}
@@ -346,7 +343,7 @@ function HeroSubtitle({
   onOpenOversight: () => void;
 }) {
   return (
-    <p className="mt-6 max-w-3xl text-lg leading-8 text-[color:var(--ink-soft)]">
+    <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-[color:var(--ink-soft)]">
       {copy.body}
       <OversightInlineTrigger copy={copy} onOpen={onOpenOversight} />
     </p>
@@ -356,8 +353,12 @@ function HeroSubtitle({
 function ParentFeatures() {
   return (
     <div id="for-parents" className="grid gap-16 sm:gap-20">
-      {parentFeatureSections.map((section) => (
-        <LandingFeatureSection key={section.title} {...section} />
+      {parentFeatureSections.map((section, index) => (
+        <LandingFeatureSection
+          key={section.title}
+          reverse={index % 2 === 1}
+          {...section}
+        />
       ))}
     </div>
   );
@@ -394,8 +395,12 @@ function TutorFeatures({
 
   return (
     <div className="grid gap-16 sm:gap-20">
-      {rows.map((row) => (
-        <LandingFeatureSection key={row.title} {...row} />
+      {rows.map((row, index) => (
+        <LandingFeatureSection
+          key={row.title}
+          reverse={index % 2 === 1}
+          {...row}
+        />
       ))}
     </div>
   );
@@ -413,19 +418,16 @@ export function PublicLandingPage({
   return (
     <main className="px-5 pb-16 pt-56 sm:px-8 sm:pt-28 lg:px-12">
       <div className="mx-auto grid max-w-[92rem] gap-16 sm:gap-20">
-        <section className="py-8 sm:py-10 lg:py-16" id="hero">
-          <div className="max-w-6xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[color:var(--ink-muted)]">
-              {selectedCopy.eyebrow}
-            </p>
-            <h1 className="mt-4 max-w-5xl font-[family-name:var(--font-heading)] text-5xl leading-[0.96] sm:text-6xl lg:text-[5.25rem]">
+        <section className="py-8 text-center sm:py-10 lg:py-16" id="hero">
+          <div className="mx-auto max-w-6xl">
+            <h1 className="mx-auto max-w-5xl font-[family-name:var(--font-heading)] text-5xl leading-[0.96] sm:text-6xl lg:text-[5.25rem]">
               {selectedCopy.title}
             </h1>
             <HeroSubtitle
               copy={selectedCopy}
               onOpenOversight={() => setIsOversightOpen(true)}
             />
-            <div className="mt-8 flex flex-wrap items-center gap-3">
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Link className="button-base button-primary" href={ctaHref}>
                 {selectedCopy.cta}
               </Link>
