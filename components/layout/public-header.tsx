@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   landingAudienceLabels,
   setLandingAudience,
@@ -46,6 +46,80 @@ function LandingAudienceSelector() {
         ))}
       </div>
     </nav>
+  );
+}
+
+function HeaderHelpMenu({ languageCode }: { languageCode: UiLanguageCode }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    function handlePointerDown(event: PointerEvent) {
+      if (
+        menuRef.current &&
+        event.target instanceof Node &&
+        !menuRef.current.contains(event.target)
+      ) {
+        setIsOpen(false);
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen]);
+
+  return (
+    <div className="relative" ref={menuRef}>
+      <button
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        aria-label="Help"
+        className="theme-toggle font-semibold"
+        onClick={() => setIsOpen((current) => !current)}
+        title="Help"
+        type="button"
+      >
+        ?
+      </button>
+      {isOpen ? (
+        <div
+          className="shell-panel absolute right-0 top-[calc(100%+0.65rem)] z-50 grid min-w-44 gap-1 rounded-[1.2rem] p-2 text-sm shadow-[var(--shadow-soft)]"
+          role="menu"
+        >
+          <button
+            className="rounded-full px-4 py-2 text-left font-semibold text-[color:var(--ink-muted)]"
+            disabled
+            role="menuitem"
+            type="button"
+          >
+            FAQ soon
+          </button>
+          <Link
+            className="rounded-full px-4 py-2 font-semibold text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--foreground)]"
+            href={withUiLanguage("/pricing", languageCode)}
+            onClick={() => setIsOpen(false)}
+            role="menuitem"
+          >
+            Pricing
+          </Link>
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -135,16 +209,7 @@ export function PublicHeader({
             languageCode={languageCode}
             variant={isHudHeader ? "minimal" : "default"}
           />
-          {isLandingHeader ? (
-            <Link
-              aria-label="Pricing"
-              className="theme-toggle font-semibold no-underline"
-              href={withUiLanguage("/pricing", languageCode)}
-              title="Pricing"
-            >
-              ?
-            </Link>
-          ) : null}
+          {isLandingHeader ? <HeaderHelpMenu languageCode={languageCode} /> : null}
           <LanguageMenu
             currentHref={currentHref}
             languageCode={languageCode}

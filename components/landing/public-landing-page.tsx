@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import {
   type LandingAudience,
   useLandingAudience,
@@ -249,81 +250,106 @@ function LandingFeatureSection({
   );
 }
 
-function OversightDetails({ copy }: { copy: HeroCopy }) {
+function OversightOverlay({
+  copy,
+  isOpen,
+  onClose,
+}: {
+  copy: HeroCopy;
+  isOpen: boolean;
+  onClose: () => void;
+}) {
   if (!copy.overlayBody || !copy.overlayTitle) {
     return null;
   }
 
+  if (!isOpen) {
+    return null;
+  }
+
   return (
-    <details className="group mt-5 max-w-2xl rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface-muted)] p-4 text-left">
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-semibold text-[color:var(--foreground)] [&::-webkit-details-marker]:hidden">
-        <span>{copy.overlayTitle}</span>
-        <span
-          aria-hidden="true"
-          className="text-[color:var(--ink-muted)] transition group-open:rotate-45"
-        >
-          +
-        </span>
-      </summary>
-      <ul className="mt-4 grid gap-3 text-sm leading-6 text-[color:var(--ink-soft)]">
-        {copy.overlayBody.map((item) => (
-          <li className="flex gap-2" key={item}>
-            <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--accent)]" />
-            <span>{item}</span>
-          </li>
-        ))}
-      </ul>
-    </details>
+    <div
+      aria-labelledby="landing-oversight-title"
+      aria-modal="true"
+      className="fixed inset-0 z-50 flex items-center justify-center p-5"
+      role="dialog"
+    >
+      <button
+        aria-label="Close oversight details"
+        className="absolute inset-0 bg-[color:var(--foreground)]/30 backdrop-blur-sm"
+        onClick={onClose}
+        type="button"
+      />
+      <div className="shell-panel page-glow relative grid max-h-[78dvh] w-[92vw] gap-6 overflow-y-auto rounded-[2rem] p-6 shadow-[var(--shadow-strong)] sm:w-[75vw] sm:p-8">
+        <div className="flex items-start justify-between gap-4">
+          <h2
+            className="font-[family-name:var(--font-heading)] text-3xl leading-tight sm:text-4xl"
+            id="landing-oversight-title"
+          >
+            {copy.overlayTitle}
+          </h2>
+          <button
+            aria-label="Close oversight details"
+            className="theme-toggle shrink-0"
+            onClick={onClose}
+            type="button"
+          >
+            x
+          </button>
+        </div>
+        <ul className="grid gap-4 text-base leading-7 text-[color:var(--ink-soft)]">
+          {copy.overlayBody.map((item) => (
+            <li className="flex gap-3" key={item}>
+              <span
+                aria-hidden="true"
+                className="mt-2.5 h-2 w-2 shrink-0 rounded-full bg-[color:var(--accent)]"
+              />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 }
 
-function HeroVisual({ audience }: { audience: LandingAudience }) {
-  const rows =
-    audience === "student"
-      ? ["Photo of homework", "Step-by-step hint", "Targeted practice"]
-      : audience === "parent"
-        ? ["Homework summary", "Weak points", "Support next steps"]
-        : ["Session context", "Learning pattern", "Tutor notes"];
+function OversightInlineTrigger({
+  copy,
+  onOpen,
+}: {
+  copy: HeroCopy;
+  onOpen: () => void;
+}) {
+  if (!copy.overlayTitle || !copy.overlayBody) {
+    return null;
+  }
 
   return (
-    <div className="shell-panel page-glow grid gap-5 rounded-[2rem] p-5 sm:p-6">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--ink-muted)]">
-            banban workspace
-          </p>
-          <p className="mt-1 font-[family-name:var(--font-heading)] text-2xl leading-tight">
-            Learning, not shortcuts
-          </p>
-        </div>
-        <span className="brand-mark brand-mark--mini" />
-      </div>
-      <div className="grid gap-3">
-        {rows.map((row, index) => (
-          <div
-            className="rounded-[1.15rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3"
-            key={row}
-          >
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--ink-muted)]">
-              0{index + 1}
-            </p>
-            <p className="mt-1 text-sm font-medium text-[color:var(--foreground)]">
-              {row}
-            </p>
-          </div>
-        ))}
-      </div>
-      <MediaFrame
-        alt="Abstract product motion preview"
-        src={
-          audience === "parent"
-            ? "/landing/abstract-flow-1.gif"
-            : audience === "tutor"
-              ? "/landing/abstract-flow-3.gif"
-              : "/landing/abstract-flow-2.gif"
-        }
-      />
-    </div>
+    <>
+      {" "}
+      <button
+        className="font-semibold text-[color:var(--foreground)] underline decoration-[color:var(--accent)] decoration-2 underline-offset-4 transition hover:text-[color:var(--accent)]"
+        onClick={onOpen}
+        type="button"
+      >
+        {copy.overlayTitle}.
+      </button>
+    </>
+  );
+}
+
+function HeroSubtitle({
+  copy,
+  onOpenOversight,
+}: {
+  copy: HeroCopy;
+  onOpenOversight: () => void;
+}) {
+  return (
+    <p className="mt-6 max-w-3xl text-lg leading-8 text-[color:var(--ink-soft)]">
+      {copy.body}
+      <OversightInlineTrigger copy={copy} onOpen={onOpenOversight} />
+    </p>
   );
 }
 
@@ -382,40 +408,36 @@ export function PublicLandingPage({
   const audience = useLandingAudience();
   const selectedCopy = heroCopy[audience];
   const ctaHref = authHrefForAudience(audience, languageCode);
+  const [isOversightOpen, setIsOversightOpen] = useState(false);
 
   return (
     <main className="px-5 pb-16 pt-56 sm:px-8 sm:pt-28 lg:px-12">
       <div className="mx-auto grid max-w-[92rem] gap-16 sm:gap-20">
-        <section
-          className="grid items-center gap-10 py-8 sm:py-10 lg:grid-cols-[minmax(0,0.96fr)_minmax(24rem,0.84fr)] lg:py-12"
-          id="hero"
-        >
-          <div>
+        <section className="py-8 sm:py-10 lg:py-16" id="hero">
+          <div className="max-w-6xl">
             <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[color:var(--ink-muted)]">
               {selectedCopy.eyebrow}
             </p>
             <h1 className="mt-4 max-w-5xl font-[family-name:var(--font-heading)] text-5xl leading-[0.96] sm:text-6xl lg:text-[5.25rem]">
               {selectedCopy.title}
             </h1>
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-[color:var(--ink-soft)]">
-              {selectedCopy.body}
-            </p>
+            <HeroSubtitle
+              copy={selectedCopy}
+              onOpenOversight={() => setIsOversightOpen(true)}
+            />
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link className="button-base button-primary" href={ctaHref}>
                 {selectedCopy.cta}
               </Link>
-              <Link
-                className="button-base button-secondary"
-                href={withUiLanguage("/auth", languageCode)}
-              >
-                Sign in
-              </Link>
             </div>
-            <OversightDetails copy={selectedCopy} />
           </div>
-
-          <HeroVisual audience={audience} />
         </section>
+
+        <OversightOverlay
+          copy={selectedCopy}
+          isOpen={isOversightOpen}
+          onClose={() => setIsOversightOpen(false)}
+        />
 
         {audience === "parent" ? (
           <section className="grid gap-16 sm:gap-20" id="features">
