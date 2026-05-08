@@ -2,6 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import {
+  landingAudienceLabels,
+  setLandingAudience,
+  useLandingAudience,
+} from "@/components/landing/landing-audience-store";
 import { LanguageMenu } from "@/components/layout/language-menu";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
@@ -14,6 +19,35 @@ type PublicHeaderProps = {
   variant?: "default" | "hud" | "landing";
   showAuthLink?: boolean;
 };
+
+function LandingAudienceSelector() {
+  const audience = useLandingAudience();
+
+  return (
+    <nav
+      aria-label="Landing audience"
+      className="order-3 flex w-full justify-center sm:order-none sm:w-auto"
+    >
+      <div className="inline-flex rounded-full border border-[color:var(--line)] bg-[color:var(--surface-muted)] p-1 text-sm font-medium text-[color:var(--ink-soft)]">
+        {landingAudienceLabels.map((item) => (
+          <button
+            aria-pressed={audience === item.value}
+            className={`min-h-10 rounded-full px-4 text-sm font-semibold transition ${
+              audience === item.value
+                ? "bg-[color:var(--surface-raised)] text-[color:var(--foreground)] shadow-[var(--shadow-soft)]"
+                : "text-[color:var(--ink-soft)] hover:text-[color:var(--foreground)]"
+            }`}
+            key={item.value}
+            onClick={() => setLandingAudience(item.value)}
+            type="button"
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
+    </nav>
+  );
+}
 
 export function PublicHeader({
   currentHref,
@@ -94,28 +128,23 @@ export function PublicHeader({
           </p>
         </Link>
 
-        {isLandingHeader ? (
-          <nav
-            aria-label="Landing sections"
-            className="hidden items-center gap-1 rounded-full border border-[color:var(--line)] bg-[color:var(--surface-muted)] p-1 text-sm font-medium text-[color:var(--ink-soft)] lg:flex"
-          >
-            <a className="shell-nav-link" href="#hero">
-              Product
-            </a>
-            <a className="shell-nav-link" href="#features">
-              Features
-            </a>
-            <Link className="shell-nav-link" href={withUiLanguage("/pricing", languageCode)}>
-              Pricing
-            </Link>
-          </nav>
-        ) : null}
+        {isLandingHeader ? <LandingAudienceSelector /> : null}
 
         <div className={controlsClassName}>
           <ThemeToggle
             languageCode={languageCode}
             variant={isHudHeader ? "minimal" : "default"}
           />
+          {isLandingHeader ? (
+            <Link
+              aria-label="Pricing"
+              className="theme-toggle font-semibold no-underline"
+              href={withUiLanguage("/pricing", languageCode)}
+              title="Pricing"
+            >
+              ?
+            </Link>
+          ) : null}
           <LanguageMenu
             currentHref={currentHref}
             languageCode={languageCode}

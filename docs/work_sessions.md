@@ -93,4 +93,4 @@ Use `OPEN` for the unfinished side of an active session.
 | 2026-05-07 | 09:18 -> 11:56 | 2h38 | A0.3.7 P1.3 | close the 2026-05-07 dashboard-polish session at 01:16, reopen a fresh execution trace, and prepare the public landing page revamp brief |
 | 2026-05-07 | 15:18 -> 17:36 | 2h18 | A0.3.7 P1.3 | close the public landing brief-prep session at 11:56, reopen a fresh execution trace, and revamp the public landing page from the identity-aware brief |
 | 2026-05-07 | 20:43 -> 20:57 | 0h14 | A0.3.7 P1.3 | reopen a fresh execution trace and standardize landing feature sections around a large GIF plus three cards for Parent and Tutor views |
-| 2026-05-08 | 11:05 -> OPEN | OPEN | A0.3.7 | correct the 2026-05-07 landing session timeline and reopen the current execution trace |
+| 2026-05-08 | 11:05 -> OPEN | OPEN | A0.3.7 P1.3 | correct the 2026-05-07 landing session timeline, reopen the current execution trace, and move the landing identity selector into the navbar with a compact pricing shortcut |

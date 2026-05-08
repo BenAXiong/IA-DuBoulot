@@ -321,3 +321,4 @@ then close it as:
 | 2026-05-07 | 20:43 -> 20:43 | 0h00 | A0.3.7 P1.3 | close the landing revamp work session at 17:36 and reopen a fresh execution trace | | |
 | 2026-05-07 | 20:49 -> 20:57 | 0h08 | P1.3 | standardize landing feature sections around a large GIF plus three cards and adapt Parent/Tutor views | | |
 | 2026-05-08 | 11:05 -> 11:05 | 0h00 | A0.3.7 | correct the 2026-05-07 landing session timeline and reopen the current execution trace | | |
+| 2026-05-08 | 11:08 -> 11:19 | 0h11 | P1.3 | move the landing identity selector into the navbar, add a compact pricing help button, and explain the hero workspace placeholder | | |

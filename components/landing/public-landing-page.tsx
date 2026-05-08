@@ -2,11 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import {
+  type LandingAudience,
+  useLandingAudience,
+} from "@/components/landing/landing-audience-store";
 import type { UiLanguageCode } from "@/lib/server/auth/types";
 import { withUiLanguage } from "@/lib/i18n/ui-language";
-
-type Audience = "student" | "parent" | "tutor";
 
 type CardCopy = {
   body: string;
@@ -30,7 +31,7 @@ type HeroCopy = {
   eyebrow: string;
   overlayBody?: string[];
   overlayTitle?: string;
-  role: Audience;
+  role: LandingAudience;
   title: string;
 };
 
@@ -41,7 +42,7 @@ type LandingFeatureSectionData = {
   title: string;
 };
 
-const heroCopy: Record<Audience, HeroCopy> = {
+const heroCopy: Record<LandingAudience, HeroCopy> = {
   student: {
     body: "Get step-by-step help with your homework, drill for exams, and explore the topics you like. banban's BigBrain keeps track of what needs strengthening, then prepares practice around the hard parts.",
     cta: "Sign up for free",
@@ -76,12 +77,6 @@ const heroCopy: Record<Audience, HeroCopy> = {
     title: "Know what your student struggled with before the session starts.",
   },
 };
-
-const audienceLabels: Array<{ label: string; value: Audience }> = [
-  { label: "Student", value: "student" },
-  { label: "Parent", value: "parent" },
-  { label: "Tutor", value: "tutor" },
-];
 
 const parentFeatureSections: LandingFeatureSectionData[] = [
   {
@@ -167,7 +162,10 @@ const parentFeatureSections: LandingFeatureSectionData[] = [
   },
 ];
 
-function authHrefForAudience(audience: Audience, languageCode: UiLanguageCode) {
+function authHrefForAudience(
+  audience: LandingAudience,
+  languageCode: UiLanguageCode,
+) {
   if (audience === "parent") {
     return withUiLanguage(
       "/auth?mode=sign_up&role=parent&intent=parent_link",
@@ -279,7 +277,7 @@ function OversightDetails({ copy }: { copy: HeroCopy }) {
   );
 }
 
-function HeroVisual({ audience }: { audience: Audience }) {
+function HeroVisual({ audience }: { audience: LandingAudience }) {
   const rows =
     audience === "student"
       ? ["Photo of homework", "Step-by-step hint", "Targeted practice"]
@@ -381,37 +379,19 @@ export function PublicLandingPage({
   languageCode,
   tutorPlaceholder,
 }: PublicLandingPageProps) {
-  const [audience, setAudience] = useState<Audience>("parent");
+  const audience = useLandingAudience();
   const selectedCopy = heroCopy[audience];
   const ctaHref = authHrefForAudience(audience, languageCode);
 
   return (
-    <main className="px-5 pb-16 pt-28 sm:px-8 lg:px-12">
+    <main className="px-5 pb-16 pt-56 sm:px-8 sm:pt-28 lg:px-12">
       <div className="mx-auto grid max-w-[92rem] gap-16 sm:gap-20">
         <section
           className="grid items-center gap-10 py-8 sm:py-10 lg:grid-cols-[minmax(0,0.96fr)_minmax(24rem,0.84fr)] lg:py-12"
           id="hero"
         >
           <div>
-            <div className="inline-flex rounded-full border border-[color:var(--line)] bg-[color:var(--surface-muted)] p-1">
-              {audienceLabels.map((item) => (
-                <button
-                  aria-pressed={audience === item.value}
-                  className={`min-h-10 rounded-full px-4 text-sm font-semibold transition ${
-                    audience === item.value
-                      ? "bg-[color:var(--surface-raised)] text-[color:var(--foreground)] shadow-[var(--shadow-soft)]"
-                      : "text-[color:var(--ink-soft)] hover:text-[color:var(--foreground)]"
-                  }`}
-                  key={item.value}
-                  onClick={() => setAudience(item.value)}
-                  type="button"
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-
-            <p className="mt-8 text-sm font-semibold uppercase tracking-[0.22em] text-[color:var(--ink-muted)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[color:var(--ink-muted)]">
               {selectedCopy.eyebrow}
             </p>
             <h1 className="mt-4 max-w-5xl font-[family-name:var(--font-heading)] text-5xl leading-[0.96] sm:text-6xl lg:text-[5.25rem]">
