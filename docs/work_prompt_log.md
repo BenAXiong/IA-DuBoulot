@@ -325,3 +325,4 @@ then close it as:
 | 2026-05-08 | 14:33 -> 14:33 | 0h00 | A0.3.7 | close the 2026-05-08 landing-navbar session at 11:19 and reopen the current execution trace | | |
 | 2026-05-08 | 15:51 -> 16:01 | 0h10 | P1.3 | remove the landing hero workspace card, convert oversight copy to an overlay, remove hero sign-in, and turn the `?` pricing shortcut into a menu | | |
 | 2026-05-08 | 16:14 -> 16:18 | 0h04 | P1.3 | center the landing hero, remove hero eyebrow text, hide feature subtitles, and alternate feature media-card order | | |
+| 2026-05-08 | 16:22 -> 16:23 | 0h01 | P1.3 | keep landing GIFs on the two-thirds width track even when feature order alternates | | |

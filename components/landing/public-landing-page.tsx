@@ -231,7 +231,13 @@ function LandingFeatureSection({
           {title}
         </h2>
       </div>
-      <div className="grid items-stretch gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(19rem,1fr)]">
+      <div
+        className={`grid items-stretch gap-5 ${
+          reverse
+            ? "lg:grid-cols-[minmax(19rem,1fr)_minmax(0,2fr)]"
+            : "lg:grid-cols-[minmax(0,2fr)_minmax(19rem,1fr)]"
+        }`}
+      >
         <MediaFrame
           alt={title}
           className={`lg:min-h-[31rem] ${reverse ? "lg:order-2" : ""}`}
