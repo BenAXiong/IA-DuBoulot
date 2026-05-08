@@ -322,3 +322,4 @@ then close it as:
 | 2026-05-07 | 20:49 -> 20:57 | 0h08 | P1.3 | standardize landing feature sections around a large GIF plus three cards and adapt Parent/Tutor views | | |
 | 2026-05-08 | 11:05 -> 11:05 | 0h00 | A0.3.7 | correct the 2026-05-07 landing session timeline and reopen the current execution trace | | |
 | 2026-05-08 | 11:08 -> 11:19 | 0h11 | P1.3 | move the landing identity selector into the navbar, add a compact pricing help button, and explain the hero workspace placeholder | | |
+| 2026-05-08 | 14:33 -> 14:33 | 0h00 | A0.3.7 | close the 2026-05-08 landing-navbar session at 11:19 and reopen the current execution trace | | |
