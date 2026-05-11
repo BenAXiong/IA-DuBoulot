@@ -54,6 +54,7 @@ Rules:
 - parent and tutor oversight links now sit inline at the end of the hero subtitle and open a large backdrop overlay that closes on outside click instead of using an in-page accordion.
 - the landing hero is centered and no longer renders the role eyebrow above the headline.
 - identity-specific landing feature sections now share the same default structure: centered section title, a large GIF/demo frame taking roughly two-thirds of the desktop row, and three adjacent feature cards taking the remaining third. The description stays in the section data for docs/copy context but is not rendered as a visible subtitle. Parent and Tutor use that template now; future Student copy should use the same section shape unless the landing brief changes.
+- the first Parent feature is an explicit exception from that default template: it uses a full-width centered title, two side-by-side comparison cards for generic AI versus banban, and a full-width demo GIF below them.
 - landing feature sections alternate GIF/cards order on desktop so the media and copy rhythm does not become repetitive.
 - the shared primary CTA now uses a slow background-position drift, so motion stays at the token layer instead of becoming page-local decoration
 - the auth route now uses a compact viewport-fit layout with a mini HUD-style header, a single centered auth card, and a stable-width segmented `Sign in` or `New user` switch as the first visible block; any explanatory copy above the toggle should stay absent unless real testing shows it is needed

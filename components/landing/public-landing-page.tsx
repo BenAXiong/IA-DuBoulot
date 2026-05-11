@@ -42,6 +42,11 @@ type LandingFeatureSectionData = {
   title: string;
 };
 
+type ComparisonCardCopy = {
+  items: string[];
+  title: string;
+};
+
 const heroCopy: Record<LandingAudience, HeroCopy> = {
   student: {
     body: "Get step-by-step help with your homework, drill for exams, and explore the topics you like. banban's BigBrain keeps track of what needs strengthening, then prepares practice around the hard parts.",
@@ -77,25 +82,12 @@ const heroCopy: Record<LandingAudience, HeroCopy> = {
 
 const parentFeatureSections: LandingFeatureSectionData[] = [
   {
-    cards: [
-      {
-        body: "The learner uploads exercises, the AI answers diligently, and finished homework can hide whether the idea was understood.",
-        title: "When AI becomes a shortcut.",
-      },
-      {
-        body: "banban guides the student through steps, gives hints before answers, and makes weak spots visible enough to practice.",
-        title: "When AI becomes a coach.",
-      },
-      {
-        body: "Parents get a clearer view of struggles and next steps without hovering over every message or taking the work over.",
-        title: "What changes for adults.",
-      },
-    ],
+    cards: [],
     description:
       "A side-by-side comparison of generic AI help and banban's coaching frame: same homework, very different learning outcome.",
     media: "/landing/abstract-flow-1.gif",
     title:
-      "AI should not replace the learner's thinking. It should help them build it.",
+      "AI should not replace the learner's thinking.\nIt should help them build it.",
   },
   {
     cards: [
@@ -159,6 +151,27 @@ const parentFeatureSections: LandingFeatureSectionData[] = [
   },
 ];
 
+const parentComparisonCards: ComparisonCardCopy[] = [
+  {
+    items: [
+      "The learner uploads exercises and the AI answers diligently.",
+      "The learner copies the answer while mistakes stay hidden.",
+      "The parent sees finished homework, not understanding.",
+      "The learner becomes more dependent over time.",
+    ],
+    title: "When AI becomes a shortcut",
+  },
+  {
+    items: [
+      "The student is guided through steps, with hints before answers.",
+      "Weak spots become visible and targetable.",
+      "Practice adapts to the learner instead of repeating the same worksheet.",
+      "Adults can follow progress without hovering.",
+    ],
+    title: "When AI becomes a coach",
+  },
+];
+
 function authHrefForAudience(
   audience: LandingAudience,
   languageCode: UiLanguageCode,
@@ -189,6 +202,27 @@ function FeatureCard({ body, title }: CardCopy) {
       <p className="mt-3 text-sm leading-6 text-[color:var(--ink-soft)]">
         {body}
       </p>
+    </article>
+  );
+}
+
+function ComparisonCard({ items, title }: ComparisonCardCopy) {
+  return (
+    <article className="shell-card page-glow h-full rounded-[1.35rem] p-5 sm:p-6">
+      <h3 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
+        {title}
+      </h3>
+      <ul className="mt-5 grid gap-3 text-sm leading-6 text-[color:var(--ink-soft)]">
+        {items.map((item) => (
+          <li className="flex gap-3" key={item}>
+            <span
+              aria-hidden="true"
+              className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--accent)]"
+            />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
     </article>
   );
 }
@@ -227,7 +261,7 @@ function LandingFeatureSection({
   return (
     <section className="grid gap-6">
       <div className="mx-auto max-w-5xl text-center">
-        <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight sm:text-4xl">
+        <h2 className="whitespace-pre-line font-[family-name:var(--font-heading)] text-3xl leading-tight sm:text-4xl">
           {title}
         </h2>
       </div>
@@ -357,9 +391,29 @@ function HeroSubtitle({
 }
 
 function ParentFeatures() {
+  const [comparisonFeature, ...standardFeatures] = parentFeatureSections;
+
   return (
     <div id="for-parents" className="grid gap-16 sm:gap-20">
-      {parentFeatureSections.map((section, index) => (
+      <section className="grid gap-6">
+        <div className="mx-auto max-w-5xl text-center">
+          <h2 className="whitespace-pre-line font-[family-name:var(--font-heading)] text-3xl leading-tight sm:text-4xl">
+            {comparisonFeature.title}
+          </h2>
+        </div>
+        <div className="grid gap-5 lg:grid-cols-2">
+          {parentComparisonCards.map((card) => (
+            <ComparisonCard key={card.title} {...card} />
+          ))}
+        </div>
+        <MediaFrame
+          alt={comparisonFeature.description}
+          className="lg:min-h-[31rem]"
+          src={comparisonFeature.media}
+        />
+      </section>
+
+      {standardFeatures.map((section, index) => (
         <LandingFeatureSection
           key={section.title}
           reverse={index % 2 === 1}
