@@ -27,6 +27,7 @@ type ProfileErrorPayload = {
 
 type AccountSettingsFormProps = {
   appUser: AppUserRecord;
+  email?: string | null;
 };
 
 function getFieldError(
@@ -36,9 +37,35 @@ function getFieldError(
   return fieldErrors[fieldName] ?? null;
 }
 
-export function AccountSettingsForm({ appUser }: AccountSettingsFormProps) {
+function getAccountEmailCopy(
+  languageCode: AppUserRecord["preferred_ui_language"],
+) {
+  switch (languageCode) {
+    case "en":
+      return {
+        label: "Email address",
+        unavailable: "Email address unavailable",
+      };
+    case "zh":
+      return {
+        label: "電子郵件地址",
+        unavailable: "無法顯示電子郵件地址",
+      };
+    default:
+      return {
+        label: "Adresse e-mail",
+        unavailable: "Adresse e-mail indisponible",
+      };
+  }
+}
+
+export function AccountSettingsForm({
+  appUser,
+  email = null,
+}: AccountSettingsFormProps) {
   const router = useRouter();
   const copy = getAccountSettingsFormCopy(appUser.preferred_ui_language);
+  const emailCopy = getAccountEmailCopy(appUser.preferred_ui_language);
   const [displayName, setDisplayName] = useState(appUser.display_name);
   const [preferredUiLanguage, setPreferredUiLanguage] = useState(
     appUser.preferred_ui_language,
@@ -119,6 +146,15 @@ export function AccountSettingsForm({ appUser }: AccountSettingsFormProps) {
           value={displayName}
         />
       </FormField>
+
+      <div className="grid gap-1.5">
+        <p className="text-sm font-medium text-[color:var(--foreground)]">
+          {emailCopy.label}
+        </p>
+        <p className="min-h-11 rounded-[1rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-3 py-2.5 text-sm leading-6 text-[color:var(--ink-soft)]">
+          {email ?? emailCopy.unavailable}
+        </p>
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <FormField

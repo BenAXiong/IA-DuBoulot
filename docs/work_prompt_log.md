@@ -328,3 +328,16 @@ then close it as:
 | 2026-05-08 | 16:22 -> 16:23 | 0h01 | P1.3 | keep landing GIFs on the two-thirds width track even when feature order alternates | | |
 | 2026-05-11 | 10:40 -> 10:40 | 0h00 | A0.3.7 | cancel the mistaken 2026-05-10 reopen and open the current execution trace | | |
 | 2026-05-11 | 11:03 -> 11:11 | 0h08 | P1.3 | implement the documented special comparison layout for the first Parent landing feature | | |
+| 2026-05-11 | 11:19 -> 11:26 | 0h07 | P1.3 | hide the Student landing bottom CTA, disable Tutor selection with tooltip/toast, and widen landing side padding | | |
+| 2026-05-11 | 11:33 -> 11:37 | 0h04 | P1.3 | keep the Tutor-unavailable toast out of header layout and double the landing viewport side padding | | |
+| 2026-05-11 | 11:38 -> 11:48 | 0h10 | P1.3 | use a dashboard image for Parent landing feature 2 and limit doubled landing side padding to desktop | | |
+| 2026-05-11 | 12:26 -> 12:34 | 0h08 | P1.3 | align the pricing page with the landing shell and fix the landing help dropdown placement | | |
+| 2026-05-11 | 12:58 -> 13:02 | 0h04 | P1.3 | use a conversation workspace image for Parent landing features 3 and 4 and make the help menu hover-centered | | |
+| 2026-05-11 | 13:14 -> 13:19 | 0h05 | P1.3 | convert pricing into identity-specific plan cards with yearly default and per-card account CTAs | | |
+| 2026-05-11 | 13:21 -> 13:23 | 0h02 | P1.3 | disable the Tutor selector on pricing so future tutor cards cannot be displayed yet | | |
+| 2026-05-11 | 13:25 -> 13:29 | 0h04 | P1.3 | refine pricing CTAs, paid-plan perk rows, and inline billing toggle placement | | |
+| 2026-05-11 | 13:31 -> 13:33 | 0h02 | P1.3 | align pricing-card rows and prevent the billing toggle from changing row height | | |
+| 2026-05-11 | 13:38 -> 13:43 | 0h05 | P1.3 | translate and wire the current public landing interface into French and Chinese | | |
+| 2026-05-11 | 15:51 -> 16:18 | 0h27 | P1.3 | align student workspace headers, revise dashboard layout, and assess the next-challenge feature | | |
+| 2026-05-11 | 16:19 -> 16:23 | 0h04 | P1.3 | show the signed-in email address on profile/settings surfaces | | |
+| 2026-05-11 | 16:24 -> 16:27 | 0h03 | P1.3 P2.4 | rename and log the Level up! cross-subject practice idea, then build-test and push | | |

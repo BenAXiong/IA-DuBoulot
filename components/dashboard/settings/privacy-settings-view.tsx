@@ -10,6 +10,7 @@ import type { PrivacySettingsSnapshot } from "@/lib/server/privacy/types";
 
 type PrivacySettingsViewProps = {
   appUser: AppUserRecord;
+  email: string | null;
   snapshot: PrivacySettingsSnapshot;
 };
 
@@ -90,6 +91,7 @@ function getMinimalSettingsCopy(
 
 export function PrivacySettingsView({
   appUser,
+  email,
   snapshot,
 }: PrivacySettingsViewProps) {
   const languageCode = appUser.preferred_ui_language;
@@ -131,7 +133,7 @@ export function PrivacySettingsView({
           </div>
         ) : (
           <div className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5">
-            <AccountSettingsForm appUser={appUser} />
+            <AccountSettingsForm appUser={appUser} email={email} />
           </div>
         )}
       </section>

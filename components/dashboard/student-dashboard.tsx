@@ -52,6 +52,12 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         exploreTitle: "Explore",
         exploreBody:
           "Follow interesting ideas beyond the assignment and connect them to what you already know.",
+        levelUpTitle: "Level up!",
+        levelUpBody:
+          "A short practice set will appear here when banban has enough recent work to spot what needs reinforcing next.",
+        levelUpSignal: "Across all subjects",
+        levelUpDetail:
+          "Built from recent mistakes and patterns that keep coming back.",
         comingSoon: "Coming soon",
         needsAttention: "Open learner settings",
         subjectResourceUploadQuotaReached:
@@ -80,6 +86,11 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
           "用有針對性的題目練習，找出不穩的地方，準備更踏實。",
         exploreTitle: "探索",
         exploreBody: "延伸探索你感興趣的主題，並連回已經學過的內容。",
+        levelUpTitle: "Level up!",
+        levelUpBody:
+          "當 banban 有足夠的近期練習可以判斷需要加強的地方時，這裡會出現一組短練習。",
+        levelUpSignal: "所有科目一起看",
+        levelUpDetail: "根據最近的錯誤和反覆出現的薄弱點建立。",
         comingSoon: "即將推出",
         needsAttention: "打開設定",
         subjectResourceUploadQuotaReached: "這個帳號的上傳額度已達上限。",
@@ -109,6 +120,12 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
         exploreTitle: "Explorer",
         exploreBody:
           "Approfondis les sujets qui t'intéressent et relie-les à ce que tu sais déjà.",
+        levelUpTitle: "Level up!",
+        levelUpBody:
+          "Une courte série d'entraînement apparaîtra ici quand banban aura assez de devoirs récents pour repérer ce qu'il faut renforcer.",
+        levelUpSignal: "Toutes matières confondues",
+        levelUpDetail:
+          "Construit à partir des erreurs récentes et des fragilités qui reviennent.",
         comingSoon: "Bientôt",
         needsAttention: "Ouvrir les réglages",
         subjectResourceUploadQuotaReached:
@@ -303,10 +320,10 @@ function DashboardHomeworkCard({
         <p className="text-sm leading-6 text-[color:var(--ink-soft)]">{body}</p>
       </Link>
 
-      <div className="grid max-w-full grid-flow-col grid-rows-3 justify-end gap-2 overflow-x-auto">
+      <div className="flex max-w-full flex-wrap justify-end gap-2">
         {subjects.map((subject) => (
           <Link
-            className="inline-flex min-h-9 items-center justify-center whitespace-nowrap rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-3 text-sm font-medium text-[color:var(--foreground)] transition hover:border-[color:var(--accent)] hover:text-[color:var(--accent)]"
+            className="inline-flex min-h-9 min-w-[7.5rem] flex-[1_1_7.5rem] items-center justify-center whitespace-nowrap rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-3 text-sm font-medium text-[color:var(--foreground)] transition hover:border-[color:var(--accent)] hover:text-[color:var(--accent)] sm:max-w-[12rem]"
             href={`/app?view=homework&subject=${encodeURIComponent(subject.subjectTag)}`}
             key={subject.subjectTag}
           >
@@ -315,6 +332,50 @@ function DashboardHomeworkCard({
         ))}
       </div>
     </section>
+  );
+}
+
+function DashboardLevelUpCard({
+  title,
+  body,
+  signal,
+  detail,
+  badge,
+}: {
+  title: string;
+  body: string;
+  signal: string;
+  detail: string;
+  badge: string;
+}) {
+  return (
+    <article className="grid gap-4 rounded-[1rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-4 sm:grid-cols-[minmax(0,1fr)_minmax(15rem,0.42fr)] sm:items-center">
+      <div className="grid gap-3">
+        <div className="flex items-center gap-3">
+          <DashboardIconFrame>
+            <TestIcon />
+          </DashboardIconFrame>
+          <div className="min-w-0">
+            <p className="text-xs font-medium uppercase tracking-[0.16em] text-[color:var(--ink-muted)]">
+              {signal}
+            </p>
+            <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
+              {title}
+            </h2>
+          </div>
+        </div>
+        <p className="text-sm leading-6 text-[color:var(--ink-soft)]">{body}</p>
+      </div>
+
+      <div className="grid gap-3 rounded-[0.9rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-3">
+        <span className="w-fit rounded-full border border-[color:var(--line)] px-2.5 py-1 text-xs font-medium text-[color:var(--ink-soft)]">
+          {badge}
+        </span>
+        <p className="text-sm leading-6 text-[color:var(--foreground)]">
+          {detail}
+        </p>
+      </div>
+    </article>
   );
 }
 
@@ -438,7 +499,7 @@ export async function StudentDashboard({
               subjects={dashboardCardSubjects}
               title={copy.homeworkCardTitle}
             />
-            <div className="grid gap-3 md:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <DashboardActivityCard
                 badge={copy.comingSoon}
                 body={copy.mapsBody}
@@ -464,10 +525,17 @@ export async function StudentDashboard({
                 title={copy.exploreTitle}
               />
             </div>
+            <DashboardLevelUpCard
+              badge={copy.comingSoon}
+              body={copy.levelUpBody}
+              detail={copy.levelUpDetail}
+              signal={copy.levelUpSignal}
+              title={copy.levelUpTitle}
+            />
           </div>
         </section>
       ) : view === "forward" ? (
-        <section className="mx-auto grid w-full max-w-4xl gap-4 py-10">
+        <section className="mx-auto grid w-full max-w-5xl gap-4 py-10">
           <p className="text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
             {copy.forwardTitle}
           </p>
@@ -479,7 +547,7 @@ export async function StudentDashboard({
           </p>
         </section>
       ) : view === "maps" ? (
-        <section className="mx-auto grid w-full max-w-4xl gap-4 py-10">
+        <section className="mx-auto grid w-full max-w-5xl gap-4 py-10">
           <p className="text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
             {copy.mapsTitle}
           </p>
@@ -491,7 +559,7 @@ export async function StudentDashboard({
           </p>
         </section>
       ) : view === "tests" ? (
-        <section className="mx-auto grid w-full max-w-4xl gap-4 py-10">
+        <section className="mx-auto grid w-full max-w-5xl gap-4 py-10">
           <p className="text-sm uppercase tracking-[0.22em] text-[color:var(--ink-soft)]">
             {copy.testsTitle}
           </p>

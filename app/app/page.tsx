@@ -162,7 +162,7 @@ export default async function AppHomePage({
           </article>
 
           <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5">
-            <AccountSettingsForm appUser={appUser} />
+            <AccountSettingsForm appUser={appUser} email={context.email} />
           </article>
         </section>
       ) : null}

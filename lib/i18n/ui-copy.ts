@@ -603,105 +603,450 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
 export function getPricingPageCopy(languageCode: UiLanguageCode) {
   return pickLocalizedValue(languageCode, {
     fr: {
-      eyebrow: "Tarifs",
-      title: "Une tarification simple pour commencer avec les premières familles.",
-      body:
-        "banban avance par étapes. Les accès sont encore resserrés, mais la structure de prix prépare déjà le passage du pilot à un service familial plus large.",
-      posture: {
-        title: "Pendant le pilot",
-        body: "L'accès se fait encore sur invitation ou validation, avec un accompagnement plus direct pendant les premiers usages.",
+      audienceLabels: {
+        student: "Élève",
+        parent: "Parent",
+        tutor: "Tuteur",
       },
-      tiers: [
-        {
-          name: "Pilot",
-          price: "Gratuit / sur invitation",
-          body: "Pour les premières familles et les premiers retours, avec un cadre serré et un suivi proche.",
-          points: ["Accès sur invitation", "Parcours parent, élève et tuteur", "Essai encadré"],
+      billingToggle: {
+        monthly: "Mensuel",
+        yearly: "Annuel",
+      },
+      explorerPerksLabel: "Tous les avantages Explorer, plus :",
+      audiences: {
+        student: {
+          plans: [
+            {
+              name: "Explorer",
+              price: "Gratuit",
+              body: "Pour tester banban sur de vrais devoirs et découvrir les modes d'apprentissage.",
+              cta: "Créer un compte Explorer",
+              points: [
+                "Aide pas à pas aux devoirs",
+                "Indices avant réponses",
+                "Historique récent",
+                "Espace de travail organisé par matière",
+                "Ressources de matière pour relier cours et exercices",
+                "Résumés utiles pour revoir les blocages",
+                "Premiers entraînements ciblés",
+                "Modes Récap, Tests, Poursuivre et Explorer selon disponibilité",
+              ],
+            },
+            {
+              name: "Conqueror",
+              price: "Accès annuel",
+              monthlyPrice: "Mensuel",
+              yearlyPrice: "Annuel",
+              body: "Pour travailler plus souvent, garder plus de contexte et viser les points faibles.",
+              cta: "Créer un compte Conqueror",
+              includesExplorerPerks: true,
+              points: [
+                "Plus de sessions et de documents",
+                "Suivi plus durable des difficultés",
+                "Préparation aux tests",
+                "Meilleure continuité entre les matières",
+              ],
+            },
+            {
+              name: "Lifetime",
+              price: "Accès à vie",
+              body: "Pour garder banban comme compagnon d'apprentissage sur le long terme.",
+              cta: "Créer un compte Lifetime",
+              includesExplorerPerks: true,
+              points: [
+                "Accès durable",
+                "Mémoire d'apprentissage étendue",
+                "Parcours de révision au long cours",
+                "Fonctions futures incluses selon disponibilité",
+              ],
+            },
+          ],
         },
-        {
-          name: "Family",
-          price: "Bientôt",
-          body: "Le futur abonnement familial regroupera l'accompagnement élève, la visibilité parent et la continuité dans le temps.",
-          points: ["Compte parent payeur", "Historique et supervision", "Gestion d'abonnement"],
+        parent: {
+          plans: [
+            {
+              name: "Explorer",
+              price: "Gratuit",
+              body: "Pour essayer banban avec un enfant et voir si l'approche convient.",
+              cta: "Créer un compte Explorer",
+              points: [
+                "Création ou liaison d'un compte élève",
+                "Aide aux devoirs guidée",
+                "Premiers résumés utiles",
+                "Visibilité parent sur les progrès essentiels",
+                "Ressources de matière pour relier cours et exercices",
+                "Premiers entraînements ciblés",
+                "Modes Récap, Tests, Poursuivre et Explorer selon disponibilité",
+              ],
+            },
+            {
+              name: "Conqueror",
+              price: "Accès annuel",
+              monthlyPrice: "Mensuel",
+              yearlyPrice: "Annuel",
+              body: "Pour accompagner l'élève plus régulièrement avec davantage de suivi parent.",
+              cta: "Créer un compte Conqueror",
+              includesExplorerPerks: true,
+              points: [
+                "Accès Family géré par le parent",
+                "Plus de documents et de sessions",
+                "Résumés et signaux de progression",
+                "Meilleure continuité dans le temps",
+              ],
+            },
+            {
+              name: "Lifetime",
+              price: "Accès à vie",
+              body: "Pour les familles qui veulent conserver banban comme appui durable.",
+              cta: "Créer un compte Lifetime",
+              includesExplorerPerks: true,
+              points: [
+                "Accès long terme",
+                "Supervision familiale étendue",
+                "Mémoire pédagogique plus durable",
+                "Fonctions futures incluses selon disponibilité",
+              ],
+            },
+          ],
         },
-        {
-          name: "Tutor",
-          price: "Inclus selon le cadre",
-          body: "Le suivi tuteur reste centré sur l'élève déjà lié, pour prolonger un accompagnement existant.",
-          points: ["Lien sécurisé", "Accès restreint par rôle", "Suivi pédagogique ciblé"],
+        tutor: {
+          plans: [
+            {
+              name: "Free",
+              price: "En préparation",
+              body: "Pour découvrir les futurs outils tuteur dès qu'ils seront ouverts.",
+              cta: "Créer un compte Free",
+              disabled: true,
+              points: [
+                "Vue tuteur liée à l'élève",
+                "Contexte récent des devoirs",
+                "Préparation de séance",
+              ],
+            },
+            {
+              name: "Herder",
+              price: "En préparation",
+              body: "Pour suivre plusieurs élèves et garder les priorités visibles.",
+              cta: "Créer un compte Herder",
+              disabled: true,
+              points: [
+                "Suivi de plusieurs élèves",
+                "Points faibles visibles",
+                "Notes et préparation structurées",
+              ],
+            },
+            {
+              name: "Guru",
+              price: "En préparation",
+              body: "Pour un accompagnement tuteur plus avancé quand la surface sera prête.",
+              cta: "Créer un compte Guru",
+              disabled: true,
+              points: [
+                "Tableau tuteur avancé",
+                "Analyse plus fine des progrès",
+                "Outils de suivi à venir",
+              ],
+            },
+          ],
         },
-      ],
-      ctas: {
-        auth: "Commencer",
-        back: "Retour produit",
       },
     },
     en: {
-      eyebrow: "Pricing",
-      title: "Simple pricing for the first families using banban.",
-      body:
-        "banban is still opening in stages. Access is intentionally controlled for now, but the pricing structure already points toward a broader family service.",
-      posture: {
-        title: "During the pilot",
-        body: "Access still runs through invitations or approvals, with closer follow-up during the first real use.",
+      audienceLabels: {
+        student: "Student",
+        parent: "Parent",
+        tutor: "Tutor",
       },
-      tiers: [
-        {
-          name: "Pilot",
-          price: "Free / invite",
-          body: "For the first families and early feedback, with a tighter frame and close support.",
-          points: ["Invite-only access", "Student, parent, and tutor flows", "Guided trial limits"],
+      billingToggle: {
+        monthly: "Monthly",
+        yearly: "Yearly",
+      },
+      explorerPerksLabel: "All Explorer perks, plus:",
+      audiences: {
+        student: {
+          plans: [
+            {
+              name: "Explorer",
+              price: "Free",
+              body: "For trying banban on real homework and discovering the learning modes.",
+              cta: "Create an Explorer account",
+              points: [
+                "Step-by-step homework help",
+                "Hints before answers",
+                "Recent history",
+                "Workspace organized by subject",
+                "Subject resources that connect courses and exercises",
+                "Useful summaries around recent sticking points",
+                "First targeted practice sessions",
+                "Recap, Tests, Forward, and Explore modes as available",
+              ],
+            },
+            {
+              name: "Conqueror",
+              price: "Yearly access",
+              monthlyPrice: "Monthly",
+              yearlyPrice: "Yearly",
+              body: "For working more often, keeping more context, and targeting weak points.",
+              cta: "Create a Conqueror account",
+              includesExplorerPerks: true,
+              points: [
+                "More sessions and documents",
+                "Longer-term weak-point tracking",
+                "Test practice support",
+                "Better continuity across subjects",
+              ],
+            },
+            {
+              name: "Lifetime",
+              price: "Lifetime access",
+              body: "For keeping banban as a long-term learning companion.",
+              cta: "Create a Lifetime account",
+              includesExplorerPerks: true,
+              points: [
+                "Durable access",
+                "Expanded learning memory",
+                "Long-run revision paths",
+                "Future features included as available",
+              ],
+            },
+          ],
         },
-        {
-          name: "Family",
-          price: "Coming soon",
-          body: "The future family plan will bundle student guidance, parent visibility, and longer-term follow-through.",
-          points: ["Parent payer account", "History and oversight", "Subscription management"],
+        parent: {
+          plans: [
+            {
+              name: "Explorer",
+              price: "Free",
+              body: "For trying banban with one learner and checking whether the approach fits.",
+              cta: "Create an Explorer account",
+              points: [
+                "Create or link a student account",
+                "Guided homework support",
+                "First useful summaries",
+                "Parent visibility on essential progress",
+                "Subject resources that connect courses and exercises",
+                "First targeted practice sessions",
+                "Recap, Tests, Forward, and Explore modes as available",
+              ],
+            },
+            {
+              name: "Conqueror",
+              price: "Yearly access",
+              monthlyPrice: "Monthly",
+              yearlyPrice: "Yearly",
+              body: "For supporting the learner more regularly with stronger parent follow-through.",
+              cta: "Create a Conqueror account",
+              includesExplorerPerks: true,
+              points: [
+                "Parent-managed Family access",
+                "More documents and sessions",
+                "Progress summaries and signals",
+                "Better continuity over time",
+              ],
+            },
+            {
+              name: "Lifetime",
+              price: "Lifetime access",
+              body: "For families who want banban as a durable learning support.",
+              cta: "Create a Lifetime account",
+              includesExplorerPerks: true,
+              points: [
+                "Long-term access",
+                "Expanded family oversight",
+                "More durable pedagogical memory",
+                "Future features included as available",
+              ],
+            },
+          ],
         },
-        {
-          name: "Tutor",
-          price: "Included when relevant",
-          body: "Tutor access stays focused on already linked students, so support can continue without rebuilding context.",
-          points: ["Secure link", "Role-restricted access", "Focused pedagogical follow-up"],
+        tutor: {
+          plans: [
+            {
+              name: "Free",
+              price: "In preparation",
+              body: "For discovering tutor tools when they open.",
+              cta: "Create a Free account",
+              disabled: true,
+              points: [
+                "Linked learner view",
+                "Recent homework context",
+                "Session preparation",
+              ],
+            },
+            {
+              name: "Herder",
+              price: "In preparation",
+              body: "For following several learners and keeping priorities visible.",
+              cta: "Create a Herder account",
+              disabled: true,
+              points: [
+                "Multiple learner follow-up",
+                "Visible sticking points",
+                "Structured notes and preparation",
+              ],
+            },
+            {
+              name: "Guru",
+              price: "In preparation",
+              body: "For deeper tutor workflows when the surface is ready.",
+              cta: "Create a Guru account",
+              disabled: true,
+              points: [
+                "Advanced tutor dashboard",
+                "Richer progress analysis",
+                "More follow-up tools to come",
+              ],
+            },
+          ],
         },
-      ],
-      ctas: {
-        auth: "Get started",
-        back: "Back to product",
       },
     },
     zh: {
-      eyebrow: "方案",
-      title: "為最早使用 banban 的家庭準備的簡單方案。",
-      body:
-        "banban 仍在分階段開放。現在的存取方式仍然較保守，但方案結構已經朝更完整的家庭服務前進。",
-      posture: {
-        title: "Pilot 期間",
-        body: "目前仍以邀請或核准為主，並在第一批真實使用時保留更密切的跟進。",
+      audienceLabels: {
+        student: "學生",
+        parent: "家長",
+        tutor: "家教",
       },
-      tiers: [
-        {
-          name: "Pilot",
-          price: "免費 / 邀請制",
-          body: "提供給第一批家庭與早期回饋，框架更緊，支援也更近。",
-          points: ["邀請制存取", "學生、家長與家教流程", "受引導的試用額度"],
+      billingToggle: {
+        monthly: "月繳",
+        yearly: "年繳",
+      },
+      explorerPerksLabel: "包含所有 Explorer 權益，另外：",
+      audiences: {
+        student: {
+          plans: [
+            {
+              name: "Explorer",
+              price: "免費",
+              body: "用真實作業試用 banban，並探索不同學習模式。",
+              cta: "建立 Explorer 帳號",
+              points: [
+                "作業逐步引導",
+                "先給提示再給答案",
+                "近期紀錄",
+                "依科目整理的工作區",
+                "連結課程與練習的科目資源",
+                "針對近期卡關點的摘要",
+                "初步目標練習",
+                "摘要、測驗、預習與探索模式依開放狀態使用",
+              ],
+            },
+            {
+              name: "Conqueror",
+              price: "年度使用",
+              monthlyPrice: "月繳",
+              yearlyPrice: "年繳",
+              body: "適合更常學習、保留更多脈絡，並針對弱點練習。",
+              cta: "建立 Conqueror 帳號",
+              includesExplorerPerks: true,
+              points: [
+                "更多對話與文件",
+                "更長期的弱點追蹤",
+                "測驗練習支援",
+                "跨科目連續性更好",
+              ],
+            },
+            {
+              name: "Lifetime",
+              price: "終身使用",
+              body: "讓 banban 成為長期學習夥伴。",
+              cta: "建立 Lifetime 帳號",
+              includesExplorerPerks: true,
+              points: [
+                "長期使用",
+                "更完整的學習記憶",
+                "長期複習路徑",
+                "未來功能依開放狀態包含",
+              ],
+            },
+          ],
         },
-        {
-          name: "Family",
-          price: "即將推出",
-          body: "未來的家庭方案會整合學生引導、家長可見性，以及更長期的追蹤。",
-          points: ["家長付費帳號", "歷史與監督", "訂閱管理"],
+        parent: {
+          plans: [
+            {
+              name: "Explorer",
+              price: "免費",
+              body: "和一位學生試用 banban，確認這種方式是否適合。",
+              cta: "建立 Explorer 帳號",
+              points: [
+                "建立或連結學生帳號",
+                "作業引導支援",
+                "初步摘要",
+                "家長可見核心進度",
+                "連結課程與練習的科目資源",
+                "初步目標練習",
+                "摘要、測驗、預習與探索模式依開放狀態使用",
+              ],
+            },
+            {
+              name: "Conqueror",
+              price: "年度使用",
+              monthlyPrice: "月繳",
+              yearlyPrice: "年繳",
+              body: "適合更規律地陪伴學生，並取得更完整的家長追蹤。",
+              cta: "建立 Conqueror 帳號",
+              includesExplorerPerks: true,
+              points: [
+                "家長管理 Family 使用權",
+                "更多文件與對話",
+                "進度摘要與訊號",
+                "更好的長期連續性",
+              ],
+            },
+            {
+              name: "Lifetime",
+              price: "終身使用",
+              body: "適合希望讓 banban 成為長期學習支援的家庭。",
+              cta: "建立 Lifetime 帳號",
+              includesExplorerPerks: true,
+              points: [
+                "長期使用",
+                "更完整的家庭監督",
+                "更持久的教學記憶",
+                "未來功能依開放狀態包含",
+              ],
+            },
+          ],
         },
-        {
-          name: "Tutor",
-          price: "依情境包含",
-          body: "家教權限仍聚焦在已連結的學生，讓教學支援可以直接延續。",
-          points: ["安全連結", "角色限制存取", "聚焦式教學追蹤"],
+        tutor: {
+          plans: [
+            {
+              name: "Free",
+              price: "準備中",
+              body: "家教工具開放後可先試用。",
+              cta: "建立 Free 帳號",
+              disabled: true,
+              points: [
+                "連結學生視圖",
+                "近期作業脈絡",
+                "備課支援",
+              ],
+            },
+            {
+              name: "Herder",
+              price: "準備中",
+              body: "適合追蹤多位學生並保持優先事項清楚。",
+              cta: "建立 Herder 帳號",
+              disabled: true,
+              points: [
+                "多位學生追蹤",
+                "可見的卡關點",
+                "結構化筆記與準備",
+              ],
+            },
+            {
+              name: "Guru",
+              price: "準備中",
+              body: "為更進階的家教工作流程準備。",
+              cta: "建立 Guru 帳號",
+              disabled: true,
+              points: [
+                "進階家教儀表板",
+                "更細緻的進度分析",
+                "更多追蹤工具即將推出",
+              ],
+            },
+          ],
         },
-      ],
-      ctas: {
-        auth: "開始使用",
-        back: "回產品頁",
       },
     },
   });

@@ -3,10 +3,14 @@ import { requireAppPageContext } from "@/lib/server/auth/page-guards";
 import { loadPrivacySettingsSnapshot } from "@/lib/server/privacy/service";
 
 export default async function AppSettingsPage() {
-  const { appUser } = await requireAppPageContext();
+  const { appUser, context } = await requireAppPageContext();
   const snapshot = await loadPrivacySettingsSnapshot(appUser);
 
   return (
-    <PrivacySettingsView appUser={appUser} snapshot={snapshot} />
+    <PrivacySettingsView
+      appUser={appUser}
+      email={context.email}
+      snapshot={snapshot}
+    />
   );
 }

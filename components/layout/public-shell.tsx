@@ -10,6 +10,7 @@ type PublicShellProps = {
   headerVariant?: "default" | "hud" | "landing";
   showAuthLink?: boolean;
   showFooter?: boolean;
+  showLandingAudienceSelector?: boolean;
 };
 
 export function PublicShell({
@@ -19,6 +20,7 @@ export function PublicShell({
   headerVariant = "default",
   showAuthLink = true,
   showFooter = true,
+  showLandingAudienceSelector = true,
 }: PublicShellProps) {
   const copy = getPublicShellCopy(languageCode);
 
@@ -35,6 +37,7 @@ export function PublicShell({
         currentHref={currentHref}
         languageCode={languageCode}
         openAppLabel={copy.openApp}
+        showLandingAudienceSelector={showLandingAudienceSelector}
         showAuthLink={showAuthLink}
         variant={headerVariant}
       />

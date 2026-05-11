@@ -895,14 +895,22 @@ export function StudentAppShell({
             isConversationRoute ? "min-h-0 overflow-hidden" : ""
           }`}
         >
-          <header className="sticky top-0 z-20 min-h-[3.25rem] border-b border-[color:var(--line)] bg-[color:var(--background)]/88 px-3 py-0 backdrop-blur sm:px-4">
+          <header
+            className={`sticky top-0 z-20 min-h-[3.25rem] border-b border-[color:var(--line)] bg-[color:var(--background)]/88 py-0 backdrop-blur ${
+              isConversationRoute ? "px-4 sm:px-6 xl:px-8" : "px-4 sm:px-5 lg:px-6"
+            }`}
+          >
             <div
               className={`mx-auto flex min-h-[3.25rem] w-full items-center justify-between gap-4 ${
-                isConversationRoute ? "max-w-none" : "max-w-7xl"
+                isConversationRoute ? "max-w-none" : "max-w-5xl"
               }`}
             >
               <div className="flex min-w-0 items-center">
-                <div className="flex min-w-0 flex-col justify-center">
+                <div
+                  className={`flex min-w-0 flex-col justify-center ${
+                    isConversationRoute ? "pl-[3.25rem]" : ""
+                  }`}
+                >
                   <p className="truncate text-xs uppercase tracking-[0.18em] text-[color:var(--ink-muted)]">
                     {headerContent.eyebrow}
                   </p>
