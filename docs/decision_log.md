@@ -1747,3 +1747,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Make `dashboard` a distinct student view. `/app` defaults to the Dashboard card grid, `view=homework` owns subject selection and chat launch, and subject links continue to include `view=homework&subject=...`.
 - Why: This matches the visible navigation model without changing the working homework flow. It also gives future Recap, Exams, Forward, and Explore features a stable overview surface before they become full routes.
 - Follow-up: Pilot walkthroughs should decide whether the Dashboard card grid is useful enough to keep, or whether learners prefer landing directly in Homework once the broader activity modes exist.
+
+### D-20260512-01 - Count Active Homework, Not Chat Volume
+
+- Date: 2026-05-12
+- Status: accepted
+- Related tasks: `P1.3`, `P2.4`, `P6.9`, `P6.10`, `P6.11`
+- Context: The Homework section is becoming the learner's schoolwork organizer, not just a chat history list. Completion matters because it clears the learner's active board and generates the trusted recap that can feed longer-term memory.
+- Decision: Treat active unfinished homework as the counted state in the left rail and Homework subject shortcuts. Completed homework remains visible with compact completion status, but does not inflate active counters. Use kid-facing school language like `My homework` or `Mes devoirs` instead of project-management labels like `Tasks`.
+- Why: The UI should teach the create-work-complete loop without making old completed work look like unfinished obligations.
+- Follow-up: Post-pilot work must reduce dependence on perfect learner discipline by adding automatic session checkpoints, cleanup paths for stale or misclassified homework, and reinforcement actions for completed homework when the learner wants more practice or feels Banban missed the real difficulty.

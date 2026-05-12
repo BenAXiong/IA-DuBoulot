@@ -30,6 +30,7 @@ type StudentView = "dashboard" | "homework" | "maps" | "tests" | "forward";
 type SubjectGroup = {
   subjectTag: string;
   count: number;
+  activeCount: number;
   conversations: ListConversationSummary[];
 };
 
@@ -216,9 +217,16 @@ function buildSubjectGroups(
     .map(([subjectTag, subjectConversations]) => ({
       subjectTag,
       count: subjectConversations.length,
+      activeCount: subjectConversations.filter(
+        (conversation) => conversation.status === "active",
+      ).length,
       conversations: subjectConversations,
     }))
     .sort((left, right) => {
+      if (right.activeCount !== left.activeCount) {
+        return right.activeCount - left.activeCount;
+      }
+
       if (right.count !== left.count) {
         return right.count - left.count;
       }
@@ -770,9 +778,11 @@ export function StudentAppShell({
                               <span className="truncate">
                                 {capitalizeSubjectLabel(group.subjectTag)}
                               </span>
-                              <span className="text-xs text-[color:var(--ink-muted)]">
-                                {group.count}
-                              </span>
+                              {group.activeCount > 0 ? (
+                                <span className="student-homework-active-badge ml-2 inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 text-[0.7rem] font-bold leading-none">
+                                  {group.activeCount}
+                                </span>
+                              ) : null}
                             </Link>
                             <button
                               aria-expanded={isSubjectExpanded}
@@ -802,13 +812,18 @@ export function StudentAppShell({
                             <div className="grid gap-0.5 pl-3 pr-3">
                               {recentConversations.map((conversation) => (
                                 <Link
-                                  className="truncate rounded-[0.8rem] px-2 py-1 text-xs leading-5 text-[color:var(--ink-muted)] transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
+                                  className="flex min-w-0 items-center gap-2 rounded-[0.8rem] px-2 py-1 text-xs leading-5 text-[color:var(--ink-muted)] transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
                                   href={`/app/conversations/${conversation.id}`}
                                   key={conversation.id}
                                   onClick={() => setSidebarOpen(false)}
                                 >
-                                  {conversation.title.trim() ||
-                                    copy.pageTitles.conversation}
+                                  <span className="truncate">
+                                    {conversation.title.trim() ||
+                                      copy.pageTitles.conversation}
+                                  </span>
+                                  {conversation.status === "active" ? (
+                                    <span className="student-homework-active-dot h-1.5 w-1.5 shrink-0 rounded-full" />
+                                  ) : null}
                                 </Link>
                               ))}
                               {group.conversations.length > 5 ? (

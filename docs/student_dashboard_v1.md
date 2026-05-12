@@ -12,7 +12,7 @@ This document started with `A3.1.1` to `A3.1.3` and now also records the later s
 
 - student-owned `/app` shell with a collapsible subject rail
 - distinct Dashboard view with a wide Homework row, a four-card learning-mode row, and a second-row `Level up!` placeholder
-- homework-focused home view with recent conversations grouped by subject-tag filters
+- homework-focused home view with homework items grouped by subject-tag filters
 - disabled placeholder activity slots for future `Recap`, `Exams`, `Forward`, and `Explore` surfaces
 - subject-level quick-start that now opens the live chat directly
 - legacy `/app/new` compatibility redirect into the homework dashboard
@@ -76,10 +76,11 @@ Current shell behavior:
 - the top bar is intentionally quiet, slimmer than the earlier MVP chrome, and keeps only the header text that adds orientation. Dashboard and Homework views suppress the redundant second header line because their page body already carries the visible title; the live conversation title stays offset to align with assistant reply text after the avatar column.
 - the Dashboard view is separate from Homework: `/app` or `view=dashboard` centers the title `Where should we start?` with a hard-working emoji marker, then shows a full-width Homework row with the same folder icon as the left rail and subject links that wrap into natural-width rows, then one row for Recap, Exams/Tests, Forward, and Explore with matching left-rail icons, followed by a disabled `Level up!` panel for the later cross-subject practice recommendation surface; `view=homework` owns subject selection and chat launch
 - Dashboard subject chips link into the matching homework subject page. They are grey when the learner has no homework in that subject yet, yellow with a small active-session counter when at least one homework is still active, and green when every visible homework session for that subject is completed.
-- the root Homework view no longer auto-selects the first subject. It shows all subject shortcuts unselected, keeps a disabled composer visible until a subject is chosen, and renders recent chats across every subject sorted by latest visible activity.
-- clicking a subject shortcut on the root Homework view now updates the page title to that subject, filters the quick-start composer and history tab locally, and writes `/app?view=homework&subject=...` with `window.history.replaceState` instead of forcing a route transition. Left-rail subject clicks use the same local event path when the learner is already on the Homework view, while links from Dashboard or conversations still perform normal navigation.
+- the root Homework view no longer auto-selects the first subject. It shows all subject shortcuts unselected, keeps a disabled composer visible until a subject is chosen, and renders homework items across every subject sorted by latest visible activity.
+- clicking a subject shortcut on the root Homework view now updates the page title to that subject, filters the quick-start composer and homework list locally, and writes `/app?view=homework&subject=...` with `window.history.replaceState` instead of forcing a route transition. Left-rail subject clicks use the same local event path when the learner is already on the Homework view, while links from Dashboard or conversations still perform normal navigation.
 - direct links or refreshes on `/app?view=homework&subject=...` hydrate that same Homework launcher with the requested subject selected, so the local click path and URL path share the same UI.
 - subject resources are no longer preloaded for every subject on the Homework page. The server preloads resources only for the URL-selected subject, and the client lazily loads another subject's resource library the first time that subject is selected locally.
+- the Homework rail subject badges and root Homework subject chips count active unfinished homework only. Completed homework stays visible and keeps its completion status in compact row pills, but does not inflate the active counters that drive the task-manager feel.
 - the root Homework subject shortcut row has a compact vertical-ellipsis editor. For the current pilot slice, it stores browser-local shortcut preferences: default-subject visibility, drag-enabled shortcut order, and custom subject labels. It does not create canonical subject entities or delete homework history.
 
 Current boundary:
@@ -125,7 +126,7 @@ Why:
 
 ## Known Boundaries
 
-- recent sessions on `/app` are intentionally short and subject-filtered, and the subject-view recent block no longer duplicates a second history surface with a separate `Open` CTA
+- homework lists on `/app` are intentionally short and subject-filtered, and the subject-view homework block no longer duplicates a second history surface with a separate `Open` CTA
 - the student dashboard no longer foregrounds quota or adult-link cards on the home surface, but the same server-owned start-state gate still controls the homework launcher
 - billing remains a parent-owned workflow, but it is no longer surfaced through the current minimalist `/app/settings` page
 - under-13 blocking still depends on the existing parent-approval flow documented in [Invitation flows V1](invitation_flows_v1.md)

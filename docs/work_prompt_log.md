@@ -357,3 +357,11 @@ then close it as:
 | 2026-05-12 | 16:20 -> 16:21 | 0h01 | P1.3 | assess strategies to reduce left-rail subject switch latency | | |
 | 2026-05-12 | 16:39 -> 16:52 | 0h13 | P1.3 | intercept Homework rail subject clicks for instant local switching and reduce subject-resource loading | | |
 | 2026-05-12 | 17:05 -> 17:05 | 0h00 | P1.3 | confirm the Homework subject-switching slice is complete, then stage, commit, and push the updated implementation and docs | | |
+| 2026-05-12 | 18:01 -> 18:12 | 0h11 | P1.3 P2.4 P6 | log post-pilot homework workflow safeguards, then add active-homework counters to the rail, Homework subject chips, and homework list | | |
+| 2026-05-12 | 18:25 -> 18:29 | 0h04 | P1.3 | compact Homework list rows and remove the subject-page Homework tab counter | | |
+| 2026-05-12 | 18:32 -> 18:34 | 0h02 | P1.3 | shrink Homework status pills back to the previous lightweight row style | | |
+| 2026-05-12 | 20:47 -> 20:49 | 0h02 | P1.3 | restore compact color and contour styling on Homework status pills and fix the French completed label gender | | |
+| 2026-05-12 | 20:55 -> 20:56 | 0h01 | P1.3 | reverse the last Homework status-pill styling change while keeping the French completed label correction | | |
+| 2026-05-12 | 20:59 -> 21:01 | 0h02 | P1.3 | restore Homework status-pill color and outline while keeping the normal row font size | | |
+| 2026-05-12 | 21:05 -> 21:06 | 0h01 | P1.3 | align root Homework row subject labels inline before a fixed-width date column | | |
+| 2026-05-12 | 21:18 -> 21:20 | 0h02 | P1.3 P2.4 P6 | test the completed Homework section polish, then commit and push | | |

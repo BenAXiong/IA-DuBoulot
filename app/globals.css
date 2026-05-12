@@ -355,6 +355,42 @@ textarea::placeholder {
   color: #ffffff;
 }
 
+.student-homework-active-badge,
+.student-homework-active-label {
+  background: #8a5d00;
+  color: #ffffff;
+}
+
+.student-homework-active-dot {
+  background: #d7a527;
+}
+
+.student-homework-status-pill {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  padding: 0 0.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.25rem;
+  color: var(--ink-soft);
+}
+
+.student-homework-status-pill--active {
+  border-color: #d7a527;
+  background: #fff3c4;
+  color: #5f4300;
+}
+
+.student-homework-status-pill--complete {
+  border-color: #3c9a66;
+  background: #dff5e8;
+  color: #145232;
+}
+
 html[data-theme="dark"] .student-subject-chip--active,
 html[data-theme="smooth"] .student-subject-chip--active,
 html[data-theme="custom"] .student-subject-chip--active {
@@ -376,6 +412,32 @@ html[data-theme="smooth"] .student-subject-chip__badge,
 html[data-theme="custom"] .student-subject-chip__badge {
   background: #ffd36a;
   color: #2f2100;
+}
+
+html[data-theme="dark"] .student-homework-active-badge,
+html[data-theme="dark"] .student-homework-active-label,
+html[data-theme="smooth"] .student-homework-active-badge,
+html[data-theme="smooth"] .student-homework-active-label,
+html[data-theme="custom"] .student-homework-active-badge,
+html[data-theme="custom"] .student-homework-active-label {
+  background: #ffd36a;
+  color: #2f2100;
+}
+
+html[data-theme="dark"] .student-homework-status-pill--active,
+html[data-theme="smooth"] .student-homework-status-pill--active,
+html[data-theme="custom"] .student-homework-status-pill--active {
+  border-color: #9f7819;
+  background: #3d300d;
+  color: #ffe49a;
+}
+
+html[data-theme="dark"] .student-homework-status-pill--complete,
+html[data-theme="smooth"] .student-homework-status-pill--complete,
+html[data-theme="custom"] .student-homework-status-pill--complete {
+  border-color: #327c53;
+  background: #123823;
+  color: #a8efc3;
 }
 
 code {

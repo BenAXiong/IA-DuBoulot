@@ -62,11 +62,13 @@ function getFirstHomeworkCopy(languageCode: UiLanguageCode) {
         customSubjectPlaceholder: "Type the subject name",
         deleteSubject: "Delete",
         editSubject: "Edit",
-        emptyRecentChats: "No recent homework chat yet.",
+        emptyRecentChats: "No homework saved yet.",
         selectSubjectFirst: "Choose a subject first.",
         disabledReplyMode: "Thinking",
+        activeHomeworkCount: (count: number) =>
+          `${count} ${count === 1 ? "to finish" : "to finish"}`,
         menuLabel: "Edit subjects",
-        recentChatsTitle: "Recent chats",
+        recentChatsTitle: "My homework",
         reorder: "Drag to reorder",
         saveSubject: "Save",
         subjectVisibility: "Visible subjects",
@@ -78,11 +80,12 @@ function getFirstHomeworkCopy(languageCode: UiLanguageCode) {
         customSubjectPlaceholder: "輸入科目名稱",
         deleteSubject: "刪除",
         editSubject: "編輯",
-        emptyRecentChats: "目前還沒有最近的作業對話。",
+        emptyRecentChats: "目前還沒有儲存的作業。",
         selectSubjectFirst: "請先選擇科目。",
         disabledReplyMode: "思考",
+        activeHomeworkCount: (count: number) => `${count} 個待完成`,
         menuLabel: "編輯科目",
-        recentChatsTitle: "最近聊天",
+        recentChatsTitle: "我的作業",
         reorder: "拖曳排序",
         saveSubject: "儲存",
         subjectVisibility: "顯示科目",
@@ -94,11 +97,13 @@ function getFirstHomeworkCopy(languageCode: UiLanguageCode) {
         customSubjectPlaceholder: "Écrire le nom de la matière",
         deleteSubject: "Supprimer",
         editSubject: "Modifier",
-        emptyRecentChats: "Aucune discussion de devoir récente.",
+        emptyRecentChats: "Aucun devoir enregistré.",
         selectSubjectFirst: "Choisis d'abord une matière.",
         disabledReplyMode: "Réflexion",
+        activeHomeworkCount: (count: number) =>
+          `${count} à terminer`,
         menuLabel: "Modifier les matières",
-        recentChatsTitle: "Discussions récentes",
+        recentChatsTitle: "Mes devoirs",
         reorder: "Glisser pour réordonner",
         saveSubject: "Enregistrer",
         subjectVisibility: "Matières visibles",
@@ -117,6 +122,72 @@ function formatSubjectDisplay(subject: string) {
 
 function normalizeSubjectValue(value: string) {
   return value.trim().toLowerCase();
+}
+
+function isActiveHomework(conversation: ListConversationSummary) {
+  return conversation.status === "active";
+}
+
+function readSubjectHomeworkStatus(
+  conversations: ListConversationSummary[],
+  subjectTag: string,
+) {
+  const subjectConversations = conversations.filter(
+    (conversation) =>
+      normalizeSubjectValue(conversation.subject_tag) ===
+      normalizeSubjectValue(subjectTag),
+  );
+  const activeCount = subjectConversations.filter(isActiveHomework).length;
+  const completedCount = subjectConversations.filter(
+    (conversation) => conversation.status === "completed",
+  ).length;
+
+  if (activeCount > 0) {
+    return {
+      activeCount,
+      status: "active" as const,
+    };
+  }
+
+  if (completedCount > 0) {
+    return {
+      activeCount: 0,
+      status: "complete" as const,
+    };
+  }
+
+  return {
+    activeCount: 0,
+    status: "empty" as const,
+  };
+}
+
+function getSubjectShortcutClassName(input: {
+  isSelected: boolean;
+  status: "active" | "complete" | "empty";
+}) {
+  const statusClassName =
+    input.status === "active"
+      ? "student-subject-chip--active"
+      : input.status === "complete"
+        ? "student-subject-chip--complete"
+        : "border-[color:var(--line)] bg-[color:var(--surface-strong)] text-[color:var(--foreground)] hover:border-[color:var(--accent)] hover:text-[color:var(--accent)]";
+
+  return `inline-flex min-h-11 items-center justify-center gap-2 rounded-full border px-4 text-sm transition ${statusClassName} ${
+    input.isSelected ? "ring-2 ring-[color:var(--foreground)]/35" : ""
+  }`;
+}
+
+function getHomeworkStatusPillClassName(status: ListConversationSummary["status"]) {
+  if (status === "active") {
+    return "student-homework-status-pill student-homework-status-pill--active";
+  }
+
+  if (status === "completed") {
+    return "student-homework-status-pill student-homework-status-pill--complete";
+  }
+
+  return "student-homework-status-pill";
 }
 
 function readStoredShortcutPreferences(): SubjectShortcutPreferences {
@@ -212,33 +283,36 @@ function renderRecentConversationRows(input: {
     <div className="divide-y divide-[color:var(--line)]">
       {input.conversations.map((conversation) => (
         <Link
-          className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 py-4 transition hover:bg-[color:var(--surface-strong)]"
+          className="grid grid-cols-[minmax(0,1fr)_minmax(13rem,auto)] items-center gap-4 py-4 transition hover:bg-[color:var(--surface-strong)]"
           href={`/app/conversations/${conversation.id}?subject=${encodeURIComponent(conversation.subject_tag)}`}
           key={conversation.id}
         >
-          <div className="min-w-0 space-y-1">
-            <h3 className="overflow-hidden text-ellipsis whitespace-nowrap font-[family-name:var(--font-heading)] text-xl leading-tight">
-              {conversation.title}
-            </h3>
-            <div className="flex flex-wrap items-center gap-2 text-sm text-[color:var(--ink-soft)]">
-              <span>{formatSubjectDisplay(conversation.subject_tag)}</span>
-              <span aria-hidden="true">·</span>
-              <span>
+          <div className="min-w-0">
+            <h3 className="flex min-w-0 items-center gap-2 font-[family-name:var(--font-heading)] text-xl leading-tight">
+              <span className={getHomeworkStatusPillClassName(conversation.status)}>
                 {getConversationStatusLabel(
                   conversation.status,
                   input.languageCode,
                 )}
               </span>
-            </div>
+              <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
+                {conversation.title}
+              </span>
+            </h3>
           </div>
 
-          <div className="shrink-0 text-sm text-[color:var(--ink-soft)]">
-            {formatDateLabel(
-              conversation.last_message_at ??
-                conversation.completed_at ??
-                conversation.created_at,
-              input.languageCode,
-            ) ?? ""}
+          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_6.5rem] items-center gap-3 text-sm text-[color:var(--ink-soft)]">
+            <span className="min-w-0 truncate text-right">
+              {formatSubjectDisplay(conversation.subject_tag)}
+            </span>
+            <span className="w-[6.5rem] shrink-0 text-right">
+              {formatDateLabel(
+                conversation.last_message_at ??
+                  conversation.completed_at ??
+                  conversation.created_at,
+                input.languageCode,
+              ) ?? ""}
+            </span>
           </div>
         </Link>
       ))}
@@ -472,6 +546,10 @@ export function StudentFirstHomeworkLauncher({
   const recentConversations = useMemo(
     () => sortConversationsByRecentActivity(conversations),
     [conversations],
+  );
+  const activeHomeworkCount = useMemo(
+    () => recentConversations.filter(isActiveHomework).length,
+    [recentConversations],
   );
   const selectedSubjectConversations = useMemo(() => {
     if (!selectedSubject) {
@@ -737,15 +815,18 @@ export function StudentFirstHomeworkLauncher({
             selectedSubject?.value &&
             normalizeSubjectValue(selectedSubject.value) ===
               normalizeSubjectValue(option.value);
+          const homeworkStatus = readSubjectHomeworkStatus(
+            conversations,
+            option.value,
+          );
 
           return (
             <button
               aria-pressed={Boolean(isSelected)}
-              className={`inline-flex min-h-11 items-center justify-center rounded-full border px-4 text-sm transition ${
-                isSelected
-                  ? "border-[color:var(--foreground)] bg-[color:var(--foreground)] text-[color:var(--background)]"
-                  : "border-[color:var(--line)] bg-[color:var(--surface-strong)] text-[color:var(--foreground)] hover:border-[color:var(--accent)] hover:text-[color:var(--accent)]"
-              }`}
+              className={getSubjectShortcutClassName({
+                isSelected: Boolean(isSelected),
+                status: homeworkStatus.status,
+              })}
               draggable={reorderEnabled}
               key={option.value}
               onDragEnd={() => setDraggedSubjectValue(null)}
@@ -793,7 +874,12 @@ export function StudentFirstHomeworkLauncher({
               title={reorderEnabled ? copy.reorder : undefined}
               type="button"
             >
-              {option.label}
+              <span>{option.label}</span>
+              {homeworkStatus.activeCount > 0 ? (
+                <span className="student-subject-chip__badge inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[0.7rem] font-bold leading-none">
+                  {homeworkStatus.activeCount}
+                </span>
+              ) : null}
             </button>
           );
         })}
@@ -947,9 +1033,16 @@ export function StudentFirstHomeworkLauncher({
           })}
 
           <section className="grid gap-2">
-            <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
-              {copy.recentChatsTitle}
-            </h2>
+            <div className="flex flex-wrap items-center gap-3">
+              <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
+                {copy.recentChatsTitle}
+              </h2>
+              {activeHomeworkCount > 0 ? (
+                <span className="student-homework-active-label rounded-full px-2.5 py-1 text-xs font-semibold">
+                  {copy.activeHomeworkCount(activeHomeworkCount)}
+                </span>
+              ) : null}
+            </div>
             {recentConversations.length > 0 ? (
               renderRecentConversationRows({
                 conversations: recentConversations,

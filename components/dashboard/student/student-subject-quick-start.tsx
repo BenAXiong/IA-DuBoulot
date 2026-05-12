@@ -120,12 +120,12 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
         voice: "Voice input coming soon!",
         startError: "Unable to open the chat right now.",
         tabs: {
-          history: "History",
+          history: "My homework",
           resources: "Sources",
           instructions: "Instructions",
         },
         masterInstructionsSoon: "Master instructions available soon!",
-        noSubjectChats: "No discussion has been saved for this subject yet.",
+        noSubjectChats: "No homework has been saved for this subject yet.",
         noInstructions: "No subject instruction has been saved yet.",
       };
     case "zh":
@@ -141,12 +141,12 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
         voice: "語音輸入即將推出！",
         startError: "目前無法開啟聊天。",
         tabs: {
-          history: "聊天",
+          history: "我的作業",
           resources: "資料來源",
           instructions: "指示",
         },
         masterInstructionsSoon: "主指示功能即將推出！",
-        noSubjectChats: "這個科目目前還沒有已儲存的對話。",
+        noSubjectChats: "這個科目目前還沒有已儲存的作業。",
         noInstructions: "這個科目目前還沒有已儲存的指示。",
       };
     default:
@@ -163,15 +163,27 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
         voice: "Saisie vocale bientôt !",
         startError: "Impossible d'ouvrir le chat pour l'instant.",
         tabs: {
-          history: "Historique",
+          history: "Mes devoirs",
           resources: "Ressources",
           instructions: "Consignes",
         },
         masterInstructionsSoon: "Consignes principales bientôt disponibles !",
-        noSubjectChats: "Aucune discussion enregistrée pour cette matière.",
+        noSubjectChats: "Aucun devoir enregistré pour cette matière.",
         noInstructions: "Aucune consigne enregistrée pour cette matière.",
       };
   }
+}
+
+function getHomeworkStatusPillClassName(status: ListConversationSummary["status"]) {
+  if (status === "active") {
+    return "student-homework-status-pill student-homework-status-pill--active";
+  }
+
+  if (status === "completed") {
+    return "student-homework-status-pill student-homework-status-pill--complete";
+  }
+
+  return "student-homework-status-pill";
 }
 
 function buildConversationTitle(existingConversationCount: number) {
@@ -286,18 +298,18 @@ function renderConversationRows(input: {
           href={`/app/conversations/${conversation.id}?subject=${encodeURIComponent(conversation.subject_tag)}`}
           key={conversation.id}
         >
-          <div className="min-w-0 space-y-1">
-            <h3 className="overflow-hidden text-ellipsis whitespace-nowrap font-[family-name:var(--font-heading)] text-xl leading-tight">
-              {conversation.title}
-            </h3>
-            <div className="flex flex-wrap items-center gap-2 text-sm text-[color:var(--ink-soft)]">
-              <span>
+          <div className="min-w-0">
+            <h3 className="flex min-w-0 items-center gap-2 font-[family-name:var(--font-heading)] text-xl leading-tight">
+              <span className={getHomeworkStatusPillClassName(conversation.status)}>
                 {getConversationStatusLabel(
                   conversation.status,
                   input.languageCode,
                 )}
               </span>
-            </div>
+              <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
+                {conversation.title}
+              </span>
+            </h3>
           </div>
 
           <div className="shrink-0 text-sm text-[color:var(--ink-soft)]">
@@ -765,7 +777,7 @@ export function StudentSubjectQuickStart({
                 role="tab"
                 type="button"
               >
-                {label}
+                <span>{label}</span>
               </button>
             );
 

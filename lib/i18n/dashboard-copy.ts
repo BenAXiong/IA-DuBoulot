@@ -145,7 +145,7 @@ export function getLocalizedConversationStatusLabel(
   const labels = pickLocalizedValue(languageCode, {
     fr: {
       active: "En cours",
-      completed: "Terminée",
+      completed: "Terminé",
       archived: "Archivée",
     },
     en: {
