@@ -287,7 +287,7 @@ export function PublicHeader({
       ? "px-4 pt-4 sm:px-6 lg:px-8"
       : "px-5 py-5 sm:px-8 lg:px-12";
   const panelClassName = isLandingHeader
-    ? "shell-panel shell-panel--allow-overflow flex w-full flex-wrap items-center justify-between gap-4 rounded-none border-x-0 border-t-0 px-5 py-3 sm:px-8 lg:px-36"
+    ? "shell-panel shell-panel--allow-overflow flex w-full flex-wrap items-center justify-between gap-4 rounded-none border-x-0 border-t-0 px-5 py-3 sm:px-8 lg:px-12"
     : isHudHeader
       ? "mx-auto flex max-w-6xl items-center justify-between gap-4"
       : "shell-panel shell-panel--allow-overflow mx-auto flex max-w-[92rem] flex-wrap items-center justify-between gap-4 rounded-[2rem] px-5 py-4 sm:px-6";

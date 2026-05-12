@@ -341,3 +341,19 @@ then close it as:
 | 2026-05-11 | 15:51 -> 16:18 | 0h27 | P1.3 | align student workspace headers, revise dashboard layout, and assess the next-challenge feature | | |
 | 2026-05-11 | 16:19 -> 16:23 | 0h04 | P1.3 | show the signed-in email address on profile/settings surfaces | | |
 | 2026-05-11 | 16:24 -> 16:27 | 0h03 | P1.3 P2.4 | rename and log the Level up! cross-subject practice idea, then build-test and push | | |
+| 2026-05-11 | 16:30 -> 16:31 | 0h01 | P1.3 | decouple the public landing header width from the widened landing body padding | | |
+| 2026-05-11 | 16:35 -> 16:38 | 0h03 | P1.3 | color dashboard subject buttons by homework status and add active-count badges | | |
+| 2026-05-11 | 16:41 -> 16:44 | 0h03 | P1.3 | remove redundant student Dashboard/Homework header second lines and retitle the Dashboard page | | |
+| 2026-05-11 | 16:47 -> 16:48 | 0h01 | P1.3 | make dashboard subject status chips readable in dark mode | | |
+| 2026-05-11 | 16:51 -> 16:57 | 0h06 | P1.3 | make the homework root unselected by default with editable subject shortcuts and all recent chats | | |
+| 2026-05-11 | 17:00 -> 19:02 | 2h02 | P1.3 | restore light-mode dashboard subject-chip colors and update the Dashboard title | | |
+| 2026-05-11 | 19:02 -> 19:08 | 0h06 | P1.3 | harmonize the homework root and per-subject views with faster local subject filtering | | |
+| 2026-05-11 | 19:27 -> 19:29 | 0h02 | P1.3 | replace the Dashboard title's literal victory text with a visual emoji marker | | |
+| 2026-05-11 | 19:29 -> 19:30 | 0h01 | P1.3 | close the subject-options dropdown on outside click | | |
+| 2026-05-12 | 15:15 -> 15:16 | 0h01 | A0.3.7 P1.3 P2.4 | close the previous work session and reopen the current trace | | |
+| 2026-05-12 | 15:24 -> 15:25 | 0h01 | P1.3 | explain URL synchronization options for snappy homework subject switching | | |
+| 2026-05-12 | 15:34 -> 15:41 | 0h07 | P1.3 | synchronize Homework subject selection into the URL without route loading | | |
+| 2026-05-12 | 16:00 -> 16:02 | 0h02 | P1.3 | resync Homework subject highlighting when external rail links change the subject URL | | |
+| 2026-05-12 | 16:20 -> 16:21 | 0h01 | P1.3 | assess strategies to reduce left-rail subject switch latency | | |
+| 2026-05-12 | 16:39 -> 16:52 | 0h13 | P1.3 | intercept Homework rail subject clicks for instant local switching and reduce subject-resource loading | | |
+| 2026-05-12 | 17:05 -> 17:05 | 0h00 | P1.3 | confirm the Homework subject-switching slice is complete, then stage, commit, and push the updated implementation and docs | | |

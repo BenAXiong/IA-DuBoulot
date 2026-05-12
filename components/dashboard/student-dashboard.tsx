@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { StudentFirstHomeworkLauncher } from "@/components/dashboard/student/student-first-homework-launcher";
-import { StudentSubjectQuickStart } from "@/components/dashboard/student/student-subject-quick-start";
 import {
   getStartStateBody,
   getStartStateLabel,
@@ -25,13 +24,21 @@ type StudentDashboardProps = {
   view: "dashboard" | "homework" | "maps" | "tests" | "forward";
 };
 
+type DashboardSubjectStatus = "empty" | "active" | "complete";
+
+type DashboardSubjectChip = {
+  label: string;
+  subjectTag: string;
+  status: DashboardSubjectStatus;
+  activeCount: number;
+};
+
 function getStudentHubCopy(languageCode: UiLanguageCode) {
   switch (languageCode) {
     case "en":
       return {
         homeworkEyebrow: "Homework",
-        dashboardTitle: "Dashboard",
-        dashboardBody: "Choose the learning space you want to open.",
+        dashboardTitle: "Where should we start?",
         homeworkTitle: "Select a subject",
         homeworkBody: "Pick a subject and jump straight into the chat.",
         homeworkCardTitle: "Homework",
@@ -66,8 +73,7 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
     case "zh":
       return {
         homeworkEyebrow: "作業",
-        dashboardTitle: "總覽",
-        dashboardBody: "選擇你要開啟的學習區域。",
+        dashboardTitle: "Where should we start?",
         homeworkTitle: "選擇科目",
         homeworkBody: "選一個科目，直接開始或回到對話。",
         homeworkCardTitle: "作業",
@@ -98,8 +104,7 @@ function getStudentHubCopy(languageCode: UiLanguageCode) {
     default:
       return {
         homeworkEyebrow: "Devoirs",
-        dashboardTitle: "Dashboard",
-        dashboardBody: "Choisis l'espace de travail que tu veux ouvrir.",
+        dashboardTitle: "Where should we start?",
         homeworkTitle: "Choisis une matière",
         homeworkBody: "Choisis une matière et entre directement dans la discussion.",
         homeworkCardTitle: "Devoirs",
@@ -300,10 +305,7 @@ function DashboardHomeworkCard({
   title: string;
   body: string;
   icon: ReactNode;
-  subjects: Array<{
-    label: string;
-    subjectTag: string;
-  }>;
+  subjects: DashboardSubjectChip[];
 }) {
   return (
     <section className="grid gap-4 rounded-[1rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-4 sm:grid-cols-[minmax(0,1fr)_minmax(16rem,0.9fr)] sm:items-center">
@@ -321,15 +323,29 @@ function DashboardHomeworkCard({
       </Link>
 
       <div className="flex max-w-full flex-wrap justify-end gap-2">
-        {subjects.map((subject) => (
-          <Link
-            className="inline-flex min-h-9 min-w-[7.5rem] flex-[1_1_7.5rem] items-center justify-center whitespace-nowrap rounded-full border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-3 text-sm font-medium text-[color:var(--foreground)] transition hover:border-[color:var(--accent)] hover:text-[color:var(--accent)] sm:max-w-[12rem]"
-            href={`/app?view=homework&subject=${encodeURIComponent(subject.subjectTag)}`}
-            key={subject.subjectTag}
-          >
-            {subject.label}
-          </Link>
-        ))}
+        {subjects.map((subject) => {
+          const statusClassName =
+            subject.status === "active"
+              ? "student-subject-chip--active"
+              : subject.status === "complete"
+                ? "student-subject-chip--complete"
+                : "border-[color:var(--line)] bg-[color:var(--surface-strong)] text-[color:var(--ink-soft)] hover:border-[color:var(--foreground)]/30 hover:text-[color:var(--foreground)]";
+
+          return (
+            <Link
+              className={`inline-flex min-h-9 min-w-[7.5rem] flex-[1_1_7.5rem] items-center justify-center gap-2 whitespace-nowrap rounded-full border px-3 text-sm font-medium transition sm:max-w-[12rem] ${statusClassName}`}
+              href={`/app?view=homework&subject=${encodeURIComponent(subject.subjectTag)}`}
+              key={subject.subjectTag}
+            >
+              <span className="truncate">{subject.label}</span>
+              {subject.activeCount > 0 ? (
+                <span className="student-subject-chip__badge inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[0.7rem] font-bold leading-none">
+                  {subject.activeCount}
+                </span>
+              ) : null}
+            </Link>
+          );
+        })}
       </div>
     </section>
   );
@@ -397,6 +413,36 @@ function buildSubjectGroups(conversations: ListConversationSummary[]) {
     .sort((left, right) => right.conversations.length - left.conversations.length);
 }
 
+function readSubjectChipStatus(
+  conversations: ListConversationSummary[],
+): Pick<DashboardSubjectChip, "activeCount" | "status"> {
+  const activeCount = conversations.filter(
+    (conversation) => conversation.status === "active",
+  ).length;
+
+  if (activeCount > 0) {
+    return {
+      activeCount,
+      status: "active",
+    };
+  }
+
+  if (
+    conversations.length > 0 &&
+    conversations.every((conversation) => conversation.status === "completed")
+  ) {
+    return {
+      activeCount: 0,
+      status: "complete",
+    };
+  }
+
+  return {
+    activeCount: 0,
+    status: "empty",
+  };
+}
+
 export async function StudentDashboard({
   appUser,
   context,
@@ -422,35 +468,34 @@ export async function StudentDashboard({
       ...subjectGroups.map((group) => group.subjectTag),
     ]),
   );
-  const dashboardCardSubjects = dashboardSubjectTags.map((subjectTag) => ({
-    subjectTag,
-    label:
-      intakeSubjectOptions.find(
-        (option) => option.value.toLowerCase() === subjectTag.toLowerCase(),
-      )?.label ?? formatSubjectDisplay(subjectTag),
-  }));
+  const dashboardCardSubjects = dashboardSubjectTags.map((subjectTag) => {
+    const subjectConversations =
+      subjectGroups.find(
+        (group) => group.subjectTag.toLowerCase() === subjectTag.toLowerCase(),
+      )?.conversations ?? [];
+
+    return {
+      subjectTag,
+      label:
+        intakeSubjectOptions.find(
+          (option) => option.value.toLowerCase() === subjectTag.toLowerCase(),
+        )?.label ?? formatSubjectDisplay(subjectTag),
+      ...readSubjectChipStatus(subjectConversations),
+    };
+  });
   const subjectCounts = Object.fromEntries(
     subjectGroups.map((group) => [group.subjectTag, group.conversations.length]),
   );
-  const selectedGroup = selectedSubject
-    ? subjectGroups.find((group) => group.subjectTag === selectedSubject) ?? {
-        subjectTag: selectedSubject,
-        conversations: [],
-      }
-    : null;
-  const selectedSubjectResources = selectedGroup
-    ? await listSubjectResourceLibrary({
-        context,
-        subjectTag: selectedGroup.subjectTag,
-      })
-    : [];
   const subjectResourceUploadDisabledReason =
     (snapshot.usage.quota.uploads.remaining ?? 0) <= 0
       ? copy.subjectResourceUploadQuotaReached
       : null;
+  const preloadResourceSubjectTags = selectedSubject
+    ? [selectedSubject]
+    : [];
   const subjectResourcesBySubject = Object.fromEntries(
     await Promise.all(
-      dashboardSubjectTags.map(async (subjectTag) => [
+      preloadResourceSubjectTags.map(async (subjectTag) => [
         subjectTag,
         await listSubjectResourceLibrary({
           context,
@@ -483,13 +528,16 @@ export async function StudentDashboard({
 
       {view === "dashboard" ? (
         <section className="mx-auto grid w-full max-w-5xl gap-6 py-1">
-          <div className="space-y-3">
+          <div className="text-center">
             <h1 className="font-[family-name:var(--font-heading)] text-4xl leading-tight sm:text-5xl">
               {copy.dashboardTitle}
+              <span
+                aria-hidden="true"
+                className="ml-3 inline-block align-[-0.04em] text-[0.8em]"
+              >
+                💪
+              </span>
             </h1>
-            <p className="max-w-3xl text-sm leading-7 text-[color:var(--ink-soft)]">
-              {copy.dashboardBody}
-            </p>
           </div>
 
           <div className="grid gap-3">
@@ -570,31 +618,8 @@ export async function StudentDashboard({
             {copy.testsBody}
           </p>
         </section>
-      ) : selectedGroup ? (
-        <section className="mx-auto grid w-full max-w-5xl gap-3 py-0.5">
-          <StudentSubjectQuickStart
-            conversations={selectedGroup.conversations}
-            existingConversationCount={selectedGroup.conversations.length}
-            initialDraft={initialDraft}
-            initialSubjectResources={selectedSubjectResources}
-            languageCode={languageCode}
-            subjectResourceUploadDisabledReason={
-              subjectResourceUploadDisabledReason
-            }
-            subjectTag={selectedGroup.subjectTag}
-          />
-        </section>
       ) : (
         <section className="mx-auto grid w-full max-w-5xl gap-8 py-1">
-          <div className="space-y-3">
-            <h1 className="font-[family-name:var(--font-heading)] text-4xl leading-tight sm:text-5xl">
-              {copy.homeworkTitle}
-            </h1>
-            <p className="max-w-3xl text-sm leading-7 text-[color:var(--ink-soft)]">
-              {copy.homeworkBody}
-            </p>
-          </div>
-
           {subjectGroups.length === 0 ? (
             <article className="grid gap-4 rounded-[1.75rem] border border-dashed border-[color:var(--line)] bg-[color:var(--surface)] px-6 py-8">
               <h2 className="font-[family-name:var(--font-heading)] text-3xl leading-tight">
@@ -605,7 +630,9 @@ export async function StudentDashboard({
               </p>
               <StudentFirstHomeworkLauncher
                 initialDraft={initialDraft}
+                initialSelectedSubject={selectedSubject}
                 languageCode={languageCode}
+                title={copy.homeworkTitle}
                 knownSubjects={subjectGroups.map((group) => group.subjectTag)}
                 conversations={conversations}
                 subjectCounts={subjectCounts}
@@ -620,8 +647,10 @@ export async function StudentDashboard({
               <article className="grid gap-4">
                 <StudentFirstHomeworkLauncher
                   initialDraft={initialDraft}
+                  initialSelectedSubject={selectedSubject}
                   knownSubjects={subjectGroups.map((group) => group.subjectTag)}
                   languageCode={languageCode}
+                  title={copy.homeworkTitle}
                   conversations={conversations}
                   subjectCounts={subjectCounts}
                   subjectResourcesBySubject={subjectResourcesBySubject}

@@ -35,6 +35,7 @@ type SubjectGroup = {
 
 const HOURGLASS_CURSOR =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M6 3h12M6 21h12M8 3v5a4 4 0 0 0 8 0V3M8 21v-5a4 4 0 0 1 8 0v5M8 8l8 8'/%3E%3C/svg%3E\") 12 12, wait";
+const HOMEWORK_SUBJECT_SELECTED_EVENT = "iadb-homework-subject-selected";
 
 function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"]) {
   switch (languageCode) {
@@ -135,6 +136,34 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
         },
       };
   }
+}
+
+function writeHomeworkSubjectUrl(subjectTag: string | null) {
+  const url = new URL(window.location.href);
+  url.searchParams.set("view", "homework");
+
+  if (subjectTag?.trim()) {
+    url.searchParams.set("subject", subjectTag.trim());
+  } else {
+    url.searchParams.delete("subject");
+  }
+
+  window.history.replaceState(
+    window.history.state,
+    "",
+    `${url.pathname}?${url.searchParams.toString()}${url.hash}`,
+  );
+}
+
+function isPlainPrimaryClick(event: React.MouseEvent<HTMLAnchorElement>) {
+  return (
+    event.button === 0 &&
+    !event.defaultPrevented &&
+    !event.metaKey &&
+    !event.ctrlKey &&
+    !event.shiftKey &&
+    !event.altKey
+  );
 }
 
 function formatSubjectDisplay(subject: string | null) {
@@ -242,14 +271,14 @@ function buildHeaderContent(input: {
   if (input.selectedSubject) {
     return {
       eyebrow: input.copy.pageTitles.homework,
-      title: formatSubjectDisplay(input.selectedSubject) ?? input.selectedSubject,
+      title: null,
     };
   }
 
   if (input.view === "dashboard") {
     return {
       eyebrow: input.copy.pageTitles.dashboard,
-      title: input.copy.pageTitles.dashboard,
+      title: null,
     };
   }
 
@@ -276,7 +305,7 @@ function buildHeaderContent(input: {
 
   return {
     eyebrow: input.copy.pageTitles.homework,
-    title: input.copy.pageTitles.selectSubject,
+    title: null,
   };
 }
 
@@ -462,6 +491,9 @@ export function StudentAppShell({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [homeworkExpanded, setHomeworkExpanded] = useState(true);
   const [expandedSubjectTag, setExpandedSubjectTag] = useState<string | null>(null);
+  const [optimisticHomeworkSubject, setOptimisticHomeworkSubject] = useState<
+    string | null
+  >(null);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [conversationHeaderOverrides, setConversationHeaderOverrides] = useState<
     Record<string, ConversationTitleUpdatedDetail>
@@ -474,6 +506,7 @@ export function StudentAppShell({
   const copy = getStudentShellCopy(languageCode);
   const selectedSubject = searchParams.get("subject")?.trim() || null;
   const activeView = readActiveView(searchParams.get("view"), selectedSubject);
+  const visibleHomeworkSubject = optimisticHomeworkSubject ?? selectedSubject;
   const activeConversationId = pathname.startsWith("/app/conversations/")
     ? pathname.slice("/app/conversations/".length).split("/")[0] ?? null
     : null;
@@ -493,7 +526,7 @@ export function StudentAppShell({
     ? readStoredConversationTitle(activeConversationId)
     : null;
   const activeConversationSubject =
-    selectedSubject ??
+    visibleHomeworkSubject ??
     conversationHeaderOverrides[activeConversationId ?? ""]?.subjectTag ??
     storedConversationHeaderOverride?.subjectTag ??
     activeConversation?.subject_tag ??
@@ -507,6 +540,10 @@ export function StudentAppShell({
   useEffect(() => {
     setShellConversations(conversations);
   }, [conversations]);
+
+  useEffect(() => {
+    setOptimisticHomeworkSubject(null);
+  }, [pathname, selectedSubject]);
 
   useEffect(() => {
     return addConversationTitleUpdatedListener((detail) => {
@@ -564,6 +601,29 @@ export function StudentAppShell({
       setProfileMenuOpen(false);
       profileMenuCloseTimeoutRef.current = null;
     }, 400);
+  }
+
+  function handleHomeworkSubjectLinkClick(
+    event: React.MouseEvent<HTMLAnchorElement>,
+    subjectTag: string | null,
+  ) {
+    if (
+      pathname !== "/app" ||
+      activeView !== "homework" ||
+      !isPlainPrimaryClick(event)
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    setSidebarOpen(false);
+    setOptimisticHomeworkSubject(subjectTag);
+    writeHomeworkSubjectUrl(subjectTag);
+    window.dispatchEvent(
+      new CustomEvent(HOMEWORK_SUBJECT_SELECTED_EVENT, {
+        detail: { subjectTag },
+      }),
+    );
   }
 
   const desktopSidebarWidth = sidebarCollapsed ? "4.5rem" : "18.5rem";
@@ -634,7 +694,7 @@ export function StudentAppShell({
                   : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
               }`}
               href="/app?view=homework"
-              onClick={() => setSidebarOpen(false)}
+              onClick={(event) => handleHomeworkSubjectLinkClick(event, null)}
               title={copy.homework}
             >
               <HomeworkIcon />
@@ -645,7 +705,7 @@ export function StudentAppShell({
                 <Link
                   className="flex min-w-0 flex-1 items-center gap-1.5 text-sm font-medium text-[color:var(--foreground)]"
                   href="/app?view=homework"
-                  onClick={() => setSidebarOpen(false)}
+                  onClick={(event) => handleHomeworkSubjectLinkClick(event, null)}
                 >
                   <HomeworkIcon />
                   <span>{copy.homework}</span>
@@ -681,7 +741,7 @@ export function StudentAppShell({
                 ) : (
                   <div className="grid gap-1 pl-7">
                     {subjectGroups.map((group) => {
-                      const isActive = selectedSubject === group.subjectTag;
+                      const isActive = visibleHomeworkSubject === group.subjectTag;
                       const isSubjectExpanded =
                         expandedSubjectTag === group.subjectTag;
                       const recentConversations = sortConversations(
@@ -700,7 +760,12 @@ export function StudentAppShell({
                             <Link
                               className="flex min-w-0 flex-1 items-center justify-between rounded-[1rem] px-2 py-1.5 text-sm"
                               href={`/app?view=homework&subject=${encodeURIComponent(group.subjectTag)}`}
-                              onClick={() => setSidebarOpen(false)}
+                              onClick={(event) =>
+                                handleHomeworkSubjectLinkClick(
+                                  event,
+                                  group.subjectTag,
+                                )
+                              }
                             >
                               <span className="truncate">
                                 {capitalizeSubjectLabel(group.subjectTag)}

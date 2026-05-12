@@ -330,6 +330,54 @@ textarea::placeholder {
   appearance: none;
 }
 
+.student-subject-chip--active {
+  border-color: #d7a527;
+  background: #fff3c4;
+  color: #5f4300;
+}
+
+.student-subject-chip--active:hover {
+  border-color: #f1c95b;
+}
+
+.student-subject-chip--complete {
+  border-color: #3c9a66;
+  background: #dff5e8;
+  color: #145232;
+}
+
+.student-subject-chip--complete:hover {
+  border-color: #66bd87;
+}
+
+.student-subject-chip__badge {
+  background: #8a5d00;
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .student-subject-chip--active,
+html[data-theme="smooth"] .student-subject-chip--active,
+html[data-theme="custom"] .student-subject-chip--active {
+  border-color: #9f7819;
+  background: #3d300d;
+  color: #ffe49a;
+}
+
+html[data-theme="dark"] .student-subject-chip--complete,
+html[data-theme="smooth"] .student-subject-chip--complete,
+html[data-theme="custom"] .student-subject-chip--complete {
+  border-color: #327c53;
+  background: #123823;
+  color: #a8efc3;
+}
+
+html[data-theme="dark"] .student-subject-chip__badge,
+html[data-theme="smooth"] .student-subject-chip__badge,
+html[data-theme="custom"] .student-subject-chip__badge {
+  background: #ffd36a;
+  color: #2f2100;
+}
+
 code {
   border-radius: 0.95rem;
   background: var(--code-bg);
