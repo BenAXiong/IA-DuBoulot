@@ -49,6 +49,7 @@ Pages and UI:
 
 - `app/app/settings/page.tsx`
 - `components/dashboard/settings/privacy-settings-view.tsx`
+- `components/dashboard/settings/editable-profile-section.tsx`
 - `components/dashboard/settings/deletion-request-form.tsx`
 
 Server routes and services:
@@ -76,7 +77,10 @@ Verification:
 
 For every role, `/app/settings` now owns:
 
-- editable app-profile fields when the account is still active
+- the signed-in email address as the primary read-only account identifier
+- account type, account status, and a visible upgrade path to `/pricing`
+- read-only app-profile fields by default, with an explicit modify/save step when the account is still active
+- linked-account visibility or role-appropriate link-management entry points
 - the self-deletion request entry point when that role is eligible
 
 Parent-specific addition:
@@ -111,6 +115,11 @@ Queued-deletion behavior:
 - tutor links for the affected student are revoked immediately
 - new write workflows are blocked through explicit service-layer checks
 - the UI shows a 30-day target purge date based on the queued timestamp
+
+Current product stance:
+
+- self-service deletion remains a queued request even when no links are visible
+- immediate account suppression is intentionally not enabled yet, because parent/tutor links, billing state, audit history, and purge recovery windows still need one consistent workflow
 
 ## User-Facing Privacy Copy
 

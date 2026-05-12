@@ -1757,3 +1757,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Treat active unfinished homework as the counted state in the left rail and Homework subject shortcuts. Completed homework remains visible with compact completion status, but does not inflate active counters. Use kid-facing school language like `My homework` or `Mes devoirs` instead of project-management labels like `Tasks`.
 - Why: The UI should teach the create-work-complete loop without making old completed work look like unfinished obligations.
 - Follow-up: Post-pilot work must reduce dependence on perfect learner discipline by adding automatic session checkpoints, cleanup paths for stale or misclassified homework, and reinforcement actions for completed homework when the learner wants more practice or feels Banban missed the real difficulty.
+
+### D-20260512-02 - Keep Settings As One Flat Account Surface
+
+- Date: 2026-05-12
+- Status: accepted
+- Related tasks: `A6.4.1`, `A6.4.2`, `P1.3`
+- Context: `/app/settings` still looked like a nested control center even though the student shell had moved toward a quieter product surface. The user also asked whether deletion could become immediate account suppression when the account is not linked.
+- Decision: Flatten `/app/settings` into one account surface: read-only email first, account type/status/upgrade path next, profile fields read-only until `Modify`, linked-account visibility or management entry points, and the existing deletion controls. Keep deletion as a queued request rather than immediate suppression, even when no links are visible.
+- Why: A queued deletion path keeps parent/tutor links, billing blockers, audit history, and the 30-day purge target consistent. The page can feel simpler without weakening privacy and recovery semantics.
+- Follow-up: Revisit immediate account suppression only after the product has explicit policy, billing, audit, and linked-account behavior for that faster path.

@@ -115,9 +115,11 @@ The student home no longer owns the heavier learner profile controls.
 
 Current `/app/settings` student surface:
 
-- profile editing still lives there
-- deletion controls still live there
-- the route is now intentionally minimal and no longer carries student support, adult-link, memory, or billing sections
+- the signed-in email is shown first as read-only account identity
+- account type, status, and an upgrade link are visible without turning the page into a billing dashboard
+- profile fields are read-only by default and become editable only after the learner chooses `Modify`
+- linked-account entry points are present, but the page does not become the full parent/tutor support workspace
+- deletion controls still live there and continue to queue requests rather than deleting immediately
 
 Why:
 

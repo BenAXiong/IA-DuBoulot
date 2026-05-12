@@ -358,6 +358,7 @@ Status note: on 2026-03-11 the deployed Vercel app also completed a real Lemon t
 - [x] A6.4.2 Implement account-linked data deletion flows.
 - [x] A6.4.3 Write clear user-facing privacy copy for the MVP.
 Status note: `/app/settings` now hosts the stable profile, billing, privacy, and deletion-control surface for every role; `POST /api/privacy/deletion-requests` queues self or linked-child deletion requests through `lib/server/privacy/`; linked-child deletion revokes tutor access immediately; deletion-requested non-admin accounts are redirected back to `/app/settings`; and `npm run smoke:privacy` now covers the real route flow.
+Status note: on 2026-05-12 the settings surface was flattened for Pilot polish: email, account type, status, upgrade path, linked-account entry points, read-only profile rows, and queued deletion controls now live in one non-nested account page; profile editing is explicit through `Modify`, and immediate account suppression remains intentionally out of scope.
 
 ## 🟨 Phase A7 - QA, iPad Polish, And Launch Readiness
 

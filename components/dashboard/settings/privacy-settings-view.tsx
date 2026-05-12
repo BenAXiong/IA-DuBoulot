@@ -1,11 +1,16 @@
-import { AccountSettingsForm } from "@/components/auth/account-settings-form";
+import Link from "next/link";
 import { formatDateLabel } from "@/components/dashboard/student/student-dashboard-presenters";
 import { DeletionRequestForm } from "@/components/dashboard/settings/deletion-request-form";
+import { EditableProfileSection } from "@/components/dashboard/settings/editable-profile-section";
 import {
   getPrivacyDeleteButtonLabel,
   getPrivacySettingsCopy,
 } from "@/lib/i18n/ui-copy";
-import type { AppUserRecord } from "@/lib/server/auth/types";
+import type {
+  AccountStatus,
+  AppUserRecord,
+  AppUserRole,
+} from "@/lib/server/auth/types";
 import type { PrivacySettingsSnapshot } from "@/lib/server/privacy/types";
 
 type PrivacySettingsViewProps = {
@@ -14,79 +19,224 @@ type PrivacySettingsViewProps = {
   snapshot: PrivacySettingsSnapshot;
 };
 
-function getMinimalSettingsCopy(
-  languageCode: AppUserRecord["preferred_ui_language"],
-) {
+function getSettingsCopy(languageCode: AppUserRecord["preferred_ui_language"]) {
   switch (languageCode) {
     case "en":
       return {
-        pageTitle: "Settings",
-        pageBody: "Manage your profile and account access.",
-        profileTitle: "Profile",
-        profileBody: "Update the name and languages used in the app.",
+        unavailableEmail: "Email address unavailable",
+        email: "Email",
+        account: "Account",
+        accountType: "Account type",
+        status: "Status",
+        plan: "Plan",
+        starterPlan: "Explorer",
+        upgrade: "See upgrade options",
         profileFrozen:
-          "Profile changes are locked while an account deletion request is pending.",
-        deletionTitle: "Delete account",
-        deletionBody:
-          "Request deletion for this account. Linked student deletion stays available for parents here too.",
-        selfTitle: "This account",
-        selfBody: "Request deletion for your own account.",
-        selfAdmin: "This account must be handled manually.",
-        linkedStudentsTitle: "Linked students",
-        linkedStudentsBody:
-          "Request deletion for a linked student account from here.",
-        noLinkedStudents: "No linked student account is currently available here.",
+          "Profile changes are locked while deletion is pending.",
+        edit: "Modify",
+        cancel: "Cancel",
+        links: "Linked accounts",
+        linkedStudent: "Linked learner",
+        noLinks: "No linked account shown here yet.",
+        parentLinkDescription: "Ask a parent to follow your work.",
+        tutorLinkDescription: "Work with a tutor of your choice.",
+        parentLinkButton: "Link to parent account",
+        tutorLinkButton: "Link to tutor account",
+        parentManageOption: "Manage learners from the parent dashboard",
+        tutorManageOption: "Manage learner links from the tutor dashboard",
+        deletion: "Account deletion",
+        deletionAdmin: "This account must be handled manually.",
+        studentDelete: "Delete learner account",
+        deleteNote:
+          "Deletion is queued first so links, billing, and audit history stay consistent.",
+        linkedStudents: "Linked learners",
+        noLinkedStudents: "No linked learner can be deleted from here.",
         studentStatusLabel: "Status",
         studentRequested: "deletion requested",
         studentDefault: "active",
-        studentDelete: "Delete student account",
+        roles: {
+          student: "Student",
+          parent: "Parent",
+          tutor: "Tutor",
+          admin: "Admin",
+        },
+        statuses: {
+          active: "Active",
+          pending_parent_approval: "Parent approval pending",
+          suspended: "Suspended",
+          deletion_requested: "Deletion requested",
+        },
       };
     case "zh":
       return {
-        pageTitle: "設定",
-        pageBody: "管理你的個人資料與帳號存取。",
-        profileTitle: "個人資料",
-        profileBody: "更新在 app 內使用的名稱與語言。",
-        profileFrozen: "帳號刪除申請排隊中時，個人資料修改會被鎖定。",
-        deletionTitle: "刪除帳號",
-        deletionBody:
-          "從這裡提出帳號刪除申請。家長也可在這裡為已連結學生提出刪除。",
-        selfTitle: "這個帳號",
-        selfBody: "為你自己的帳號提出刪除申請。",
-        selfAdmin: "這個帳號需要人工處理。",
-        linkedStudentsTitle: "已連結學生",
-        linkedStudentsBody: "從這裡為已連結的學生帳號提出刪除申請。",
-        noLinkedStudents: "目前沒有可在這裡處理的已連結學生帳號。",
+        unavailableEmail: "無法顯示電子郵件地址",
+        email: "電子郵件",
+        account: "帳號",
+        accountType: "帳號類型",
+        status: "狀態",
+        plan: "方案",
+        starterPlan: "Explorer",
+        upgrade: "查看升級選項",
+        profileFrozen: "刪除申請待處理時，個人資料修改會被鎖定。",
+        edit: "修改",
+        cancel: "取消",
+        links: "已連結帳號",
+        linkedStudent: "已連結學生",
+        noLinks: "目前沒有可顯示的已連結帳號。",
+        parentLinkDescription: "請家長追蹤你的學習進度。",
+        tutorLinkDescription: "和你選擇的導師一起學習。",
+        parentLinkButton: "連結家長帳號",
+        tutorLinkButton: "連結導師帳號",
+        parentManageOption: "到家長總覽管理學生",
+        tutorManageOption: "到導師總覽管理學生連結",
+        deletion: "刪除帳號",
+        deletionAdmin: "這個帳號需要人工處理。",
+        studentDelete: "刪除學生帳號",
+        deleteNote: "刪除會先排隊處理，以保持連結、付費與稽核紀錄一致。",
+        linkedStudents: "已連結學生",
+        noLinkedStudents: "目前沒有可從這裡刪除的已連結學生。",
         studentStatusLabel: "狀態",
         studentRequested: "已提出刪除申請",
         studentDefault: "啟用中",
-        studentDelete: "刪除學生帳號",
+        roles: {
+          student: "學生",
+          parent: "家長",
+          tutor: "導師",
+          admin: "管理員",
+        },
+        statuses: {
+          active: "啟用中",
+          pending_parent_approval: "等待家長核准",
+          suspended: "已停用",
+          deletion_requested: "已要求刪除",
+        },
       };
     default:
       return {
-        pageTitle: "Réglages",
-        pageBody: "Gère ton profil et l'accès au compte.",
-        profileTitle: "Profil",
-        profileBody: "Modifie le nom et les langues utilisés dans l'app.",
+        unavailableEmail: "Adresse e-mail indisponible",
+        email: "E-mail",
+        account: "Compte",
+        accountType: "Type de compte",
+        status: "Statut",
+        plan: "Offre",
+        starterPlan: "Explorer",
+        upgrade: "Voir les options",
         profileFrozen:
-          "Les changements de profil sont bloqués pendant qu'une demande de suppression est en attente.",
-        deletionTitle: "Supprimer le compte",
-        deletionBody:
-          "Demande la suppression de ce compte. Pour les parents, la suppression d'un élève lié reste aussi disponible ici.",
-        selfTitle: "Ce compte",
-        selfBody: "Demande la suppression de ton propre compte.",
-        selfAdmin: "Ce compte doit être traité manuellement.",
-        linkedStudentsTitle: "Élèves liés",
-        linkedStudentsBody:
-          "Demande la suppression d'un compte élève lié depuis ici.",
+          "Le profil est bloqué pendant la demande de suppression.",
+        edit: "Modifier",
+        cancel: "Annuler",
+        links: "Comptes liés",
+        linkedStudent: "Élève lié",
+        noLinks: "Aucun compte lié n'est affiché ici pour le moment.",
+        parentLinkDescription: "Demande à un parent de suivre ton travail.",
+        tutorLinkDescription: "Travaille avec le tuteur de ton choix.",
+        parentLinkButton: "Lier un compte parent",
+        tutorLinkButton: "Lier un compte tuteur",
+        parentManageOption: "Gérer les élèves depuis le tableau parent",
+        tutorManageOption: "Gérer les liens élèves depuis le tableau tuteur",
+        deletion: "Suppression du compte",
+        deletionAdmin: "Ce compte doit être traité manuellement.",
+        studentDelete: "Supprimer le compte élève",
+        deleteNote:
+          "La suppression passe d'abord par une demande pour garder les liens, la facturation et l'audit cohérents.",
+        linkedStudents: "Élèves liés",
         noLinkedStudents:
-          "Aucun compte élève lié n'est disponible ici pour le moment.",
+          "Aucun élève lié ne peut être supprimé depuis ici pour le moment.",
         studentStatusLabel: "Statut",
         studentRequested: "suppression demandée",
         studentDefault: "actif",
-        studentDelete: "Supprimer le compte élève",
+        roles: {
+          student: "Élève",
+          parent: "Parent",
+          tutor: "Tuteur",
+          admin: "Admin",
+        },
+        statuses: {
+          active: "Actif",
+          pending_parent_approval: "Validation parentale en attente",
+          suspended: "Suspendu",
+          deletion_requested: "Suppression demandée",
+        },
       };
   }
+}
+
+function AccountFact({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="grid gap-1">
+      <dt className="text-xs uppercase tracking-[0.14em] text-[color:var(--ink-muted)]">
+        {label}
+      </dt>
+      <dd className="text-sm font-medium text-[color:var(--foreground)]">
+        {value}
+      </dd>
+    </div>
+  );
+}
+
+function PlanFact({
+  label,
+  value,
+  upgradeLabel,
+}: {
+  label: string;
+  value: string;
+  upgradeLabel: string;
+}) {
+  return (
+    <div className="grid gap-1">
+      <dt className="text-xs uppercase tracking-[0.14em] text-[color:var(--ink-muted)]">
+        {label}
+      </dt>
+      <dd className="flex flex-wrap items-center gap-2 text-sm font-medium text-[color:var(--foreground)]">
+        <span>{value}</span>
+        <Link
+          className="inline-flex items-center gap-1 text-sm font-medium text-[color:var(--accent)] underline-offset-4 hover:underline"
+          href="/pricing"
+        >
+          <span>{upgradeLabel}</span>
+          <ExternalLinkIcon />
+        </Link>
+      </dd>
+    </div>
+  );
+}
+
+function ExternalLinkIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-3.5 w-3.5"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <path
+        d="M14 5h5v5M19 5l-8 8"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M10 6.5H7.5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V14"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
+function formatPlan(
+  snapshot: PrivacySettingsSnapshot,
+  fallback: string,
+) {
+  if (!snapshot.billing?.hasSubscription) {
+    return fallback;
+  }
+
+  return snapshot.billing.planKey ?? fallback;
 }
 
 export function PrivacySettingsView({
@@ -96,67 +246,117 @@ export function PrivacySettingsView({
 }: PrivacySettingsViewProps) {
   const languageCode = appUser.preferred_ui_language;
   const deletionCopy = getPrivacySettingsCopy(languageCode);
-  const copy = getMinimalSettingsCopy(languageCode);
+  const copy = getSettingsCopy(languageCode);
   const isFrozen = appUser.account_status === "deletion_requested";
+  const roleLabel = copy.roles[appUser.role as AppUserRole];
+  const statusLabel = copy.statuses[appUser.account_status as AccountStatus];
 
   return (
-    <div className="grid gap-6">
-      <section className="grid gap-3 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]">
-        <h1 className="font-[family-name:var(--font-heading)] text-3xl leading-tight sm:text-4xl">
-          {copy.pageTitle}
-        </h1>
-        <p className="max-w-2xl text-sm leading-6 text-[color:var(--ink-soft)]">
-          {copy.pageBody}
+    <div className="mx-auto grid w-full max-w-5xl gap-6">
+      {isFrozen ? (
+        <p className="rounded-[1.25rem] border border-[#d6c48d] bg-[#fff8e5] px-4 py-3 text-sm leading-6 text-[#6b5320]">
+          {deletionCopy.deletionQueuedPrefix}
+          {formatDateLabel(appUser.deletion_requested_at, languageCode)}
+          {deletionCopy.deletionQueuedSuffix}
         </p>
-        {isFrozen ? (
-          <p className="rounded-[1.25rem] border border-[#d6c48d] bg-[#fff8e5] px-4 py-3 text-sm leading-6 text-[#6b5320]">
-            {deletionCopy.deletionQueuedPrefix}
-            {formatDateLabel(appUser.deletion_requested_at, languageCode)}
-            {deletionCopy.deletionQueuedSuffix}
-          </p>
-        ) : null}
-      </section>
+      ) : null}
 
-      <section className="grid gap-4 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]">
-        <div className="space-y-2">
-          <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
-            {copy.profileTitle}
-          </h2>
-          <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-            {copy.profileBody}
+      <section className="grid gap-5">
+        <div className="grid gap-1">
+          <p className="text-xs uppercase tracking-[0.14em] text-[color:var(--ink-muted)]">
+            {copy.email}
+          </p>
+          <p className="text-base font-medium text-[color:var(--foreground)]">
+            {email ?? copy.unavailableEmail}
           </p>
         </div>
 
-        {isFrozen ? (
-          <div className="rounded-[1.5rem] border border-dashed border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5 text-sm leading-6 text-[color:var(--ink-soft)]">
-            {copy.profileFrozen}
-          </div>
-        ) : (
-          <div className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5">
-            <AccountSettingsForm appUser={appUser} email={email} />
-          </div>
-        )}
+        <dl className="grid gap-4 border-t border-[color:var(--line)] pt-5 sm:grid-cols-3">
+          <AccountFact label={copy.accountType} value={roleLabel} />
+          <AccountFact label={copy.status} value={statusLabel} />
+          <PlanFact
+            label={copy.plan}
+            upgradeLabel={copy.upgrade}
+            value={formatPlan(snapshot, copy.starterPlan)}
+          />
+        </dl>
       </section>
 
-      <section className="grid gap-4 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)]">
-        <div className="space-y-2">
+      <EditableProfileSection
+        appUser={appUser}
+        cancelLabel={copy.cancel}
+        editLabel={copy.edit}
+        frozenCopy={copy.profileFrozen}
+      />
+
+      <section className="grid gap-4 border-t border-[color:var(--line)] pt-6">
+        <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
+          {copy.links}
+        </h2>
+        {appUser.role === "parent" && snapshot.linkedStudentDeletionTargets.length > 0 ? (
+          <div className="grid gap-2">
+            {snapshot.linkedStudentDeletionTargets.map((target) => (
+              <div
+                className="flex flex-wrap items-center justify-between gap-3 border-b border-[color:var(--line)] py-3 last:border-b-0"
+                key={target.targetUserId}
+              >
+                <p className="font-medium">{target.displayName}</p>
+                <p className="text-sm text-[color:var(--ink-soft)]">
+                  {copy.linkedStudent}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
+            {copy.noLinks}
+          </p>
+        )}
+
+        <div className="grid gap-3">
+          {appUser.role === "student" ? (
+            <>
+              <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
+                <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
+                  {copy.parentLinkDescription}
+                </p>
+                <Link className="button-base button-secondary justify-center" href="/app">
+                  {copy.parentLinkButton}
+                </Link>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
+                <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
+                  {copy.tutorLinkDescription}
+                </p>
+                <Link className="button-base button-secondary justify-center" href="/app">
+                  {copy.tutorLinkButton}
+                </Link>
+              </div>
+            </>
+          ) : appUser.role === "parent" ? (
+            <Link className="button-base button-secondary" href="/app">
+              {copy.parentManageOption}
+            </Link>
+          ) : appUser.role === "tutor" ? (
+            <Link className="button-base button-secondary" href="/app">
+              {copy.tutorManageOption}
+            </Link>
+          ) : null}
+        </div>
+      </section>
+
+      <section className="grid gap-4 border-t border-[color:var(--line)] pt-6">
+        <div className="grid gap-1">
           <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
-            {copy.deletionTitle}
+            {copy.deletion}
           </h2>
           <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-            {copy.deletionBody}
+            {copy.deleteNote}
           </p>
         </div>
 
         <div className="grid gap-4 lg:grid-cols-2">
-          <article className="grid gap-4 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5">
-            <div className="space-y-2">
-              <p className="font-medium">{copy.selfTitle}</p>
-              <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-                {snapshot.selfDeletion ? copy.selfBody : copy.selfAdmin}
-              </p>
-            </div>
-
+          <div className="grid content-start gap-3">
             {snapshot.selfDeletion ? (
               <DeletionRequestForm
                 buttonLabel={getPrivacyDeleteButtonLabel(appUser, languageCode)}
@@ -166,40 +366,33 @@ export function PrivacySettingsView({
                 requestedAt={snapshot.selfDeletion.requestedAt}
                 targetDisplayName={snapshot.selfDeletion.displayName}
               />
-            ) : null}
-          </article>
+            ) : (
+              <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
+                {copy.deletionAdmin}
+              </p>
+            )}
+          </div>
 
           {appUser.role === "parent" ? (
-            <article className="grid gap-4 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5">
-              <div className="space-y-2">
-                <p className="font-medium">{copy.linkedStudentsTitle}</p>
-                <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-                  {copy.linkedStudentsBody}
-                </p>
-              </div>
-
+            <div className="grid content-start gap-3">
+              <p className="font-medium">{copy.linkedStudents}</p>
               {snapshot.linkedStudentDeletionTargets.length === 0 ? (
-                <div className="rounded-[1.25rem] border border-dashed border-[color:var(--line)] bg-white px-4 py-3 text-sm leading-6 text-[color:var(--ink-soft)]">
+                <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
                   {copy.noLinkedStudents}
-                </div>
+                </p>
               ) : (
-                <div className="grid gap-3">
+                <div className="grid gap-4">
                   {snapshot.linkedStudentDeletionTargets.map((target) => (
-                    <div
-                      className="grid gap-3 rounded-[1.25rem] border border-[color:var(--line)] bg-white px-4 py-4"
-                      key={target.targetUserId}
-                    >
-                      <div className="space-y-1">
+                    <div className="grid gap-2" key={target.targetUserId}>
+                      <div className="flex flex-wrap items-center justify-between gap-3">
                         <p className="font-medium">{target.displayName}</p>
-                        <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
+                        <p className="text-sm text-[color:var(--ink-soft)]">
                           {copy.studentStatusLabel}:{" "}
                           {target.requestedAt
                             ? copy.studentRequested
                             : copy.studentDefault}
-                          .
                         </p>
                       </div>
-
                       <DeletionRequestForm
                         buttonLabel={copy.studentDelete}
                         disabledReason={target.blockedReason}
@@ -213,7 +406,7 @@ export function PrivacySettingsView({
                   ))}
                 </div>
               )}
-            </article>
+            </div>
           ) : null}
         </div>
       </section>

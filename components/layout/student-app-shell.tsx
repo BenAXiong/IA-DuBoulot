@@ -68,7 +68,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
           tests: "Tests",
           conversation: "Conversation",
           history: "History",
-          settings: "Profile",
+          settings: "Profile and settings",
           fallback: "Homework",
         },
       };
@@ -100,7 +100,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
           tests: "測驗",
           conversation: "對話",
           history: "歷程",
-          settings: "個人檔案",
+          settings: "個人檔案與設定",
           fallback: "作業",
         },
       };
@@ -132,7 +132,7 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
           tests: "Tests",
           conversation: "Discussion",
           history: "Historique",
-          settings: "Profil",
+          settings: "Profil et réglages",
           fallback: "Devoirs",
         },
       };
@@ -256,7 +256,7 @@ function buildHeaderContent(input: {
   if (input.pathname.startsWith("/app/settings")) {
     return {
       eyebrow: input.copy.pageTitles.settings,
-      title: input.copy.pageTitles.settings,
+      title: null,
     };
   }
 

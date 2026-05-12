@@ -28,6 +28,7 @@ type ProfileErrorPayload = {
 type AccountSettingsFormProps = {
   appUser: AppUserRecord;
   email?: string | null;
+  showEmail?: boolean;
 };
 
 function getFieldError(
@@ -62,6 +63,7 @@ function getAccountEmailCopy(
 export function AccountSettingsForm({
   appUser,
   email = null,
+  showEmail = true,
 }: AccountSettingsFormProps) {
   const router = useRouter();
   const copy = getAccountSettingsFormCopy(appUser.preferred_ui_language);
@@ -147,14 +149,16 @@ export function AccountSettingsForm({
         />
       </FormField>
 
-      <div className="grid gap-1.5">
-        <p className="text-sm font-medium text-[color:var(--foreground)]">
-          {emailCopy.label}
-        </p>
-        <p className="min-h-11 rounded-[1rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-3 py-2.5 text-sm leading-6 text-[color:var(--ink-soft)]">
-          {email ?? emailCopy.unavailable}
-        </p>
-      </div>
+      {showEmail ? (
+        <div className="grid gap-1.5">
+          <p className="text-sm font-medium text-[color:var(--foreground)]">
+            {emailCopy.label}
+          </p>
+          <p className="min-h-11 rounded-[1rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-3 py-2.5 text-sm leading-6 text-[color:var(--ink-soft)]">
+            {email ?? emailCopy.unavailable}
+          </p>
+        </div>
+      ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <FormField

@@ -365,3 +365,7 @@ then close it as:
 | 2026-05-12 | 20:59 -> 21:01 | 0h02 | P1.3 | restore Homework status-pill color and outline while keeping the normal row font size | | |
 | 2026-05-12 | 21:05 -> 21:06 | 0h01 | P1.3 | align root Homework row subject labels inline before a fixed-width date column | | |
 | 2026-05-12 | 21:18 -> 21:20 | 0h02 | P1.3 P2.4 P6 | test the completed Homework section polish, then commit and push | | |
+| 2026-05-12 | 21:32 -> 21:34 | 0h02 | P1.3 | log a demo-data utility follow-up for populating account homework by subject and status | | |
+| 2026-05-12 | 21:49 -> 22:01 | 0h12 | A6.4.1 A6.4.2 P1.3 | simplify the `/app/settings` profile, account, linked-account, and deletion-control surface | | |
+| 2026-05-12 | 22:10 -> 22:13 | 0h03 | A6.4.1 P1.3 | polish `/app/settings` linked-account actions, deletion layout, and subscription link placement | | |
+| 2026-05-12 | 22:18 -> 22:21 | 0h03 | A6.4.1 P1.3 | rename the settings header, add the external-link icon to upgrade options, then commit and push the settings slice | | |
