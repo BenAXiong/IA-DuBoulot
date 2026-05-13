@@ -42,6 +42,10 @@ export type AppUserRecord = {
   ai_help_language: AiLanguageCode;
   age_band: AgeBand | null;
   is_under_13: boolean;
+  birth_date: string | null;
+  country_of_study: string | null;
+  school_name: string | null;
+  grade_level: string | null;
   deletion_requested_at: string | null;
   created_at: string;
   updated_at: string;
@@ -60,6 +64,10 @@ export type BootstrapProfileInput = {
   aiHelpLanguage: AiLanguageCode;
   ageBand: AgeBand | null;
   isUnder13: boolean;
+  birthDate: string | null;
+  countryOfStudy: string | null;
+  schoolName: string | null;
+  gradeLevel: string | null;
 };
 
 export type UpdateProfileInput = {

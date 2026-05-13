@@ -10,13 +10,14 @@ This document explains the first Supabase schema draft so future sessions do not
 
 - SQL migration: [20260310000100_initial_schema.sql](../supabase/migrations/20260310000100_initial_schema.sql)
 - Invitation extension: [20260311000300_account_link_invitations.sql](../supabase/migrations/20260311000300_account_link_invitations.sql)
+- Onboarding profile fields: [20260513000100_add_onboarding_profile_fields.sql](../supabase/migrations/20260513000100_add_onboarding_profile_fields.sql)
 
 ## Main Decisions
 
 ### Auth Identity And App Identity Are Split Cleanly
 
 - `auth.users` remains the Supabase authentication source of truth.
-- `public.users` stores app-specific role, status, language, and under-13 state.
+- `public.users` stores app-specific role, status, language, under-13 state, and the small learner registration profile needed for school-context defaults.
 - All domain tables reference `public.users`, not `auth.users`, after that entry point.
 
 Why:
@@ -55,6 +56,7 @@ This avoids a single giant session table and keeps later policy logic easier to 
 
 - `users.account_status` includes `pending_parent_approval` and `deletion_requested`
 - `users.deletion_requested_at` supports queued purge flows
+- `users.birth_date`, `country_of_study`, optional `school_name`, and `grade_level` support the current learner onboarding source of truth; the service derives `age_band` and `is_under_13` from `birth_date`
 - learning-content tables cascade from student-owned roots, so purge jobs can delete account content cleanly
 - deleting a subject resource cascades its chunks and conversation links; storage cleanup is service-owned because promoted chat attachments and resource-owned uploads have different storage ownership
 - `subscriptions`, `audit_logs`, `moderation_events`, and the server-owned `ai_generation_debug_captures` table are structured so limited operational/debug records can survive separately when necessary

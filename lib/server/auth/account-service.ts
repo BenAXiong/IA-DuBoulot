@@ -28,6 +28,10 @@ type BootstrapProfilePayload = Partial<{
   aiHelpLanguage: string;
   ageBand: string | null;
   isUnder13: boolean;
+  birthDate: string | null;
+  countryOfStudy: string | null;
+  schoolName: string | null;
+  gradeLevel: string | null;
 }>;
 
 type BootstrapProfileResult = {
@@ -45,7 +49,7 @@ type UpdateProfilePayload = Partial<{
 type AuthProfileServerCopy = ReturnType<typeof getAuthProfileServerCopy>;
 
 export const APP_USER_SELECT =
-  "id, role, account_status, display_name, preferred_ui_language, ai_help_language, age_band, is_under_13, deletion_requested_at, created_at, updated_at";
+  "id, role, account_status, display_name, preferred_ui_language, ai_help_language, age_band, is_under_13, birth_date, country_of_study, school_name, grade_level, deletion_requested_at, created_at, updated_at";
 
 function isStringInArray<T extends readonly string[]>(
   value: string,
@@ -112,6 +116,125 @@ function parseDisplayName(
       status: 400,
       fieldErrors: {
         displayName: copy.fieldErrors.displayName,
+      },
+    });
+  }
+
+  return normalized;
+}
+
+function parseOptionalText(
+  value: string | null | undefined,
+  maxLength: number,
+  fieldName: string,
+  copy: AuthProfileServerCopy,
+) {
+  const normalized = value?.trim() ?? "";
+
+  if (normalized.length > maxLength) {
+    throw new AppError({
+      code: "validation_error",
+      message: copy.invalidFields,
+      status: 400,
+      fieldErrors: {
+        [fieldName]: copy.fieldErrors.textTooLong,
+      },
+    });
+  }
+
+  return normalized || null;
+}
+
+function parseRequiredText(
+  value: string | null | undefined,
+  maxLength: number,
+  fieldName: string,
+  copy: AuthProfileServerCopy,
+) {
+  const normalized = parseOptionalText(value, maxLength, fieldName, copy);
+
+  if (!normalized) {
+    throw new AppError({
+      code: "validation_error",
+      message: copy.invalidFields,
+      status: 400,
+      fieldErrors: {
+        [fieldName]: copy.fieldErrors.requiredText,
+      },
+    });
+  }
+
+  return normalized;
+}
+
+function calculateAge(birthDate: Date, now = new Date()) {
+  let age = now.getUTCFullYear() - birthDate.getUTCFullYear();
+  const currentMonth = now.getUTCMonth();
+  const birthMonth = birthDate.getUTCMonth();
+  const hasHadBirthday =
+    currentMonth > birthMonth ||
+    (currentMonth === birthMonth && now.getUTCDate() >= birthDate.getUTCDate());
+
+  if (!hasHadBirthday) {
+    age -= 1;
+  }
+
+  return age;
+}
+
+function ageToBand(age: number): AgeBand {
+  if (age <= 8) {
+    return "six_eight";
+  }
+
+  if (age <= 10) {
+    return "nine_ten";
+  }
+
+  if (age <= 12) {
+    return "eleven_twelve";
+  }
+
+  if (age <= 15) {
+    return "thirteen_fifteen";
+  }
+
+  return "sixteen_eighteen";
+}
+
+function parseBirthDate(
+  value: string | null | undefined,
+  copy: AuthProfileServerCopy,
+) {
+  const normalized = value?.trim() ?? "";
+
+  if (!normalized || !/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
+    throw new AppError({
+      code: "validation_error",
+      message: copy.invalidFields,
+      status: 400,
+      fieldErrors: {
+        birthDate: copy.fieldErrors.birthDate,
+      },
+    });
+  }
+
+  const parsed = new Date(`${normalized}T00:00:00.000Z`);
+  const [year, month, day] = normalized.split("-").map(Number);
+
+  if (
+    Number.isNaN(parsed.getTime()) ||
+    parsed.getUTCFullYear() !== year ||
+    parsed.getUTCMonth() + 1 !== month ||
+    parsed.getUTCDate() !== day ||
+    parsed > new Date()
+  ) {
+    throw new AppError({
+      code: "validation_error",
+      message: copy.invalidFields,
+      status: 400,
+      fieldErrors: {
+        birthDate: copy.fieldErrors.birthDate,
       },
     });
   }
@@ -299,8 +422,26 @@ export async function parseBootstrapProfileInput(
   const displayName = parseDisplayName(payload.displayName, copy);
   const preferredUiLanguage = parseUiLanguage(payload.preferredUiLanguage, copy);
   const aiHelpLanguage = parseAiLanguage(payload.aiHelpLanguage, copy);
-  const ageBand = parseAgeBand(payload.ageBand, copy);
-  const isUnder13 = payload.isUnder13 ?? false;
+  const birthDate = role === "student" ? parseBirthDate(payload.birthDate, copy) : null;
+  const studentAge = birthDate
+    ? calculateAge(new Date(`${birthDate}T00:00:00.000Z`))
+    : null;
+  const derivedAgeBand = studentAge === null ? null : ageToBand(studentAge);
+  const ageBand =
+    role === "student" ? derivedAgeBand : parseAgeBand(payload.ageBand, copy);
+  const isUnder13 = role === "student" ? (studentAge ?? 99) < 13 : false;
+  const countryOfStudy =
+    role === "student"
+      ? parseRequiredText(payload.countryOfStudy, 80, "countryOfStudy", copy)
+      : null;
+  const schoolName =
+    role === "student"
+      ? parseOptionalText(payload.schoolName, 120, "schoolName", copy)
+      : null;
+  const gradeLevel =
+    role === "student"
+      ? parseRequiredText(payload.gradeLevel, 40, "gradeLevel", copy)
+      : null;
 
   if (isUnder13 && role !== "student") {
     throw new AppError({
@@ -342,6 +483,10 @@ export async function parseBootstrapProfileInput(
     aiHelpLanguage,
     ageBand,
     isUnder13,
+    birthDate,
+    countryOfStudy,
+    schoolName,
+    gradeLevel,
   };
 }
 
@@ -475,6 +620,10 @@ export async function bootstrapProfile(
     ai_help_language: input.aiHelpLanguage,
     age_band: input.role === "student" ? input.ageBand : null,
     is_under_13: input.role === "student" ? input.isUnder13 : false,
+    birth_date: input.role === "student" ? input.birthDate : null,
+    country_of_study: input.role === "student" ? input.countryOfStudy : null,
+    school_name: input.role === "student" ? input.schoolName : null,
+    grade_level: input.role === "student" ? input.gradeLevel : null,
     deletion_requested_at: null,
   };
 
@@ -524,6 +673,8 @@ export async function bootstrapProfile(
       created: !existingUser,
       role: input.role,
       isUnder13: input.isUnder13,
+      countryOfStudy: input.countryOfStudy,
+      gradeLevel: input.gradeLevel,
     },
   });
 

@@ -51,6 +51,27 @@ export function EditableProfileSection({
           appUser.age_band,
         )
       : null;
+  const studentProfileCopy =
+    appUser.preferred_ui_language === "en"
+      ? {
+          birthDate: "Birthday",
+          countryOfStudy: "Country of study",
+          schoolName: "School",
+          gradeLevel: "Grade",
+        }
+      : appUser.preferred_ui_language === "zh"
+        ? {
+            birthDate: "生日",
+            countryOfStudy: "就學國家",
+            schoolName: "學校",
+            gradeLevel: "年級",
+          }
+        : {
+            birthDate: "Date de naissance",
+            countryOfStudy: "Pays de scolarité",
+            schoolName: "Établissement scolaire",
+            gradeLevel: "Classe",
+          };
 
   return (
     <section className="grid gap-4 border-t border-[color:var(--line)] pt-6">
@@ -94,7 +115,25 @@ export function EditableProfileSection({
             value={findOptionLabel(AI_LANGUAGE_OPTIONS, appUser.ai_help_language)}
           />
           {appUser.role === "student" ? (
-            <ProfileRow label={copy.fields.ageBand} value={ageBandLabel} />
+            <>
+              <ProfileRow
+                label={studentProfileCopy.birthDate}
+                value={appUser.birth_date}
+              />
+              <ProfileRow label={copy.fields.ageBand} value={ageBandLabel} />
+              <ProfileRow
+                label={studentProfileCopy.countryOfStudy}
+                value={appUser.country_of_study}
+              />
+              <ProfileRow
+                label={studentProfileCopy.schoolName}
+                value={appUser.school_name}
+              />
+              <ProfileRow
+                label={studentProfileCopy.gradeLevel}
+                value={appUser.grade_level}
+              />
+            </>
           ) : null}
         </dl>
       )}

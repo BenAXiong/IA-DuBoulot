@@ -154,6 +154,7 @@ Status note: `components/ui/` now provides the shared primitive layer, onboardin
 - [x] A2.2.4 Implement protected routes and session refresh handling.
 
 Status note: the SSR auth foundation is now wired into `/auth`, `/auth/confirm`, `/onboarding`, and a protected `/app` page.
+Status note: on 2026-05-13, learner onboarding began persisting `birth_date`, `country_of_study`, optional `school_name`, and `grade_level` on `users`; `is_under_13` and `age_band` are derived server-side from the birth date during profile bootstrap.
 Status note: safe app-profile fields now sync into Supabase auth metadata on bootstrap and profile updates.
 Status note: canonical invitation rows now back the parent-approval and tutor-link flows, with `/invite/[token]` as the shared acceptance surface.
 Status note: same-browser invite confirmation now recovers pending tutor/parent flows through the `ia_pending_invite` cookie and the `/auth/complete` redirect bridge even when the Supabase email template does not preserve `next`.

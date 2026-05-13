@@ -1238,19 +1238,19 @@ export function getOnboardingPageCopy(languageCode: UiLanguageCode) {
   return pickLocalizedValue(languageCode, {
     fr: {
       eyebrow: "Onboarding",
-      title: "Finalise le compte avant d'entrer dans le bon espace.",
+      title: "Encore quelques étapes avant que ton espace soit prêt.",
       body:
         "Confirme le nom, les langues, et les informations essentielles pour que banban ouvre la bonne expérience dès la première session.",
     },
     en: {
       eyebrow: "Onboarding",
-      title: "Finish setting up the account before entering the right workspace.",
+      title: "Just a few steps before your workspace is ready.",
       body:
         "Confirm the name, languages, and a few essentials so banban can open the right experience from the very first session.",
     },
     zh: {
       eyebrow: "Onboarding",
-      title: "先完成帳號設定，再進入對應的工作空間。",
+      title: "再幾步，你的工作空間就準備好了。",
       body:
         "確認名稱、語言與必要資訊，讓 banban 從第一個 session 就能打開正確的使用體驗。",
     },
@@ -1264,12 +1264,18 @@ export function getOnboardingFormCopy(languageCode: UiLanguageCode) {
       connectedSession: "Session connectée",
       emailUnavailable: "email indisponible",
       fields: {
-        displayName: "Nom affiché",
+        displayName: "Choisis un pseudo",
         uiLanguage: "Langue de l'interface",
         aiLanguage: "Langue de l'aide IA",
-        ageBand: "Tranche d'âge",
+        birthDate: "Date de naissance",
+        countryOfStudy: "Pays de scolarité",
+        schoolName: "Établissement scolaire",
+        gradeLevel: "Classe",
       },
-      displayNamePlaceholder: "Ex : Léa Martin",
+      displayNamePlaceholder: "Ex : Léa",
+      countryPlaceholder: "Ex : France",
+      schoolPlaceholder: "Optionnel",
+      gradePlaceholder: "Ex : 5e",
       under13Label: "Compte élève de moins de 13 ans",
       studentStatus: {
         under13: "Le compte restera en attente jusqu'à la validation parentale.",
@@ -1285,12 +1291,18 @@ export function getOnboardingFormCopy(languageCode: UiLanguageCode) {
       connectedSession: "Connected session",
       emailUnavailable: "email unavailable",
       fields: {
-        displayName: "Display name",
+        displayName: "Choose a nickname",
         uiLanguage: "Interface language",
         aiLanguage: "AI help language",
-        ageBand: "Age band",
+        birthDate: "Birthday",
+        countryOfStudy: "Country of study",
+        schoolName: "School",
+        gradeLevel: "Grade",
       },
-      displayNamePlaceholder: "Example: Lea Martin",
+      displayNamePlaceholder: "Example: Lea",
+      countryPlaceholder: "Example: France",
+      schoolPlaceholder: "Optional",
+      gradePlaceholder: "Example: 7th grade",
       under13Label: "Student account under 13",
       studentStatus: {
         under13: "The account will stay pending until a parent approves it.",
@@ -1306,12 +1318,18 @@ export function getOnboardingFormCopy(languageCode: UiLanguageCode) {
       connectedSession: "已登入 session",
       emailUnavailable: "email 無法取得",
       fields: {
-        displayName: "顯示名稱",
+        displayName: "選擇暱稱",
         uiLanguage: "介面語言",
         aiLanguage: "AI 協助語言",
-        ageBand: "年齡區間",
+        birthDate: "生日",
+        countryOfStudy: "就學國家",
+        schoolName: "學校",
+        gradeLevel: "年級",
       },
-      displayNamePlaceholder: "例如：Lea Martin",
+      displayNamePlaceholder: "例如：Lea",
+      countryPlaceholder: "例如：台灣",
+      schoolPlaceholder: "選填",
+      gradePlaceholder: "例如：國一",
       under13Label: "13 歲以下學生帳號",
       studentStatus: {
         under13: "帳號會先維持待家長核准。",
@@ -1767,6 +1785,9 @@ export function getAuthProfileServerCopy(languageCode: UiLanguageCode) {
         aiHelpLanguage: "La langue d'aide IA doit être fr ou en.",
         ageBandSupported:
           "La tranche d'âge doit faire partie des valeurs prises en charge.",
+        birthDate: "La date de naissance est requise et doit être valide.",
+        requiredText: "Ce champ est requis.",
+        textTooLong: "Ce champ est trop long.",
         onlyStudentUnder13:
           "Seuls les comptes élève peuvent être marqués comme moins de 13 ans.",
         under13AgeBand:
@@ -1803,6 +1824,9 @@ export function getAuthProfileServerCopy(languageCode: UiLanguageCode) {
           "Interface language must be fr, en, or zh.",
         aiHelpLanguage: "AI help language must be fr or en.",
         ageBandSupported: "Age band must be one of the supported values.",
+        birthDate: "Birth date is required and must be valid.",
+        requiredText: "This field is required.",
+        textTooLong: "This field is too long.",
         onlyStudentUnder13:
           "Only student accounts can be marked as under 13.",
         under13AgeBand:
@@ -1832,6 +1856,9 @@ export function getAuthProfileServerCopy(languageCode: UiLanguageCode) {
         preferredUiLanguage: "介面語言必須是 fr、en 或 zh。",
         aiHelpLanguage: "AI 協助語言必須是 fr 或 en。",
         ageBandSupported: "年齡區間必須是支援的值之一。",
+        birthDate: "必須提供有效的出生日期。",
+        requiredText: "此欄位為必填。",
+        textTooLong: "此欄位太長。",
         onlyStudentUnder13: "只有學生帳號可以標記為 13 歲以下。",
         under13AgeBand:
           "13 歲以下的學生帳號必須使用 six_eight、nine_ten 或 eleven_twelve。",

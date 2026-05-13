@@ -250,10 +250,6 @@ export function AuthPanel({
                 : copy.buttons.signUp}
           </button>
         </form>
-
-        <p className="mt-3 text-center text-[11px] leading-5 text-[color:var(--ink-soft)]">
-          {mode === "sign_in" ? copy.footer.signIn : copy.footer.signUp}
-        </p>
       </article>
     </section>
   );

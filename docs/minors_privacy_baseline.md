@@ -88,6 +88,12 @@ Why not:
 
 - it adds sensitive data with little MVP benefit
 
+Pilot exception:
+
+- on 2026-05-13 the learner onboarding flow switched to collecting `birth_date` as the source of truth for age-gating, then deriving `age_band` and `is_under_13` server-side
+- this exception exists because the product now needs a less confusing registration path than a self-declared under-13 checkbox plus age band
+- the exact birth date must stay in app profile storage only and must not be mirrored into auth metadata, prompt context, or learner-facing summaries unless a future policy explicitly approves that use
+
 ### 4. Parent Rights In Product
 
 Chosen default:
@@ -123,8 +129,12 @@ Reason:
 Collect only:
 
 - display name or nickname
-- age band
+- age band, derived from birth date during the current onboarding exception
+- birth date for age-gating while the current onboarding exception remains active
 - language preference
+- country of study
+- school grade
+- optional school name
 - role and linked-account relationships
 - homework uploads
 - extracted text
@@ -138,9 +148,9 @@ Collect only:
 
 Do not collect by default:
 
-- precise birth date
+- precise birth date outside the explicit age-gating exception above
 - home address
-- precise school name
+- precise school name unless the learner voluntarily provides the optional school field
 - phone number for child accounts
 - advertising identifiers
 - child profile photos

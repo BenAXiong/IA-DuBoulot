@@ -11,8 +11,6 @@ import {
   AI_LANGUAGE_CODES,
   AI_LANGUAGE_OPTIONS,
   UI_LANGUAGE_OPTIONS,
-  UNDER_13_AGE_BAND_VALUES,
-  getStudentAgeBandOptions,
 } from "@/lib/i18n/config";
 import { getOnboardingFormCopy } from "@/lib/i18n/ui-copy";
 import { withUiLanguage } from "@/lib/i18n/ui-language";
@@ -30,7 +28,6 @@ type BootstrapErrorPayload = {
 };
 
 type OnboardingFormProps = {
-  email: string | null;
   defaultRole?: "student" | "parent" | "tutor";
   inviteToken?: string | null;
   initialPreferredUiLanguage: UiLanguageCode;
@@ -54,8 +51,28 @@ function resolveInitialAiHelpLanguage(
   return "fr";
 }
 
+function calculateAge(birthDate: string) {
+  const parsed = new Date(`${birthDate}T00:00:00.000Z`);
+
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+
+  const now = new Date();
+  let age = now.getUTCFullYear() - parsed.getUTCFullYear();
+  const hasHadBirthday =
+    now.getUTCMonth() > parsed.getUTCMonth() ||
+    (now.getUTCMonth() === parsed.getUTCMonth() &&
+      now.getUTCDate() >= parsed.getUTCDate());
+
+  if (!hasHadBirthday) {
+    age -= 1;
+  }
+
+  return age;
+}
+
 export function OnboardingForm({
-  email,
   defaultRole = "student",
   inviteToken = null,
   initialPreferredUiLanguage,
@@ -71,19 +88,15 @@ export function OnboardingForm({
   const [aiHelpLanguage, setAiHelpLanguage] = useState<AiLanguageCode>(
     resolveInitialAiHelpLanguage(initialPreferredUiLanguage),
   );
-  const [isUnder13, setIsUnder13] = useState(false);
-  const [ageBand, setAgeBand] = useState("");
+  const [birthDate, setBirthDate] = useState("");
+  const [countryOfStudy, setCountryOfStudy] = useState("");
+  const [schoolName, setSchoolName] = useState("");
+  const [gradeLevel, setGradeLevel] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
-
-  const ageBandOptions = getStudentAgeBandOptions(languageCode);
-  const visibleAgeBandOptions = !isUnder13
-    ? ageBandOptions
-    : ageBandOptions.filter(
-        (option) =>
-          option.value === "" || UNDER_13_AGE_BAND_VALUES.has(option.value),
-      );
+  const age = birthDate ? calculateAge(birthDate) : null;
+  const isUnder13 = role === "student" && age !== null && age < 13;
 
   function resetErrors() {
     setErrorMessage(null);
@@ -105,8 +118,10 @@ export function OnboardingForm({
           displayName,
           preferredUiLanguage,
           aiHelpLanguage,
-          isUnder13: role === "student" ? isUnder13 : false,
-          ageBand: role === "student" && ageBand ? ageBand : null,
+          birthDate: role === "student" ? birthDate : null,
+          countryOfStudy: role === "student" ? countryOfStudy : null,
+          schoolName: role === "student" ? schoolName : null,
+          gradeLevel: role === "student" ? gradeLevel : null,
         }),
       });
 
@@ -130,13 +145,6 @@ export function OnboardingForm({
 
   return (
     <form className="grid gap-5" onSubmit={handleSubmit}>
-      <div className="grid gap-2 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-4 text-sm text-[color:var(--ink-soft)]">
-        <span className="font-medium text-[color:var(--foreground)]">
-          {copy.connectedSession}
-        </span>
-        <span>{email ?? copy.emailUnavailable}</span>
-      </div>
-
       {errorMessage ? <FormCallout variant="error">{errorMessage}</FormCallout> : null}
 
       <FormField
@@ -152,92 +160,102 @@ export function OnboardingForm({
         />
       </FormField>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <FormField
-          error={getFieldError(fieldErrors, "preferredUiLanguage")}
-          label={copy.fields.uiLanguage}
+      <FormField
+        error={getFieldError(fieldErrors, "preferredUiLanguage")}
+        label={copy.fields.uiLanguage}
+      >
+        <SelectInput
+          onChange={(event) =>
+            setPreferredUiLanguage(event.target.value as UiLanguageCode)
+          }
+          value={preferredUiLanguage}
         >
-          <SelectInput
-            onChange={(event) =>
-              setPreferredUiLanguage(event.target.value as UiLanguageCode)
-            }
-            value={preferredUiLanguage}
-          >
-            {UI_LANGUAGE_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </SelectInput>
-        </FormField>
+          {UI_LANGUAGE_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </SelectInput>
+      </FormField>
 
-        <FormField
-          error={getFieldError(fieldErrors, "aiHelpLanguage")}
-          label={copy.fields.aiLanguage}
+      <FormField
+        error={getFieldError(fieldErrors, "aiHelpLanguage")}
+        label={copy.fields.aiLanguage}
+      >
+        <SelectInput
+          onChange={(event) =>
+            setAiHelpLanguage(event.target.value as AiLanguageCode)
+          }
+          value={aiHelpLanguage}
         >
-          <SelectInput
-            onChange={(event) =>
-              setAiHelpLanguage(event.target.value as AiLanguageCode)
-            }
-            value={aiHelpLanguage}
-          >
-            {AI_LANGUAGE_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </SelectInput>
-        </FormField>
-      </div>
+          {AI_LANGUAGE_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </SelectInput>
+      </FormField>
 
       {role === "student" ? (
-        <section className="grid gap-4 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5">
-          <label className="inline-flex items-center gap-3 text-sm">
-            <input
-              checked={isUnder13}
-              onChange={(event) => {
-                const nextValue = event.target.checked;
-                setIsUnder13(nextValue);
-
-                if (!nextValue && UNDER_13_AGE_BAND_VALUES.has(ageBand)) {
-                  return;
-                }
-
-                if (
-                  nextValue &&
-                  ageBand &&
-                  !UNDER_13_AGE_BAND_VALUES.has(ageBand)
-                ) {
-                  setAgeBand("");
-                }
-              }}
-              type="checkbox"
-            />
-            <span>{copy.under13Label}</span>
-          </label>
-
+        <>
           <FormField
-            error={getFieldError(fieldErrors, "ageBand")}
-            label={copy.fields.ageBand}
+            error={getFieldError(fieldErrors, "birthDate")}
+            label={copy.fields.birthDate}
           >
-            <SelectInput
-              onChange={(event) => setAgeBand(event.target.value)}
-              value={ageBand}
-            >
-              {visibleAgeBandOptions.map((option) => (
-                <option key={option.value || "empty"} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </SelectInput>
+            <TextInput
+              onChange={(event) => setBirthDate(event.target.value)}
+              required
+              type="date"
+              value={birthDate}
+            />
           </FormField>
 
-          <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
-            {isUnder13
-              ? copy.studentStatus.under13
-              : copy.studentStatus.default}
-          </p>
-        </section>
+          <FormField
+            error={getFieldError(fieldErrors, "countryOfStudy")}
+            label={copy.fields.countryOfStudy}
+          >
+            <TextInput
+              onChange={(event) => setCountryOfStudy(event.target.value)}
+              placeholder={copy.countryPlaceholder}
+              required
+              type="text"
+              value={countryOfStudy}
+            />
+          </FormField>
+
+          <FormField
+            error={getFieldError(fieldErrors, "schoolName")}
+            label={copy.fields.schoolName}
+          >
+            <TextInput
+              onChange={(event) => setSchoolName(event.target.value)}
+              placeholder={copy.schoolPlaceholder}
+              type="text"
+              value={schoolName}
+            />
+          </FormField>
+
+          <FormField
+            error={getFieldError(fieldErrors, "gradeLevel")}
+            label={copy.fields.gradeLevel}
+          >
+            <TextInput
+              onChange={(event) => setGradeLevel(event.target.value)}
+              placeholder={copy.gradePlaceholder}
+              required
+              type="text"
+              value={gradeLevel}
+            />
+          </FormField>
+
+          {birthDate ? (
+            <p className="text-sm leading-6 text-[color:var(--ink-soft)]">
+              {isUnder13
+                ? copy.studentStatus.under13
+                : copy.studentStatus.default}
+            </p>
+          ) : null}
+        </>
       ) : null}
 
       <ActionButton disabled={isPending} type="submit">

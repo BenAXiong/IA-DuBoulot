@@ -39,28 +39,21 @@ export default async function OnboardingPage({
   return (
     <PublicShell
       currentHref={currentHref}
+      headerVariant="hud"
       languageCode={languageCode}
+      showAuthLink={false}
       showFooter={false}
     >
-      <main className="px-5 py-6 sm:px-8 lg:px-12">
-        <div className="mx-auto flex min-h-[calc(100dvh-6rem)] max-w-2xl flex-col justify-center">
-          <section className="grid gap-6 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow)] md:p-8">
-            <div className="space-y-3">
-              <p className="font-[family-name:var(--font-heading)] text-sm uppercase tracking-[0.24em] text-[color:var(--ink-soft)]">
-                {copy.eyebrow}
-              </p>
-              <h1 className="font-[family-name:var(--font-heading)] text-3xl leading-tight sm:text-4xl">
-                {copy.title}
-              </h1>
-              <p className="text-base leading-7 text-[color:var(--ink-soft)]">
-                {copy.body}
-              </p>
-            </div>
+      <main className="flex min-h-[calc(100dvh-4.75rem)] px-4 pb-5 pt-1 sm:min-h-[calc(100dvh-5rem)] sm:px-6 sm:pb-6 lg:min-h-[calc(100dvh-5.5rem)] lg:px-8 lg:pb-8">
+        <div className="mx-auto flex w-full max-w-2xl items-center justify-center">
+          <section className="shell-panel grid w-full gap-6 rounded-[2rem] border border-[color:var(--line)] p-6 shadow-[var(--shadow)] md:p-8">
+            <h1 className="text-center font-[family-name:var(--font-heading)] text-3xl leading-tight sm:text-4xl">
+              {copy.title}
+            </h1>
 
-            <article className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] p-5">
+            <article>
               <OnboardingForm
                 defaultRole={defaultRole}
-                email={context.email}
                 initialPreferredUiLanguage={languageCode}
                 inviteToken={readFirstSearchParam(resolvedSearchParams.invite)}
                 languageCode={languageCode}

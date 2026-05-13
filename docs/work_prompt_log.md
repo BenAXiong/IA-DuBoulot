@@ -369,3 +369,7 @@ then close it as:
 | 2026-05-12 | 21:49 -> 22:01 | 0h12 | A6.4.1 A6.4.2 P1.3 | simplify the `/app/settings` profile, account, linked-account, and deletion-control surface | | |
 | 2026-05-12 | 22:10 -> 22:13 | 0h03 | A6.4.1 P1.3 | polish `/app/settings` linked-account actions, deletion layout, and subscription link placement | | |
 | 2026-05-12 | 22:18 -> 22:21 | 0h03 | A6.4.1 P1.3 | rename the settings header, add the external-link icon to upgrade options, then commit and push the settings slice | | |
+| 2026-05-12 | 22:29 -> 22:29 | 0h00 | A2.1.1 | explain why a random signup email can be rejected as invalid despite syntactic email shape | | |
+| 2026-05-13 | 09:17 -> 09:17 | 0h00 | A0.3.7 | close the current work session at 22:29 on 2026-05-12 and reopen a fresh session now | | |
+| 2026-05-13 | 09:18 -> 09:20 | 0h02 | A2.1.1 P1.3 P2.6 | assess auth and onboarding simplification, registration field changes, and related planning tasks | | |
+| 2026-05-13 | 09:53 -> 10:11 | 0h18 | A2.1.1 A2.2.3 P1.3 P2.6 | simplify auth/onboarding chrome and persist the new learner onboarding fields | | |

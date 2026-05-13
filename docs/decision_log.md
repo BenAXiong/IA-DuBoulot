@@ -1767,3 +1767,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Flatten `/app/settings` into one account surface: read-only email first, account type/status/upgrade path next, profile fields read-only until `Modify`, linked-account visibility or management entry points, and the existing deletion controls. Keep deletion as a queued request rather than immediate suppression, even when no links are visible.
 - Why: A queued deletion path keeps parent/tutor links, billing blockers, audit history, and the 30-day purge target consistent. The page can feel simpler without weakening privacy and recovery semantics.
 - Follow-up: Revisit immediate account suppression only after the product has explicit policy, billing, audit, and linked-account behavior for that faster path.
+
+### D-20260513-01 - Use Birth Date As Onboarding Age Source Of Truth
+
+- Date: 2026-05-13
+- Status: accepted
+- Related tasks: `A2.1.1`, `A2.2.3`, `P2.6`
+- Context: The onboarding flow asked learners to self-declare an under-13 checkbox and choose an age band. The user wanted a simpler registration path with birthday, country of study, school, and grade, while the existing minors baseline had preferred age bands where possible.
+- Decision: For learner onboarding, collect `birth_date`, `country_of_study`, optional `school_name`, and `grade_level` on `users`. Derive `is_under_13` and `age_band` server-side from `birth_date`. Keep exact birth date out of auth metadata and prompt context by default.
+- Why: A birthday is clearer for users and gives a reliable age-gating source, while the derived fields preserve current policy checks and prompt-tone affordances.
+- Follow-up: Before broader rollout, review whether exact birth date still satisfies the legal/data-minimization posture, and decide whether grade/country should feed coach context directly or only through a later explicit pedagogical-baseline feature.
