@@ -1,6 +1,8 @@
 # Demo Nath_0410
 
-Related: [README](../README.md) | [Founder walkthrough V1](founder_walkthrough_v1.md) | [Smoke checklist V1](smoke_checklist_v1.md) | [Student dashboard V1](student_dashboard_v1.md) | [Student workbench V1](student_workbench_v1.md) | [AI ops and economics V1](ai_ops_economics_v1.md) | [Pilot_todo](pilot_todo.md) | [MVP to-do list](mvp_todo.md)
+Related: [README](../../README.md) | [Founder walkthrough V1](../founder_walkthrough_v1.md) | [Smoke checklist V1](../smoke_checklist_v1.md) | [Student dashboard V1](../student_dashboard_v1.md) | [Student workbench V1](../student_workbench_v1.md) | [AI ops and economics V1](../ai_ops_economics_v1.md) | [Pilot_todo](../pilot_todo.md) | [MVP to-do list](../mvp_todo.md)
+
+Archived on 2026-05-31 as historical demo context. Outstanding tasks were copied into the temporary Nath demo intake section in [Pilot_todo](../pilot_todo.md).
 
 ## Purpose
 

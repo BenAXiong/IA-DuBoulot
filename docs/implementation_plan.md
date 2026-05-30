@@ -1,6 +1,6 @@
 # Implementation Plan
 
-Related: [README](../README.md) | [Original brief](../project_brief_codex.txt) | [Brief adjustments](brief_adjustments.md) | [Minors privacy baseline](minors_privacy_baseline.md) | [MVP to-do list](mvp_todo.md) | [MVP timeline](mvp_timeline.md)
+Related: [README](../README.md) | [Original brief](../project_brief_codex.txt) | [Archived brief adjustments](archive/brief_adjustments.md) | [Minors privacy baseline](minors_privacy_baseline.md) | [MVP to-do list](mvp_todo.md) | [Archived MVP timeline](archive/mvp_timeline.md)
 
 ## Objective
 

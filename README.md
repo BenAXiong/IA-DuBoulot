@@ -6,7 +6,6 @@ Planning-first repository for a supervised AI homework coach web app built for s
 
 - [Original build brief](project_brief_codex.txt)
 - [Implementation plan](docs/implementation_plan.md)
-- [Brief adjustments](docs/brief_adjustments.md)
 - [Branch and PR conventions](docs/branch_pr_conventions.md)
 - [GitHub workflow V1](docs/github_workflow_v1.md)
 - [Role and access matrix](docs/role_access_matrix.md)
@@ -18,7 +17,6 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [RLS fixture verification](docs/rls_fixture_verification.md)
 - [Smoke checklist V1](docs/smoke_checklist_v1.md)
 - [Founder walkthrough V1](docs/founder_walkthrough_v1.md)
-- [Demo Nath_0410](docs/demo_Nath_0410.md)
 - [Launch checklist V1](docs/launch_checklist_v1.md)
 - [Pilot_todo](docs/pilot_todo.md)
 - [Pilot interface trust details](docs/pilot/interface_trust.md)
@@ -30,7 +28,6 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Sample attachment corpus](docs/sample_attachment_corpus.md)
 - [API route map](docs/api_route_map.md)
 - [App shell V1](docs/app_shell_v1.md)
-- [Public landing page revamp brief](docs/public_landing_page_revamp_brief.md)
 - [Frontend foundations V1](docs/frontend_foundations_v1.md)
 - [Student dashboard V1](docs/student_dashboard_v1.md)
 - [Student intake V1](docs/student_intake_v1.md)
@@ -39,7 +36,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Student history and summary V1](docs/student_history_summary_v1.md)
 - [Student memory profile V1](docs/student_memory_profile_v1.md)
 - [Subject docs feature V1](docs/subject_docs_feature_v1.md)
-- [Subject-wide upload plan](docs/subject_wide_upload_plan.md)
+- [Subject-wide upload plan/history](docs/subject_wide_upload_plan.md)
 - [Invitation flows V1](docs/invitation_flows_v1.md)
 - [Oversight surfaces V1](docs/oversight_surfaces_v1.md)
 - [Privacy controls V1](docs/privacy_controls_v1.md)
@@ -50,14 +47,20 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Error and audit conventions](docs/error_audit_conventions.md)
 - [Storage and attachment rules](docs/storage_attachment_rules.md)
 - [MVP to-do list](docs/mvp_todo.md)
-- [MVP timeline](docs/mvp_timeline.md)
 - [Decision log](docs/decision_log.md)
 - [Work sessions log](docs/work_sessions.md)
-- [Work sessions archive 2026-03 to 2026-04](docs/archive/work_sessions_2026-03_to_2026-04.md)
 - [Prompt work log](docs/work_prompt_log.md)
-- [Prompt work archive 2026-03 to 2026-04](docs/archive/work_prompt_log_2026-03_to_2026-04.md)
 - [Vibestructions](docs/vibestructions.md)
 - [Agent operating manual](AGENTS.md)
+
+## Historical / Archived Docs
+
+- [Archived brief adjustments](docs/archive/brief_adjustments.md)
+- [Archived Demo Nath_0410](docs/archive/demo_Nath_0410.md)
+- [Archived public landing page revamp brief](docs/archive/public_landing_page_revamp_brief.md)
+- [Archived MVP timeline](docs/archive/mvp_timeline.md)
+- [Work sessions archive 2026-03 to 2026-04](docs/archive/work_sessions_2026-03_to_2026-04.md)
+- [Prompt work archive 2026-03 to 2026-04](docs/archive/work_prompt_log_2026-03_to_2026-04.md)
 
 ## Current Status
 
@@ -84,13 +87,13 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - The protected app now has a shared responsive shell plus separate student, parent, tutor, and admin dashboard variants.
 - The shell has been checked on 2026-03-11 at emulated iPad portrait and landscape widths with no horizontal overflow on `/auth`, `/app`, or the recovered invite surface.
 - The student dashboard now reads a dedicated server snapshot for recent sessions, subject tags, adult-link state, and usage counters.
-- `/app/new` now exists as the canonical student intake entry route ahead of the real title/subject/upload flow.
-- `/app/new` now hosts the real intake surface for title, subject, staged files, pasted text, graded-homework state, and editable review text.
-- validating `/app/new` now persists a conversation draft and redirects into `/app/conversations/[conversationId]`.
+- `/app` now owns the canonical student homework start flow through the Homework view and subject quick-start composer.
+- `/app/new` is retained only as a compatibility redirect into `/app?view=homework`, preserving older `subject` and `draft` links.
+- the subject quick-start now creates a bare conversation shell, uploads staged files when present, sends the learner's first real message, and opens `/app/conversations/[conversationId]`.
 - `/app/conversations/[conversationId]` now hosts the real student workbench with a persisted transcript, saveable workspace, private attachment access, upload-triggered extraction, and provider-backed coaching replies.
 - the retired `/app/history` route now redirects back into the homework surface for compatibility, and the conversation detail page still supports completion plus provider-backed student, parent, and tutor summary generation.
 - the current local workspace now contains a build-clean and smoke-verified `A4` slice for Gemini-backed coaching, upload/extraction, moderation event logging, and multi-audience summaries, with deterministic fallbacks preserving the student flow when Gemini fails.
-- a fixture-backed local smoke script now exists at `scripts/smoke-student-flow.mjs` and passed on 2026-03-11 against the real `/app/new` -> upload -> workspace -> chat -> complete API flow.
+- a fixture-backed local smoke script now exists at `scripts/smoke-student-flow.mjs`; it originally covered the `/app/new` draft path, and later notes track the need to expand it around the current subject quick-start flow.
 - parent, tutor, and admin oversight surfaces now exist at `/app`, `/app/students/[studentUserId]`, `/app/review/[conversationId]`, and `/app/audit`, backed by explicit oversight services, tutor-note routes, and adult session-view audit logging.
 - a second fixture-backed smoke script now exists at `scripts/smoke-adult-oversight.mjs` and passed on 2026-03-11 against the real parent/tutor/admin oversight routes.
 - usage tracking, trial/quota enforcement, and Lemon Squeezy billing routes now live behind dedicated `lib/server/usage/` and `lib/server/billing/` services, with student and parent dashboards reading the same server-owned quota snapshot.
@@ -100,7 +103,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - the student dashboard and linked-parent student detail now expose a pedagogical memory panel backed by `lib/server/memory/`, with completion-triggered refresh, manual edit/delete controls, and tutor raw-memory access explicitly blocked.
 - a fifth fixture-backed smoke script now exists at `scripts/smoke-memory-profile.mjs` and passed on 2026-03-11 against the real memory route, dashboard surfaces, manual mutation flow, and tutor-access boundary.
 - a written operator smoke checklist now exists at `docs/smoke_checklist_v1.md`, and `npm run regress:mvp` now gives the canonical pre-demo regression pass across typecheck, build, deterministic fixture reseed, RLS verification, and the current non-device smoke suite.
-- a sixth fixture-backed tablet-emulation smoke script now exists at `scripts/smoke-tablet-emulation.mjs` and passed on 2026-03-11 against a local production-build `next start` instance for `/app`, `/app/new`, and `/app/conversations/[conversationId]`, with no horizontal overflow or detected sub-`44x44` controls on those checked student surfaces.
+- a sixth fixture-backed tablet-emulation smoke script now exists at `scripts/smoke-tablet-emulation.mjs`; it now targets `/app`, the subject-level homework launcher, and `/app/conversations/[conversationId]`, with real iPad Safari validation still open.
 - `A7.3` cost-control guardrails now bound the Gemini-backed path through request-size caps, prompt-context truncation, output-token caps, and idempotent reuse of existing upload-extraction and completion artifacts instead of repeating expensive provider calls.
 - launch-candidate operating docs now exist at `docs/founder_walkthrough_v1.md` and `docs/launch_checklist_v1.md`, and the current scope decision explicitly defers PWA installability until after real iPad Safari validation and early beta feedback.
 - an experimental prompt-level trace now also exists at `docs/work_prompt_log.md`, while `docs/work_sessions.md` remains the canonical session log.

@@ -1,6 +1,6 @@
 # App Shell V1
 
-Related: [README](../README.md) | [MVP to-do list](mvp_todo.md) | [API route map](api_route_map.md) | [Public landing page revamp brief](public_landing_page_revamp_brief.md) | [Invitation flows V1](invitation_flows_v1.md) | [Privacy controls V1](privacy_controls_v1.md) | [Service interfaces](service_interfaces.md)
+Related: [README](../README.md) | [MVP to-do list](mvp_todo.md) | [API route map](api_route_map.md) | [Archived public landing page revamp brief](archive/public_landing_page_revamp_brief.md) | [Invitation flows V1](invitation_flows_v1.md) | [Privacy controls V1](privacy_controls_v1.md) | [Service interfaces](service_interfaces.md)
 
 ## Purpose
 
@@ -23,7 +23,7 @@ Code:
 - `components/layout/public-shell.tsx`
 - `components/layout/public-header.tsx`
 - home route body: `components/landing/public-landing-page.tsx`
-- landing-revamp working brief: `docs/public_landing_page_revamp_brief.md`
+- archived landing-revamp working brief: `docs/archive/public_landing_page_revamp_brief.md`
 
 Current routes using it:
 

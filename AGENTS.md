@@ -25,7 +25,7 @@ Read these in order before any substantial implementation work:
 
 1. [README.md](README.md)
 2. [docs/implementation_plan.md](docs/implementation_plan.md)
-3. [docs/brief_adjustments.md](docs/brief_adjustments.md)
+3. [docs/archive/brief_adjustments.md](docs/archive/brief_adjustments.md) only when original brief-history is in scope
 4. [docs/branch_pr_conventions.md](docs/branch_pr_conventions.md)
 5. [docs/github_workflow_v1.md](docs/github_workflow_v1.md) when repo workflow, labels, templates, or GitHub operating artifacts are in scope
 6. [docs/role_access_matrix.md](docs/role_access_matrix.md)
@@ -59,7 +59,7 @@ Read these in order before any substantial implementation work:
 34. [docs/sample_attachment_corpus.md](docs/sample_attachment_corpus.md) when upload, extraction, or demo fixture work is in scope
 35. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
 36. [docs/mvp_todo.md](docs/mvp_todo.md)
-37. [docs/mvp_timeline.md](docs/mvp_timeline.md)
+37. [docs/archive/mvp_timeline.md](docs/archive/mvp_timeline.md) only when historical schedule assumptions are in scope
 38. [docs/decision_log.md](docs/decision_log.md)
 39. [docs/work_sessions.md](docs/work_sessions.md)
 40. [docs/work_prompt_log.md](docs/work_prompt_log.md) when the experimental prompt-level trace is active
@@ -204,7 +204,7 @@ If a new folder becomes a stable part of the project, add it to [README.md](READ
 
 ### Every Completed Phase
 
-- Review [docs/implementation_plan.md](docs/implementation_plan.md), [docs/mvp_timeline.md](docs/mvp_timeline.md), and [docs/mvp_todo.md](docs/mvp_todo.md).
+- Review [docs/implementation_plan.md](docs/implementation_plan.md) and [docs/mvp_todo.md](docs/mvp_todo.md); use archived [docs/archive/mvp_timeline.md](docs/archive/mvp_timeline.md) only when historical schedule assumptions are being revised.
 - Archive or rewrite stale assumptions.
 - Add any newly discovered risks or blockers.
 

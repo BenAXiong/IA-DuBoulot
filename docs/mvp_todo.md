@@ -1,6 +1,6 @@
 # MVP To-Do List
 
-Related: [README](../README.md) | [Implementation plan](implementation_plan.md) | [MVP timeline](mvp_timeline.md) | [Decision log](decision_log.md) | [Work sessions log](work_sessions.md)
+Related: [README](../README.md) | [Implementation plan](implementation_plan.md) | [Archived MVP timeline](archive/mvp_timeline.md) | [Decision log](decision_log.md) | [Work sessions log](work_sessions.md)
 
 Use these task IDs everywhere: session log, decision log, commits, reviews, and release notes.
 
@@ -75,6 +75,7 @@ Status note: `docs/work_sessions.md` remains the canonical session log, and `doc
 Status note: on 2026-05-31, `docs/work_sessions.md` moved to a current-plus-archive shape: the active `OPEN` row and recent closed rows stay in the canonical log, while older closed rows are preserved verbatim under linked files in `docs/archive/`.
 Status note: on 2026-05-31, `docs/work_prompt_log.md` adopted the same current-plus-archive pattern for the experimental prompt trace; older closed prompt rows are preserved verbatim under linked files in `docs/archive/`.
 Status note: on 2026-05-31, `docs/pilot_todo.md` was slimmed back into a canonical Pilot board, while long-form Pilot evidence moved into focused files under `docs/pilot/`.
+Status note: on 2026-05-31, stale one-off planning/demo docs moved into `docs/archive/`, while outstanding Nath demo tasks were copied into a temporary intake section in `docs/pilot_todo.md`.
 Status note: repo-owned issue and PR workflow artifacts now live under `.github/` plus `docs/github_workflow_v1.md`, and the public GitHub repository labels were synced from `.github/labels.json` on 2026-03-12 through an authenticated GitHub CLI pass.
 Status note: the canonical remote label set is now `type:bug`, `type:work`, `type:ops`, `needs:triage`, `blocked:external`, `risk:student-flow`, `risk:oversight`, and `risk:billing-ai`.
 
@@ -194,7 +195,7 @@ Outcome: a student can complete a full homework-help session through the product
 
 Reference: [Student dashboard V1](student_dashboard_v1.md)
 Status note: the student home screen now reads a dedicated server snapshot for recent conversations, subject-tag rollup, adult-link counts, parent-approval state, and latest usage counters.
-Status note: `/app/new` is now the canonical student intake entry route, even though the detailed title/subject/upload flow still belongs to `A3.2`.
+Historical status note: `/app/new` originally became the canonical student intake entry route, but the current product now uses the Homework view and subject quick-start composer; `/app/new` remains only as a compatibility redirect.
 
 ### A3.2 New Homework Intake
 
@@ -204,7 +205,7 @@ Status note: `/app/new` is now the canonical student intake entry route, even th
 - [x] A3.2.4 Build extracted-text preview and manual edit flow.
 
 Reference: [Student intake V1](student_intake_v1.md)
-Status note: `/app/new` now hosts the real intake form with title, subject, staged files, pasted text, graded toggle, and editable review text.
+Historical status note: `/app/new` once hosted the richer intake form with title, subject, staged files, pasted text, graded toggle, and editable review text; the visible learner flow now starts from the Homework view.
 Status note: files and extracted-text review are still browser-local at this stage; upload persistence belongs to `A3.3` and real extraction belongs to `A4.3`.
 
 ### A3.3 Conversation Persistence
@@ -214,7 +215,7 @@ Status note: files and extracted-text review are still browser-local at this sta
 - [x] A3.3.3 Support attachment references inside the session history.
 
 Reference: [Student session persistence V1](student_session_persistence_v1.md)
-Status note: validating `/app/new` now creates a persisted `conversations` row, `workspace_states` row, and first student message through the new conversation service.
+Historical status note: validating `/app/new` originally created a persisted `conversations` row, `workspace_states` row, and first student message through the conversation service; the current subject quick-start now owns the visible student start path.
 Status note: the dashboard recent-session cards now reopen `/app/conversations/[conversationId]` instead of staying informational only.
 Status note: attachment references are currently persisted as human-readable intake context inside the session history and workspace notes; true `attachments` rows still belong to the later upload path.
 

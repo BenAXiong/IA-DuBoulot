@@ -37,6 +37,23 @@ Current carryover blockers that still stay in MVP:
 - `A7.1.1` to `A7.1.3` real iPad Safari validation and fixes
 - `A7.4.4` to `A7.4.6` full shared-interface localization and zh-aware tablet verification
 
+## Temporary Nath Demo Task Intake
+
+Source: archived [Demo Nath_0410](archive/demo_Nath_0410.md). These are unsorted legacy demo-readiness tasks copied forward so they can be reviewed, de-duplicated, and dispatched into existing `P*` sections later.
+
+- Gemini/demo operations: verify production uses a paid Gemini project or otherwise trustworthy pilot provider setup; rerun a live learner conversation and confirm provider fallback is rare enough for demo use.
+- Student-only live smoke: verify sign-in, required onboarding, subject creation from Homework, first-message send/reply, file upload, pasted-image behavior, right-rail behavior, `Homework done!` recap, and Fast versus Thinking response speed on the deployed app.
+- First-prompt responsiveness: keep upload pills and pending chat state visible quickly when a conversation initializes from the first-prompt handoff.
+- iPad-critical polish: rerun tablet emulation, test deployed app in an iPad-sized browser or real iPad, fix sub-`44x44` tap targets, check portrait/landscape layouts, and check keyboard-open behavior around the pinned composer.
+- Student UI polish: make recent homework chat lists credible and tap-friendly, keep avatar behavior acceptable if real avatar upload stays deferred, localize subject toggles, disable or clearly mark placeholder sidebar sections, and remove visual rough edges that still read as prototype.
+- Demo narrative: remove developer wording, internal fallback-looking phrasing, confusing multi-role affordances, and dead-end homework-start/completion navigation; make unsupported non-homework asks produce a concise homework-mode warning.
+- Commercial posture: decide whether a demo should expose free-plan wording, whether the demo account simply runs on paid access, and ensure quota copy is not coupled to Gemini free-project limits.
+- Non-student surfaces: consider hiding, blocking, or deprioritizing parent/tutor/admin entry points for student-only demos when they distract from the learner flow.
+- Completion output polish: ensure `Homework done!` feels like a short learner recap with covered material and current strength/confidence, not an operator summary or debug trace.
+- Prompting feedback: consider concise prompting feedback only when useful, such as overloaded prompts, answer-seeking too early, unclear pictures, or missing attempt context.
+- French-expression follow-up: consider a lightweight learner French-expression issue log across syntax, grammar, and vocabulary, later usable in the side rail or asynchronous drilling.
+- Stretch only after core stability: subject-wide library upload and Maps `v0` should stay narrow and should not widen beyond the core homework chat until the student demo is stable.
+
 ## Pilot Detail Docs
 
 - [P1 interface trust details](pilot/interface_trust.md)

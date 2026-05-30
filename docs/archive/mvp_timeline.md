@@ -1,6 +1,8 @@
 # MVP Timeline
 
-Related: [README](../README.md) | [Implementation plan](implementation_plan.md) | [MVP to-do list](mvp_todo.md)
+Related: [README](../../README.md) | [Implementation plan](../implementation_plan.md) | [MVP to-do list](../mvp_todo.md)
+
+Archived on 2026-05-31 as historical schedule context.
 
 ## Recommended Schedule
 

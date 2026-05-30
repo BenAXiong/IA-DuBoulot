@@ -4,6 +4,8 @@ Related: [README](../README.md) | [Pilot_todo](pilot_todo.md) | [Subject docs fe
 
 ## Purpose
 
+This is implementation-history documentation for the `P2.7` build slices. The current feature contract lives in [Subject docs feature V1](subject_docs_feature_v1.md).
+
 `P2.7` moves long-lived course PDFs and notes out of the per-chat attachment-only model. The product should let a student upload a resource once for a subject, reuse the extracted text across conversations, and later retrieve only relevant chunks instead of resending a whole document to the coach.
 
 ## Target Direction

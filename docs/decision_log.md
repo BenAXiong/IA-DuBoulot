@@ -18,6 +18,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 
 ## Current Decisions
 
+### D-20260531-05 - Archive One-Off Planning And Demo Docs After Copying Forward Action Items
+
+- Date: 2026-05-31
+- Status: accepted
+- Related tasks: `A0.3.7`, `P4.2`
+- Context: Several one-off docs had become historical artifacts rather than active source-of-truth files: the original brief adjustments, the MVP timeline, the public landing revamp brief, and the Nath 2026-04-10 demo target. Keeping them in the active docs list made current context rebuild noisier.
+- Decision: Move those one-off docs into `docs/archive/`. Before archiving `demo_Nath_0410.md`, copy its remaining demo-readiness tasks into a temporary intake section in `docs/pilot_todo.md` so they can later be sorted into existing `P*` sections.
+- Why: The archive keeps historical planning context available without making future sessions treat obsolete one-off briefs as current operating instructions.
+- Follow-up: Review the temporary Nath demo intake and dispatch each item into `P1` through `P6`, then remove the temporary section once every task is either accepted, rejected, or merged into an existing backlog item.
+
 ### D-20260531-03 - Pilot Todo Stays The Board While Long Evidence Moves To Pilot Detail Docs
 
 - Date: 2026-05-31
@@ -144,7 +154,7 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Status: accepted
 - Related tasks: `A0.3.1`, `A0.3.2`, `A0.3.3`, `A0.3.4`, `A0.3.5`
 - Context: The repo started with only the project brief. Long-term AI-assisted implementation will fail if future sessions cannot quickly reconstruct project state.
-- Decision: `README.md`, `AGENTS.md`, `docs/implementation_plan.md`, `docs/mvp_todo.md`, `docs/mvp_timeline.md`, `docs/decision_log.md`, and `docs/work_sessions.md` are mandatory operating files.
+- Decision: `README.md`, `AGENTS.md`, `docs/implementation_plan.md`, `docs/mvp_todo.md`, the MVP timeline doc (archived on 2026-05-31 as `docs/archive/mvp_timeline.md`), `docs/decision_log.md`, and `docs/work_sessions.md` are mandatory operating files.
 - Why: These files create the minimum traceability system needed to keep code, docs, and workflow aligned.
 - Follow-up: Keep the files current whenever scope, architecture, or workflow changes.
 

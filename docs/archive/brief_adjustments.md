@@ -1,6 +1,8 @@
 # Brief Adjustments
 
-Related: [README](../README.md) | [Original brief](../project_brief_codex.txt) | [Implementation plan](implementation_plan.md) | [MVP to-do list](mvp_todo.md)
+Related: [README](../../README.md) | [Original brief](../../project_brief_codex.txt) | [Implementation plan](../implementation_plan.md) | [MVP to-do list](../mvp_todo.md)
+
+Archived on 2026-05-31 as historical brief-to-plan context.
 
 This file lists the main changes, additions, and sequencing adjustments made while turning the original brief into an execution-ready plan.
 
