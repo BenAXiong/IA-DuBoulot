@@ -122,3 +122,4 @@ then close it as:
 | 2026-05-31 | 00:13 -> 00:14 | 0h01 | A0.3.7 P4.2 | recommend current-plus-archive handling for logs and a bounded Pilot_todo split | | |
 | 2026-05-31 | 01:04 -> 01:06 | 0h02 | A0.3.7 P4.2 | archive older work-session rows while keeping the canonical current log stable | | |
 | 2026-05-31 | 01:07 -> 01:09 | 0h02 | A0.3.7 P4.2 | archive older prompt-log rows while keeping the experimental current trace stable | | |
+| 2026-05-31 | 01:12 -> 01:17 | 0h05 | A0.3.7 P4.2 | split the Pilot_todo working board from long-form pilot evidence docs and record doc-only git handling | | |

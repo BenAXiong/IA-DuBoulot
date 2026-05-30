@@ -21,6 +21,12 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Demo Nath_0410](docs/demo_Nath_0410.md)
 - [Launch checklist V1](docs/launch_checklist_v1.md)
 - [Pilot_todo](docs/pilot_todo.md)
+- [Pilot interface trust details](docs/pilot/interface_trust.md)
+- [Pilot journey and UX details](docs/pilot/journey_ux.md)
+- [Pilot device and reliability details](docs/pilot/device_reliability.md)
+- [Pilot operations details](docs/pilot/operations.md)
+- [Pilot refactor discipline details](docs/pilot/refactor_discipline.md)
+- [Post-pilot backlog details](docs/pilot/post_pilot_backlog.md)
 - [Sample attachment corpus](docs/sample_attachment_corpus.md)
 - [API route map](docs/api_route_map.md)
 - [App shell V1](docs/app_shell_v1.md)
@@ -121,4 +127,5 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - Keep current execution trace in [the work sessions log](docs/work_sessions.md), with older closed rows moved verbatim to linked archive files under `docs/archive/`.
 - Keep current prompt-level trace in [the prompt work log](docs/work_prompt_log.md), with older closed rows moved verbatim to linked archive files under `docs/archive/` while the experimental prompt trace remains active.
 - After a coherent verified slice, create a task-ID commit and push it to `origin` unless the user explicitly asks to defer git actions.
+- For doc-only maintenance slices, create the local task-ID commit but skip pushing unless the user asks for a push.
 - Update this file whenever a new top-level project doc becomes part of the operating workflow.

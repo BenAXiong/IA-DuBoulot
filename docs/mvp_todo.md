@@ -74,6 +74,7 @@ Status note: the Gemini note now explicitly records that RPM and RPD limits appl
 Status note: `docs/work_sessions.md` remains the canonical session log, and `docs/work_prompt_log.md` now exists as an experimental one-row-per-prompt trace with a manual Codex-credit column.
 Status note: on 2026-05-31, `docs/work_sessions.md` moved to a current-plus-archive shape: the active `OPEN` row and recent closed rows stay in the canonical log, while older closed rows are preserved verbatim under linked files in `docs/archive/`.
 Status note: on 2026-05-31, `docs/work_prompt_log.md` adopted the same current-plus-archive pattern for the experimental prompt trace; older closed prompt rows are preserved verbatim under linked files in `docs/archive/`.
+Status note: on 2026-05-31, `docs/pilot_todo.md` was slimmed back into a canonical Pilot board, while long-form Pilot evidence moved into focused files under `docs/pilot/`.
 Status note: repo-owned issue and PR workflow artifacts now live under `.github/` plus `docs/github_workflow_v1.md`, and the public GitHub repository labels were synced from `.github/labels.json` on 2026-03-12 through an authenticated GitHub CLI pass.
 Status note: the canonical remote label set is now `type:bug`, `type:work`, `type:ops`, `needs:triage`, `blocked:external`, `risk:student-flow`, `risk:oversight`, and `risk:billing-ai`.
 

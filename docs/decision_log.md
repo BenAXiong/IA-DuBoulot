@@ -18,6 +18,26 @@ Use this file to record project-shaping decisions so future sessions do not reve
 
 ## Current Decisions
 
+### D-20260531-03 - Pilot Todo Stays The Board While Long Evidence Moves To Pilot Detail Docs
+
+- Date: 2026-05-31
+- Status: accepted
+- Related tasks: `A0.3.7`, `P4.2`
+- Context: `docs/pilot_todo.md` had grown into both a task board and a long evidence log, with 78 status notes making the current pilot backlog harder to scan.
+- Decision: Keep `docs/pilot_todo.md` as the canonical Pilot board for task IDs, checkboxes, and short current status. Move long-form evidence and historical status notes into focused detail docs under `docs/pilot/`: interface trust, journey and UX, device reliability, operations, refactor discipline, and post-pilot backlog.
+- Why: This preserves traceability without making the active board unusable. Future sessions can read the board first, then open the matching detail doc only when that area is in scope.
+- Follow-up: Apply the same pattern when any `docs/pilot/*.md` file becomes too large: keep task IDs in the board, move historical detail into a linked archive or narrower detail doc.
+
+### D-20260531-04 - Doc-Only Maintenance Commits Do Not Need Immediate Push
+
+- Date: 2026-05-31
+- Status: accepted
+- Related tasks: `A0.3.7`, `P4.2`
+- Context: The repo rules previously pushed every coherent tracked-file slice, but doc-only maintenance can create unnecessary remote churn when the user is actively reorganizing trace files.
+- Decision: For doc-only maintenance slices, create a local task-ID commit for traceability but do not push unless the user asks. Code, schema, release-affecting, or deployment-relevant slices should still push after the verified commit unless explicitly deferred.
+- Why: This keeps the local history reviewable while respecting that documentation reorganization may happen in several small passes before it is worth publishing remotely.
+- Follow-up: Push accumulated doc-only commits when the user asks or before switching machines/threads if the local-only history would become a continuity risk.
+
 ### D-20260531-02 - Prompt Work Log Uses The Same Current Plus Verbatim Archive Pattern
 
 - Date: 2026-05-31
@@ -801,7 +821,7 @@ Use this file to record project-shaping decisions so future sessions do not reve
 ### D-20260312-69 - Pilot Backlog And Git Publishing Become Mandatory Same-Session Close-Out
 
 - Date: 2026-03-12
-- Status: accepted
+- Status: accepted, superseded for doc-only maintenance by `D-20260531-04`
 - Related tasks: `A0.3.2`, `A0.3.6`, `A0.3.7`, `P4.1`, `P4.2`
 - Context: The repo now has a real `docs/pilot_todo.md` lane, but recent hardening work showed an avoidable failure mode: pilot-relevant status can change in code and docs without the pilot backlog being updated in the same session, and verified work can remain only in a local dirty worktree instead of becoming durable git history. Both gaps weaken handoff quality even when the underlying implementation is correct.
 - Decision: Treat `docs/pilot_todo.md` as mandatory maintenance whenever a session changes pilot-facing polish, UX findings, release-ops assumptions, or `P*` task status, even if the active implementation still lives under an `A*` launch task. Also treat a task-ID git commit plus push to `origin` as the default end-of-slice workflow after verification. If a push should be deferred, the reason must be stated explicitly in the session close-out instead of left implicit.

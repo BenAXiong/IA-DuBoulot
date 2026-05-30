@@ -17,6 +17,7 @@ This file defines the mandatory operating system for all future agents and sessi
 7. Prefer explicit, boring, reviewable structure over clever abstractions.
 8. Do not create god components, god hooks, god services, or god utility files.
 9. After each coherent implementation slice that changes tracked files, create a task-ID git commit and push it unless the user explicitly asks to defer git actions or the work is still intentionally mid-slice.
+   - For doc-only maintenance slices, create the local task-ID commit but skip pushing unless the user explicitly asks for a push.
 
 ## Mandatory Read Order At Session Start
 
@@ -102,7 +103,7 @@ After any meaningful code or doc change:
 - Add or update decision entries in [docs/decision_log.md](docs/decision_log.md) when the change affects structure or behavior.
 - Update [README.md](README.md) if a new top-level artifact becomes important to future work.
 - Update cross-links inside any new document or operating document.
-- After verification, stage only the relevant files, create a task-ID commit, and push to `origin`. If unrelated local work is present, do not mix it silently; either commit a bounded subset or leave an explicit note.
+- After verification, stage only the relevant files and create a task-ID commit. Push to `origin` for implementation, schema, release-affecting, or deployment-relevant work; for doc-only maintenance slices, skip pushing unless the user asks. If unrelated local work is present, do not mix it silently; either commit a bounded subset or leave an explicit note.
 
 ### 5. End The Session Only On Explicit User Instruction
 
@@ -164,6 +165,7 @@ Log a decision when changing:
 - Product and repo overview: repository root `README.md`
 - Agent workflow: repository root `AGENTS.md`
 - Planning and meta docs: `docs/`
+- Pilot detail docs: `docs/pilot/`
 - SQL and Supabase config: `supabase/`
 - Scripts and automation: `scripts/`
 - Source-controlled sample inputs and demo attachments: `fixtures/`
