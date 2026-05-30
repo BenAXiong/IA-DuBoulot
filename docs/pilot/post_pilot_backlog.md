@@ -21,7 +21,8 @@ This file holds long-form evidence and historical status notes. Keep the canonic
 - P6.9 - Add automatic session checkpoints for meaningful unfinished homework work, so Banban can retain lower-confidence learning signals even when the learner never clicks the final completion action. Checkpoints must be clearly separate from trusted completion summaries and must define update, overwrite, and deletion behavior.
 - P6.10 - Add cleanup paths for stale or misclassified homework items, such as archive, not a homework, done elsewhere, or dismiss from active counters, so students who do not maintain their board perfectly do not accumulate permanent unfinished-work pressure.
 - P6.11 - Explore post-completion reinforcement actions: turn completed homework into practice, log it for later revision, or let the learner mark topics as needing reinforcement when they feel Banban did not fully grasp their difficulty.
+- P6.12 - Run real iPad Safari validation and iPad-specific polish after practical device constraints clear, including upload, chat, workspace, keyboard-open behavior, tap targets, and portrait/landscape checks.
 
 ## Evidence And Status Notes
 
-No long-form notes have been moved here yet.
+Status note: on 2026-05-31, the open MVP `A7.1.1` to `A7.1.3` real iPad Safari tasks moved here because hardware validation is practically constrained. Near-term demo and Pilot readiness should rely on the repeatable tablet-emulation pre-pass plus ordinary deployed-browser checks; hardware Safari behavior should be revisited after the closed pilot when access to the target device is realistic.

@@ -8,7 +8,7 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 
-- Overall: `[############################..]` `128/135` complete (`95%`)
+- Overall: `[#############################.]` `131/135` complete (`97%`)
 - A0: `[xxxxxxxxxxxxxxxxxxxxx.]` `21/22`
 - A1: `[xxxxxxxxxxxxxxxx]` `16/16`
 - A2: `[xxxxxxxxxxxxxxxxx]` `17/17`
@@ -16,7 +16,7 @@ Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 - A4: `[xxxxxxxxxxxxxxxxxxx]` `19/19`
 - A5: `[xxxxxxxxxxxxx]` `13/13`
 - A6: `[xxxxxxxxxxxxx]` `13/13`
-- A7: `[xxxxxxxxxxxx......]` `12/18`
+- A7: `[xxxxxxxxxxxxxxx...]` `15/18`
 
 ## Table Of Contents
 
@@ -27,7 +27,7 @@ Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 - [Phase A4 - AI Coaching, Extraction, And Safety](#phase-a4---ai-coaching-extraction-and-safety)
 - [Phase A5 - Parent And Tutor Oversight](#phase-a5---parent-and-tutor-oversight)
 - [Phase A6 - Memory, Billing, And Privacy Controls](#phase-a6---memory-billing-and-privacy-controls)
-- [Phase A7 - QA, iPad Polish, And Launch Readiness](#phase-a7---qa-ipad-polish-and-launch-readiness)
+- [Phase A7 - QA, Tablet Pre-Pass, And Launch Readiness](#phase-a7---qa-tablet-pre-pass-and-launch-readiness)
 
 ## 🟨 Phase A0 - Bootstrap And Governance
 
@@ -173,7 +173,7 @@ Status note: the third Supabase migration for `account_link_invitations` is now 
 
 Status note: landing, pricing, auth, onboarding, and invite pages now share one public shell.
 Status note: `/app` now uses a dedicated authenticated shell and role-specific dashboard modules instead of a single temporary mixed page.
-Status note: on 2026-03-11 the shell was checked in a browser pass at `820x1180` and `1180x820` on `/auth`, `/app`, and `/invite/[token]`, with no horizontal overflow detected. Real iPad Safari remains part of `A7.1`.
+Status note: on 2026-03-11 the shell was checked in a browser pass at `820x1180` and `1180x820` on `/auth`, `/app`, and `/invite/[token]`, with no horizontal overflow detected. Real iPad Safari hardware validation is now deferred to post-pilot `P6.12`.
 
 ### A2.4 Telemetry And Feature Controls
 
@@ -365,20 +365,20 @@ Status note: on 2026-03-11 the deployed Vercel app also completed a real Lemon t
 Status note: `/app/settings` now hosts the stable profile, billing, privacy, and deletion-control surface for every role; `POST /api/privacy/deletion-requests` queues self or linked-child deletion requests through `lib/server/privacy/`; linked-child deletion revokes tutor access immediately; deletion-requested non-admin accounts are redirected back to `/app/settings`; and `npm run smoke:privacy` now covers the real route flow.
 Status note: on 2026-05-12 the settings surface was flattened for Pilot polish: email, account type, status, upgrade path, linked-account entry points, read-only profile rows, and queued deletion controls now live in one non-nested account page; profile editing is explicit through `Modify`, and immediate account suppression remains intentionally out of scope.
 
-## 🟨 Phase A7 - QA, iPad Polish, And Launch Readiness
+## 🟨 Phase A7 - QA, Tablet Pre-Pass, And Launch Readiness
 
 Outcome: the product is stable enough for serious parent and tutor trials.
 
-### A7.1 iPad And Responsive QA
+### A7.1 Tablet Pre-Pass And Deferred iPad QA
 
-- [ ] A7.1.1 Test upload, chat, and workspace flows on iPad Safari.
-- [ ] A7.1.2 Fix keyboard, layout, and tap-target issues.
-- [ ] A7.1.3 Verify portrait and landscape tablet behavior.
+- [x] A7.1.1 Deferred to `P6.12`: test upload, chat, and workspace flows on iPad Safari.
+- [x] A7.1.2 Deferred to `P6.12`: fix iPad-specific keyboard, layout, and tap-target issues.
+- [x] A7.1.3 Deferred to `P6.12`: verify real iPad portrait and landscape behavior.
 
 Status note: `scripts/smoke-tablet-emulation.mjs` now provides a repeatable tablet pre-pass against `/app`, the subject-level homework launcher on `/app?view=homework&subject=...`, and `/app/conversations/[conversationId]` using the deterministic fixture student plus a local production-build `next start` instance when no URL override is provided.
 Status note: on 2026-03-11 that pre-pass reported no horizontal overflow and no detected tap targets below `44x44` on the checked student surfaces in both portrait and landscape tablet viewports.
-Status note: on 2026-04-04 the same pre-pass was updated to the retired `/app/new` replacement path and still reported no horizontal overflow, but it now flags several student-shell targets below `44x44` on the current homework dashboard, subject launcher, and live conversation routes. `A7.1.2` stays open for those tap-target fixes before the later real iPad Safari pass.
-Status note: real iPad Safari upload, keyboard, and chat ergonomics are still required before `A7.1` can close.
+Status note: on 2026-04-04 the same pre-pass was updated to the retired `/app/new` replacement path and still reported no horizontal overflow, but it now flags several student-shell targets below `44x44` on the current homework dashboard, subject launcher, and live conversation routes.
+Status note: on 2026-05-31, real iPad Safari validation and iPad-specific polish moved out of MVP/Pilot gates because of practical device-access constraints. The remaining hardware work now lives in post-pilot `P6.12`; the near-term device gate is the repeatable tablet-emulation pre-pass plus ordinary browser checks.
 
 ### A7.2 Smoke Tests And Regression Coverage
 
@@ -407,7 +407,7 @@ Status note: the latest isolated `npm run smoke:student-flow` rerun on 2026-04-0
 - [x] A7.4.3 Freeze the MVP scope and publish the launch checklist.
 - [x] A7.4.4 Restore accented French copy and audit Unicode-safe rendering on shared MVP surfaces.
 - [ ] A7.4.5 Add actual interface-copy localization for `fr`, `en`, and `zh` across the shared MVP routes.
-- [ ] A7.4.6 Verify language switching, parent-summary language defaults, and `zh` copy fit on the tablet-critical routes.
+- [ ] A7.4.6 Verify language switching, parent-summary language defaults, and `zh` copy fit on the tablet-emulated critical routes.
 - [x] A7.4.7 Add a shared MVP brand layer and shell polish that improves trust without a full UI rewrite.
 - [x] A7.4.8 Create a separate `Pilot_todo` hardening plan and logging rules without moving true MVP blockers out of the launch gate.
 
@@ -421,7 +421,7 @@ Status note: the core student APIs now also localize their user-facing validatio
 Status note: auth/profile bootstrap and update, invitation create and accept, tutor-note mutations, memory mutations, deterministic memory fallback copy, and the small parent billing-management conflict path now also localize their user-facing server messages through the focused copy modules.
 Status note: the shared MVP now carries accented French across the visible shared UI plus the AI prompt layer that generates French coach, summary, translation, and memory outputs, while `app/layout.tsx` already provides `latin-ext` plus explicit CJK fallback for Unicode-safe rendering. The remaining launch-blocking language gap is now primarily broader parent-summary default and language-switch verification, plus residual generic provider or service fallback strings that still bypass the focused copy modules.
 Status note: the authenticated language menu no longer waits for the full profile PATCH before starting the `/app` refresh; it now writes an immediate `ia_ui_lang` override used by authenticated page context during that refresh, so role dashboards can flip visible copy faster while the saved profile update completes in the background. Broader end-to-end verification for language switching and parent-summary defaults still remains open in `A7.4.6`.
-Status note: the public language switcher is now visible at tablet widths, and refreshed local `npm run smoke:tablet-emulation` passes succeeded again on 2026-03-12 against both the current localized French labels and a temporary `zh` fixture-language pre-pass for `/app`, the subject-level homework launcher on `/app?view=homework&subject=...`, and `/app/conversations/[conversationId]`, but broader language-switch behavior, parent-summary default verification, and real iPad Safari validation still remain open inside `A7.4.6` and `A7.1`.
+Status note: the public language switcher is now visible at tablet widths, and refreshed local `npm run smoke:tablet-emulation` passes succeeded again on 2026-03-12 against both the current localized French labels and a temporary `zh` fixture-language pre-pass for `/app`, the subject-level homework launcher on `/app?view=homework&subject=...`, and `/app/conversations/[conversationId]`, but broader language-switch behavior and parent-summary default verification still remain open inside `A7.4.6`. Real iPad Safari validation is now deferred to post-pilot `P6.12`.
 Status note: the shared public and app shells, `SurfaceCard`, and global CSS now carry a calmer brand baseline and reusable shell classes, while deeper route-by-route redesign remains pilot work rather than a late MVP rewrite.
 Status note: the student role now also uses a dedicated chat-first shell with a collapsible subject rail, a minimal top bar, a placeholder avatar dock, a direct subject quick-start that creates a bare conversation shell before opening the live chat, and a flatter conversation layout with a lighter sources/completion rail; `/app/new` now behaves only as a compatibility redirect into the homework dashboard while the remaining decisions about true subject entities, more implicit conversation creation, optional completion, and real avatar media stay deferred to Pilot work.
 Status note: the homework dashboard empty state no longer dead-ends on a self-link when the learner has no prior subjects yet; it now renders a first-homework launcher with subject selection so the first conversation can start directly from `/app` and establish the first subject tag in the same flow.

@@ -18,6 +18,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 
 ## Current Decisions
 
+### D-20260531-06 - Real iPad Safari Validation Moves To Post-Pilot
+
+- Date: 2026-05-31
+- Status: accepted
+- Related tasks: `A7.1.1`, `A7.1.2`, `A7.1.3`, `P6.12`
+- Context: Real iPad Safari validation and iPad-specific polish were still listed as MVP/Pilot gates, but the project currently has practical constraints around doing that hardware pass reliably.
+- Decision: Close the MVP `A7.1` hardware tasks by deferring them to post-pilot `P6.12`. Keep the repeatable tablet-emulation smoke and ordinary deployed-browser checks as the near-term device readiness bar for demo and closed Pilot work.
+- Why: Keeping inaccessible hardware validation as an MVP blocker makes the board misleading and slows the move into real learner feedback. Deferring it explicitly preserves the risk without pretending it has been solved.
+- Follow-up: When practical device access exists, run `P6.12` against real iPad Safari for upload, chat, workspace, keyboard-open behavior, tap targets, and portrait/landscape checks.
+
 ### D-20260531-05 - Archive One-Off Planning And Demo Docs After Copying Forward Action Items
 
 - Date: 2026-05-31
@@ -616,7 +626,7 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Context: The repo already had several focused smoke scripts, but there was still no single acceptance document describing what "demo-ready" means across student, parent, tutor, admin, billing, privacy, and deployment checks. That left the project with automation but no stable operator runbook, and with no single command to rerun the current regression set before a demo or external walkthrough.
 - Decision: Add `docs/smoke_checklist_v1.md` as the canonical acceptance checklist, covering automated and manual role-based smoke expectations, explicit blocking versus non-blocking outcomes, and the remaining device/deployment checks. Add `npm run regress:mvp` as the canonical pre-demo regression command that chains typecheck, lint, build, RLS verification, and the full current smoke suite.
 - Why: This turns the existing smoke scripts into a repeatable release gate, reduces the chance of skipping an important cross-role check before demos, and makes later sessions inherit one stable definition of regression coverage instead of reconstructing it from scattered docs and package scripts.
-- Follow-up: Record real iPad Safari results against this checklist as `A7.1` progresses, and tighten the regression command further if new high-risk flows are added later.
+- Follow-up: Hardware iPad recording is superseded by `D-20260531-06` and now lives in post-pilot `P6.12`; keep tightening the regression command if new high-risk flows are added.
 
 ### D-20260311-48 - Cost Control Uses Bounded AI Context Plus Idempotent Artifact Reuse
 
@@ -633,10 +643,10 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Date: 2026-03-11
 - Status: accepted
 - Related tasks: `A7.4.1`, `A7.4.2`, `A7.4.3`
-- Context: The product now has a real deployed web flow, a regression gate, and a founder-ready billing path in Lemon test mode, but the last meaningful manual risk is still real iPad Safari behavior. The repo also has no PWA manifest or service-worker foundation, so adding installability now would create a new branch of launch work without evidence that it matters more than device validation or demo operations.
+- Context: The product now has a real deployed web flow, a regression gate, and a founder-ready billing path in Lemon test mode. The repo also has no PWA manifest or service-worker foundation, so adding installability now would create a new branch of launch work without evidence that it matters more than device validation or demo operations.
 - Decision: Freeze the launch candidate around the current web MVP, defer PWA installability until after beta, and treat `docs/founder_walkthrough_v1.md` plus `docs/launch_checklist_v1.md` as the canonical operating docs for demos and launch-readiness. Use the deterministic fixture accounts as the default role-demo set, while keeping real Lemon checkout demos on a separate fresh parent account instead of the seeded fixture parent.
 - Why: This keeps the launch surface small, focuses attention on the flows that already exist and are regression-covered, and avoids spending launch time on installability plumbing before the web experience is fully validated on the target device.
-- Follow-up: Revisit PWA only after `A7.1` closes on a real iPad Safari pass and early beta usage shows that installability would materially improve retention or return frequency.
+- Follow-up: The old `A7.1` dependency is superseded by `D-20260531-06`; revisit PWA only after post-pilot `P6.12` if iPad becomes a priority device again and real usage shows that installability would materially improve retention or return frequency.
 
 ### D-20260311-50 - Prompt-Level Traceability Is Experimental And Does Not Replace Session Logging
 
@@ -703,10 +713,10 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Date: 2026-03-11
 - Status: accepted
 - Related tasks: `A7.1.1`, `A7.1.2`, `A7.1.3`
-- Context: The remaining MVP blocker is real iPad Safari validation, but the first attempt to do ad hoc local tablet emulation during an active coding session caused instability and left no reviewable QA artifact behind. The project needed a lower-risk, repeatable pre-pass that could validate the current student surfaces on tablet-sized viewports before a manual device run.
-- Decision: Add `scripts/smoke-tablet-emulation.mjs` as the canonical tablet-emulation pre-pass. The script now authenticates with the deterministic fixture student through the same SSR-cookie shape used by the other smoke scripts, starts a temporary `next start` instance from the current production build when no URL override is provided, checks `/app`, `/app/new`, and `/app/conversations/[conversationId]` in portrait and landscape tablet viewports, records screenshots, and reports horizontal-overflow plus tap-target findings. Keep real iPad Safari validation as a separate required step; this script does not close `A7.1` by itself.
+- Context: At the time, real iPad Safari validation was still an MVP blocker, but the first attempt to do ad hoc local tablet emulation during an active coding session caused instability and left no reviewable QA artifact behind. The project needed a lower-risk, repeatable pre-pass that could validate the current student surfaces on tablet-sized viewports before a manual device run.
+- Decision: Add `scripts/smoke-tablet-emulation.mjs` as the canonical tablet-emulation pre-pass. The script now authenticates with the deterministic fixture student through the same SSR-cookie shape used by the other smoke scripts, starts a temporary `next start` instance from the current production build when no URL override is provided, checks `/app`, `/app/new`, and `/app/conversations/[conversationId]` in portrait and landscape tablet viewports, records screenshots, and reports horizontal-overflow plus tap-target findings. `D-20260531-06` later moved real iPad Safari validation from `A7.1` into post-pilot `P6.12`.
 - Why: This turns tablet QA into a reviewable repo artifact, reduces dependence on a running dev server or brittle UI-login timing, and lets future sessions catch layout and touch-target regressions before spending time on manual device testing.
-- Follow-up: Log the real iPad Safari pass separately once upload, keyboard, and chat ergonomics are checked on hardware, and keep the tablet-emulation smoke focused on pre-pass layout and reachability rather than pretending to emulate Safari exactly.
+- Follow-up: Log the real iPad Safari pass under post-pilot `P6.12` once upload, keyboard, and chat ergonomics are checked on hardware, and keep the tablet-emulation smoke focused on pre-pass layout and reachability rather than pretending to emulate Safari exactly.
 
 ### D-20260311-57 - The Canonical Regression Command Reseeds Fixtures Before Verification And Smokes
 
@@ -796,7 +806,7 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Context: After the deeper route localization pass, the user-facing language leaks that still mattered on shared MVP surfaces were no longer whole pages. They were concentrated in the admin audit list, the privacy deletion form and blocked reasons, the quota-block messages surfaced during conversation or upload actions, and the tablet-emulation smoke script still depended on pre-accent French selectors. The root font setup also still relied on Latin-first fonts without an explicit CJK fallback chain.
 - Decision: Extend the existing focused i18n architecture rather than introducing a new framework. Keep admin audit copy and label mappings in `lib/i18n/oversight-copy.ts`, keep deletion-request form feedback in `lib/i18n/ui-copy.ts`, localize the privacy blocked reasons and quota-block `AppError` messages from the viewer's `preferred_ui_language`, add explicit CJK fallback fonts in `app/layout.tsx`, and refresh `scripts/smoke-tablet-emulation.mjs` to the current accented French selectors before rerunning the local tablet smoke.
 - Why: This closes the remaining high-visibility language leaks on MVP-critical routes, keeps copy close to the surfaces that own it, and preserves the existing narrow localization structure instead of widening scope into a late global refactor.
-- Follow-up: The remaining launch-blocking language work is now mostly the broader accented-French and Unicode audit, the broader parent-summary and language-switch verification, and the still-pending real iPad verification.
+- Follow-up: The remaining language work is now mostly broader parent-summary and language-switch verification, plus residual generic provider or service strings. Real iPad verification is deferred to post-pilot `P6.12` by `D-20260531-06`.
 
 ### D-20260312-66 - Tablet Emulation Smoke Can Temporarily Flip The Fixture UI Language
 
@@ -806,7 +816,7 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Context: The original tablet-emulation smoke only exercised the seeded French fixture account, so once the trilingual UI pass advanced, the repeatable pre-pass could not say anything about `zh` fit without a manual profile edit before every run.
 - Decision: Extend `scripts/smoke-tablet-emulation.mjs` with `SMOKE_UI_LANGUAGE=fr|en|zh`. The script now temporarily updates the fixture student's `preferred_ui_language`, runs the localized selector plan for that language, and restores the seeded fixture language afterward.
 - Why: This keeps the tablet pre-pass repeatable, reduces manual fixture drift, and gives the MVP a real local `zh` route-fit check on the critical student surfaces before the later hardware pass.
-- Follow-up: Keep treating the localized smoke as a pre-pass only. Real iPad Safari behavior, broader language-switch verification, and parent-summary default checks still remain outside what this script proves.
+- Follow-up: Keep treating the localized smoke as a pre-pass only. Broader language-switch verification and parent-summary default checks still remain outside what this script proves, while real iPad Safari behavior is deferred to post-pilot `P6.12`.
 
 ### D-20260312-67 - Core Student Runtime Text Reuses The Student-Flow Copy Boundary
 

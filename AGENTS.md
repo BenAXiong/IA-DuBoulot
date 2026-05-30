@@ -212,7 +212,7 @@ If a new folder becomes a stable part of the project, add it to [README.md](READ
 
 - Run the smoke checklist for the current MVP slice.
 - Verify role separation and data visibility.
-- Verify iPad layout and upload behavior.
+- Run the tablet-emulation smoke for the current MVP slice; real iPad Safari validation is post-pilot `P6.12` unless the user explicitly brings hardware QA back into scope.
 - Verify that the session and decision logs explain the current product state.
 
 ## Quality Bar

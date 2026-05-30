@@ -34,8 +34,11 @@ Rules:
 Current carryover blockers that still stay in MVP:
 
 - `A0.2.3` Resend sender setup and the later real mailer slice
-- `A7.1.1` to `A7.1.3` real iPad Safari validation and fixes
-- `A7.4.4` to `A7.4.6` full shared-interface localization and zh-aware tablet verification
+- `A7.4.5` to `A7.4.6` full shared-interface localization and zh-aware tablet-emulation verification
+
+Deferred beyond Pilot:
+
+- `P6.12` real iPad Safari validation and iPad-specific polish, moved out of MVP/Pilot gates on 2026-05-31 because hardware validation is practically constrained.
 
 ## Temporary Nath Demo Task Intake
 
@@ -44,7 +47,7 @@ Source: archived [Demo Nath_0410](archive/demo_Nath_0410.md). These are unsorted
 - Gemini/demo operations: verify production uses a paid Gemini project or otherwise trustworthy pilot provider setup; rerun a live learner conversation and confirm provider fallback is rare enough for demo use.
 - Student-only live smoke: verify sign-in, required onboarding, subject creation from Homework, first-message send/reply, file upload, pasted-image behavior, right-rail behavior, `Homework done!` recap, and Fast versus Thinking response speed on the deployed app.
 - First-prompt responsiveness: keep upload pills and pending chat state visible quickly when a conversation initializes from the first-prompt handoff.
-- iPad-critical polish: rerun tablet emulation, test deployed app in an iPad-sized browser or real iPad, fix sub-`44x44` tap targets, check portrait/landscape layouts, and check keyboard-open behavior around the pinned composer.
+- Tablet pre-pass polish: rerun tablet emulation, test the deployed app in an iPad-sized browser viewport when useful, fix obvious sub-`44x44` tap-target issues found without hardware, and keep real iPad Safari plus keyboard-open behavior deferred to `P6.12`.
 - Student UI polish: make recent homework chat lists credible and tap-friendly, keep avatar behavior acceptable if real avatar upload stays deferred, localize subject toggles, disable or clearly mark placeholder sidebar sections, and remove visual rough edges that still read as prototype.
 - Demo narrative: remove developer wording, internal fallback-looking phrasing, confusing multi-role affordances, and dead-end homework-start/completion navigation; make unsupported non-homework asks produce a concise homework-mode warning.
 - Commercial posture: decide whether a demo should expose free-plan wording, whether the demo account simply runs on paid access, and ensure quota copy is not coupled to Gemini free-project limits.
@@ -141,6 +144,7 @@ Detail notes: [Pilot Structural Audit And Refactor Discipline](pilot/refactor_di
 - [ ] P6.9 Add automatic session checkpoints for meaningful unfinished homework work, so Banban can retain lower-confidence learning signals even when the learner never clicks the final completion action. Checkpoints must be clearly separate from trusted completion summaries and must define update, overwrite, and deletion behavior.
 - [ ] P6.10 Add cleanup paths for stale or misclassified homework items, such as archive, not a homework, done elsewhere, or dismiss from active counters, so students who do not maintain their board perfectly do not accumulate permanent unfinished-work pressure.
 - [ ] P6.11 Explore post-completion reinforcement actions: turn completed homework into practice, log it for later revision, or let the learner mark topics as needing reinforcement when they feel Banban did not fully grasp their difficulty.
+- [ ] P6.12 Run real iPad Safari validation and iPad-specific polish after practical device constraints clear, including upload, chat, workspace, keyboard-open behavior, tap targets, and portrait/landscape checks.
 
 Detail notes: [Post-Pilot Candidate Backlog](pilot/post_pilot_backlog.md).
 

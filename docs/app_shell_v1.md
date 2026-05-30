@@ -185,13 +185,13 @@ Recorded check:
 Scope boundary:
 
 - this closes `A2.3.4` for shell-width validation
-- actual iPad Safari behavior, keyboard behavior, and upload/chat ergonomics still belong to phase `A7.1`
+- actual iPad Safari behavior, keyboard behavior, and upload/chat ergonomics are deferred to post-pilot `P6.12`
 
 ## Known Follow-Ups
 
 - convert anchor sections into real route destinations as dashboards grow
 - continue the trilingual pass inside the deeper student, parent, tutor, and admin dashboard content
-- validate the shell on actual iPad Safari during `A7.1`
+- validate the shell on actual iPad Safari during post-pilot `P6.12` if iPad becomes a priority device again
 - add role-specific empty states that consume real data rather than static MVP guidance copy
 - validate the new parent-specific shell rhythm in real walkthroughs so the learner rail, billing dock, and grouped activity panels stay calmer than the generic shared-sidebar pattern they replaced
 - decide later whether the student shell should keep subject filters only, whether the hidden legacy intake code behind the `/app/new` redirect should be repurposed or removed, and whether conversation creation can become even more implicit than the current shell-first quick-start

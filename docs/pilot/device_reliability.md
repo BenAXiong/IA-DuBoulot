@@ -16,4 +16,4 @@ This file holds long-form evidence and historical status notes. Keep the canonic
 
 ## Evidence And Status Notes
 
-No long-form notes have been moved here yet.
+Status note: real iPad Safari validation and iPad-specific keyboard or touch polish are not active Pilot gates as of 2026-05-31. They are deferred to post-pilot `P6.12`; `P3.1` should focus on the browser/device set that can actually be verified during the closed Pilot.

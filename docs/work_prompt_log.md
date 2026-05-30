@@ -125,3 +125,4 @@ then close it as:
 | 2026-05-31 | 01:12 -> 01:17 | 0h05 | A0.3.7 P4.2 | split the Pilot_todo working board from long-form pilot evidence docs and record doc-only git handling | | |
 | 2026-05-31 | 01:19 -> 01:39 | 0h20 | A0.3.7 P4.2 | audit stale docs candidates for review or archive after log and pilot-board cleanup | | |
 | 2026-05-31 | 01:42 -> 01:43 | 0h01 | A0.3.7 P4.2 | assess whether remaining MVP to-do items should move into Pilot planning | | |
+| 2026-05-31 | 01:54 -> 01:58 | 0h04 | A0.3.7 P6.12 | defer iPad-specific MVP exit tasks into post-pilot planning due to practical constraints | | |

@@ -29,7 +29,7 @@ The original brief already has a good product order, but for actual implementati
 3. Uploads and extracted-text review should be implemented before advanced conversation behavior, because they are core to real student intake.
 4. AI provider abstraction and prompt contracts should be defined before expanding parent, tutor, and memory features.
 5. Billing should be abstracted early but integrated late, because the provider decision is externally blocked by geography and entity setup.
-6. PWA installability stays optional and only happens after the web experience is already solid on iPad Safari.
+6. PWA installability stays optional and only happens after the web experience is solid enough to justify installability work; real iPad Safari validation is now post-pilot `P6.12` because hardware validation is practically constrained.
 
 ## Recommended Build Order
 
@@ -139,11 +139,11 @@ Then add:
 
 These systems support monetization and responsible data handling without blocking the first core flow.
 
-### Phase A7 - Quality, iPad Polish, And Launch Readiness
+### Phase A7 - Quality, Tablet Pre-Pass, And Launch Readiness
 
 Finish with:
 
-- iPad Safari QA
+- tablet-emulation QA as the near-term device pre-pass
 - smoke tests
 - performance and cost caps
 - optional PWA installability
@@ -166,7 +166,7 @@ The original brief was intentionally product-focused. For build execution, these
 - artifact index so docs, SQL, prompts, and scripts are hyperlinkable
 - legal/privacy and deletion-path tasks suitable for minors
 - modular architecture rules to prevent god components and hidden logic
-- explicit iPad Safari verification as a recurring QA step
+- explicit tablet-emulation verification as a recurring near-term QA step, with real iPad Safari deferred to post-pilot `P6.12`
 - localization structure that does not entangle UI copy with business logic
 
 ## High-Risk Areas And Mitigations
@@ -254,5 +254,5 @@ The MVP is done when all of the following are true:
 - A linked tutor can review sessions and leave private notes invisible to the student.
 - Access control is enforced with both RLS and server-side checks.
 - Usage caps and a trial path exist, even if pricing is still simple.
-- The app is usable on iPad Safari across the core flow.
+- The app passes the repeatable tablet-emulation pre-pass across the core flow; real iPad Safari validation is deferred to post-pilot `P6.12`.
 - The session and decision logs explain how the current system works.

@@ -152,7 +152,7 @@ The tablet-emulation smoke script currently checks that:
 - a local production-build `next start` instance is started automatically when no URL override is provided
 - `/app`, the subject-level homework launcher on `/app?view=homework&subject=...`, and `/app/conversations/[conversationId]` render in portrait and landscape tablet viewports without horizontal overflow
 - key student controls stay reachable and the tracked critical controls meet the `44x44` tap-target floor
-- screenshots are written for later review while real iPad Safari remains a separate required manual step
+- screenshots are written for later review while real iPad Safari remains a separate post-pilot `P6.12` hardware step
 
 ## Safety Rules
 

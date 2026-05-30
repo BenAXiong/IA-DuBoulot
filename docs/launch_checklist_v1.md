@@ -12,14 +12,14 @@ Decision for `A7.4.1`: defer PWA installability before beta.
 
 Reason:
 
-- the implementation plan already treats PWA as optional after the web experience is solid on real iPad Safari
+- the implementation plan already treats PWA as optional after the web experience is solid on the target devices
 - the repo currently has no manifest, service worker, or installability path
-- the higher-value remaining validation is real iPad Safari behavior under `A7.1`, not install banners or offline support
+- the higher-value near-term validation is the deployed web flow plus tablet-emulation pre-pass, not install banners or offline support
 
 Revisit PWA only after:
 
-- `A7.1` is closed on a real device
-- real beta usage shows repeated return traffic that would materially benefit from installability
+- post-pilot `P6.12` is complete on a real iPad if iPad becomes a priority device again
+- real pilot or beta usage shows repeated return traffic that would materially benefit from installability
 
 ## Frozen MVP Scope
 
@@ -36,6 +36,7 @@ Keep in the launch candidate:
 Explicitly defer beyond this launch candidate:
 
 - PWA installability
+- real iPad Safari validation and iPad-specific keyboard or tap-target polish, now tracked as post-pilot `P6.12`
 - a second AI provider or richer retry orchestration
 - adult-summary repair or manual summary-regeneration tooling
 - richer analytics, dashboards, or marketing-site polish
@@ -80,12 +81,12 @@ Explicitly defer beyond this launch candidate:
 ### Device Readiness
 
 - local `npm run smoke:tablet-emulation` pre-pass is green and logged
-- real iPad Safari validation is still pending and remains a launch blocker
+- real iPad Safari validation is deferred to post-pilot `P6.12` because hardware validation is practically constrained and is no longer a closed-Pilot launch blocker
 
 ## Current Remaining Blockers
 
-The remaining open work inside `A7` is `A7.1` real iPad Safari validation plus the last `A7.4.4` to `A7.4.6` interface-language gaps around the accented-French or Unicode audit, the broader parent-summary default and language-switch verification, and any residual generic provider or service strings that still bypass the focused copy modules after the local `zh` tablet-fit pre-pass for the Taiwan-first pilot.
+The remaining open MVP work is `A0.2.3` Resend sender setup if real email delivery is required for the Pilot, plus `A7.4.5` to `A7.4.6` interface-language gaps around broader shared-route localization, parent-summary default and language-switch verification, and any residual generic provider or service strings that still bypass the focused copy modules after the local `zh` tablet-fit pre-pass for the Taiwan-first pilot. Real iPad Safari validation has moved to post-pilot `P6.12`.
 
-The AI ops/economics and parent-AI policy note is now published in [AI ops and economics V1](ai_ops_economics_v1.md), including the Gemini project-limit model and pilot-project recommendation, so the main product blockers are now device validation and the explicit trilingual UI pass.
+The AI ops/economics and parent-AI policy note is now published in [AI ops and economics V1](ai_ops_economics_v1.md), including the Gemini project-limit model and pilot-project recommendation, so the main product blockers are now email-delivery policy if needed and the explicit trilingual UI pass.
 
 Post-launch polish, UX hardening, and broader pilot operating work now live in [Pilot_todo](pilot_todo.md) instead of being mixed into the launch gate.
