@@ -18,6 +18,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 
 ## Current Decisions
 
+### D-20260531-02 - Prompt Work Log Uses The Same Current Plus Verbatim Archive Pattern
+
+- Date: 2026-05-31
+- Status: accepted
+- Related tasks: `A0.3.7`, `P4.2`
+- Context: `docs/work_prompt_log.md` is experimental but had grown much faster than the canonical work-session log because it records prompt-level slices. Keeping every historical prompt row in the current file made the active prompt trace harder to maintain.
+- Decision: Keep `docs/work_prompt_log.md` as the current prompt-level trace with rules, format, active `OPEN` rows, and recent closed rows. Move older closed rows verbatim into linked archive files under `docs/archive/`, starting with `docs/archive/work_prompt_log_2026-03_to_2026-04.md`.
+- Why: This preserves the experimental prompt history while keeping prompt-start and prompt-close maintenance lightweight during active sessions.
+- Follow-up: Use the same archive convention for future prompt-log months if the experimental trace remains active; do not treat archived prompt rows as a substitute for the canonical work-session log.
+
 ### D-20260531-01 - Work Sessions Use A Current Log Plus Verbatim Archives
 
 - Date: 2026-05-31

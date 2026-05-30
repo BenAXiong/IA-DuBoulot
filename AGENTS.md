@@ -79,6 +79,7 @@ If a file above is outdated, update it before or alongside the code change that 
 - When the prompt log is active, create or update the prompt row immediately at prompt start with an `OPEN` end marker, keep that row open during the whole active handling window, and close that same row with the real end time only after the work is actually finished and just before the final response.
 - Never pre-close a prompt row during analysis, planning, or midway through a turn. If the prompt is still being handled, the row must still show `OPEN`.
 - Treat the prompt log as a prompt-driven work-slice trace, not a literal row-for-every-fast-back-and-forth transcript. Small clarification bursts that do not create a distinct implementation or audit slice should be folded into the current active row instead of creating misleading micro-rows.
+- Keep active `OPEN` prompt rows and recent closed rows in [docs/work_prompt_log.md](docs/work_prompt_log.md); move older closed rows only by copying them verbatim into linked archive files under `docs/archive/`.
 
 ### 2. Rebuild Context
 
