@@ -375,3 +375,4 @@ then close it as:
 | 2026-05-13 | 09:53 -> 10:11 | 0h18 | A2.1.1 A2.2.3 P1.3 P2.6 | simplify auth/onboarding chrome and persist the new learner onboarding fields | | |
 | 2026-05-18 | 11:48 -> 11:48 | 0h00 | A0.3.7 | cancel the mistaken 2026-05-15 reopen and open the current work session now | | |
 | 2026-05-31 | 00:03 -> 00:04 | 0h01 | A0.3.7 | cancel the stale open work session, reopen the trace, and assess docs organization | | |
+| 2026-05-31 | 00:13 -> 00:14 | 0h01 | A0.3.7 P4.2 | recommend current-plus-archive handling for logs and a bounded Pilot_todo split | | |
