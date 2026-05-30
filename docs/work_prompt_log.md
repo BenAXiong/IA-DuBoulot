@@ -376,3 +376,4 @@ then close it as:
 | 2026-05-18 | 11:48 -> 11:48 | 0h00 | A0.3.7 | cancel the mistaken 2026-05-15 reopen and open the current work session now | | |
 | 2026-05-31 | 00:03 -> 00:04 | 0h01 | A0.3.7 | cancel the stale open work session, reopen the trace, and assess docs organization | | |
 | 2026-05-31 | 00:13 -> 00:14 | 0h01 | A0.3.7 P4.2 | recommend current-plus-archive handling for logs and a bounded Pilot_todo split | | |
+| 2026-05-31 | 01:04 -> 01:06 | 0h02 | A0.3.7 P4.2 | archive older work-session rows while keeping the canonical current log stable | | |

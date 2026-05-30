@@ -73,6 +73,7 @@ If a file above is outdated, update it before or alongside the code change that 
 - Open [docs/work_sessions.md](docs/work_sessions.md) immediately.
 - If there is already an `OPEN` session and the user has not explicitly said `end session`, continue that row instead of creating a second open session.
 - If there is no open row, append a new row with the current date, start time, `OPEN` as the end marker, planned task IDs, and a short scope description.
+- Treat [docs/work_sessions.md](docs/work_sessions.md) as the current canonical log: keep the active `OPEN` row and recent closed rows there, and move older closed rows only by copying them verbatim into linked archive files under `docs/archive/`.
 - If the experimental prompt log is active, append or update the current prompt row in [docs/work_prompt_log.md](docs/work_prompt_log.md) in parallel.
 - Treat the prompt log as a prompt-level trace, not a merged work-slice summary. Short back-and-forth prompts are fine as separate rows as long as the timestamps stay accurate.
 - When the prompt log is active, create or update the prompt row immediately at prompt start with an `OPEN` end marker, keep that row open during the whole active handling window, and close that same row with the real end time only after the work is actually finished and just before the final response.

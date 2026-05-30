@@ -47,6 +47,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [MVP timeline](docs/mvp_timeline.md)
 - [Decision log](docs/decision_log.md)
 - [Work sessions log](docs/work_sessions.md)
+- [Work sessions archive 2026-03 to 2026-04](docs/archive/work_sessions_2026-03_to_2026-04.md)
 - [Prompt work log](docs/work_prompt_log.md)
 - [Vibestructions](docs/vibestructions.md)
 - [Agent operating manual](AGENTS.md)
@@ -116,5 +117,6 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - Use task IDs from [the MVP to-do list](docs/mvp_todo.md) in session notes, decision log entries, commit messages, and review notes.
 - Use task IDs from [Pilot_todo](docs/pilot_todo.md) the same way for pilot-hardening work, and update that backlog whenever a session changes pilot-facing polish, UX findings, or release-ops assumptions.
 - Treat [the decision log](docs/decision_log.md) and [the work sessions log](docs/work_sessions.md) as mandatory maintenance files, not optional notes.
+- Keep current execution trace in [the work sessions log](docs/work_sessions.md), with older closed rows moved verbatim to linked archive files under `docs/archive/`.
 - After a coherent verified slice, create a task-ID commit and push it to `origin` unless the user explicitly asks to defer git actions.
 - Update this file whenever a new top-level project doc becomes part of the operating workflow.

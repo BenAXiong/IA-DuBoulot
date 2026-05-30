@@ -197,6 +197,7 @@ Status note: add a later student-input UX follow-up under `P1.3` and `P2.1`: the
 - [ ] P4.5 Define how the pilot verifies or operationally trusts that a `parent` account really belongs to an adult, and when stronger checks are required before wider rollout.
 
 Status note: `docs/pilot_todo.md` maintenance is now mandatory whenever a session changes pilot-facing polish, UX findings, release-ops assumptions, or `P*` task status, and a verified coherent slice should now also be committed and pushed in the same session. `P4` stays open because the triage cadence, operator-facing change log, Pilot-to-Beta exit criteria, and the current parent-account adulthood-verification posture are still not fully defined.
+Status note: on 2026-05-31, the canonical work-session log adopted the first current-plus-archive pattern: recent/current execution rows remain in `docs/work_sessions.md`, and older closed rows move verbatim into linked files under `docs/archive/`. This closes a navigation pain point for the operating trace, but `P4.2` remains open because a broader pilot-facing change log still has not been defined.
 
 ### P5 Structural Audit And Refactor Discipline
 

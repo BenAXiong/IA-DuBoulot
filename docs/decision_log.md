@@ -18,6 +18,16 @@ Use this file to record project-shaping decisions so future sessions do not reve
 
 ## Current Decisions
 
+### D-20260531-01 - Work Sessions Use A Current Log Plus Verbatim Archives
+
+- Date: 2026-05-31
+- Status: accepted
+- Related tasks: `A0.3.7`, `P4.2`
+- Context: `docs/work_sessions.md` had grown into a long append-only table, making the active execution trace harder to scan while still needing to preserve historical session rows for future reconstruction.
+- Decision: Keep `docs/work_sessions.md` as the canonical current work-session log with rules, format, the active `OPEN` row, and recent closed rows. Move older closed rows verbatim into linked archive files under `docs/archive/`, starting with `docs/archive/work_sessions_2026-03_to_2026-04.md`.
+- Why: This keeps session startup and trace review fast without losing the chronological history or rewriting old session summaries.
+- Follow-up: Apply the same current-plus-archive pattern to `docs/work_prompt_log.md` next if the experimental prompt trace remains active and keeps growing.
+
 ### D-20260430-01 - Cap Subject Docs By Paid Or Free Access
 
 - Date: 2026-04-30
