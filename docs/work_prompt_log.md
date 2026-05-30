@@ -373,3 +373,5 @@ then close it as:
 | 2026-05-13 | 09:17 -> 09:17 | 0h00 | A0.3.7 | close the current work session at 22:29 on 2026-05-12 and reopen a fresh session now | | |
 | 2026-05-13 | 09:18 -> 09:20 | 0h02 | A2.1.1 P1.3 P2.6 | assess auth and onboarding simplification, registration field changes, and related planning tasks | | |
 | 2026-05-13 | 09:53 -> 10:11 | 0h18 | A2.1.1 A2.2.3 P1.3 P2.6 | simplify auth/onboarding chrome and persist the new learner onboarding fields | | |
+| 2026-05-18 | 11:48 -> 11:48 | 0h00 | A0.3.7 | cancel the mistaken 2026-05-15 reopen and open the current work session now | | |
+| 2026-05-31 | 00:03 -> 00:04 | 0h01 | A0.3.7 | cancel the stale open work session, reopen the trace, and assess docs organization | | |
