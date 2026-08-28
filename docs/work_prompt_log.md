@@ -129,3 +129,5 @@ then close it as:
 | 2026-05-31 | 02:24 -> 02:25 | 0h01 | A0.3.7 P4.2 P6.12 | close the active documentation session and push accumulated local doc commits | | |
 | 2026-05-31 | 11:50 -> 11:51 | 0h01 | A0.3.7 | open a fresh work session | | |
 | 2026-08-29 | 00:53 -> 00:58 | 0h05 | A0.3.7 | rebuild and recap the current repository state from documentation, Git, and implemented code | | |
+| 2026-08-29 | 01:30 -> 01:32 | 0h02 | A7.2.2 A7.2.3 A7.4.5 A7.4.6 P1.3 P2.1 P2.3 P3.2 P3.3 P5.1 P5.2 P5.3 | begin planning the broad regression and hardening slice, then stop when the user changed scope to a Supabase portability audit | | |
+| 2026-08-29 | 01:32 -> 01:39 | 0h07 | A0.2.1 A1.1.5 A1.2.4 A6.3.2 A6.3.3 | audit the technical difficulty, failure modes, billing impact, and time required to relocate the inactive Supabase project to a new free account | | |
