@@ -1837,3 +1837,12 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: For learner onboarding, collect `birth_date`, `country_of_study`, optional `school_name`, and `grade_level` on `users`. Derive `is_under_13` and `age_band` server-side from `birth_date`. Keep exact birth date out of auth metadata and prompt context by default.
 - Why: A birthday is clearer for users and gives a reliable age-gating source, while the derived fields preserve current policy checks and prompt-tone affordances.
 - Follow-up: Before broader rollout, review whether exact birth date still satisfies the legal/data-minimization posture, and decide whether grade/country should feed coach context directly or only through a later explicit pedagogical-baseline feature.
+### D-20260829-01 - Student Smoke Uses An Isolated Learner And The Subject Quick-Start Interface
+
+- Date: 2026-08-29
+- Status: accepted
+- Related tasks: `A7.2.2`, `A7.2.3`, `P2.1`, `P2.3`
+- Context: The student smoke still exercised the retired intake-style conversation draft, expected a synthetic initial message, and asserted provider extraction contained a particular word and minimum length. The live product now starts from the Homework surface, creates a bare subject conversation, prepares attachments, and sends the learner's first real message from the conversation workbench. The shared fixture learner also already has conversation history, so it could not prove the first-ever-homework state.
+- Decision: Create and clean up an isolated smoke learner for each run, assert the server-rendered zero-history and returning-homework states through a stable semantic marker, create the conversation through `POST /api/conversations?mode=shell`, and keep extraction assertions at the actual route contract: a ready result must contain a source block with non-empty extracted content, while provider failure must produce the documented manual-review path.
+- Why: The test interface now matches the learner journey and no longer fails merely because a valid provider extraction is shorter or differently worded. Isolating the learner keeps the first-run proof deterministic without erasing or reshaping shared demo fixtures.
+- Follow-up: Rerun the live smoke and full regression after restoring a resolvable hosted Supabase project. The 2026-08-29 attempt stopped before fixture mutation because both local and Vercel production configuration referenced an unavailable Supabase hostname.

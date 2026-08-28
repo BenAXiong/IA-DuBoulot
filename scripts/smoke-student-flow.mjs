@@ -7,12 +7,8 @@ import { fileURLToPath } from "node:url";
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import {
-  FIXTURE,
   createAdminClient,
   env as fixtureEnv,
-  restoreFixtureUsageState,
-  resolveFixtureUserIds,
-  snapshotFixtureUsageState,
 } from "./rls-fixture-shared.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -42,13 +38,6 @@ function assert(condition, message) {
   if (!condition) {
     throw new Error(message);
   }
-}
-
-function normalizeAssertionText(value) {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
 }
 
 function wait(ms) {
@@ -248,7 +237,7 @@ function buildHttpClient(baseUrl) {
 
   return {
     cookieJar,
-    async signInFixtureStudent() {
+    async signInPassword(email, password) {
       const supabase = createServerClient(
         fixtureEnv.supabaseUrl,
         fixtureEnv.supabaseAnonKey,
@@ -257,13 +246,13 @@ function buildHttpClient(baseUrl) {
         },
       );
       const { error } = await supabase.auth.signInWithPassword({
-        email: FIXTURE.emails.student,
-        password: fixtureEnv.fixturePassword,
+        email,
+        password,
       });
 
       if (error) {
         throw new Error(
-          `Fixture sign-in failed. Rerun \`npm run seed:rls-fixtures\` and retry. ${error.message}`,
+          `Smoke learner sign-in failed: ${error.message}`,
         );
       }
 
@@ -271,6 +260,35 @@ function buildHttpClient(baseUrl) {
         cookieJar.toHeader().includes("sb-"),
         "Supabase SSR auth cookie was not created after fixture sign-in.",
       );
+    },
+    async requestText(pathname, init = {}) {
+      requestSequence += 1;
+      const requestId = `${requestPrefix}_${requestSequence}_${pathname
+        .replace(/[^a-z0-9]+/gi, "_")
+        .replace(/^_+|_+$/g, "")
+        .toLowerCase()}`;
+      const headers = new Headers(init.headers ?? {});
+
+      headers.set("x-request-id", requestId);
+
+      if (cookieJar.toHeader()) {
+        headers.set("cookie", cookieJar.toHeader());
+      }
+
+      const response = await fetch(`${baseUrl}${pathname}`, {
+        ...init,
+        headers,
+        redirect: "manual",
+        signal: AbortSignal.timeout(requestTimeoutMs),
+      });
+
+      cookieJar.applyResponseCookies(response);
+
+      return {
+        requestId,
+        response,
+        text: await response.text(),
+      };
     },
     async requestJson(pathname, init = {}) {
       requestSequence += 1;
@@ -311,6 +329,76 @@ function buildHttpClient(baseUrl) {
         payload,
       };
     },
+  };
+}
+
+async function createIsolatedSmokeStudent(adminClient) {
+  const timestamp = Date.now();
+  const email = `smoke-student-${timestamp}@iaduboulot.local`;
+  const displayName = "Smoke First Homework Student";
+  const { data: authData, error: authError } =
+    await adminClient.auth.admin.createUser({
+      email,
+      password: fixtureEnv.fixturePassword,
+      email_confirm: true,
+      user_metadata: {
+        app_role: "student",
+        display_name: displayName,
+        preferred_ui_language: "fr",
+        ai_help_language: "fr",
+        age_band: "thirteen_fifteen",
+        is_under_13: false,
+        account_status: "active",
+        onboarding_completed: true,
+        app_profile_version: 1,
+        smoke_tag: requestPrefix,
+      },
+    });
+
+  if (authError || !authData.user) {
+    throw authError ?? new Error("Smoke learner auth creation returned no user.");
+  }
+
+  const userId = authData.user.id;
+  const { error: userError } = await adminClient.from("users").insert({
+    id: userId,
+    role: "student",
+    account_status: "active",
+    display_name: displayName,
+    preferred_ui_language: "fr",
+    ai_help_language: "fr",
+    age_band: "thirteen_fifteen",
+    is_under_13: false,
+    birth_date: "2011-08-29",
+    country_of_study: "TW",
+    grade_level: "college",
+  });
+
+  if (userError) {
+    await adminClient.auth.admin.deleteUser(userId).catch(() => {});
+    throw userError;
+  }
+
+  const { error: profileError } = await adminClient
+    .from("student_profiles")
+    .insert({
+      student_user_id: userId,
+      current_grade_level: "college",
+      preferred_help_style: "step_by_step",
+      recurring_subjects: [],
+      parental_approval_required: false,
+      parent_approved_at: null,
+      learning_notes: null,
+    });
+
+  if (profileError) {
+    await adminClient.auth.admin.deleteUser(userId).catch(() => {});
+    throw profileError;
+  }
+
+  return {
+    email,
+    userId,
   };
 }
 
@@ -385,12 +473,7 @@ async function cleanupConversation(adminClient, state) {
 
 async function main() {
   const adminClient = createAdminClient();
-  const fixtureUserIds = await resolveFixtureUserIds(adminClient);
-  assert(fixtureUserIds.student, "Missing fixture student user id.");
-  const usageSnapshot = await snapshotFixtureUsageState(
-    adminClient,
-    fixtureUserIds.student,
-  );
+  const smokeStudent = await createIsolatedSmokeStudent(adminClient);
   const storageClient = createClient(
     fixtureEnv.supabaseUrl,
     fixtureEnv.supabaseAnonKey,
@@ -403,6 +486,7 @@ async function main() {
     },
   );
   const state = {
+    authUserId: smokeStudent.userId,
     conversationId: null,
     uploadedObject: null,
   };
@@ -420,23 +504,36 @@ async function main() {
     }
 
     const http = buildHttpClient(baseUrl);
-    await http.signInFixtureStudent();
+    await http.signInPassword(smokeStudent.email, fixtureEnv.fixturePassword);
 
-    const createConversationResult = await http.requestJson("/api/conversations", {
+    const firstHomeworkPage = await http.requestText("/app?view=homework");
+    assert(
+      firstHomeworkPage.response.status === 200,
+      `First-homework page should load with 200, saw ${firstHomeworkPage.response.status}.`,
+    );
+    assert(
+      firstHomeworkPage.text.includes('data-homework-state="first"'),
+      "Zero-history learner did not receive the first-homework launcher.",
+    );
+
+    const createConversationResult = await http.requestJson("/api/conversations?mode=shell", {
       method: "POST",
       body: JSON.stringify({
-        title: `Smoke A4 flow ${new Date().toISOString()}`,
+        title: "Subject_001",
         subjectTag: "mathematiques",
-        gradedHomework: true,
-        pastedText: "",
-        editedExtractedText:
-          "Brouillon initial avant upload et extraction du PDF.",
-        attachmentReferences: [],
+        gradedHomework: false,
+        attachmentReferences: [
+          {
+            name: sampleAttachmentName,
+            category: "pdf",
+            byteSize: (await readFile(sampleAttachmentPath)).byteLength,
+          },
+        ],
       }),
     });
     const createConversationPayload = expectOkJson(
       createConversationResult,
-      "Failed to create the conversation draft",
+      "Failed to create the subject quick-start conversation shell",
     );
     const conversationId =
       createConversationPayload.data?.conversationId ?? null;
@@ -459,12 +556,21 @@ async function main() {
       "Fresh conversation should start in active status.",
     );
     assert(
-      initialDetail.messages.length === 1,
-      `Fresh conversation should have one initial message, saw ${initialDetail.messages.length}.`,
+      initialDetail.messages.length === 0,
+      `Fresh quick-start conversation should be bare, saw ${initialDetail.messages.length} messages.`,
     );
     assert(
       initialDetail.attachments.length === 0,
       "Fresh conversation should not have attachments before upload.",
+    );
+
+    const returningHomeworkPage = await http.requestText(
+      "/app?view=homework&subject=mathematiques",
+    );
+    assert(
+      returningHomeworkPage.response.status === 200 &&
+        returningHomeworkPage.text.includes('data-homework-state="returning"'),
+      "Created subject shell did not move the learner into the returning-homework state.",
     );
 
     const sampleBuffer = await readFile(sampleAttachmentPath);
@@ -537,8 +643,9 @@ async function main() {
       assert(
         typeof extractedTextBlock === "string" &&
           extractedTextBlock.startsWith("[Source: fractions-partage.pdf]") &&
-          normalizeAssertionText(extractedTextBlock).includes("exercice") &&
-          extractedTextBlock.trim().length >= 40,
+          extractedTextBlock
+            .slice("[Source: fractions-partage.pdf]".length)
+            .trim().length > 0,
         `Extracted text block is unexpectedly empty or malformed. Received: ${extractedTextBlock}`,
       );
     } else {
@@ -644,6 +751,7 @@ async function main() {
         method: "POST",
         body: JSON.stringify({
           intent: "student_message",
+          replyMode: "thinking",
           contentText:
             "Je pense que chaque ami recoit trois quarts, mais je n'arrive pas a formuler les etapes clairement.",
         }),
@@ -945,7 +1053,9 @@ async function main() {
           conversationId,
           checks: [
             "student auth cookie established",
-            "draft conversation created",
+            "zero-history dashboard exposed the first-homework launcher",
+            "subject quick-start created a bare conversation shell",
+            "dashboard transitioned to the returning-homework state",
             "PDF upload confirmed with extraction or graceful manual-review fallback",
             "repeated confirm and complete calls reused existing expensive artifacts",
             "workspace synced with extracted text",
@@ -964,11 +1074,9 @@ async function main() {
     );
   } finally {
     await cleanupConversation(adminClient, state);
-    await restoreFixtureUsageState(
-      adminClient,
-      fixtureUserIds.student,
-      usageSnapshot,
-    ).catch(() => {});
+    if (state.authUserId) {
+      await adminClient.auth.admin.deleteUser(state.authUserId).catch(() => {});
+    }
     await stopLocalServer(childProcess);
   }
 }

@@ -63,7 +63,9 @@ Current blocking failure class:
 
 ### Student
 
-- authenticated student can create a conversation draft
+- an isolated zero-history student sees the first-homework launcher on `/app?view=homework`
+- subject quick-start creates a bare conversation shell before the learner's first real message
+- the dashboard moves from the first-homework state to the returning-homework state after that shell exists
 - file upload confirmation succeeds or degrades to manual review without breaking the flow
 - repeated upload confirmation reuses the stored extraction result instead of re-running provider extraction
 - workspace persists extracted or manual text
@@ -152,6 +154,9 @@ These remain required before an external demo even if the regression command pas
 
 ## Latest Recorded Result
 
+- 2026-08-29 local `npm run typecheck`, `npm run lint`, and `npm run build`: success after aligning `scripts/smoke-student-flow.mjs` with the current subject quick-start and isolated first-ever-homework flow.
+- 2026-08-29 hosted fixture reseed: blocked before mutation because the configured Supabase project hostname `dfiiujkhbuvltrlqrerd.supabase.co` no longer resolves. Local and Vercel production configuration currently point to the same unavailable host, so the refreshed student smoke and full integration regression cannot be honestly marked green until the hosted project or configuration is restored.
+
 - 2026-03-11 local `npm run regress:mvp`: success, including deterministic fixture reseed before hosted RLS verification and the non-device smoke suite
 - 2026-03-11 local `npm run smoke:tablet-emulation`: success against a temporary local `next start` instance, with no horizontal overflow and no detected sub-`44x44` controls on the checked student tablet surfaces
 - 2026-03-12 local `npm run smoke:tablet-emulation`: success again after the trilingual copy refresh, with the selectors updated to the current accented French labels and no horizontal overflow or detected sub-`44x44` controls on the checked student tablet surfaces
@@ -160,6 +165,6 @@ These remain required before an external demo even if the regression command pas
 - 2026-03-12 local `SMOKE_THEME_MODE=dark npm run smoke:tablet-emulation`: success on `/app`, `/app/new`, and `/app/conversations/[conversationId]` after the shared light or dark theme redesign, with no horizontal overflow and no detected sub-`44x44` controls on the checked student tablet surfaces
 - 2026-04-04 local `npm run smoke:tablet-emulation`: route alignment updated successfully to `/app`, the subject-level homework launcher on `/app?view=homework&subject=...`, and `/app/conversations/[conversationId]`, with no horizontal overflow, but the current student shell still exposes several sub-`44x44` tap targets on the sidebar toggle, theme or language controls, subject links, quick-start actions, and live composer actions. Treat that as device-polish evidence now carried by post-pilot `P6.12`, not as a route-retirement regression.
 - 2026-04-02 local `npm run smoke:adult-oversight`: success after adding the parent-created learner bootstrap path, including parent dashboard learner creation, immediate learner-rail visibility, learner sign-in with the parent-chosen credentials, pending parent-approval visibility, direct dashboard acceptance, tutor-note mutations, and admin audit visibility
-- 2026-04-04 local `npm run smoke:student-flow`: failed again on the existing sample-PDF extraction assertion after the newer student quick-start pass; the harness still drives the older `/app/new` draft-creation flow, the API path still created the draft and completed provider extraction, but the harness rejected a shorter-than-expected extracted-text block (`[Source : fractions-partage.pdf]` plus one line of body text). This still looks like smoke-harness or corpus drift rather than a student-chat regression, but the automated student smoke now also needs to be expanded so it covers the new subject quick-start path before the next full demo-regression run.
-- 2026-04-04 scope note after the first-homework dashboard fix: the zero-history learner path is now usable again through the empty homework launcher on `/app`, but the automated student smoke still does not seed or simulate a learner with no existing subject tags. Treat that as an open harness gap until a future smoke slice covers the first-ever homework path directly.
+- 2026-04-04 local `npm run smoke:student-flow`: failed on the old sample-PDF extraction assertion while the harness still drove the retired draft-creation contract. The 2026-08-29 harness update removes that stale contract and the brittle length/content assertion; live rerun evidence remains pending only because the configured hosted Supabase project is unavailable.
+- 2026-04-04 scope note after the first-homework dashboard fix: the zero-history learner path lacked automated coverage at the time. The 2026-08-29 harness now creates an isolated temporary learner, verifies the server-rendered first-homework state, creates the current bare subject shell, and verifies the returning-homework transition without changing the shared fixture learner.
 - latest observed non-blocking warnings: provider-backed extraction, coach reply, student summary, or memory refresh may fall back to the documented deterministic path; optional adult summary variants can also be missing in some student-flow runs without breaking the student contract

@@ -33,6 +33,8 @@ This file holds long-form evidence and historical status notes. Keep the canonic
 
 ## Evidence And Status Notes
 
+Status note: on 2026-08-29 the automated student journey was updated to prove the real first-run transition with an isolated learner: zero history renders the first-homework launcher, subject quick-start creates a bare conversation shell, and the dashboard then renders the returning-homework state before upload, first real message, and completion continue. This removes the stale `/app/new`-era draft assumption from the harness; a live end-to-end rerun remains pending because the configured hosted Supabase project hostname no longer resolves.
+
   - [x] Add the dedicated subject-resource upload entry point outside the chat attachment controls.
   - [x] Keep chat-only attachments separate from subject-resource uploads; no chat-to-subject promotion UI in this Pilot slice.
   - [x] Refine the below-composer subject page tabs for History, Resources, and Instructions once the first resource UI has been tried.

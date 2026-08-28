@@ -388,6 +388,7 @@ Status note: on 2026-05-31, real iPad Safari validation and iPad-specific polish
 
 Status note: fixture-backed automated smoke now exists for student, memory, adult-oversight, privacy, and billing flows; `docs/smoke_checklist_v1.md` now defines the written acceptance criteria for student, parent, tutor, and admin roles; and `npm run regress:mvp` now acts as the canonical pre-demo regression pass while reseeding deterministic fixtures before verification and the smoke suite.
 Status note: the latest isolated `npm run smoke:student-flow` rerun on 2026-04-04 now fails on a too-strict extracted-text assertion against the sample PDF corpus even though the draft creation and provider extraction steps still succeed. This looks like smoke-harness or corpus drift rather than a student-UI regression, but the harness still needs review before the next full demo-regression pass.
+Status note: on 2026-08-29 the student smoke was realigned to the current product interface: it creates an isolated zero-history learner, verifies the first-homework dashboard state, creates a bare subject quick-start shell, verifies the returning-homework state, and then exercises upload, first real message, completion, reuse, and cleanup. Typecheck, lint, and production build pass; the live smoke rerun is externally blocked because the Supabase hostname configured both locally and in Vercel production no longer resolves.
 
 ### A7.3 Performance And Cost Controls
 

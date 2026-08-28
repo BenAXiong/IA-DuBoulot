@@ -802,7 +802,10 @@ export function StudentFirstHomeworkLauncher({
   }
 
   return (
-    <div className="grid gap-4">
+    <div
+      className="grid gap-4"
+      data-homework-state={knownSubjects.length === 0 ? "first" : "returning"}
+    >
       {selectedSubjectTitle ? (
         <h1 className="font-[family-name:var(--font-heading)] text-4xl leading-tight sm:text-5xl">
           {selectedSubjectTitle}
