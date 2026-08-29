@@ -125,8 +125,8 @@ Current status: trace docs now use current-plus-archive files, and long pilot ev
 
 ### P5 Structural Audit And Refactor Discipline
 
-- [ ] P5.1 Run a targeted structural audit on MVP-era files that grew during delivery, and log concrete mixed-responsibility or dead-code hotspots with evidence.
-- [ ] P5.2 Turn structural-audit findings into bounded refactor slices, dead-code cleanup, or reopened MVP bugs instead of one sweeping rewrite.
+- [x] P5.1 Run a targeted structural audit on MVP-era files that grew during delivery, and log concrete mixed-responsibility or dead-code hotspots with evidence.
+- [x] P5.2 Turn structural-audit findings into bounded refactor slices, dead-code cleanup, or reopened MVP bugs instead of one sweeping rewrite.
 - [ ] P5.3 Add a prompt-governance layer so AI prompt builders, routes, versions, and modification history stay reviewable and synchronized instead of drifting across code and docs.
 
 Detail notes: [Pilot Structural Audit And Refactor Discipline](pilot/refactor_discipline.md).

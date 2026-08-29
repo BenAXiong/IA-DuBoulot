@@ -1,10 +1,3 @@
-import { spawn } from "node:child_process";
-import { access } from "node:fs/promises";
-import net from "node:net";
-import path from "node:path";
-import process from "node:process";
-import { fileURLToPath } from "node:url";
-import { createServerClient } from "@supabase/ssr";
 import {
   FIXTURE,
   createAdminClient,
@@ -13,20 +6,13 @@ import {
   resolveFixtureUserIds,
   snapshotFixtureUsageState,
 } from "./rls-fixture-shared.mjs";
+import {
+  createSmokeHttpClient,
+  startLocalNextServer,
+  stopLocalNextServer,
+} from "./smoke-app-harness.mjs";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(__dirname, "..");
-const nextBinPath = path.join(
-  repoRoot,
-  "node_modules",
-  "next",
-  "dist",
-  "bin",
-  "next",
-);
-const buildIdPath = path.join(repoRoot, ".next", "BUILD_ID");
 const requestPrefix = `smoke_memory_${Date.now()}`;
-const requestTimeoutMs = 90000;
 
 function assert(condition, message) {
   if (!condition) {
@@ -41,367 +27,27 @@ function normalizeAssertionText(value) {
     .toLowerCase();
 }
 
-function wait(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+function startLocalServer() {
+  return startLocalNextServer({
+    smokeCommand: "npm run smoke:memory",
+    startPort: 3195,
+  });
 }
 
-async function ensureBuildArtifact() {
-  try {
-    await access(buildIdPath);
-  } catch {
-    throw new Error(
-      "Missing .next build output. Run `npm run build` before `npm run smoke:memory`.",
-    );
-  }
-}
-
-function parseSetCookieHeader(headerValue) {
-  const firstSegment = headerValue.split(";")[0] ?? "";
-  const separatorIndex = firstSegment.indexOf("=");
-
-  if (separatorIndex <= 0) {
-    return null;
-  }
-
-  return {
-    name: firstSegment.slice(0, separatorIndex).trim(),
-    value: firstSegment.slice(separatorIndex + 1),
-  };
-}
-
-function createCookieJar() {
-  const cookies = new Map();
-
-  return {
-    applyResponseCookies(response) {
-      const getSetCookie = response.headers.getSetCookie?.bind(response.headers);
-      const setCookieHeaders = getSetCookie
-        ? getSetCookie()
-        : response.headers.get("set-cookie")
-          ? [response.headers.get("set-cookie")]
-          : [];
-
-      for (const headerValue of setCookieHeaders) {
-        if (!headerValue) {
-          continue;
-        }
-
-        const parsed = parseSetCookieHeader(headerValue);
-
-        if (!parsed) {
-          continue;
-        }
-
-        if (!parsed.value) {
-          cookies.delete(parsed.name);
-          continue;
-        }
-
-        cookies.set(parsed.name, parsed.value);
-      }
-    },
-    toHeader() {
-      return Array.from(cookies.entries())
-        .map(([name, value]) => `${name}=${value}`)
-        .join("; ");
-    },
-  };
-}
-
-async function findAvailablePort(startPort = 3195) {
-  let port = startPort;
-
-  while (port < startPort + 50) {
-    try {
-      await new Promise((resolve, reject) => {
-        const server = net.createServer();
-
-        server.once("error", reject);
-        server.listen(port, "127.0.0.1", () => {
-          server.close((closeError) => {
-            if (closeError) {
-              reject(closeError);
-              return;
-            }
-
-            resolve(null);
-          });
-        });
-      });
-
-      return port;
-    } catch (error) {
-      if (error && typeof error === "object" && "code" in error) {
-        if (error.code === "EADDRINUSE") {
-          port += 1;
-          continue;
-        }
-      }
-
-      throw error;
-    }
-  }
-
-  throw new Error("Unable to find an open local port for the memory smoke server.");
-}
-
-async function waitForServerReady(baseUrl, childProcess) {
-  for (let attempt = 0; attempt < 60; attempt += 1) {
-    if (childProcess.exitCode !== null) {
-      throw new Error(
-        `Next server exited early with code ${childProcess.exitCode}.`,
-      );
-    }
-
-    try {
-      const response = await fetch(`${baseUrl}/auth`, {
-        redirect: "manual",
-        signal: AbortSignal.timeout(5000),
-      });
-
-      if (response.status >= 200) {
-        return;
-      }
-    } catch {
-      // Retry until ready.
-    }
-
-    await wait(1000);
-  }
-
-  throw new Error("Timed out while waiting for the local Next server.");
-}
-
-async function startLocalServer() {
-  await ensureBuildArtifact();
-
-  const port = await findAvailablePort();
-  const baseUrl = `http://127.0.0.1:${port}`;
-  const childProcess = spawn(
-    process.execPath,
-    [nextBinPath, "start", "--hostname", "127.0.0.1", "--port", `${port}`],
-    {
-      cwd: repoRoot,
-      env: {
-        ...process.env,
-        NEXT_PUBLIC_APP_URL: baseUrl,
-      },
-      stdio: ["ignore", "pipe", "pipe"],
-    },
-  );
-
-  childProcess.stdout.on("data", (chunk) => process.stderr.write(chunk));
-  childProcess.stderr.on("data", (chunk) => process.stderr.write(chunk));
-
-  await waitForServerReady(baseUrl, childProcess);
-
-  return {
-    baseUrl,
-    childProcess,
-  };
-}
-
-async function stopLocalServer(childProcess) {
-  if (!childProcess || childProcess.exitCode !== null) {
-    return;
-  }
-
-  childProcess.kill("SIGTERM");
-  await wait(1000);
-
-  if (childProcess.exitCode === null) {
-    childProcess.kill("SIGKILL");
-  }
+function stopLocalServer(childProcess) {
+  return stopLocalNextServer(childProcess);
 }
 
 function buildHttpClient(baseUrl, roleLabel) {
-  const cookieJar = createCookieJar();
-  let requestSequence = 0;
-
-  return {
-    async signInFixture(email) {
-      const supabase = createServerClient(
-        fixtureEnv.supabaseUrl,
-        fixtureEnv.supabaseAnonKey,
-        {
-          cookies: {
-            getAll() {
-              const header = cookieJar.toHeader();
-
-              if (!header) {
-                return [];
-              }
-
-              return header.split("; ").map((segment) => {
-                const separatorIndex = segment.indexOf("=");
-
-                return {
-                  name: segment.slice(0, separatorIndex),
-                  value: segment.slice(separatorIndex + 1),
-                };
-              });
-            },
-            setAll(cookiesToSet) {
-              const response = new Response(null);
-
-              for (const cookie of cookiesToSet) {
-                response.headers.append(
-                  "set-cookie",
-                  `${cookie.name}=${cookie.value}`,
-                );
-              }
-
-              cookieJar.applyResponseCookies(response);
-            },
-          },
-        },
-      );
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password: fixtureEnv.fixturePassword,
-      });
-
-      if (error) {
-        throw new Error(`Fixture ${roleLabel} sign-in failed: ${error.message}`);
-      }
-    },
-    async requestJson(pathname, init = {}) {
-      requestSequence += 1;
-      const requestId = `${requestPrefix}_${roleLabel}_${requestSequence}`;
-      const headers = new Headers(init.headers ?? {});
-
-      headers.set("x-request-id", requestId);
-
-      if (cookieJar.toHeader()) {
-        headers.set("cookie", cookieJar.toHeader());
-      }
-
-      if (
-        init.body !== undefined &&
-        !headers.has("content-type") &&
-        typeof init.body === "string"
-      ) {
-        headers.set("content-type", "application/json");
-      }
-
-      const response = await fetch(`${baseUrl}${pathname}`, {
-        ...init,
-        headers,
-        signal: AbortSignal.timeout(requestTimeoutMs),
-      });
-
-      cookieJar.applyResponseCookies(response);
-      const payload = await response.json().catch(() => null);
-
-      return {
-        requestId,
-        response,
-        payload,
-        location: response.headers.get("location"),
-      };
-    },
-    async requestText(pathname, init = {}) {
-      requestSequence += 1;
-      const requestId = `${requestPrefix}_${roleLabel}_${requestSequence}`;
-      const headers = new Headers(init.headers ?? {});
-
-      headers.set("x-request-id", requestId);
-
-      if (cookieJar.toHeader()) {
-        headers.set("cookie", cookieJar.toHeader());
-      }
-
-      const response = await fetch(`${baseUrl}${pathname}`, {
-        ...init,
-        headers,
-        signal: AbortSignal.timeout(requestTimeoutMs),
-      });
-
-      cookieJar.applyResponseCookies(response);
-      const text = await response.text();
-
-      return {
-        requestId,
-        response,
-        text,
-        location: response.headers.get("location"),
-      };
-    },
-  };
-}
-
-async function snapshotMemoryState(adminClient, studentUserId) {
-  const [{ data: profile, error: profileError }, { data: items, error: itemsError }] =
-    await Promise.all([
-      adminClient
-        .from("student_memory_profiles")
-        .select("*")
-        .eq("student_user_id", studentUserId)
-        .maybeSingle(),
-      adminClient
-        .from("student_memory_items")
-        .select("*")
-        .eq("student_user_id", studentUserId)
-        .order("created_at", { ascending: true }),
-    ]);
-
-  if (profileError) {
-    throw profileError;
-  }
-
-  if (itemsError) {
-    throw itemsError;
-  }
-
-  return {
-    profile,
-    items: items ?? [],
-  };
-}
-
-async function restoreMemoryState(adminClient, studentUserId, snapshot) {
-  const { error: deleteItemsError } = await adminClient
-    .from("student_memory_items")
-    .delete()
-    .eq("student_user_id", studentUserId);
-
-  if (deleteItemsError) {
-    throw deleteItemsError;
-  }
-
-  const { error: deleteProfileError } = await adminClient
-    .from("student_memory_profiles")
-    .delete()
-    .eq("student_user_id", studentUserId);
-
-  if (deleteProfileError) {
-    throw deleteProfileError;
-  }
-
-  if (snapshot.profile) {
-    const { error: restoreProfileError } = await adminClient
-      .from("student_memory_profiles")
-      .insert(snapshot.profile);
-
-    if (restoreProfileError) {
-      throw restoreProfileError;
-    }
-  }
-
-  if (snapshot.items.length > 0) {
-    const { error: restoreItemsError } = await adminClient
-      .from("student_memory_items")
-      .insert(snapshot.items);
-
-    if (restoreItemsError) {
-      throw restoreItemsError;
-    }
-  }
-}
-
-async function cleanupConversation(adminClient, conversationId) {
-  await adminClient.from("conversations").delete().eq("id", conversationId);
-  await adminClient.from("audit_logs").delete().eq("conversation_id", conversationId);
+  return createSmokeHttpClient({
+    baseUrl,
+    requestPrefix,
+    roleLabel,
+    supabaseUrl: fixtureEnv.supabaseUrl,
+    supabaseAnonKey: fixtureEnv.supabaseAnonKey,
+    fixturePassword: fixtureEnv.fixturePassword,
+    signInErrorLabel: `fixture ${roleLabel}`,
+  });
 }
 
 async function main() {

@@ -1,31 +1,18 @@
-import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
-import { access } from "node:fs/promises";
-import net from "node:net";
-import path from "node:path";
-import process from "node:process";
-import { fileURLToPath } from "node:url";
-import { createServerClient } from "@supabase/ssr";
 import {
   FIXTURE,
   createAdminClient,
   env as fixtureEnv,
   resolveFixtureUserIds,
 } from "./rls-fixture-shared.mjs";
+import {
+  createSmokeHttpClient,
+  expectOkJson,
+  startLocalNextServer,
+  stopLocalNextServer,
+} from "./smoke-app-harness.mjs";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(__dirname, "..");
-const nextBinPath = path.join(
-  repoRoot,
-  "node_modules",
-  "next",
-  "dist",
-  "bin",
-  "next",
-);
-const buildIdPath = path.join(repoRoot, ".next", "BUILD_ID");
 const requestPrefix = `smoke_adult_oversight_${Date.now()}`;
-const requestTimeoutMs = 90000;
 
 function assert(condition, message) {
   if (!condition) {
@@ -33,315 +20,27 @@ function assert(condition, message) {
   }
 }
 
-function wait(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+function startLocalServer() {
+  return startLocalNextServer({
+    smokeCommand: "npm run smoke:adult-oversight",
+    startPort: 3144,
+  });
 }
 
-async function ensureBuildArtifact() {
-  try {
-    await access(buildIdPath);
-  } catch {
-    throw new Error(
-      "Missing .next build output. Run `npm run build` before `npm run smoke:adult-oversight`.",
-    );
-  }
-}
-
-function parseSetCookieHeader(headerValue) {
-  const firstSegment = headerValue.split(";")[0] ?? "";
-  const separatorIndex = firstSegment.indexOf("=");
-
-  if (separatorIndex <= 0) {
-    return null;
-  }
-
-  return {
-    name: firstSegment.slice(0, separatorIndex).trim(),
-    value: firstSegment.slice(separatorIndex + 1),
-  };
-}
-
-function createCookieJar() {
-  const cookies = new Map();
-
-  return {
-    getAll() {
-      return Array.from(cookies.entries()).map(([name, value]) => ({
-        name,
-        value,
-      }));
-    },
-    setAll(cookiesToSet) {
-      for (const cookie of cookiesToSet) {
-        if (!cookie?.name) {
-          continue;
-        }
-
-        if (!cookie.value) {
-          cookies.delete(cookie.name);
-          continue;
-        }
-
-        cookies.set(cookie.name, cookie.value);
-      }
-    },
-    applyResponseCookies(response) {
-      const getSetCookie = response.headers.getSetCookie?.bind(response.headers);
-      const setCookieHeaders = getSetCookie
-        ? getSetCookie()
-        : response.headers.get("set-cookie")
-          ? [response.headers.get("set-cookie")]
-          : [];
-
-      for (const headerValue of setCookieHeaders) {
-        if (!headerValue) {
-          continue;
-        }
-
-        const parsed = parseSetCookieHeader(headerValue);
-
-        if (!parsed) {
-          continue;
-        }
-
-        if (!parsed.value) {
-          cookies.delete(parsed.name);
-          continue;
-        }
-
-        cookies.set(parsed.name, parsed.value);
-      }
-    },
-    toHeader() {
-      return Array.from(cookies.entries())
-        .map(([name, value]) => `${name}=${value}`)
-        .join("; ");
-    },
-  };
-}
-
-async function findAvailablePort(startPort = 3144) {
-  let port = startPort;
-
-  while (port < startPort + 50) {
-    try {
-      await new Promise((resolve, reject) => {
-        const server = net.createServer();
-
-        server.once("error", reject);
-        server.listen(port, "127.0.0.1", () => {
-          server.close((closeError) => {
-            if (closeError) {
-              reject(closeError);
-              return;
-            }
-
-            resolve(null);
-          });
-        });
-      });
-
-      return port;
-    } catch (error) {
-      if (error && typeof error === "object" && "code" in error) {
-        if (error.code === "EADDRINUSE") {
-          port += 1;
-          continue;
-        }
-      }
-
-      throw error;
-    }
-  }
-
-  throw new Error("Unable to find an open local port for the adult smoke server.");
-}
-
-async function waitForServerReady(baseUrl, childProcess) {
-  for (let attempt = 0; attempt < 60; attempt += 1) {
-    if (childProcess.exitCode !== null) {
-      throw new Error(
-        `Next server exited early with code ${childProcess.exitCode}.`,
-      );
-    }
-
-    try {
-      const response = await fetch(`${baseUrl}/auth`, {
-        redirect: "manual",
-        signal: AbortSignal.timeout(5000),
-      });
-
-      if (response.status >= 200) {
-        return;
-      }
-    } catch {
-      // Retry until ready.
-    }
-
-    await wait(1000);
-  }
-
-  throw new Error("Timed out while waiting for the local Next server.");
-}
-
-async function startLocalServer() {
-  await ensureBuildArtifact();
-
-  const port = await findAvailablePort();
-  const baseUrl = `http://127.0.0.1:${port}`;
-  const childProcess = spawn(
-    process.execPath,
-    [nextBinPath, "start", "--hostname", "127.0.0.1", "--port", `${port}`],
-    {
-      cwd: repoRoot,
-      env: { ...process.env },
-      stdio: ["ignore", "pipe", "pipe"],
-    },
-  );
-
-  childProcess.stdout.on("data", (chunk) => process.stderr.write(chunk));
-  childProcess.stderr.on("data", (chunk) => process.stderr.write(chunk));
-
-  await waitForServerReady(baseUrl, childProcess);
-
-  return {
-    baseUrl,
-    childProcess,
-  };
-}
-
-async function stopLocalServer(childProcess) {
-  if (!childProcess || childProcess.exitCode !== null) {
-    return;
-  }
-
-  childProcess.kill("SIGTERM");
-  await wait(1000);
-
-  if (childProcess.exitCode === null) {
-    childProcess.kill("SIGKILL");
-    await wait(500);
-  }
-}
-
-function readErrorMessage(payload, fallbackMessage) {
-  if (
-    payload &&
-    typeof payload === "object" &&
-    "error" in payload &&
-    payload.error &&
-    typeof payload.error === "object" &&
-    "message" in payload.error &&
-    typeof payload.error.message === "string"
-  ) {
-    return payload.error.message;
-  }
-
-  return fallbackMessage;
-}
-
-function expectOkJson(result, fallbackMessage) {
-  const { response, payload } = result;
-
-  if (!response.ok) {
-    throw new Error(
-      `${fallbackMessage} (${response.status}): ${readErrorMessage(payload, "Unknown error")}`,
-    );
-  }
-
-  if (!payload || typeof payload !== "object" || payload.ok !== true) {
-    throw new Error(`${fallbackMessage}: route returned an unexpected payload.`);
-  }
-
-  return payload;
+function stopLocalServer(childProcess) {
+  return stopLocalNextServer(childProcess);
 }
 
 function buildHttpClient(baseUrl, roleLabel) {
-  const cookieJar = createCookieJar();
-  let requestSequence = 0;
-
-  return {
-    async signInPassword(email, password) {
-      const supabase = createServerClient(
-        fixtureEnv.supabaseUrl,
-        fixtureEnv.supabaseAnonKey,
-        {
-          cookies: cookieJar,
-        },
-      );
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        throw new Error(`Sign-in failed for ${roleLabel}: ${error.message}`);
-      }
-    },
-    async signInFixture(email) {
-      await this.signInPassword(email, fixtureEnv.fixturePassword);
-    },
-    async requestJson(pathname, init = {}) {
-      requestSequence += 1;
-      const requestId = `${requestPrefix}_${roleLabel}_${requestSequence}`;
-      const headers = new Headers(init.headers ?? {});
-
-      headers.set("x-request-id", requestId);
-
-      if (cookieJar.toHeader()) {
-        headers.set("cookie", cookieJar.toHeader());
-      }
-
-      if (
-        init.body !== undefined &&
-        !headers.has("content-type") &&
-        typeof init.body === "string"
-      ) {
-        headers.set("content-type", "application/json");
-      }
-
-      const response = await fetch(`${baseUrl}${pathname}`, {
-        ...init,
-        headers,
-        signal: AbortSignal.timeout(requestTimeoutMs),
-      });
-
-      cookieJar.applyResponseCookies(response);
-      const payload = await response.json().catch(() => null);
-
-      return {
-        requestId,
-        response,
-        payload,
-      };
-    },
-    async requestText(pathname, init = {}) {
-      requestSequence += 1;
-      const requestId = `${requestPrefix}_${roleLabel}_${requestSequence}`;
-      const headers = new Headers(init.headers ?? {});
-
-      headers.set("x-request-id", requestId);
-
-      if (cookieJar.toHeader()) {
-        headers.set("cookie", cookieJar.toHeader());
-      }
-
-      const response = await fetch(`${baseUrl}${pathname}`, {
-        ...init,
-        headers,
-        signal: AbortSignal.timeout(requestTimeoutMs),
-      });
-
-      cookieJar.applyResponseCookies(response);
-      const text = await response.text();
-
-      return {
-        requestId,
-        response,
-        text,
-      };
-    },
-  };
+  return createSmokeHttpClient({
+    baseUrl,
+    requestPrefix,
+    roleLabel,
+    supabaseUrl: fixtureEnv.supabaseUrl,
+    supabaseAnonKey: fixtureEnv.supabaseAnonKey,
+    fixturePassword: fixtureEnv.fixturePassword,
+    signInErrorLabel: roleLabel,
+  });
 }
 
 async function main() {
