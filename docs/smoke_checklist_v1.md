@@ -62,7 +62,7 @@ Current blocking failure class:
 
 - typecheck, lint, and production build succeed
 - `scripts/smoke-app-harness.mjs` provides the common local-server, cookie, authenticated-request, and response helpers used by the student, adult, memory, privacy, and billing smoke adapters
-- public French, English, and Chinese rendering passes on `/`, `/pricing`, and `/auth`, including the document `lang` contract
+- public French, English, and Chinese rendering passes on `/`, `/pricing`, and `/auth`, including the document `lang` contract and signed-out `/app` language-preserving redirects
 - deterministic fixture reseed assumptions still hold under `verify:rls-fixtures`
 
 ### Student

@@ -88,6 +88,26 @@ async function main() {
       }
     }
 
+    for (const language of ["fr", "en", "zh"]) {
+      const response = await fetch(`${baseUrl}/app?lang=${language}`, {
+        redirect: "manual",
+        signal: AbortSignal.timeout(30000),
+      });
+      const location = response.headers.get("location");
+
+      assert(
+        response.status >= 300 && response.status < 400,
+        `${language} /app did not redirect an unauthenticated visitor.`,
+      );
+      assert(
+        location === `/auth?lang=${language}` ||
+          location === `${baseUrl}/auth?lang=${language}`,
+        `${language} /app did not preserve language in its auth redirect.`,
+      );
+
+      checks.push(`${language} /app -> /auth`);
+    }
+
     console.log(
       JSON.stringify(
         {

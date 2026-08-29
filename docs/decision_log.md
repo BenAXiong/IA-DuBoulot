@@ -1852,8 +1852,8 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Date: 2026-08-29
 - Status: accepted
 - Related tasks: `A7.4.5`, `A7.4.6`, `P1.3`, `P3.2`
-- Context: Public pages resolved `?lang=` independently, while the root document always emitted `lang="fr"`. A fresh English or Chinese link could therefore show translated copy with the wrong document language until a browser cookie happened to exist.
-- Decision: Validate public `lang` parameters in the Next proxy, mirror valid values into the request and response UI-language cookie, and have the async root layout derive `<html lang>` from that same cookie. Keep a build-backed public smoke for `fr`, `en`, and `zh` across `/`, `/pricing`, and `/auth`.
+- Context: Public pages resolved `?lang=` independently, while the root document always emitted `lang="fr"`. A fresh English or Chinese link could therefore show translated copy with the wrong document language until a browser cookie happened to exist. The first deployed walkthrough also showed that signed-out `/app?lang=en` redirected to bare `/auth` and fell back to French.
+- Decision: Validate public `lang` parameters in the Next proxy, mirror valid values into the request and response UI-language cookie, have the async root layout derive `<html lang>` from that same cookie, and preserve the resolved language across auth/app/onboarding guard redirects. Keep a build-backed public smoke for `fr`, `en`, and `zh` across `/`, `/pricing`, `/auth`, and the signed-out `/app` redirect.
 - Why: The visible copy, screen-reader pronunciation, browser language metadata, and subsequent navigation now share one routing contract instead of relying on prior browser state.
 - Follow-up: Keep authenticated profile persistence under `A7.4.6`; the query/cookie contract does not replace the saved user preference.
 

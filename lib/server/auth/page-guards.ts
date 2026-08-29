@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import {
   APP_UI_LANGUAGE_COOKIE_NAME,
   resolveUiLanguageCode,
+  withUiLanguage,
 } from "@/lib/i18n/ui-language";
 import { getAuthenticatedUserContext } from "@/lib/server/auth/authorization";
 import type {
@@ -19,14 +20,29 @@ export async function redirectAuthenticatedUserFromAuthPage() {
     return null;
   }
 
-  redirect(context.appUser ? "/app" : "/onboarding");
+  const languageCode = await getRequestUiLanguage(
+    context.appUser?.preferred_ui_language,
+  );
+
+  redirect(
+    withUiLanguage(context.appUser ? "/app" : "/onboarding", languageCode),
+  );
+}
+
+async function getRequestUiLanguage(fallback?: AppUserRecord["preferred_ui_language"]) {
+  const cookieStore = await cookies();
+
+  return resolveUiLanguageCode(
+    cookieStore.get(APP_UI_LANGUAGE_COOKIE_NAME)?.value,
+    fallback,
+  );
 }
 
 export async function requireSessionForPage(): Promise<AuthenticatedUserContext> {
   const context = await getAuthenticatedUserContext();
 
   if (!context) {
-    redirect("/auth");
+    redirect(withUiLanguage("/auth", await getRequestUiLanguage()));
   }
 
   return context;
@@ -36,7 +52,12 @@ export async function requireOnboardingPageContext() {
   const context = await requireSessionForPage();
 
   if (context.appUser) {
-    redirect("/app");
+    redirect(
+      withUiLanguage(
+        "/app",
+        await getRequestUiLanguage(context.appUser.preferred_ui_language),
+      ),
+    );
   }
 
   return context;
@@ -49,12 +70,12 @@ export async function requireAppPageContext(): Promise<{
   const context = await requireSessionForPage();
 
   if (!context.appUser) {
-    redirect("/onboarding");
+    redirect(
+      withUiLanguage("/onboarding", await getRequestUiLanguage()),
+    );
   }
 
-  const cookieStore = await cookies();
-  const overrideLanguage = resolveUiLanguageCode(
-    cookieStore.get(APP_UI_LANGUAGE_COOKIE_NAME)?.value,
+  const overrideLanguage = await getRequestUiLanguage(
     context.appUser.preferred_ui_language,
   );
   const appUser =
