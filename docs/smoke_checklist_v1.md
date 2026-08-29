@@ -159,8 +159,9 @@ These remain required before an external demo even if the regression command pas
 
 ## Latest Recorded Result
 
+- 2026-09-29 three consecutive resumed-goal audits: production still points to `dfiiujkhbuvltrlqrerd.supabase.co`, and that hostname still does not resolve. The deployed 12-check French/English/Chinese public smoke remains green. The authenticated fixture/RLS/product suite therefore remains unavailable without a Supabase project restoration or replacement, and the goal returned to blocked status after the required third observation.
 - 2026-08-29 local `npm run regress:mvp`: typecheck, lint, executable localization contracts, production build, and the 12-check local public localization smoke passed; the command then stopped at `seed:rls-fixtures` before mutation with DNS `ENOTFOUND` for `dfiiujkhbuvltrlqrerd.supabase.co`.
-- 2026-08-29 deployed public walkthrough on production commit `f00a395`: the same 12 French/English/Chinese public checks passed against `https://ia-du-boulot.vercel.app`, including `/`, `/pricing`, `/auth`, document language, and language-preserving signed-out `/app` redirects.
+- 2026-08-29 deployed public walkthrough on final production commit `e75dbd0`: the same 12 French/English/Chinese public checks passed against `https://ia-du-boulot.vercel.app`, including `/`, `/pricing`, `/auth`, document language, and language-preserving signed-out `/app` redirects.
 - 2026-08-29 hosted fixture reseed and authenticated walkthrough: blocked because local and Vercel production configuration point to the same unavailable Supabase host. No fixture mutation occurred, and student/adult/memory/privacy/billing authenticated smokes cannot be marked current until `A0.2.1` is restored and the canonical regression completes.
 
 - 2026-03-11 local `npm run regress:mvp`: success, including deterministic fixture reseed before hosted RLS verification and the non-device smoke suite
