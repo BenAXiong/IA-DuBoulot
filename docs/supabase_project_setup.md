@@ -6,9 +6,11 @@ Related: [README](../README.md) | [Environment matrix](environment_matrix.md) | 
 
 These are the settings worth paying attention to for the first Supabase project.
 
-Current project URL:
+Previously configured project URL (unavailable as of 2026-08-29):
 
 - `https://dfiiujkhbuvltrlqrerd.supabase.co`
+
+`A0.2.1` is reopened. Do not treat that URL or its keys as active configuration until DNS resolution and a fixture-backed regression succeed. If the old project cannot be restored, create a replacement in the intended pilot region, replay the repository migrations in order, update local and Vercel values, and relink the CLI.
 
 ### 1. Region
 
@@ -63,9 +65,9 @@ This matters because Supabase auth emails and OTP flows redirect to the configur
 5. Keep the service-role or secret key server-only; never expose it in browser code.
 6. The repo now includes a local CLI path through `npm run supabase`; remote commands still require a one-time `supabase link --project-ref ...` with operator credentials.
 7. The migration filenames now use valid unique Supabase version prefixes, so the local migration graph is no longer ambiguous.
-8. The `20260408000400_ai_generation_debug_captures.sql` migration has been applied to the linked remote database, and `public.ai_generation_debug_captures` exists remotely.
-9. The linked remote project migration history has now been repaired to match the renamed local migration versions.
-10. `npm run db:push` now succeeds again against the linked hosted project from this operator machine.
+8. The `20260408000400_ai_generation_debug_captures.sql` migration was applied to the previous remote database, and `public.ai_generation_debug_captures` existed there.
+9. The previous remote project migration history was repaired to match the renamed local migration versions.
+10. After restoration or replacement, run `npm run db:migrations`, `npm run db:push`, fixture reseed, RLS verification, and the complete regression before considering the new link ready.
 
 ### Windows CLI Note
 

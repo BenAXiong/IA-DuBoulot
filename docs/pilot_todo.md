@@ -33,8 +33,8 @@ Rules:
 
 Current carryover blockers that still stay in MVP:
 
+- `A0.2.1` restore or replace the unavailable hosted Supabase project, relink environments, and rerun fixture-backed regression
 - `A0.2.3` Resend sender setup and the later real mailer slice
-- `A7.4.5` to `A7.4.6` full shared-interface localization and zh-aware tablet-emulation verification
 
 Deferred beyond Pilot:
 
@@ -106,7 +106,7 @@ Detail notes: [Pilot Journey And UX Hardening](pilot/journey_ux.md).
 ### P3 Device, Accessibility, And Reliability
 
 - [ ] P3.1 Expand the device matrix beyond tablet emulation to cover the real pilot browser set.
-- [ ] P3.2 Run a focused accessibility pass on tap targets, focus states, contrast, and motion.
+- [x] P3.2 Run a focused accessibility pass on tap targets, focus states, contrast, and motion.
 - [ ] P3.3 Tighten empty-state, retry, and failure-recovery behavior before widening access.
 
 Detail notes: [Pilot Device, Accessibility, And Reliability](pilot/device_reliability.md).

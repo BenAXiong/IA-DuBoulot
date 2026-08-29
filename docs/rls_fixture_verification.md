@@ -165,6 +165,7 @@ The tablet-emulation smoke script currently checks that:
 
 ## Latest Result
 
+- 2026-08-29 hosted reseed: blocked before mutation with DNS `ENOTFOUND` because the configured Supabase project hostname no longer resolves; `A0.2.1` is reopened and the 2026-04-29 `20/20` result below is historical evidence, not proof of current hosted availability
 - 2026-03-10 hosted reseed: success
 - 2026-03-10 hosted verification: `17` checks passed, `0` failed
 - 2026-03-11 local student-flow smoke: success against a temporary local `next start` instance
@@ -186,4 +187,4 @@ The tablet-emulation smoke script currently checks that:
 - `A1.4.3` is satisfied by this documented credential and demo-data workflow
 - `A1.2.4` is satisfied by the successful hosted verification run
 - `A7.2.3` now uses `npm run regress:mvp` as the canonical pre-demo regression pass
-- `A1.4.2` remains open because the fixture currently seeds attachment metadata, not a committed sample file corpus
+- `A1.4.2` was later satisfied by the committed sample attachment corpus under `fixtures/homework-samples/`; the deterministic database fixture still seeds attachment metadata by design

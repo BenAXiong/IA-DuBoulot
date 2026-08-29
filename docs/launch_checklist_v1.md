@@ -85,8 +85,8 @@ Explicitly defer beyond this launch candidate:
 
 ## Current Remaining Blockers
 
-The remaining open MVP work is `A0.2.3` Resend sender setup if real email delivery is required for the Pilot, plus `A7.4.5` to `A7.4.6` interface-language gaps around broader shared-route localization, parent-summary default and language-switch verification, and any residual generic provider or service strings that still bypass the focused copy modules after the local `zh` tablet-fit pre-pass for the Taiwan-first pilot. Real iPad Safari validation has moved to post-pilot `P6.12`.
+The primary release blocker is reopened `A0.2.1`: the Supabase hostname configured in local and Vercel production environments no longer resolves. The 2026-08-29 canonical regression passes typecheck, lint, localization contracts, production build, and public-route smoke, then stops before fixture mutation at the hosted reseed. Restore the project or provision a replacement, replay and verify migrations, update the Supabase URL/anon/service-role values in both environments, relink the CLI, and rerun the full fixture-backed regression.
 
-The AI ops/economics and parent-AI policy note is now published in [AI ops and economics V1](ai_ops_economics_v1.md), including the Gemini project-limit model and pilot-project recommendation, so the main product blockers are now email-delivery policy if needed and the explicit trilingual UI pass.
+`A0.2.3` Resend sender/domain setup remains open if real transactional email delivery is required for the Pilot. The trilingual interface gate is complete, and production commit `f00a395` passes the 12-check French/English/Chinese public smoke including language-preserving signed-out app redirects. Real iPad Safari validation remains post-pilot `P6.12`.
 
 Post-launch polish, UX hardening, and broader pilot operating work now live in [Pilot_todo](pilot_todo.md) instead of being mixed into the launch gate.

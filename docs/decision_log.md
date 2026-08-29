@@ -1866,3 +1866,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Move that infrastructure into `scripts/smoke-app-harness.mjs` and keep thin student, adult, memory, privacy, and billing adapters responsible for their own fixtures, assertions, cleanup, and special environment overrides.
 - Why: This deepens a stable test boundary with multiple real consumers while preserving locality for the product journeys. It reduces maintenance leverage without creating a generic test framework or coupling unrelated scenario logic.
 - Follow-up: Tablet emulation remains separate because its Playwright/browser lifecycle is materially different; only migrate it if a second browser-based adapter creates the same repeated interface.
+
+### D-20260829-04 - Reopen Hosted Supabase Provisioning When The Active Project Is Unavailable
+
+- Date: 2026-08-29
+- Status: accepted
+- Related tasks: `A0.2.1`, `A1.1.5`, `A1.2.4`, `A7.2.3`
+- Context: The canonical regression and direct DNS checks show that `dfiiujkhbuvltrlqrerd.supabase.co` no longer resolves, while both local and Vercel production environments still reference it. Public production pages remain healthy, but fixture reseeding stops before mutation and no authenticated/RLS smoke can prove current behavior.
+- Decision: Reopen `A0.2.1` and treat hosted Supabase restoration or replacement as the primary release blocker. Preserve the last successful migration/RLS results as historical evidence only. A replacement must receive the full migration graph, synchronized local/Vercel URL and key values, a repaired CLI link, deterministic reseed, RLS verification, and the complete canonical regression.
+- Why: A completed historical provisioning checkbox is not truthful when the active dependency no longer exists. Reopening the task keeps release state aligned with deploy reality without misclassifying the public app or current source code as broken.
+- Follow-up: Do not send pilot traffic or claim the authenticated walkthrough is green until the restored project passes the fixture-backed suite.

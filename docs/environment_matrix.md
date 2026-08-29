@@ -45,10 +45,11 @@ Keep environment configuration explicit so local development, Vercel, and provid
 
 ## Current Gaps
 
-- confirm Vercel environment sync after Supabase integration changes
+- the previously verified Supabase project hostname `dfiiujkhbuvltrlqrerd.supabase.co` no longer resolves as of 2026-08-29; local `.env.local` and Vercel production still point to it, so restore or replace the project and rotate/sync `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` before any authenticated regression or pilot use
+- confirm local/Vercel parity and relink the Supabase CLI after that project restoration or replacement
 - planned storage buckets are now created automatically by the fixture seed script, and the upload route family now exists locally, but deployed route-level verification still needs a targeted smoke pass
 - `GEMINI_API_KEY` is now present both locally and on the linked Vercel production project as of 2026-04-02, but Gemini free-tier RPM and RPD limits still apply per Google project rather than per API key; use a separate dev project for local work and provision a dedicated billed pilot project before real user traffic
-- the repo now includes `supabase/config.toml` plus `npm run supabase`, `npm run db:push`, and `npm run db:migrations`, and the hosted project is now linked with repaired remote migration history, so normal hosted migration listing and push work again from the linked operator machine
+- the repo includes `supabase/config.toml` plus `npm run supabase`, `npm run db:push`, and `npm run db:migrations`; these commands previously worked against the linked project after migration-history repair, but the link must be updated and the full migration graph reverified when `A0.2.1` is restored
 - on Windows, run Supabase CLI commands from the normal drive path like `C:\Users\Ben\Documents\Projects\IA_du_boulot`, not a `\\?\...` PowerShell path, or the CLI can fall back to `cmd.exe` with the wrong working directory and fail trying to create or use `supabase/`
 - local PostHog provisioning is now present through `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`, and `NEXT_PUBLIC_ENABLE_ANALYTICS`; confirm Vercel parity and keep the sink runtime-only until the real PostHog adapter exists
 - local `RESEND_API_KEY` is now present, but sender/domain setup and `ENABLE_RESEND_EMAILS` remain off, so Resend-backed delivery is still externally blocked

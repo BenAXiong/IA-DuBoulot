@@ -131,7 +131,7 @@ export function StudentReplyModeSwitch({
         aria-expanded={open}
         aria-haspopup="menu"
         aria-label={copy.switchLabel}
-        className="inline-flex h-8 items-center gap-2 rounded-full px-2.5 text-sm text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
+        className="inline-flex min-h-11 items-center gap-2 rounded-full px-2.5 text-sm text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)] disabled:cursor-not-allowed disabled:opacity-50"
         disabled={disabled}
         onClick={() => setOpen((value) => !value)}
         title={copy.switchTooltip}

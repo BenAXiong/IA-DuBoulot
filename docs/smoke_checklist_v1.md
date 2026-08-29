@@ -63,6 +63,7 @@ Current blocking failure class:
 - typecheck, lint, and production build succeed
 - `scripts/smoke-app-harness.mjs` provides the common local-server, cookie, authenticated-request, and response helpers used by the student, adult, memory, privacy, and billing smoke adapters
 - public French, English, and Chinese rendering passes on `/`, `/pricing`, and `/auth`, including the document `lang` contract and signed-out `/app` language-preserving redirects
+- the executable UI-language contract also guards parent-summary fallback, localized accessible names, 44px critical controls, keyboard focus, reduced-motion behavior, and at least `4.5:1` muted-text contrast across the shared themes
 - deterministic fixture reseed assumptions still hold under `verify:rls-fixtures`
 
 ### Student
@@ -158,8 +159,9 @@ These remain required before an external demo even if the regression command pas
 
 ## Latest Recorded Result
 
-- 2026-08-29 local `npm run typecheck`, `npm run lint`, and `npm run build`: success after aligning `scripts/smoke-student-flow.mjs` with the current subject quick-start and isolated first-ever-homework flow.
-- 2026-08-29 hosted fixture reseed: blocked before mutation because the configured Supabase project hostname `dfiiujkhbuvltrlqrerd.supabase.co` no longer resolves. Local and Vercel production configuration currently point to the same unavailable host, so the refreshed student smoke and full integration regression cannot be honestly marked green until the hosted project or configuration is restored.
+- 2026-08-29 local `npm run regress:mvp`: typecheck, lint, executable localization contracts, production build, and the 12-check local public localization smoke passed; the command then stopped at `seed:rls-fixtures` before mutation with DNS `ENOTFOUND` for `dfiiujkhbuvltrlqrerd.supabase.co`.
+- 2026-08-29 deployed public walkthrough on production commit `f00a395`: the same 12 French/English/Chinese public checks passed against `https://ia-du-boulot.vercel.app`, including `/`, `/pricing`, `/auth`, document language, and language-preserving signed-out `/app` redirects.
+- 2026-08-29 hosted fixture reseed and authenticated walkthrough: blocked because local and Vercel production configuration point to the same unavailable Supabase host. No fixture mutation occurred, and student/adult/memory/privacy/billing authenticated smokes cannot be marked current until `A0.2.1` is restored and the canonical regression completes.
 
 - 2026-03-11 local `npm run regress:mvp`: success, including deterministic fixture reseed before hosted RLS verification and the non-device smoke suite
 - 2026-03-11 local `npm run smoke:tablet-emulation`: success against a temporary local `next start` instance, with no horizontal overflow and no detected sub-`44x44` controls on the checked student tablet surfaces

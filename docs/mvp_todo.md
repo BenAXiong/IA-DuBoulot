@@ -8,8 +8,8 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 
-- Overall: `[##############################]` `134/135` complete (`99%`)
-- A0: `[xxxxxxxxxxxxxxxxxxxxx.]` `21/22`
+- Overall: `[#############################.]` `133/135` complete (`99%`)
+- A0: `[xxxxxxxxxxxxxxxxxxxx..]` `20/22`
 - A1: `[xxxxxxxxxxxxxxxx]` `16/16`
 - A2: `[xxxxxxxxxxxxxxxxx]` `17/17`
 - A3: `[xxxxxxxxxxxxxxxxx]` `17/17`
@@ -45,7 +45,7 @@ Current direction: GitHub repo exists, Vercel is the chosen deployment platform,
 
 ### A0.2 Service Accounts And Environment Matrix
 
-- [x] A0.2.1 Create the Supabase project.
+- [ ] A0.2.1 Create and maintain the active Supabase project.
 - [x] A0.2.2 Create the PostHog project.
 - [ ] A0.2.3 Create the Resend account and sender setup.
 - [x] A0.2.4 Choose the primary AI provider and a fallback provider.
@@ -53,6 +53,7 @@ Current direction: GitHub repo exists, Vercel is the chosen deployment platform,
 - [x] A0.2.6 Create `.env.example` and a secrets ownership checklist.
 
 Current direction: primary starter AI path is Gemini, with OpenAI API now selected as the explicit fallback provider for a later adapter. Billing provider is Lemon Squeezy.
+Status note: `A0.2.1` was reopened on 2026-08-29 because the previously verified project hostname `dfiiujkhbuvltrlqrerd.supabase.co` no longer resolves, and both local plus Vercel production configuration still reference it. Restore that project or create a replacement, replay migrations, update all three Supabase keys/URLs, relink the CLI, and rerun the fixture-backed regression before closing the task again.
 Constraint: verify the Gemini tier and data-handling settings are suitable for minors before any live child traffic uses the AI flow.
 Constraint: a founder personal AI subscription is not treated as a backend fallback provider for the app.
 Status note: local env now confirms `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`, and `NEXT_PUBLIC_ENABLE_ANALYTICS`, so the external PostHog project-creation step is treated as complete; the telemetry sink still stays runtime-only until a dedicated PostHog adapter exists.
@@ -414,13 +415,13 @@ Status note: on 2026-08-29 the student smoke was realigned to the current produc
 
 Status note: PWA installability is now explicitly deferred before beta, the canonical demo-account and founder walkthrough script now live in `docs/founder_walkthrough_v1.md`, and the frozen launch-candidate scope plus exit checklist now live in `docs/launch_checklist_v1.md`.
 Status note: `A2.1.6` still marks the foundation slice only, but the shared public, auth, onboarding, invite, app-shell, app-home, and settings/privacy surfaces now read from `lib/i18n/ui-copy.ts`, preserve public-route `lang` state through `lib/i18n/ui-language.ts`, and localize the shared student age-band options.
-Status note: a small `components/i18n/document-language-sync.tsx` layer now updates `document.documentElement.lang` from the live UI language on the shared shells, even though `app/layout.tsx` still renders `lang=\"fr\"` at the initial server HTML level.
+Status note: `components/i18n/document-language-sync.tsx` keeps the live document language synchronized during client-side shell changes, while `app/layout.tsx` now derives the initial server-rendered `<html lang>` from the validated UI-language cookie established by the proxy.
 Status note: the `/app` role dashboards now also localize their main copy through `lib/i18n/dashboard-copy.ts`, including the student start/support/recent panels, the student memory panel, the student-side adult-link forms, and the parent/tutor/admin dashboard summaries.
 Status note: the deeper student and adult route family now localizes its main interface copy through `lib/i18n/student-flow-copy.ts` and `lib/i18n/oversight-copy.ts`, covering the student homework launcher on `/app`, the compatibility redirect from `/app/history`, `/app/conversations/[conversationId]`, `/app/students/[studentUserId]`, and `/app/review/[conversationId]`.
 Status note: the admin audit list, deletion-request feedback, and the user-facing quota block messages for conversation creation, upload, and chat now also localize by UI language, while `app/layout.tsx` adds explicit CJK fallback for the shared font variables.
 Status note: the core student APIs now also localize their user-facing validation errors, upload warnings, deterministic coach fallback, initial transcript scaffolding, deterministic student-summary fallback, and visible weakness-tag labels through `lib/i18n/student-flow-copy.ts`.
 Status note: auth/profile bootstrap and update, invitation create and accept, tutor-note mutations, memory mutations, deterministic memory fallback copy, and the small parent billing-management conflict path now also localize their user-facing server messages through the focused copy modules.
-Status note: the shared MVP now carries accented French across the visible shared UI plus the AI prompt layer that generates French coach, summary, translation, and memory outputs, while `app/layout.tsx` provides `latin-ext` plus explicit CJK fallback for Unicode-safe rendering. `A7.4.5` is complete after the final shared-shell, public overlay, pricing, side-rail, and workbench accessibility labels were localized and the route-level public smoke covered French, English, and Chinese on `/`, `/pricing`, and `/auth`. Broader authenticated switching and live parent-summary verification remain in `A7.4.6`.
+Status note: the shared MVP now carries accented French across the visible shared UI plus the AI prompt layer that generates French coach, summary, translation, and memory outputs, while `app/layout.tsx` provides `latin-ext` plus explicit CJK fallback for Unicode-safe rendering. `A7.4.5` is complete after the final shared-shell, public overlay, pricing, side-rail, and workbench accessibility labels were localized and the route-level public smoke covered French, English, and Chinese on `/`, `/pricing`, and `/auth`.
 Status note: the authenticated language menu no longer waits for the full profile PATCH before starting the `/app` refresh; it writes an immediate `ia_ui_lang` override used by authenticated page context during that refresh, so role dashboards can flip visible copy faster while the saved profile update completes in the background.
 Status note: the public language switcher is now visible at tablet widths, and refreshed local `npm run smoke:tablet-emulation` passes succeeded on 2026-03-12 against both the localized French labels and a temporary `zh` fixture-language pre-pass for `/app`, the subject-level homework launcher on `/app?view=homework&subject=...`, and `/app/conversations/[conversationId]`. Real iPad Safari validation is deferred to post-pilot `P6.12`.
 Status note: `A7.4.6` is complete after combining the authenticated French/Chinese tablet evidence above with a build-backed 12-check public language smoke, direct `820x1180` Chinese landing/pricing inspection without horizontal overflow, signed-out `/app` redirect continuity for all three languages, and an executable contract test over the actual parent-summary preferred-language/French-fallback selector. Live fixture-backed regression remains separately blocked at hosted Supabase setup, not at the localization contract.

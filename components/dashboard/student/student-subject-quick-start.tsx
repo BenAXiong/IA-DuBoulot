@@ -687,7 +687,7 @@ export function StudentSubjectQuickStart({
           <div className="flex min-w-0 items-center gap-2">
             <button
               aria-label={copy.addSources}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] disabled:cursor-not-allowed disabled:opacity-60"
               disabled={isStarting}
               onClick={() => fileInputRef.current?.click()}
               title={copy.addSources}
@@ -703,7 +703,7 @@ export function StudentSubjectQuickStart({
             />
             <button
               aria-label={copy.voice}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] focus:shadow-none focus-visible:shadow-none"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)]"
               disabled
               title={copy.voice}
               type="button"
@@ -725,7 +725,7 @@ export function StudentSubjectQuickStart({
                   ? copy.sending
                   : copy.submit
             }
-            className="inline-flex h-11 w-11 items-center justify-center text-[color:var(--foreground)] transition hover:text-[color:var(--accent)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex h-11 w-11 items-center justify-center text-[color:var(--foreground)] transition hover:text-[color:var(--accent)] disabled:cursor-not-allowed disabled:opacity-40"
             disabled={isStarting || draft.trim().length === 0}
             type="submit"
           >

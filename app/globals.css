@@ -22,7 +22,7 @@
   --highlight: #ff8f4d;
   --highlight-soft: rgba(255, 143, 77, 0.18);
   --ink-soft: rgba(19, 32, 51, 0.74);
-  --ink-muted: rgba(19, 32, 51, 0.54);
+  --ink-muted: rgba(19, 32, 51, 0.64);
   --shadow: 0 28px 80px rgba(17, 28, 47, 0.14);
   --shadow-soft: 0 18px 46px rgba(17, 28, 47, 0.1);
   --focus-ring: rgba(79, 110, 249, 0.28);
@@ -77,7 +77,7 @@ html[data-theme="dark"] {
   --highlight: #f4b740;
   --highlight-soft: rgba(244, 183, 64, 0.15);
   --ink-soft: rgba(236, 236, 236, 0.74);
-  --ink-muted: rgba(236, 236, 236, 0.48);
+  --ink-muted: rgba(236, 236, 236, 0.56);
   --shadow: 0 30px 90px rgba(0, 0, 0, 0.52);
   --shadow-soft: 0 18px 52px rgba(0, 0, 0, 0.36);
   --focus-ring: rgba(138, 180, 255, 0.26);
@@ -133,7 +133,7 @@ html[data-theme="custom"] {
   --highlight: #ffb15d;
   --highlight-soft: rgba(255, 177, 93, 0.16);
   --ink-soft: rgba(235, 243, 251, 0.76);
-  --ink-muted: rgba(235, 243, 251, 0.5);
+  --ink-muted: rgba(235, 243, 251, 0.56);
   --shadow: 0 30px 90px rgba(3, 8, 14, 0.48);
   --shadow-soft: 0 18px 52px rgba(3, 8, 14, 0.34);
   --focus-ring: rgba(125, 168, 255, 0.3);
@@ -188,7 +188,7 @@ html[data-theme="warm"] {
   --highlight: #e3a24e;
   --highlight-soft: rgba(227, 162, 78, 0.18);
   --ink-soft: rgba(53, 39, 31, 0.74);
-  --ink-muted: rgba(53, 39, 31, 0.52);
+  --ink-muted: rgba(53, 39, 31, 0.66);
   --shadow: 0 28px 80px rgba(88, 58, 34, 0.14);
   --shadow-soft: 0 18px 46px rgba(88, 58, 34, 0.1);
   --focus-ring: rgba(192, 97, 66, 0.26);
@@ -321,13 +321,18 @@ textarea::placeholder {
 }
 
 .student-chat-textarea,
-.student-chat-textarea:focus,
-.student-chat-textarea:focus-visible {
+.student-chat-textarea:focus {
   outline: none !important;
   border: 0 !important;
   box-shadow: none !important;
   -webkit-appearance: none;
   appearance: none;
+}
+
+.student-chat-textarea:focus-visible {
+  outline: none !important;
+  border: 0 !important;
+  box-shadow: inset 0 -2px 0 var(--accent) !important;
 }
 
 .student-subject-chip--active {
@@ -948,8 +953,10 @@ html[data-theme="custom"] .bg-\[\#cb5d3c\] {
 
   body::before,
   body::after,
+  .brand-mark,
   .interactive-card,
   .button-base,
+  .student-pending-shimmer,
   .theme-toggle-option {
     animation: none;
     transition: none;
