@@ -970,7 +970,7 @@ export function StudentConversationWorkbench({
 
         <aside className="relative min-h-0 overflow-hidden border-l border-[color:var(--line)] bg-[color:var(--surface)] px-5 py-4 xl:h-full">
           <button
-            aria-label="Resize side rail"
+            aria-label={copy.resizeSideRail}
             className="absolute bottom-0 left-[-4px] top-0 hidden w-2 cursor-col-resize xl:block"
             onPointerDown={(event) => {
               event.preventDefault();

@@ -603,6 +603,10 @@ export function getHomePageCopy(languageCode: UiLanguageCode) {
 export function getPricingPageCopy(languageCode: UiLanguageCode) {
   return pickLocalizedValue(languageCode, {
     fr: {
+      audienceNavigationLabel: "Choix du public pour les tarifs",
+      title: "Choisis l'accès qui accompagne ton rythme.",
+      body:
+        "Commence gratuitement, puis augmente l'accompagnement seulement quand davantage de sessions, de mémoire et de suivi deviennent utiles.",
       audienceLabels: {
         student: "Élève",
         parent: "Parent",
@@ -613,6 +617,8 @@ export function getPricingPageCopy(languageCode: UiLanguageCode) {
         yearly: "Annuel",
       },
       explorerPerksLabel: "Tous les avantages Explorer, plus :",
+      tutorUnavailableMessage:
+        "Les comptes tuteurs sont en cours d'implémentation. Contactez-nous si vous souhaitez les essayer en avant-première.",
       audiences: {
         student: {
           plans: [
@@ -752,6 +758,10 @@ export function getPricingPageCopy(languageCode: UiLanguageCode) {
       },
     },
     en: {
+      audienceNavigationLabel: "Choose pricing audience",
+      title: "Choose the support that fits your learning rhythm.",
+      body:
+        "Start free, then expand the support only when more sessions, memory, and follow-through become useful.",
       audienceLabels: {
         student: "Student",
         parent: "Parent",
@@ -762,6 +772,8 @@ export function getPricingPageCopy(languageCode: UiLanguageCode) {
         yearly: "Yearly",
       },
       explorerPerksLabel: "All Explorer perks, plus:",
+      tutorUnavailableMessage:
+        "Tutor accounts are being implemented. Contact us if you want to try it out early.",
       audiences: {
         student: {
           plans: [
@@ -901,6 +913,10 @@ export function getPricingPageCopy(languageCode: UiLanguageCode) {
       },
     },
     zh: {
+      audienceNavigationLabel: "選擇方案使用者類型",
+      title: "選擇適合學習節奏的方案。",
+      body:
+        "先免費開始；當更多對話、學習記憶與追蹤真正有幫助時，再升級支援。",
       audienceLabels: {
         student: "學生",
         parent: "家長",
@@ -911,6 +927,8 @@ export function getPricingPageCopy(languageCode: UiLanguageCode) {
         yearly: "年繳",
       },
       explorerPerksLabel: "包含所有 Explorer 權益，另外：",
+      tutorUnavailableMessage:
+        "家教帳號正在實作中。如果你想提早試用，請聯絡我們。",
       audiences: {
         student: {
           plans: [

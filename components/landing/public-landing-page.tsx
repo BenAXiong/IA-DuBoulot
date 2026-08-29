@@ -49,6 +49,7 @@ type ComparisonCardCopy = {
 };
 
 type LandingPageCopy = {
+  closeOverlayLabel: string;
   closingBody: string;
   closingTitle: string;
   heroCopy: Record<LandingAudience, HeroCopy>;
@@ -185,6 +186,7 @@ const parentComparisonCards: ComparisonCardCopy[] = [
 ];
 
 const frenchLandingCopy: LandingPageCopy = {
+  closeOverlayLabel: "Fermer les détails du suivi",
   closingBody:
     "Crée un compte gratuit et découvre comment banban accompagne un vrai travail, étape par étape.",
   closingTitle: "Commence avec banban.",
@@ -316,6 +318,7 @@ const frenchLandingCopy: LandingPageCopy = {
 };
 
 const chineseLandingCopy: LandingPageCopy = {
+  closeOverlayLabel: "關閉監督說明",
   closingBody: "建立免費帳號，看看 banban 如何一步一步支援真實學習。",
   closingTitle: "從 banban 開始。",
   heroCopy: {
@@ -454,6 +457,7 @@ function getLandingPageCopy(languageCode: UiLanguageCode): LandingPageCopy {
   }
 
   return {
+    closeOverlayLabel: "Close oversight details",
     closingBody:
       "Create a free account and see how banban supports real learning, one step at a time.",
     closingTitle: "Start with banban.",
@@ -585,10 +589,12 @@ function LandingFeatureSection({
 }
 
 function OversightOverlay({
+  closeLabel,
   copy,
   isOpen,
   onClose,
 }: {
+  closeLabel: string;
   copy: HeroCopy;
   isOpen: boolean;
   onClose: () => void;
@@ -609,7 +615,7 @@ function OversightOverlay({
       role="dialog"
     >
       <button
-        aria-label="Close oversight details"
+        aria-label={closeLabel}
         className="absolute inset-0 bg-[color:var(--foreground)]/30 backdrop-blur-sm"
         onClick={onClose}
         type="button"
@@ -623,7 +629,7 @@ function OversightOverlay({
             {copy.overlayTitle}
           </h2>
           <button
-            aria-label="Close oversight details"
+            aria-label={closeLabel}
             className="theme-toggle shrink-0"
             onClick={onClose}
             type="button"
@@ -794,6 +800,7 @@ export function PublicLandingPage({
         </section>
 
         <OversightOverlay
+          closeLabel={landingCopy.closeOverlayLabel}
           copy={selectedCopy}
           isOpen={isOversightOpen}
           onClose={() => setIsOversightOpen(false)}

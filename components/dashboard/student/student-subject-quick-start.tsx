@@ -127,6 +127,7 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
         masterInstructionsSoon: "Master instructions available soon!",
         noSubjectChats: "No homework has been saved for this subject yet.",
         noInstructions: "No subject instruction has been saved yet.",
+        workspaceLabel: "Subject workspace",
       };
     case "zh":
       return {
@@ -148,6 +149,7 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
         masterInstructionsSoon: "主指示功能即將推出！",
         noSubjectChats: "這個科目目前還沒有已儲存的作業。",
         noInstructions: "這個科目目前還沒有已儲存的指示。",
+        workspaceLabel: "科目工作區",
       };
     default:
       return {
@@ -170,6 +172,7 @@ function getQuickStartCopy(languageCode: UiLanguageCode) {
         masterInstructionsSoon: "Consignes principales bientôt disponibles !",
         noSubjectChats: "Aucun devoir enregistré pour cette matière.",
         noInstructions: "Aucune consigne enregistrée pour cette matière.",
+        workspaceLabel: "Espace de travail de la matière",
       };
   }
 }
@@ -684,7 +687,7 @@ export function StudentSubjectQuickStart({
           <div className="flex min-w-0 items-center gap-2">
             <button
               aria-label={copy.addSources}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
               disabled={isStarting}
               onClick={() => fileInputRef.current?.click()}
               title={copy.addSources}
@@ -700,7 +703,7 @@ export function StudentSubjectQuickStart({
             />
             <button
               aria-label={copy.voice}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] focus:shadow-none focus-visible:shadow-none"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] focus:shadow-none focus-visible:shadow-none"
               disabled
               title={copy.voice}
               type="button"
@@ -722,7 +725,7 @@ export function StudentSubjectQuickStart({
                   ? copy.sending
                   : copy.submit
             }
-            className="inline-flex h-8 w-8 items-center justify-center text-[color:var(--foreground)] transition hover:text-[color:var(--accent)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex h-11 w-11 items-center justify-center text-[color:var(--foreground)] transition hover:text-[color:var(--accent)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-40"
             disabled={isStarting || draft.trim().length === 0}
             type="submit"
           >
@@ -743,7 +746,7 @@ export function StudentSubjectQuickStart({
 
       <section className="grid gap-3">
         <div
-          aria-label="Subject workspace"
+          aria-label={copy.workspaceLabel}
           className="flex flex-wrap gap-2"
           role="tablist"
         >
@@ -760,7 +763,7 @@ export function StudentSubjectQuickStart({
               <button
                 aria-disabled={disabled}
                 aria-selected={selected}
-                className={`inline-flex min-h-10 items-center justify-center rounded-full px-4 text-sm font-medium transition ${
+                className={`inline-flex min-h-11 items-center justify-center rounded-full px-4 text-sm font-medium transition ${
                   disabled
                     ? "cursor-not-allowed text-[color:var(--ink-muted)] opacity-60"
                     : selected

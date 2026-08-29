@@ -741,8 +741,8 @@ code {
 }
 
 .theme-toggle--minimal {
-    min-height: 2.25rem;
-    min-width: 2.25rem;
+    min-height: 2.75rem;
+    min-width: 2.75rem;
     border-color: transparent;
     background: transparent;
     box-shadow: none;

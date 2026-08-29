@@ -59,6 +59,9 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
         signOutPending: "Signing out...",
         trialPlan: "Starter plan",
         familyPlan: "Family plan",
+        comingSoon: "Coming soon!",
+        expandSidebar: "Expand sidebar",
+        collapseSidebar: "Collapse sidebar",
         pageTitles: {
           dashboard: "Dashboard",
           homework: "Homework",
@@ -91,6 +94,9 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
         signOutPending: "登出中...",
         trialPlan: "入門方案",
         familyPlan: "Family 方案",
+        comingSoon: "即將推出！",
+        expandSidebar: "展開側邊欄",
+        collapseSidebar: "收合側邊欄",
         pageTitles: {
           dashboard: "總覽",
           homework: "作業",
@@ -123,6 +129,9 @@ function getStudentShellCopy(languageCode: AppUserRecord["preferred_ui_language"
         signOutPending: "Déconnexion...",
         trialPlan: "Accès Starter",
         familyPlan: "Accès Family",
+        comingSoon: "Bientôt disponible !",
+        expandSidebar: "Déployer la barre latérale",
+        collapseSidebar: "Réduire la barre latérale",
         pageTitles: {
           dashboard: "Dashboard",
           homework: "Devoirs",
@@ -452,11 +461,13 @@ function ChevronIcon() {
 
 function DisabledRailItem({
   collapsed,
+  comingSoonLabel,
   icon,
   label,
   hint,
 }: {
   collapsed: boolean;
+  comingSoonLabel: string;
   icon: React.ReactNode;
   label: string;
   hint: string;
@@ -466,9 +477,9 @@ function DisabledRailItem({
       aria-disabled="true"
       className={`group/disabled-rail ${
         collapsed ? "flex items-center justify-center" : "grid"
-      } rounded-2xl px-3 py-2.5 text-sm font-medium text-[color:var(--ink-muted)] opacity-60`}
+      } min-h-11 rounded-2xl px-3 py-2.5 text-sm font-medium text-[color:var(--ink-muted)] opacity-60`}
       style={{ cursor: HOURGLASS_CURSOR }}
-      title="Coming soon!"
+      title={comingSoonLabel}
     >
       {collapsed ? (
         icon
@@ -642,11 +653,11 @@ export function StudentAppShell({
       {sidebarCollapsed ? (
         <div className={`flex min-h-[3.25rem] items-center justify-center ${desktopSidebarPadding}`}>
           <button
-            className="group relative inline-flex h-[2.28rem] w-[2.28rem] items-center justify-center rounded-[0.8rem]"
+            className="group relative inline-flex h-11 w-11 items-center justify-center rounded-[0.8rem]"
             onClick={() => setSidebarCollapsed(false)}
             type="button"
           >
-            <span className="sr-only">Expand sidebar</span>
+            <span className="sr-only">{copy.expandSidebar}</span>
             <span className="brand-mark inline-flex h-full w-full items-center justify-center rounded-[0.8rem] font-[family-name:var(--font-heading)] text-xs font-semibold text-white transition group-hover:opacity-0">
               伴
             </span>
@@ -673,7 +684,7 @@ export function StudentAppShell({
             onClick={() => setSidebarCollapsed(true)}
             type="button"
           >
-            <span className="sr-only">Collapse sidebar</span>
+            <span className="sr-only">{copy.collapseSidebar}</span>
             <PanelIcon />
           </button>
         </div>
@@ -682,7 +693,7 @@ export function StudentAppShell({
       <nav className={`flex-1 overflow-y-auto py-4 ${desktopSidebarPadding}`}>
         <div className="grid gap-2">
           <Link
-            className={`flex items-center ${sidebarCollapsed ? "justify-center" : "gap-3"} rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
+            className={`flex min-h-11 items-center ${sidebarCollapsed ? "justify-center" : "gap-3"} rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
               activeView === "dashboard"
                 ? "bg-[color:var(--surface-strong)] text-[color:var(--foreground)]"
                 : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
@@ -696,7 +707,7 @@ export function StudentAppShell({
 
           {sidebarCollapsed ? (
             <Link
-              className={`flex items-center justify-center rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
+              className={`flex min-h-11 items-center justify-center rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
                 activeView === "homework"
                   ? "bg-[color:var(--surface-strong)] text-[color:var(--foreground)]"
                   : "text-[color:var(--ink-soft)] hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
@@ -709,7 +720,7 @@ export function StudentAppShell({
             </Link>
           ) : (
             <div className="group grid gap-1">
-              <div className="flex items-center justify-between gap-3 px-3 py-2.5">
+              <div className="flex min-h-11 items-center justify-between gap-3 px-3 py-2.5">
                 <Link
                   className="flex min-w-0 flex-1 items-center gap-1.5 text-sm font-medium text-[color:var(--foreground)]"
                   href="/app?view=homework"
@@ -720,7 +731,7 @@ export function StudentAppShell({
                 </Link>
                 <button
                   aria-expanded={homeworkExpanded}
-                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[color:var(--ink-muted)] transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
+                  className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[color:var(--ink-muted)] transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
                   onClick={() => {
                     const nextValue = !homeworkExpanded;
 
@@ -766,7 +777,7 @@ export function StudentAppShell({
                             }`}
                           >
                             <Link
-                              className="flex min-w-0 flex-1 items-center justify-between rounded-[1rem] px-2 py-1.5 text-sm"
+                              className="flex min-h-11 min-w-0 flex-1 items-center justify-between rounded-[1rem] px-2 py-1.5 text-sm"
                               href={`/app?view=homework&subject=${encodeURIComponent(group.subjectTag)}`}
                               onClick={(event) =>
                                 handleHomeworkSubjectLinkClick(
@@ -787,7 +798,7 @@ export function StudentAppShell({
                             <button
                               aria-expanded={isSubjectExpanded}
                               aria-label={capitalizeSubjectLabel(group.subjectTag)}
-                              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[color:var(--ink-muted)] transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
+                              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[color:var(--ink-muted)] transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
                               onClick={() => {
                                 setExpandedSubjectTag((current) =>
                                   current === group.subjectTag
@@ -812,7 +823,7 @@ export function StudentAppShell({
                             <div className="grid gap-0.5 pl-3 pr-3">
                               {recentConversations.map((conversation) => (
                                 <Link
-                                  className="flex min-w-0 items-center gap-2 rounded-[0.8rem] px-2 py-1 text-xs leading-5 text-[color:var(--ink-muted)] transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
+                                  className="flex min-h-11 min-w-0 items-center gap-2 rounded-[0.8rem] px-2 py-1 text-xs leading-5 text-[color:var(--ink-muted)] transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
                                   href={`/app/conversations/${conversation.id}`}
                                   key={conversation.id}
                                   onClick={() => setSidebarOpen(false)}
@@ -846,12 +857,14 @@ export function StudentAppShell({
           <div className="grid gap-0.5">
             <DisabledRailItem
               collapsed={sidebarCollapsed}
+              comingSoonLabel={copy.comingSoon}
               hint={copy.mapsHint}
               icon={<MapIcon />}
               label={copy.maps}
             />
             <DisabledRailItem
               collapsed={sidebarCollapsed}
+              comingSoonLabel={copy.comingSoon}
               hint={copy.testsHint}
               icon={<TestIcon />}
               label={copy.tests}
@@ -859,12 +872,14 @@ export function StudentAppShell({
             <div className="mx-3 my-1 h-px bg-[color:var(--line)]" />
             <DisabledRailItem
               collapsed={sidebarCollapsed}
+              comingSoonLabel={copy.comingSoon}
               hint={copy.forwardHint}
               icon={<ForwardIcon />}
               label={copy.forward}
             />
             <DisabledRailItem
               collapsed={sidebarCollapsed}
+              comingSoonLabel={copy.comingSoon}
               hint={copy.exploreHint}
               icon={<ExploreIcon />}
               label={copy.explore}

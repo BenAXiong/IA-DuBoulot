@@ -77,6 +77,7 @@ Server services:
 
 - `lib/server/oversight/access.ts`
 - `lib/server/oversight/parent-service.ts`
+- `lib/oversight/summary-selection.ts`
 - `lib/server/oversight/tutor-service.ts`
 - `lib/server/oversight/tutor-note-service.ts`
 - `lib/server/oversight/admin-service.ts`
@@ -87,6 +88,7 @@ Verification:
 
 - `scripts/smoke-adult-oversight.mjs`
 - `scripts/smoke-memory-profile.mjs`
+- `scripts/verify-i18n-contracts.mjs`
 
 ## Parent Surface Rules
 

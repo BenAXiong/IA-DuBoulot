@@ -23,7 +23,9 @@ This command currently runs:
 
 - `npm run typecheck`
 - `npm run lint`
+- `npm run verify:i18n-contracts`
 - `npm run build`
+- `npm run smoke:public-localization`
 - `npm run seed:rls-fixtures`
 - `npm run verify:rls-fixtures`
 - `npm run smoke:memory`
@@ -59,6 +61,8 @@ Current blocking failure class:
 ### Shared Infrastructure
 
 - typecheck, lint, and production build succeed
+- `scripts/smoke-app-harness.mjs` provides the common local-server, cookie, authenticated-request, and response helpers used by the student, adult, memory, privacy, and billing smoke adapters
+- public French, English, and Chinese rendering passes on `/`, `/pricing`, and `/auth`, including the document `lang` contract
 - deterministic fixture reseed assumptions still hold under `verify:rls-fixtures`
 
 ### Student

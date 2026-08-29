@@ -31,6 +31,7 @@ function getLandingHeaderCopy(languageCode: UiLanguageCode) {
       },
       faq: "FAQ",
       help: "Aide",
+      audienceNavigationLabel: "Choix du public",
       pricing: "Tarifs",
       tutorUnavailable:
         "Les comptes tuteurs sont en cours d'implémentation. Contactez-nous si vous souhaitez les essayer en avant-première.",
@@ -46,6 +47,7 @@ function getLandingHeaderCopy(languageCode: UiLanguageCode) {
       },
       faq: "FAQ",
       help: "說明",
+      audienceNavigationLabel: "使用者類型選擇",
       pricing: "方案",
       tutorUnavailable:
         "家教帳號正在實作中。如果你想提早試用，請聯絡我們。",
@@ -60,6 +62,7 @@ function getLandingHeaderCopy(languageCode: UiLanguageCode) {
     },
     faq: "FAQ",
     help: "Help",
+    audienceNavigationLabel: "Choose audience",
     pricing: "Pricing",
     tutorUnavailable:
       "Tutor accounts are being implemented. Contact us if you want to try it out early.",
@@ -94,8 +97,8 @@ function LandingAudienceSelector({ languageCode }: { languageCode: UiLanguageCod
 
   return (
     <nav
-      aria-label="Landing audience"
-      className="order-3 flex w-full justify-center sm:order-none sm:w-auto"
+      aria-label={copy.audienceNavigationLabel}
+      className="order-3 flex w-full justify-center lg:order-none lg:w-auto"
     >
       <div className="inline-flex rounded-full border border-[color:var(--line)] bg-[color:var(--surface-muted)] p-1 text-sm font-medium text-[color:var(--ink-soft)]">
         {landingAudienceLabels.map((item) => {
@@ -104,7 +107,7 @@ function LandingAudienceSelector({ languageCode }: { languageCode: UiLanguageCod
           return (
             <button
               aria-pressed={!isTutor && audience === item.value}
-              className={`min-h-10 rounded-full px-4 text-sm font-semibold transition ${
+              className={`min-h-11 rounded-full px-4 text-sm font-semibold transition ${
                 !isTutor && audience === item.value
                   ? "bg-[color:var(--surface-raised)] text-[color:var(--foreground)] shadow-[var(--shadow-soft)]"
                   : isTutor

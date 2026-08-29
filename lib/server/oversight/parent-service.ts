@@ -2,6 +2,7 @@ import "server-only";
 
 import { requireAppUserRole } from "@/lib/server/auth/authorization";
 import type { AppUserRecord, UiLanguageCode } from "@/lib/server/auth/types";
+import { selectSummaryForLanguage } from "@/lib/oversight/summary-selection";
 import { loadPayerBillingSnapshot } from "@/lib/server/billing/service";
 import { AppError } from "@/lib/server/errors/app-error";
 import { loadConversationDetail } from "@/lib/server/conversations/conversation-service";
@@ -112,18 +113,6 @@ function byNewestActivity(
   const leftKey = left.last_message_at ?? left.created_at;
   const rightKey = right.last_message_at ?? right.created_at;
   return rightKey.localeCompare(leftKey);
-}
-
-function selectSummaryForLanguage(
-  summaries: SummaryRow[],
-  preferredLanguage: UiLanguageCode,
-) {
-  return (
-    summaries.find((summary) => summary.language_code === preferredLanguage) ??
-    summaries.find((summary) => summary.language_code === "fr") ??
-    summaries[0] ??
-    null
-  );
 }
 
 function buildSummaryMap(rows: SummaryRow[]) {

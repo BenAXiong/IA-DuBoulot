@@ -170,7 +170,7 @@ export function StudentConversationComposer({
         <div className="flex items-center gap-2">
           <button
             aria-label={copy.addAttachment}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
             disabled={disabled || isSending || isUploading}
             onClick={onUploadAttachments}
             title={copy.addAttachment}
@@ -186,7 +186,7 @@ export function StudentConversationComposer({
           />
           <button
             aria-label={copy.voice}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] focus:shadow-none focus-visible:shadow-none"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full text-[color:var(--ink-soft)] transition hover:bg-[color:var(--surface-strong)] focus:shadow-none focus-visible:shadow-none"
             disabled
             title={copy.voice}
             type="button"
@@ -205,7 +205,7 @@ export function StudentConversationComposer({
             aria-label={
               isUploading ? copy.uploadInProgressTooltip : isSending ? copy.sending : copy.send
             }
-            className="inline-flex h-8 w-8 items-center justify-center text-[color:var(--foreground)] transition hover:text-[color:var(--accent)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex h-11 w-11 items-center justify-center text-[color:var(--foreground)] transition hover:text-[color:var(--accent)] focus:shadow-none focus-visible:shadow-none disabled:cursor-not-allowed disabled:opacity-40"
             disabled={
               disabled || isSending || isUploading || composerText.trim().length === 0
             }

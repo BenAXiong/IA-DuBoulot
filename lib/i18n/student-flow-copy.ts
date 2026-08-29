@@ -877,6 +877,7 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       previewImage: "Aperçu de l'image",
       expandPreview: "Agrandir",
       jumpToLatest: "Revenir en bas",
+      resizeSideRail: "Redimensionner le panneau latéral",
       closePreview: "Fermer l'aperçu",
       subjectUploadsTitle: "Ressources de matière",
       subjectUploadsPlaceholder:
@@ -962,6 +963,7 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       previewImage: "Image preview",
       expandPreview: "Expand",
       jumpToLatest: "Jump to latest",
+      resizeSideRail: "Resize side panel",
       closePreview: "Close preview",
       subjectUploadsTitle: "Subject resources",
       subjectUploadsPlaceholder:
@@ -1041,6 +1043,7 @@ export function getStudentWorkbenchCopy(languageCode: UiLanguageCode) {
       previewImage: "圖片預覽",
       expandPreview: "放大",
       jumpToLatest: "回到最新訊息",
+      resizeSideRail: "調整側邊面板寬度",
       closePreview: "關閉預覽",
       subjectUploadsTitle: "科目資源",
       subjectUploadsPlaceholder:

@@ -1846,3 +1846,23 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Create and clean up an isolated smoke learner for each run, assert the server-rendered zero-history and returning-homework states through a stable semantic marker, create the conversation through `POST /api/conversations?mode=shell`, and keep extraction assertions at the actual route contract: a ready result must contain a source block with non-empty extracted content, while provider failure must produce the documented manual-review path.
 - Why: The test interface now matches the learner journey and no longer fails merely because a valid provider extraction is shorter or differently worded. Isolating the learner keeps the first-run proof deterministic without erasing or reshaping shared demo fixtures.
 - Follow-up: Rerun the live smoke and full regression after restoring a resolvable hosted Supabase project. The 2026-08-29 attempt stopped before fixture mutation because both local and Vercel production configuration referenced an unavailable Supabase hostname.
+
+### D-20260829-02 - Treat Public Language As A Document-Level Routing Contract
+
+- Date: 2026-08-29
+- Status: accepted
+- Related tasks: `A7.4.5`, `A7.4.6`, `P1.3`, `P3.2`
+- Context: Public pages resolved `?lang=` independently, while the root document always emitted `lang="fr"`. A fresh English or Chinese link could therefore show translated copy with the wrong document language until a browser cookie happened to exist.
+- Decision: Validate public `lang` parameters in the Next proxy, mirror valid values into the request and response UI-language cookie, and have the async root layout derive `<html lang>` from that same cookie. Keep a build-backed public smoke for `fr`, `en`, and `zh` across `/`, `/pricing`, and `/auth`.
+- Why: The visible copy, screen-reader pronunciation, browser language metadata, and subsequent navigation now share one routing contract instead of relying on prior browser state.
+- Follow-up: Keep authenticated profile persistence under `A7.4.6`; the query/cookie contract does not replace the saved user preference.
+
+### D-20260829-03 - Share Smoke Infrastructure, Keep Scenario Adapters Local
+
+- Date: 2026-08-29
+- Status: accepted
+- Related tasks: `A7.2.2`, `A7.2.3`, `P5.1`, `P5.2`
+- Context: Five smoke scripts each carried nearly identical local Next startup, port probing, cookie jars, Supabase SSR sign-in, request IDs, and JSON/text response handling. The duplication made every harness correction a multi-file change and obscured the scenario-specific behavior under test.
+- Decision: Move that infrastructure into `scripts/smoke-app-harness.mjs` and keep thin student, adult, memory, privacy, and billing adapters responsible for their own fixtures, assertions, cleanup, and special environment overrides.
+- Why: This deepens a stable test boundary with multiple real consumers while preserving locality for the product journeys. It reduces maintenance leverage without creating a generic test framework or coupling unrelated scenario logic.
+- Follow-up: Tablet emulation remains separate because its Playwright/browser lifecycle is materially different; only migrate it if a second browser-based adapter creates the same repeated interface.

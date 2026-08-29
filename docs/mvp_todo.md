@@ -8,7 +8,7 @@ Use these task IDs everywhere: session log, decision log, commits, reviews, and 
 
 Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 
-- Overall: `[#############################.]` `131/135` complete (`97%`)
+- Overall: `[#############################.]` `133/135` complete (`99%`)
 - A0: `[xxxxxxxxxxxxxxxxxxxxx.]` `21/22`
 - A1: `[xxxxxxxxxxxxxxxx]` `16/16`
 - A2: `[xxxxxxxxxxxxxxxxx]` `17/17`
@@ -16,7 +16,7 @@ Overall progress uses a scaled bar. Phase bars use one unit per subtask.
 - A4: `[xxxxxxxxxxxxxxxxxxx]` `19/19`
 - A5: `[xxxxxxxxxxxxx]` `13/13`
 - A6: `[xxxxxxxxxxxxx]` `13/13`
-- A7: `[xxxxxxxxxxxxxxx...]` `15/18`
+- A7: `[xxxxxxxxxxxxxxxxx.]` `17/18`
 
 ## Table Of Contents
 
@@ -407,7 +407,7 @@ Status note: on 2026-08-29 the student smoke was realigned to the current produc
 - [x] A7.4.2 Prepare demo accounts and a founder walkthrough script.
 - [x] A7.4.3 Freeze the MVP scope and publish the launch checklist.
 - [x] A7.4.4 Restore accented French copy and audit Unicode-safe rendering on shared MVP surfaces.
-- [ ] A7.4.5 Add actual interface-copy localization for `fr`, `en`, and `zh` across the shared MVP routes.
+- [x] A7.4.5 Add actual interface-copy localization for `fr`, `en`, and `zh` across the shared MVP routes.
 - [ ] A7.4.6 Verify language switching, parent-summary language defaults, and `zh` copy fit on the tablet-emulated critical routes.
 - [x] A7.4.7 Add a shared MVP brand layer and shell polish that improves trust without a full UI rewrite.
 - [x] A7.4.8 Create a separate `Pilot_todo` hardening plan and logging rules without moving true MVP blockers out of the launch gate.
@@ -420,13 +420,13 @@ Status note: the deeper student and adult route family now localizes its main in
 Status note: the admin audit list, deletion-request feedback, and the user-facing quota block messages for conversation creation, upload, and chat now also localize by UI language, while `app/layout.tsx` adds explicit CJK fallback for the shared font variables.
 Status note: the core student APIs now also localize their user-facing validation errors, upload warnings, deterministic coach fallback, initial transcript scaffolding, deterministic student-summary fallback, and visible weakness-tag labels through `lib/i18n/student-flow-copy.ts`.
 Status note: auth/profile bootstrap and update, invitation create and accept, tutor-note mutations, memory mutations, deterministic memory fallback copy, and the small parent billing-management conflict path now also localize their user-facing server messages through the focused copy modules.
-Status note: the shared MVP now carries accented French across the visible shared UI plus the AI prompt layer that generates French coach, summary, translation, and memory outputs, while `app/layout.tsx` already provides `latin-ext` plus explicit CJK fallback for Unicode-safe rendering. The remaining launch-blocking language gap is now primarily broader parent-summary default and language-switch verification, plus residual generic provider or service fallback strings that still bypass the focused copy modules.
+Status note: the shared MVP now carries accented French across the visible shared UI plus the AI prompt layer that generates French coach, summary, translation, and memory outputs, while `app/layout.tsx` provides `latin-ext` plus explicit CJK fallback for Unicode-safe rendering. `A7.4.5` is complete after the final shared-shell, public overlay, pricing, side-rail, and workbench accessibility labels were localized and the route-level public smoke covered French, English, and Chinese on `/`, `/pricing`, and `/auth`. Broader authenticated switching and live parent-summary verification remain in `A7.4.6`.
 Status note: the authenticated language menu no longer waits for the full profile PATCH before starting the `/app` refresh; it now writes an immediate `ia_ui_lang` override used by authenticated page context during that refresh, so role dashboards can flip visible copy faster while the saved profile update completes in the background. Broader end-to-end verification for language switching and parent-summary defaults still remains open in `A7.4.6`.
 Status note: the public language switcher is now visible at tablet widths, and refreshed local `npm run smoke:tablet-emulation` passes succeeded again on 2026-03-12 against both the current localized French labels and a temporary `zh` fixture-language pre-pass for `/app`, the subject-level homework launcher on `/app?view=homework&subject=...`, and `/app/conversations/[conversationId]`, but broader language-switch behavior and parent-summary default verification still remain open inside `A7.4.6`. Real iPad Safari validation is now deferred to post-pilot `P6.12`.
 Status note: the shared public and app shells, `SurfaceCard`, and global CSS now carry a calmer brand baseline and reusable shell classes, while deeper route-by-route redesign remains pilot work rather than a late MVP rewrite.
 Status note: the student role now also uses a dedicated chat-first shell with a collapsible subject rail, a minimal top bar, a placeholder avatar dock, a direct subject quick-start that creates a bare conversation shell before opening the live chat, and a flatter conversation layout with a lighter sources/completion rail; `/app/new` now behaves only as a compatibility redirect into the homework dashboard while the remaining decisions about true subject entities, more implicit conversation creation, optional completion, and real avatar media stay deferred to Pilot work.
 Status note: the homework dashboard empty state no longer dead-ends on a self-link when the learner has no prior subjects yet; it now renders a first-homework launcher with subject selection so the first conversation can start directly from `/app` and establish the first subject tag in the same flow.
-Status note: the automated student smoke still does not cover that zero-history launcher path yet, so the restored first-homework entry has compile-time verification plus the current dashboard/workbench regressions around it, but not a dedicated first-ever-homework harness pass yet.
+Status note: the automated student smoke now creates an isolated learner, proves the zero-history first-homework state, creates a bare subject conversation shell, proves the returning-homework state, and then continues through upload, first message, and completion. This keeps first-ever-homework evidence deterministic without reshaping shared demo fixtures.
 Status note: the public landing is now a story-first product entry instead of a toolbox-like shortcut page, with the old quick links and pilot context grouped into a floating helper button above the Vercel helper area, the public language selector moved into a globe-menu dropdown, the top bar widened and simplified to wordmark plus controls, the hero and closing CTA centered on a wider page canvas, three alternating `preview + 3 glass cards` product rows with matched GIF height, neutral moving placeholder GIFs now stored in `public/landing/`, and a slow shared CTA gradient drift.
 Status note: `/auth` now also opts out of the shared public footer and uses a viewport-fit layout with a compact HUD-style header, a single centered auth card, and a stable-width `Sign in` or `New user` switch as the first visible element, leaving the route intentionally quiet above the toggle unless real testing proves it needs more explanation.
 Status note: the most visible public and shared-route filler copy has now been rewritten toward product-facing language across landing helper text, pricing, onboarding, auth-complete, app-home, student start/history/workbench surfaces, and related shared dictionaries, so those routes no longer read like implementation scaffolding by default.

@@ -25,10 +25,14 @@ type PricingAudienceCopy = {
 };
 
 type PricingPageCopy = {
+  audienceNavigationLabel: string;
   audienceLabels: Record<LandingAudience, string>;
   billingToggle: Record<BillingCycle, string>;
+  body: string;
   audiences: Record<LandingAudience, PricingAudienceCopy>;
   explorerPerksLabel: string;
+  title: string;
+  tutorUnavailableMessage: string;
 };
 
 type PublicPricingPageProps = {
@@ -65,8 +69,7 @@ export function PublicPricingPage({
   const [audience, setAudience] = useState<LandingAudience>("parent");
   const [billingCycle, setBillingCycle] = useState<BillingCycle>("yearly");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const tutorUnavailableMessage =
-    "Tutor accounts are being implemented. Contact us if you want to try it out early.";
+  const tutorUnavailableMessage = copy.tutorUnavailableMessage;
   const selectedCopy = copy.audiences[audience];
   const ctaHref = authHrefForAudience(audience, languageCode);
 
@@ -87,8 +90,16 @@ export function PublicPricingPage({
   return (
     <main className="px-5 pb-16 pt-40 sm:px-8 lg:px-36">
       <div className="mx-auto grid max-w-[92rem] gap-8">
+        <header className="mx-auto max-w-3xl text-center">
+          <h1 className="font-[family-name:var(--font-heading)] text-4xl leading-tight sm:text-5xl">
+            {copy.title}
+          </h1>
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-[color:var(--ink-soft)]">
+            {copy.body}
+          </p>
+        </header>
         <nav
-          aria-label="Pricing audience"
+          aria-label={copy.audienceNavigationLabel}
           className="flex justify-center"
         >
           <div className="inline-flex rounded-full border border-[color:var(--line)] bg-[color:var(--surface-muted)] p-1 text-sm font-medium text-[color:var(--ink-soft)]">
@@ -98,7 +109,7 @@ export function PublicPricingPage({
               return (
                 <button
                   aria-pressed={!isTutor && audience === item}
-                  className={`min-h-10 rounded-full px-4 text-sm font-semibold transition ${
+                  className={`min-h-11 rounded-full px-4 text-sm font-semibold transition ${
                     !isTutor && audience === item
                       ? "bg-[color:var(--surface-raised)] text-[color:var(--foreground)] shadow-[var(--shadow-soft)]"
                       : isTutor
