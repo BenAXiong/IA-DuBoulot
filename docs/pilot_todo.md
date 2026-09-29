@@ -109,7 +109,7 @@ Detail notes: [Pilot Journey And UX Hardening](pilot/journey_ux.md).
 - [x] P3.2 Run a focused accessibility pass on tap targets, focus states, contrast, and motion.
 - [ ] P3.3 Tighten empty-state, retry, and failure-recovery behavior before widening access.
 
-Status note: the 2026-09-30 completion-reliability slice bounds Gemini generation/translation calls, makes application retry policy the single retry owner for those calls, and parallelizes independent audience work after a deployed student smoke exceeded `90s`. The complete local regression is green; keep `P3.3` open for the remaining empty-state and user-facing recovery audit.
+Status note: the 2026-09-30 completion-reliability slice bounds Gemini generation/translation calls, makes application retry policy the single retry owner for those calls, and parallelizes independent audience work after a deployed student smoke exceeded `90s`. The complete local regression and post-fix production walkthrough are green; keep `P3.3` open for the remaining empty-state and user-facing recovery audit. The deployed tablet scan also keeps smaller secondary subject chips, copy/remove actions, and side-rail targets visible as accessibility debt even though the critical-path `44px` gate passes.
 
 Detail notes: [Pilot Device, Accessibility, And Reliability](pilot/device_reliability.md).
 

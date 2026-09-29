@@ -87,6 +87,8 @@ Explicitly defer beyond this launch candidate:
 
 `A0.2.1` is no longer a release blocker. The original Supabase project was restored in place on 2026-09-29; DNS, CLI linkage, all eight migration versions, deterministic fixture reseeding, `20/20` hosted RLS verification, and the complete `npm run regress:mvp` command are green.
 
+The 2026-09-30 production deployment for commit `95d3a07` is healthy. The deployed public localization, authenticated student, adult oversight, and French/Chinese tablet-emulation walkthroughs are green after bounding completion latency. Optional parent summary variants can still be absent during Gemini degradation, but the required student completion contract remains intact.
+
 `A0.2.3` Resend sender/domain setup remains open if real transactional email delivery is required for the Pilot. The trilingual interface gate is complete, the 12-check French/English/Chinese public smoke passes including language-preserving signed-out app redirects, and the authenticated hosted suite is current again. Real iPad Safari validation remains post-pilot `P6.12`.
 
 Post-launch polish, UX hardening, and broader pilot operating work now live in [Pilot_todo](pilot_todo.md) instead of being mixed into the launch gate.

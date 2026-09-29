@@ -54,30 +54,29 @@ const LANGUAGE_PLAN = {
         name: "dashboard",
         path: "/app",
         selectors: [
-          "role=link[name=\"Tableau\"]",
-          "text=Choisir une matière, reprendre une discussion, ou en lancer une nouvelle.",
-          "text=Discussions récentes",
-          "text=mathematiques",
+          "role=link[name=\"Dashboard\"]",
+          "text=Where should we start?",
+          "text=Devoirs",
+          "text=Mathématiques",
         ],
-        criticalTargets: ["Tableau"],
+        criticalTargets: ["Dashboard"],
       },
       {
         name: "subject-launcher",
         path: "/app?view=homework&subject=mathematiques&draft=Smoke",
         selectors: [
-          "text=mathematiques",
-          "text=Discussions récentes",
+          "text=Mathématiques",
+          "text=Mes devoirs",
           "textarea[placeholder=\"Écris directement ta question sur ce devoir...\"]",
           "role=button[name=\"Lancer le chat\"]",
         ],
-        criticalTargets: ["Lancer le chat", "Ouvrir"],
+        criticalTargets: ["Lancer le chat", "Mes devoirs"],
       },
       {
         name: "conversation",
         path: `/app/conversations/${FIXTURE.ids.conversation}`,
         selectors: [
-          "text=Sources",
-          "text=Pièces privées et texte récupéré",
+          "text=Fichiers du devoir",
           "role=button[name=\"Envoyer\"]",
         ],
         criticalTargets: ["Ajouter une pièce", "Envoyer"],
@@ -92,9 +91,9 @@ const LANGUAGE_PLAN = {
         path: "/app",
         selectors: [
           "role=link[name=\"Dashboard\"]",
-          "text=Pick a subject, continue a discussion, or start a fresh one.",
-          "text=Recent homework chats",
-          "text=mathematiques",
+          "text=Where should we start?",
+          "text=Homework",
+          "text=Mathematics",
         ],
         criticalTargets: ["Dashboard"],
       },
@@ -102,19 +101,18 @@ const LANGUAGE_PLAN = {
         name: "subject-launcher",
         path: "/app?view=homework&subject=mathematiques&draft=Smoke",
         selectors: [
-          "text=mathematiques",
-          "text=Recent homework chats",
+          "text=Mathematics",
+          "text=My homework",
           "textarea[placeholder=\"Ask anything about this homework...\"]",
           "role=button[name=\"Start chat\"]",
         ],
-        criticalTargets: ["Start chat", "Open"],
+        criticalTargets: ["Start chat", "My homework"],
       },
       {
         name: "conversation",
         path: `/app/conversations/${FIXTURE.ids.conversation}`,
         selectors: [
-          "text=Sources",
-          "text=Private files and recovered text",
+          "text=Homework files",
           "role=button[name=\"Send\"]",
         ],
         criticalTargets: ["Add attachment", "Send"],
@@ -129,9 +127,9 @@ const LANGUAGE_PLAN = {
         path: "/app",
         selectors: [
           "role=link[name=\"總覽\"]",
-          "text=選擇科目、接續對話，或開始新的作業。",
-          "text=最近作業對話",
-          "text=mathematiques",
+          "text=Where should we start?",
+          "text=作業",
+          "text=數學",
         ],
         criticalTargets: ["總覽"],
       },
@@ -139,19 +137,18 @@ const LANGUAGE_PLAN = {
         name: "subject-launcher",
         path: "/app?view=homework&subject=mathematiques&draft=Smoke",
         selectors: [
-          "text=mathematiques",
-          "text=最近作業對話",
+          "text=數學",
+          "text=我的作業",
           "textarea[placeholder=\"直接輸入你對這份作業的問題...\"]",
           "role=button[name=\"開始聊天\"]",
         ],
-        criticalTargets: ["開始聊天", "打開"],
+        criticalTargets: ["開始聊天", "我的作業"],
       },
       {
         name: "conversation",
         path: `/app/conversations/${FIXTURE.ids.conversation}`,
         selectors: [
-          "text=來源",
-          "text=私人檔案與擷取文字",
+          "text=作業檔案",
           "role=button[name=\"送出\"]",
         ],
         criticalTargets: ["加入附件", "送出"],
@@ -467,7 +464,13 @@ async function assertVisible(page, selector) {
 async function measureTarget(page, label) {
   const button = page.getByRole("button", { name: label, exact: true });
   const link = page.getByRole("link", { name: label, exact: true });
-  const locator = (await button.count()) > 0 ? button.first() : link.first();
+  const tab = page.getByRole("tab", { name: label, exact: true });
+  const locator =
+    (await button.count()) > 0
+      ? button.first()
+      : (await link.count()) > 0
+        ? link.first()
+        : tab.first();
   await locator.waitFor({ state: "visible", timeout: 30_000 });
   const box = await locator.boundingBox();
 
@@ -744,7 +747,9 @@ async function main() {
       );
     }
 
-    console.log("\nTablet emulation smoke passed. Real iPad Safari validation is still required for A7.1.");
+    console.log(
+      "\nTablet emulation smoke passed. Real iPad Safari validation remains deferred to post-pilot P6.12.",
+    );
   } finally {
     if (restoreFixtureLanguage) {
       await restoreFixtureLanguage();
