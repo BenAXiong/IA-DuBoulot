@@ -13,8 +13,10 @@ import {
   GEMINI_COACH_MODEL,
   GEMINI_DEFAULT_SAFETY_SETTINGS,
   GEMINI_EXTRACTION_MODEL,
+  GEMINI_GENERATION_REQUEST_TIMEOUT_MS,
   GEMINI_PROVIDER_NAME,
   GEMINI_SUMMARY_MODEL,
+  GEMINI_TOKEN_COUNT_REQUEST_TIMEOUT_MS,
   GEMINI_TITLE_MODEL,
   GEMINI_TRANSLATION_MODEL,
   GEMINI_UPLOAD_POLL_ATTEMPTS,
@@ -99,6 +101,15 @@ type GeminiRetryPolicy = {
   outputBaseDelayMs: number;
   outputMaxDelayMs: number;
 };
+
+function buildGeminiHttpOptions(timeout: number) {
+  return {
+    timeout,
+    retryOptions: {
+      attempts: 1,
+    },
+  };
+}
 
 function sleep(delayMs: number) {
   return new Promise((resolve) => setTimeout(resolve, delayMs));
@@ -667,6 +678,11 @@ export class GeminiAiProvider implements AiProvider {
       const response = await this.client.models.countTokens({
         model,
         contents: text,
+        config: {
+          httpOptions: buildGeminiHttpOptions(
+            GEMINI_TOKEN_COUNT_REQUEST_TIMEOUT_MS,
+          ),
+        },
       });
       return response.totalTokens ?? 0;
     } catch {
@@ -679,6 +695,11 @@ export class GeminiAiProvider implements AiProvider {
       const response = await this.client.models.countTokens({
         model,
         contents,
+        config: {
+          httpOptions: buildGeminiHttpOptions(
+            GEMINI_TOKEN_COUNT_REQUEST_TIMEOUT_MS,
+          ),
+        },
       });
       return response.totalTokens ?? 0;
     } catch {
@@ -814,6 +835,9 @@ export class GeminiAiProvider implements AiProvider {
           model: input.model,
           contents: input.contents,
           config: {
+            httpOptions: buildGeminiHttpOptions(
+              GEMINI_GENERATION_REQUEST_TIMEOUT_MS,
+            ),
             temperature: 0.2,
             safetySettings: GEMINI_DEFAULT_SAFETY_SETTINGS,
             systemInstruction: input.systemInstruction,
@@ -1022,6 +1046,9 @@ export class GeminiAiProvider implements AiProvider {
           model: input.model,
           contents: input.contents,
           config: {
+            httpOptions: buildGeminiHttpOptions(
+              GEMINI_GENERATION_REQUEST_TIMEOUT_MS,
+            ),
             temperature: 0.2,
             safetySettings: GEMINI_DEFAULT_SAFETY_SETTINGS,
             systemInstruction: input.systemInstruction,
@@ -1591,6 +1618,9 @@ export class GeminiAiProvider implements AiProvider {
         model: GEMINI_TRANSLATION_MODEL,
         contents: prompt.instruction,
         config: {
+          httpOptions: buildGeminiHttpOptions(
+            GEMINI_GENERATION_REQUEST_TIMEOUT_MS,
+          ),
           temperature: 0.1,
           safetySettings: GEMINI_DEFAULT_SAFETY_SETTINGS,
           maxOutputTokens: AI_OUTPUT_TOKEN_LIMITS.translation,

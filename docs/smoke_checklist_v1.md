@@ -78,6 +78,7 @@ Current blocking failure class:
 - completion produces at least the required student summary and leaves the conversation read-only
 - repeated completion reuses the stored student summary and does not regenerate memory
 - completion-triggered memory refresh succeeds, with fallback allowed
+- the completion request remains bounded when several provider-backed summary variants fail or time out
 
 ### Parent
 
@@ -117,7 +118,7 @@ Use this when demonstrating the deployed app, even after the automated pass is g
 - upload or paste homework content
 - exchange at least one coaching turn
 - complete the session and confirm the student summary appears
-- return to `/app` and confirm the memory panel now reflects durable pedagogical context
+- confirm the student summary is visible; durable pedagogical memory is verified through the automated memory flow and linked-parent surface while the future learner-facing location remains tracked under `P2.9`
 
 ### Parent Manual Pass
 
@@ -159,6 +160,8 @@ These remain required before an external demo even if the regression command pas
 
 ## Latest Recorded Result
 
+- 2026-09-30 local `npm run regress:mvp`: success across typecheck, lint, localization contracts, production build, the 12-check public localization smoke, deterministic hosted fixture reseed, `20/20` RLS verification, memory, student flow, adult oversight, privacy, and billing after bounding Gemini request latency and parallelizing independent completion work. Provider `504` and `MAX_TOKENS` cases exercised the documented required-summary and memory fallbacks without breaking the workflow.
+- 2026-09-30 deployed pre-fix walkthrough: the 12-check public localization smoke passed against `https://ia-du-boulot.vercel.app`; the student flow then identified a real completion request exceeding the `90s` smoke budget. The bounded-latency fix passed the full local regression and must be rechecked on the deployment containing that fix before demo readiness is claimed.
 - 2026-09-29 restored-project `npm run regress:mvp`: success across typecheck, lint, localization contracts, production build, the 12-check public localization smoke, deterministic hosted fixture reseed, `20/20` RLS verification, memory, student flow, adult oversight, privacy, and billing. The run exercised the documented deterministic memory fallback after Gemini returned `MAX_TOKENS`, and the user flow still completed successfully.
 - 2026-09-29 three consecutive resumed-goal audits: production still points to `dfiiujkhbuvltrlqrerd.supabase.co`, and that hostname still does not resolve. The deployed 12-check French/English/Chinese public smoke remains green. The authenticated fixture/RLS/product suite therefore remains unavailable without a Supabase project restoration or replacement, and the goal returned to blocked status after the required third observation.
 - 2026-08-29 local `npm run regress:mvp`: typecheck, lint, executable localization contracts, production build, and the 12-check local public localization smoke passed; the command then stopped at `seed:rls-fixtures` before mutation with DNS `ENOTFOUND` for `dfiiujkhbuvltrlqrerd.supabase.co`.

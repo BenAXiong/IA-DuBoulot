@@ -279,8 +279,33 @@ export async function generateConversationSummaries(
 ) {
   const provider = getAiProvider();
   let summaries: SessionSummaryRecord[] = [];
+  const studentSummaryPromise = generateRequiredStudentSummary(input, provider);
+  const parentBaseSummaryPromise = input.studentOnly
+    ? Promise.resolve(null)
+    : runOptionalSummaryStep(input, "generate_parent_summary_fr", async () => {
+        const result = await provider.generateSummary(
+          buildBaseSummaryInput(input, "parent", "fr"),
+        );
+        await recordStudentAiUsageBestEffort({
+          studentUserId: input.appUser.id,
+          usage: result.usage,
+        });
+        return result;
+      });
+  const tutorSummaryPromise = input.studentOnly
+    ? Promise.resolve(null)
+    : runOptionalSummaryStep(input, "generate_tutor_summary_fr", async () => {
+        const result = await provider.generateSummary(
+          buildBaseSummaryInput(input, "tutor", "fr"),
+        );
+        await recordStudentAiUsageBestEffort({
+          studentUserId: input.appUser.id,
+          usage: result.usage,
+        });
+        return result;
+      });
 
-  const studentSummary = await generateRequiredStudentSummary(input, provider);
+  const studentSummary = await studentSummaryPromise;
   summaries = mergeSummaryRecord(
     summaries,
     await runSummaryStep(input, "upsert_student_summary", () =>
@@ -296,20 +321,7 @@ export async function generateConversationSummaries(
     return summaries;
   }
 
-  const parentBaseSummary = await runOptionalSummaryStep(
-    input,
-    "generate_parent_summary_fr",
-    async () => {
-      const result = await provider.generateSummary(
-        buildBaseSummaryInput(input, "parent", "fr"),
-      );
-      await recordStudentAiUsageBestEffort({
-        studentUserId: input.appUser.id,
-        usage: result.usage,
-      });
-      return result;
-    },
-  );
+  const parentBaseSummary = await parentBaseSummaryPromise;
   if (parentBaseSummary) {
     const persistedParentSummary = await runOptionalSummaryStep(
       input,
@@ -326,38 +338,16 @@ export async function generateConversationSummaries(
       summaries = mergeSummaryRecord(summaries, persistedParentSummary);
     }
 
-    for (const languageCode of ["en", "zh"] as const) {
-      const parentRecommendation = parentBaseSummary.next_step_recommendation;
-      const translatedSummary = await runOptionalSummaryStep(
-        input,
-        `translate_parent_summary_${languageCode}`,
-        () =>
-          translateText({
-            sourceText: parentBaseSummary.summary_text,
-            sourceLanguage: "fr",
-            targetLanguage: languageCode,
-            requestContext: {
-              requestId: input.requestId,
-              route: input.route,
-              actorUserId: input.appUser.id,
-              actorRole: input.appUser.role,
-              conversationId: input.conversation.id,
-              studentUserId: input.appUser.id,
-            },
-          }),
-      );
-
-      if (!translatedSummary) {
-        continue;
-      }
-
-      const translatedRecommendation = parentRecommendation
-        ? await runOptionalSummaryStep(
+    const parentRecommendation = parentBaseSummary.next_step_recommendation;
+    const persistedTranslatedParentSummaries = await Promise.all(
+      (["en", "zh"] as const).map(async (languageCode) => {
+        const [translatedSummary, translatedRecommendation] = await Promise.all([
+          runOptionalSummaryStep(
             input,
-            `translate_parent_recommendation_${languageCode}`,
+            `translate_parent_summary_${languageCode}`,
             () =>
               translateText({
-                sourceText: parentRecommendation,
+                sourceText: parentBaseSummary.summary_text,
                 sourceLanguage: "fr",
                 targetLanguage: languageCode,
                 requestContext: {
@@ -369,56 +359,68 @@ export async function generateConversationSummaries(
                   studentUserId: input.appUser.id,
                 },
               }),
-          )
-        : null;
+          ),
+          parentRecommendation
+            ? runOptionalSummaryStep(
+                input,
+                `translate_parent_recommendation_${languageCode}`,
+                () =>
+                  translateText({
+                    sourceText: parentRecommendation,
+                    sourceLanguage: "fr",
+                    targetLanguage: languageCode,
+                    requestContext: {
+                      requestId: input.requestId,
+                      route: input.route,
+                      actorUserId: input.appUser.id,
+                      actorRole: input.appUser.role,
+                      conversationId: input.conversation.id,
+                      studentUserId: input.appUser.id,
+                    },
+                  }),
+              )
+            : Promise.resolve(null),
+        ]);
 
-      const persistedTranslatedParentSummary = await runOptionalSummaryStep(
-        input,
-        `upsert_parent_summary_${languageCode}`,
-        () =>
-          upsertSummary({
-            conversationId: input.conversation.id,
-            audience: "parent",
-            summary: {
-              language_code: languageCode,
-              summary_text: translatedSummary.translatedText,
-              weakness_tags: parentBaseSummary.weakness_tags,
-              next_step_recommendation:
-                translatedRecommendation?.translatedText ??
-                parentRecommendation,
-              generated_model_name:
-                parentBaseSummary.generated_model_name
-                  ? `${parentBaseSummary.generated_model_name}+${PARENT_SUMMARY_PROMPT_VERSION}`
-                  : PARENT_SUMMARY_PROMPT_VERSION,
-            },
-          }),
-      );
+        if (!translatedSummary) {
+          return null;
+        }
 
-      if (!persistedTranslatedParentSummary) {
-        continue;
+        return runOptionalSummaryStep(
+          input,
+          `upsert_parent_summary_${languageCode}`,
+          () =>
+            upsertSummary({
+              conversationId: input.conversation.id,
+              audience: "parent",
+              summary: {
+                language_code: languageCode,
+                summary_text: translatedSummary.translatedText,
+                weakness_tags: parentBaseSummary.weakness_tags,
+                next_step_recommendation:
+                  translatedRecommendation?.translatedText ??
+                  parentRecommendation,
+                generated_model_name:
+                  parentBaseSummary.generated_model_name
+                    ? `${parentBaseSummary.generated_model_name}+${PARENT_SUMMARY_PROMPT_VERSION}`
+                    : PARENT_SUMMARY_PROMPT_VERSION,
+              },
+            }),
+        );
+      }),
+    );
+
+    for (const persistedTranslatedParentSummary of persistedTranslatedParentSummaries) {
+      if (persistedTranslatedParentSummary) {
+        summaries = mergeSummaryRecord(
+          summaries,
+          persistedTranslatedParentSummary,
+        );
       }
-
-      summaries = mergeSummaryRecord(
-        summaries,
-        persistedTranslatedParentSummary,
-      );
     }
   }
 
-  const tutorSummary = await runOptionalSummaryStep(
-    input,
-    "generate_tutor_summary_fr",
-    async () => {
-      const result = await provider.generateSummary(
-        buildBaseSummaryInput(input, "tutor", "fr"),
-      );
-      await recordStudentAiUsageBestEffort({
-        studentUserId: input.appUser.id,
-        usage: result.usage,
-      });
-      return result;
-    },
-  );
+  const tutorSummary = await tutorSummaryPromise;
 
   if (tutorSummary) {
     const persistedTutorSummary = await runOptionalSummaryStep(

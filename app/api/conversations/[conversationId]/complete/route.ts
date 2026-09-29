@@ -7,6 +7,8 @@ import { withRouteErrorHandling } from "@/lib/server/errors/with-route-error-han
 
 type Params = Promise<{ conversationId: string }>;
 
+export const maxDuration = 90;
+
 export const POST = withRouteErrorHandling<{ params: Params }>(
   async (request, { params, requestId }) => {
     const context = await requireAuthenticatedUserContext();

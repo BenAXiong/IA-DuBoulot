@@ -14,6 +14,8 @@ export const GEMINI_SUMMARY_MODEL = "gemini-2.5-pro";
 export const GEMINI_TRANSLATION_MODEL = "gemini-2.5-flash";
 export const GEMINI_UPLOAD_POLL_ATTEMPTS = 20;
 export const GEMINI_UPLOAD_POLL_DELAY_MS = 750;
+export const GEMINI_GENERATION_REQUEST_TIMEOUT_MS = 12_000;
+export const GEMINI_TOKEN_COUNT_REQUEST_TIMEOUT_MS = 5_000;
 
 type GeminiPricingSnapshot = {
   inputUsdPerMillionTokens: number;

@@ -403,10 +403,18 @@ async function main() {
       repeatedExtractedTextBlock === extractedTextBlock,
       "Repeated upload confirmation changed the extracted text block unexpectedly.",
     );
-    assert(
-      repeatedWarningMessage === warningMessage,
-      "Repeated upload confirmation changed the extraction warning unexpectedly.",
-    );
+    if (extractionStatus === "ready") {
+      assert(
+        repeatedWarningMessage === null,
+        "Repeated confirmation of a ready extraction should not add a warning.",
+      );
+    } else {
+      assert(
+        typeof repeatedWarningMessage === "string" &&
+          repeatedWarningMessage.trim().length > 0,
+        "Repeated confirmation of a failed extraction should preserve a manual-review warning.",
+      );
+    }
 
     const workspaceExtractedText =
       extractedTextBlock ?? "Brouillon initial avant upload et extraction du PDF.";

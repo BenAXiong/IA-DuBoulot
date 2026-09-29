@@ -65,16 +65,17 @@ If the walkthrough needs a real checkout:
 ### 2. Student Flow
 
 - sign in as the fixture student on `/auth`
-- land on `/app` and point out recent sessions, quota state, and the memory panel
+- land on `/app` and point out recent sessions, quota state, and the homework subject rail
 - choose a subject from the homework dashboard and start a fresh chat from the subject quick-start
 - add a file in the subject quick-start or the live chat if needed
-- show the extracted-text workspace, the plan area, and one coaching turn
+- show the uploaded source state and one coaching turn in the live workbench
 - complete the session and show the student summary
 
 Narration rule:
 
 - if the coach or summary falls back to the deterministic path, say that the student contract stays intact even when the provider is unstable
 - if extraction falls back, say the file is still kept and the student is asked to manually review the useful zone
+- if durable learner memory comes up, explain that it is verified in the automated/API contract and parent detail surface; its future learner-facing location is intentionally deferred to `P2.9`
 
 ### 3. Parent Flow
 

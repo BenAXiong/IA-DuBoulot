@@ -69,6 +69,8 @@ Rules:
 - return normalized token/cost/failure metadata
 - prompt selection/versioning belongs to prompt config, not route handlers
 - prompt-context truncation and output-token caps belong to the AI guardrails module, not route handlers or UI code
+- provider HTTP deadlines belong to the adapter; model-generation calls disable hidden SDK retries so the application retry and fallback policy remains the single retry owner
+- file-upload and file-read calls may keep provider-SDK retries when the remote file lifecycle is eventually consistent
 
 ### Upload Storage Service
 
@@ -211,6 +213,7 @@ Rules:
 
 - student-facing completion must stay idempotent once a required student summary already exists
 - expensive provider-backed work should reuse persisted artifacts when the stable product contract is already satisfied
+- independent audience-summary work may run concurrently, but the conversation service must preserve the required student-summary fallback and keep optional adult variants best-effort
 
 ### Summary Service
 
