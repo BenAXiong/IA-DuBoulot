@@ -348,12 +348,15 @@ async function main() {
     );
 
     if (extractionStatus === "ready") {
+      const extractedSourceBody =
+        typeof extractedTextBlock === "string"
+          ? extractedTextBlock.split(/\r?\n/).slice(1).join("\n").trim()
+          : "";
+
       assert(
         typeof extractedTextBlock === "string" &&
-          extractedTextBlock.startsWith("[Source: fractions-partage.pdf]") &&
-          extractedTextBlock
-            .slice("[Source: fractions-partage.pdf]".length)
-            .trim().length > 0,
+          extractedTextBlock.includes(sampleAttachmentName) &&
+          extractedSourceBody.length > 0,
         `Extracted text block is unexpectedly empty or malformed. Received: ${extractedTextBlock}`,
       );
     } else {
@@ -595,11 +598,9 @@ async function main() {
       `Completed conversations should reject new turns with 409, saw ${readOnlyMessageResult.response.status}.`,
     );
     assert(
-      readErrorMessage(
-        readOnlyMessageResult.payload,
-        "",
-      ) === "Completed sessions are read-only.",
-      "Completed conversation rejection returned an unexpected message.",
+      readOnlyMessageResult.payload?.error?.code === "conflict" &&
+        readErrorMessage(readOnlyMessageResult.payload, "").trim().length > 0,
+      "Completed conversation rejection should return the localized conflict contract.",
     );
 
     const finalDetailResult = await http.requestJson(

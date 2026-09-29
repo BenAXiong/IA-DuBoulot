@@ -27,7 +27,7 @@ Current local status:
 - `scripts/smoke-student-flow.mjs` now verifies the real student route flow against a temporary local `next start` instance
 - `scripts/smoke-adult-oversight.mjs` now verifies parent, tutor, and admin oversight routes against the same local server model
 - `scripts/smoke-privacy-controls.mjs` now verifies settings rendering, linked-child deletion queueing, tutor-access revocation, and deletion-requested write blocking
-- `scripts/smoke-memory-profile.mjs` now verifies the live memory route, student dashboard memory panel, parent linked-student panel, and tutor-access denial
+- `scripts/smoke-memory-profile.mjs` now verifies authenticated student rendering, the live memory route and student mutations, parent linked-student panel, tutor-access denial, and restoration of pre-smoke memory state
 - provider-unavailable fallbacks now exist for attachment extraction, coach replies, the required student summary, and memory refresh, while adult summary variants remain best-effort
 - the current `A7.3` cost-control pass now prefers idempotent reuse of persisted extraction and completion artifacts over duplicate provider calls
 

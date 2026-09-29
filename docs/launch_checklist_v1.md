@@ -85,8 +85,8 @@ Explicitly defer beyond this launch candidate:
 
 ## Current Remaining Blockers
 
-The primary release blocker is reopened `A0.2.1`: the Supabase hostname configured in local and Vercel production environments no longer resolves. The 2026-08-29 canonical regression passes typecheck, lint, localization contracts, production build, and public-route smoke, then stops before fixture mutation at the hosted reseed. Restore the project or provision a replacement, replay and verify migrations, update the Supabase URL/anon/service-role values in both environments, relink the CLI, and rerun the full fixture-backed regression.
+`A0.2.1` is no longer a release blocker. The original Supabase project was restored in place on 2026-09-29; DNS, CLI linkage, all eight migration versions, deterministic fixture reseeding, `20/20` hosted RLS verification, and the complete `npm run regress:mvp` command are green.
 
-`A0.2.3` Resend sender/domain setup remains open if real transactional email delivery is required for the Pilot. The trilingual interface gate is complete, and final production commit `e75dbd0` passes the 12-check French/English/Chinese public smoke including language-preserving signed-out app redirects. Real iPad Safari validation remains post-pilot `P6.12`.
+`A0.2.3` Resend sender/domain setup remains open if real transactional email delivery is required for the Pilot. The trilingual interface gate is complete, the 12-check French/English/Chinese public smoke passes including language-preserving signed-out app redirects, and the authenticated hosted suite is current again. Real iPad Safari validation remains post-pilot `P6.12`.
 
 Post-launch polish, UX hardening, and broader pilot operating work now live in [Pilot_todo](pilot_todo.md) instead of being mixed into the launch gate.

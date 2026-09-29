@@ -124,7 +124,7 @@ The adult-oversight smoke script currently checks that:
 
 The memory smoke script currently checks that:
 
-- the seeded fixture student dashboard renders the memory panel through the real `/app` page
+- the seeded fixture student dashboard renders for an authenticated learner
 - `POST /api/conversations/[conversationId]/complete` refreshes memory without blocking completion
 - `GET /api/students/[studentId]/memory` returns the current snapshot for the student
 - `PATCH /api/students/[studentId]/memory` supports create, update, and delete for safe manual items
@@ -165,6 +165,7 @@ The tablet-emulation smoke script currently checks that:
 
 ## Latest Result
 
+- 2026-09-29 restored hosted project: fixture reseed succeeded, RLS verification passed `20/20`, and the complete `npm run regress:mvp` command passed through memory, student, adult-oversight, privacy, and billing. The memory smoke used the documented deterministic fallback after a provider `MAX_TOKENS` response and still persisted a safe refreshed snapshot.
 - 2026-08-29 hosted reseed: blocked before mutation with DNS `ENOTFOUND` because the configured Supabase project hostname no longer resolves; `A0.2.1` is reopened and the 2026-04-29 `20/20` result below is historical evidence, not proof of current hosted availability
 - 2026-03-10 hosted reseed: success
 - 2026-03-10 hosted verification: `17` checks passed, `0` failed

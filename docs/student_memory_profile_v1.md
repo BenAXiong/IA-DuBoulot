@@ -26,8 +26,8 @@ This V1 covers `A6.1.1` to `A6.1.4`:
 
 Pages:
 
-- `/app` for the student memory panel
 - `/app/students/[studentUserId]` for the linked-parent memory panel
+- there is currently no learner-facing raw-memory panel after the `/app/settings` simplification recorded in `D-20260410-128`; the student API contract remains active while `P2.9` decides whether and where the surface should return
 
 API:
 
@@ -45,7 +45,6 @@ Trigger path:
 - Types: `lib/server/memory/types.ts`
 - Prompt: `lib/server/ai/prompts/memory-profile.ts`
 - Provider boundary: `lib/server/ai/types.ts` and `lib/server/ai/gemini-provider.ts`
-- Student surface: `components/dashboard/student-dashboard.tsx`
 - Shared panel: `components/dashboard/memory/memory-panel.tsx`
 - Parent surface: `components/dashboard/oversight/parent-student-detail.tsx`
 - Completion integration: `lib/server/conversations/conversation-service.ts`
@@ -115,7 +114,8 @@ Current regression coverage:
 - `npm run smoke:student-flow`
 - `npm run smoke:adult-oversight`
 
-Latest local result on 2026-03-12:
+Latest hosted result on 2026-09-29:
 
-- the memory smoke passed across student dashboard rendering, completion-triggered refresh, manual create/update/delete, parent linked-student rendering, and tutor raw-memory denial
-- the latest pass also exercised the deterministic memory fallback after a provider failure, while still persisting a safe refreshed snapshot and the localized memory-mutation path
+- the memory smoke passed across authenticated student dashboard rendering, completion-triggered refresh, student API create/update/delete, parent linked-student panel rendering, tutor raw-memory denial, and state cleanup
+- the pass exercised the deterministic memory fallback after Gemini returned `MAX_TOKENS`, while still persisting a safe refreshed snapshot and completing the canonical regression
+- `P2.9` now carries the product decision about a future learner-visible memory home; tests intentionally do not claim that the current student dashboard exposes a panel

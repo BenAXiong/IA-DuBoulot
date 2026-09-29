@@ -45,7 +45,7 @@ Current direction: GitHub repo exists, Vercel is the chosen deployment platform,
 
 ### A0.2 Service Accounts And Environment Matrix
 
-- [ ] A0.2.1 Create and maintain the active Supabase project.
+- [x] A0.2.1 Create and maintain the active Supabase project.
 - [x] A0.2.2 Create the PostHog project.
 - [ ] A0.2.3 Create the Resend account and sender setup.
 - [x] A0.2.4 Choose the primary AI provider and a fallback provider.
@@ -53,7 +53,7 @@ Current direction: GitHub repo exists, Vercel is the chosen deployment platform,
 - [x] A0.2.6 Create `.env.example` and a secrets ownership checklist.
 
 Current direction: primary starter AI path is Gemini, with OpenAI API now selected as the explicit fallback provider for a later adapter. Billing provider is Lemon Squeezy.
-Status note: `A0.2.1` was reopened on 2026-08-29 because the previously verified project hostname `dfiiujkhbuvltrlqrerd.supabase.co` no longer resolves, and both local plus Vercel production configuration still reference it. Restore that project or create a replacement, replay migrations, update all three Supabase keys/URLs, relink the CLI, and rerun the fixture-backed regression before closing the task again.
+Status note: `A0.2.1` was closed again on 2026-09-29 after restoring the original `dfiiujkhbuvltrlqrerd` project. DNS recovered, the existing CLI link and credentials remained valid, all eight local migration versions matched the remote history, fixture reseeding succeeded, hosted RLS verification passed `20/20`, and the complete `npm run regress:mvp` command passed through the student, memory, adult, privacy, and billing smokes.
 Constraint: verify the Gemini tier and data-handling settings are suitable for minors before any live child traffic uses the AI flow.
 Constraint: a founder personal AI subscription is not treated as a backend fallback provider for the app.
 Status note: local env now confirms `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`, and `NEXT_PUBLIC_ENABLE_ANALYTICS`, so the external PostHog project-creation step is treated as complete; the telemetry sink still stays runtime-only until a dedicated PostHog adapter exists.
@@ -341,7 +341,7 @@ Outcome: the MVP can retain useful educational context, gate usage, and handle d
 - [x] A6.1.2 Store strengths, weaknesses, preferences, and recurring topics.
 - [x] A6.1.3 Make memory editable and deletable.
 - [x] A6.1.4 Prevent speculative or sensitive profiling from being stored.
-Status note: `POST /api/conversations/[conversationId]/complete` now refreshes pedagogical memory through `lib/server/memory`, the student dashboard and linked-parent student detail both expose the canonical memory panel, manual edits and deletes flow through `PATCH /api/students/[studentId]/memory`, tutors are blocked from raw memory, and `npm run smoke:memory` now verifies the real route and UI behavior with provider-fallback coverage.
+Status note: `POST /api/conversations/[conversationId]/complete` refreshes pedagogical memory through `lib/server/memory`; manual edits and deletes flow through `PATCH /api/students/[studentId]/memory`; linked parents retain the canonical visible panel; tutors are blocked from raw memory; and `npm run smoke:memory` verifies generation, mutation, parent visibility, tutor denial, and cleanup. The student-facing panel was intentionally removed from `/app/settings` during the later shell simplification, so its future learner-visible home is now an explicit Pilot product decision under `P2.9` rather than an undocumented assumption.
 
 ### A6.2 Usage Counters, Trial, And Quotas
 
@@ -389,7 +389,7 @@ Status note: on 2026-05-31, real iPad Safari validation and iPad-specific polish
 
 Status note: fixture-backed automated smoke now exists for student, memory, adult-oversight, privacy, and billing flows; `docs/smoke_checklist_v1.md` now defines the written acceptance criteria for student, parent, tutor, and admin roles; and `npm run regress:mvp` now acts as the canonical pre-demo regression pass while reseeding deterministic fixtures before verification and the smoke suite.
 Status note: the latest isolated `npm run smoke:student-flow` rerun on 2026-04-04 now fails on a too-strict extracted-text assertion against the sample PDF corpus even though the draft creation and provider extraction steps still succeed. This looks like smoke-harness or corpus drift rather than a student-UI regression, but the harness still needs review before the next full demo-regression pass.
-Status note: on 2026-08-29 the student smoke was realigned to the current product interface: it creates an isolated zero-history learner, verifies the first-homework dashboard state, creates a bare subject quick-start shell, verifies the returning-homework state, and then exercises upload, first real message, completion, reuse, and cleanup. Typecheck, lint, and production build pass; the live smoke rerun is externally blocked because the Supabase hostname configured both locally and in Vercel production no longer resolves.
+Status note: on 2026-08-29 the student smoke was realigned to the current product interface: it creates an isolated zero-history learner, verifies the first-homework dashboard state, creates a bare subject quick-start shell, verifies the returning-homework state, and then exercises upload, first real message, completion, reuse, and cleanup. The restored-project run on 2026-09-29 passed that full live flow, including localized extraction and completed-session conflict handling.
 
 ### A7.3 Performance And Cost Controls
 
@@ -416,7 +416,7 @@ Status note: on 2026-08-29 the student smoke was realigned to the current produc
 Status note: PWA installability is now explicitly deferred before beta, the canonical demo-account and founder walkthrough script now live in `docs/founder_walkthrough_v1.md`, and the frozen launch-candidate scope plus exit checklist now live in `docs/launch_checklist_v1.md`.
 Status note: `A2.1.6` still marks the foundation slice only, but the shared public, auth, onboarding, invite, app-shell, app-home, and settings/privacy surfaces now read from `lib/i18n/ui-copy.ts`, preserve public-route `lang` state through `lib/i18n/ui-language.ts`, and localize the shared student age-band options.
 Status note: `components/i18n/document-language-sync.tsx` keeps the live document language synchronized during client-side shell changes, while `app/layout.tsx` now derives the initial server-rendered `<html lang>` from the validated UI-language cookie established by the proxy.
-Status note: the `/app` role dashboards now also localize their main copy through `lib/i18n/dashboard-copy.ts`, including the student start/support/recent panels, the student memory panel, the student-side adult-link forms, and the parent/tutor/admin dashboard summaries.
+Status note: the `/app` role dashboards now localize their main copy through `lib/i18n/dashboard-copy.ts`, including the student start/support/recent panels, memory API and linked-parent panel copy, student-side adult-link forms, and parent/tutor/admin dashboard summaries. The later settings simplification removed the learner-facing raw-memory panel; `P2.9` owns any future return.
 Status note: the deeper student and adult route family now localizes its main interface copy through `lib/i18n/student-flow-copy.ts` and `lib/i18n/oversight-copy.ts`, covering the student homework launcher on `/app`, the compatibility redirect from `/app/history`, `/app/conversations/[conversationId]`, `/app/students/[studentUserId]`, and `/app/review/[conversationId]`.
 Status note: the admin audit list, deletion-request feedback, and the user-facing quota block messages for conversation creation, upload, and chat now also localize by UI language, while `app/layout.tsx` adds explicit CJK fallback for the shared font variables.
 Status note: the core student APIs now also localize their user-facing validation errors, upload warnings, deterministic coach fallback, initial transcript scaffolding, deterministic student-summary fallback, and visible weakness-tag labels through `lib/i18n/student-flow-copy.ts`.

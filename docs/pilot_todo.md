@@ -33,7 +33,6 @@ Rules:
 
 Current carryover blockers that still stay in MVP:
 
-- `A0.2.1` restore or replace the unavailable hosted Supabase project, relink environments, and rerun fixture-backed regression
 - `A0.2.3` Resend sender setup and the later real mailer slice
 
 Deferred beyond Pilot:
@@ -100,6 +99,7 @@ Detail notes: [Pilot Interface Trust And Visual Cohesion](pilot/interface_trust.
 - [x] P2.7.11 Define and implement resource lifecycle behavior: unlink, delete, purge raw text/chunks/links/storage, and adult/tutor visibility.
 - [x] P2.7.12 Expand retrieval evaluation, observability, and token-impact measurement before considering embeddings.
 - [ ] P2.8 Evaluate and design a durable conversation working-memory layer for active tutoring state, including assistant-generated questions, student answers, current correction targets, unresolved points, and explicit interactions with completion summaries, student memory profiles, subject-wide resources, and transcript-window compaction.
+- [ ] P2.9 Decide whether raw pedagogical memory should return to a learner-facing surface, and if so choose a dedicated product home and explanation instead of rebuilding the removed mixed-purpose settings block.
 
 Detail notes: [Pilot Journey And UX Hardening](pilot/journey_ux.md).
 

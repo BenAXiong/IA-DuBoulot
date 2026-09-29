@@ -136,3 +136,4 @@ then close it as:
 | 2026-09-29 | 16:56 -> 16:59 | 0h03 | A0.2.1 A7.2.3 | revalidate the resumed goal against current Git, DNS, Vercel production configuration, and the deployed trilingual public smoke; confirm production still targets the unavailable Supabase host while all 12 public checks remain green | | |
 | 2026-09-29 | 16:59 -> 17:00 | 0h01 | A0.2.1 A7.2.3 | perform the second resumed-goal dependency audit and confirm Vercel production still targets the same non-resolving Supabase hostname | | |
 | 2026-09-29 | 17:01 -> 17:01 | 0h00 | A0.2.1 A7.2.3 | perform the third resumed-goal dependency audit, confirm the same external Supabase blocker, and formally return the goal to blocked status | | |
+| 2026-09-29 | 17:08 -> 17:42 | 0h34 | A0.2.1 A7.2.3 P2.9 P5.1 P5.2 | restore the IA DuBoulot Supabase project, verify hosted availability and migration parity, repair stale smoke boundaries, and pass the complete authenticated regression | | |

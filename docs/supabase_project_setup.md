@@ -6,11 +6,11 @@ Related: [README](../README.md) | [Environment matrix](environment_matrix.md) | 
 
 These are the settings worth paying attention to for the first Supabase project.
 
-Previously configured project URL (unavailable as of 2026-08-29):
+Active project URL (restored on 2026-09-29):
 
 - `https://dfiiujkhbuvltrlqrerd.supabase.co`
 
-`A0.2.1` is reopened. Do not treat that URL or its keys as active configuration until DNS resolution and a fixture-backed regression succeed. If the old project cannot be restored, create a replacement in the intended pilot region, replay the repository migrations in order, update local and Vercel values, and relink the CLI.
+`A0.2.1` is closed again. The original project was resumed in place, so no URL or key rotation was required. DNS resolves, the existing CLI link is valid, all eight local migrations match the remote history, and the 2026-09-29 fixture-backed canonical regression passed. If this project becomes unavailable again, reopen `A0.2.1` before treating historical smoke evidence as current.
 
 ### 1. Region
 

@@ -131,12 +131,11 @@ async function main() {
 
     const settingsResult = await parent.requestText("/app/settings");
     assert(settingsResult.response.ok, "Parent settings page did not render.");
+    const normalizedSettingsText = normalizeAssertionText(settingsResult.text);
     assert(
-      normalizeAssertionText(settingsResult.text).includes(
-        "reglages et confidentialite",
-      ) &&
-        normalizeAssertionText(settingsResult.text).includes("suppression et gel"),
-      "Parent settings page did not surface the privacy controls copy.",
+      normalizedSettingsText.includes("suppression du compte") &&
+        normalizedSettingsText.includes("supprimer le compte eleve"),
+      "Parent settings page did not surface the current linked-learner deletion controls.",
     );
 
     const deletionResult = await parent.requestJson(
