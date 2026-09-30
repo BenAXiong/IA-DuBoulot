@@ -1,8 +1,8 @@
 # MVP To-Do List
 
-Related: [README](../README.md) | [Implementation plan](implementation_plan.md) | [Archived MVP timeline](archive/mvp_timeline.md) | [Decision log](decision_log.md) | [Work sessions log](work_sessions.md)
+Related: [README](../README.md) | [Implementation plan](implementation_plan.md) | [Archived MVP timeline](archive/mvp_timeline.md) | [Decision log](decision_log.md)
 
-Use these task IDs everywhere: session log, decision log, commits, reviews, and release notes.
+Use these task IDs everywhere: decision log, commits, reviews, and release notes.
 
 ## Progress Snapshot
 
@@ -72,9 +72,7 @@ Status note: the Gemini note now explicitly records that RPM and RPD limits appl
 - [x] A0.3.6 Add issue labels and review templates after GitHub setup.
 - [x] A0.3.7 Add an experimental prompt-level log that can run in parallel with session logging.
 
-Status note: `docs/work_sessions.md` remains the canonical session log, and `docs/work_prompt_log.md` now exists as an experimental one-row-per-prompt trace with a manual Codex-credit column.
-Status note: on 2026-05-31, `docs/work_sessions.md` moved to a current-plus-archive shape: the active `OPEN` row and recent closed rows stay in the canonical log, while older closed rows are preserved verbatim under linked files in `docs/archive/`.
-Status note: on 2026-05-31, `docs/work_prompt_log.md` adopted the same current-plus-archive pattern for the experimental prompt trace; older closed prompt rows are preserved verbatim under linked files in `docs/archive/`.
+Status note: the work-session and experimental prompt logs were retired on 2026-09-30. Their files and archives remain historical records, but future work no longer opens or updates activity-log rows; task boards, decisions, commits, and verification notes carry active traceability.
 Status note: on 2026-05-31, `docs/pilot_todo.md` was slimmed back into a canonical Pilot board, while long-form Pilot evidence moved into focused files under `docs/pilot/`.
 Status note: on 2026-05-31, stale one-off planning/demo docs moved into `docs/archive/`, while outstanding Nath demo tasks were copied into a temporary intake section in `docs/pilot_todo.md`.
 Status note: repo-owned issue and PR workflow artifacts now live under `.github/` plus `docs/github_workflow_v1.md`, and the public GitHub repository labels were synced from `.github/labels.json` on 2026-03-12 through an authenticated GitHub CLI pass.

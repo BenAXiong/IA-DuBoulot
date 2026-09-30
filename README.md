@@ -16,6 +16,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Access rules V1](docs/access_rules_v1.md)
 - [RLS fixture verification](docs/rls_fixture_verification.md)
 - [Smoke checklist V1](docs/smoke_checklist_v1.md)
+- [Portfolio golden path](docs/portfolio_golden_path.md)
 - [Founder walkthrough V1](docs/founder_walkthrough_v1.md)
 - [Launch checklist V1](docs/launch_checklist_v1.md)
 - [Pilot_todo](docs/pilot_todo.md)
@@ -48,8 +49,6 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Storage and attachment rules](docs/storage_attachment_rules.md)
 - [MVP to-do list](docs/mvp_todo.md)
 - [Decision log](docs/decision_log.md)
-- [Work sessions log](docs/work_sessions.md)
-- [Prompt work log](docs/work_prompt_log.md)
 - [Vibestructions](docs/vibestructions.md)
 - [Agent operating manual](AGENTS.md)
 
@@ -59,6 +58,8 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [Archived Demo Nath_0410](docs/archive/demo_Nath_0410.md)
 - [Archived public landing page revamp brief](docs/archive/public_landing_page_revamp_brief.md)
 - [Archived MVP timeline](docs/archive/mvp_timeline.md)
+- [Retired work sessions log](docs/work_sessions.md)
+- [Retired prompt work log](docs/work_prompt_log.md)
 - [Work sessions archive 2026-03 to 2026-04](docs/archive/work_sessions_2026-03_to_2026-04.md)
 - [Prompt work archive 2026-03 to 2026-04](docs/archive/work_prompt_log_2026-03_to_2026-04.md)
 
@@ -106,7 +107,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - a sixth fixture-backed tablet-emulation smoke script now exists at `scripts/smoke-tablet-emulation.mjs`; it now targets `/app`, the subject-level homework launcher, and `/app/conversations/[conversationId]`, while real iPad Safari validation is deferred to post-pilot `P6.12`.
 - `A7.3` cost-control guardrails now bound the Gemini-backed path through request-size caps, prompt-context truncation, output-token caps, and idempotent reuse of existing upload-extraction and completion artifacts instead of repeating expensive provider calls.
 - launch-candidate operating docs now exist at `docs/founder_walkthrough_v1.md` and `docs/launch_checklist_v1.md`, and the current scope decision explicitly defers PWA installability until after post-pilot device validation and real usage feedback.
-- an experimental prompt-level trace now also exists at `docs/work_prompt_log.md`, while `docs/work_sessions.md` remains the canonical session log.
+- the former work-session and prompt activity logs were retired on 2026-09-30; their files remain historical records but are no longer maintained.
 - a consolidated AI operations and economics note now exists at `docs/ai_ops_economics_v1.md`, including the current quota model, prompt pipeline, guardrails, token-cost ceilings, and the recommended parent-paid policy for future adult-triggered AI features.
 - frontend foundations now live in `components/ui/`, `lib/i18n/config.ts`, `lib/i18n/ui-copy.ts`, `lib/i18n/dashboard-copy.ts`, `lib/i18n/ui-language.ts`, `.editorconfig`, and `docs/frontend_foundations_v1.md`, giving the repo a stable primitive layer, shared locale metadata, shared route/surface UI dictionaries, and explicit form/modularity rules.
 - telemetry and risky-integration controls now live in `lib/analytics/`, `lib/server/telemetry/`, `lib/feature-flags.ts`, and `docs/telemetry_feature_controls_v1.md`; the local PostHog project/env is now provisioned, but the MVP analytics path still stays runtime-only until a real PostHog forwarding adapter exists.
@@ -126,11 +127,9 @@ Planning-first repository for a supervised AI homework coach web app built for s
 
 ## Working Conventions
 
-- Use task IDs from [the MVP to-do list](docs/mvp_todo.md) in session notes, decision log entries, commit messages, and review notes.
+- Use task IDs from [the MVP to-do list](docs/mvp_todo.md) in decision log entries, commit messages, and review notes.
 - Use task IDs from [Pilot_todo](docs/pilot_todo.md) the same way for pilot-hardening work, and update that backlog whenever a session changes pilot-facing polish, UX findings, or release-ops assumptions.
-- Treat [the decision log](docs/decision_log.md) and [the work sessions log](docs/work_sessions.md) as mandatory maintenance files, not optional notes.
-- Keep current execution trace in [the work sessions log](docs/work_sessions.md), with older closed rows moved verbatim to linked archive files under `docs/archive/`.
-- Keep current prompt-level trace in [the prompt work log](docs/work_prompt_log.md), with older closed rows moved verbatim to linked archive files under `docs/archive/` while the experimental prompt trace remains active.
+- Treat [the decision log](docs/decision_log.md) and the roadmap task boards as mandatory maintenance files, not optional notes.
 - After a coherent verified slice, create a task-ID commit and push it to `origin` unless the user explicitly asks to defer git actions.
 - For doc-only maintenance slices, create the local task-ID commit but skip pushing unless the user asks for a push.
 - Update this file whenever a new top-level project doc becomes part of the operating workflow.

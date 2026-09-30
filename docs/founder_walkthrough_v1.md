@@ -1,10 +1,12 @@
 # Founder Walkthrough V1
 
-Related: [README](../README.md) | [Smoke checklist V1](smoke_checklist_v1.md) | [RLS fixture verification](rls_fixture_verification.md) | [App shell V1](app_shell_v1.md) | [Student workbench V1](student_workbench_v1.md) | [Oversight surfaces V1](oversight_surfaces_v1.md) | [Privacy controls V1](privacy_controls_v1.md) | [Launch checklist V1](launch_checklist_v1.md) | [MVP to-do list](mvp_todo.md)
+Related: [README](../README.md) | [Portfolio golden path](portfolio_golden_path.md) | [Smoke checklist V1](smoke_checklist_v1.md) | [RLS fixture verification](rls_fixture_verification.md) | [App shell V1](app_shell_v1.md) | [Student workbench V1](student_workbench_v1.md) | [Oversight surfaces V1](oversight_surfaces_v1.md) | [Privacy controls V1](privacy_controls_v1.md) | [Launch checklist V1](launch_checklist_v1.md) | [MVP to-do list](mvp_todo.md)
 
 ## Purpose
 
 This document defines the canonical founder-led product walkthrough for demos, investor conversations, pilot parent calls, and future beta dry runs.
+
+For the narrower freelance/client-acquisition demo, use [Portfolio golden path](portfolio_golden_path.md). The original roadmap and recorded product decisions remain authoritative for both walkthroughs.
 
 It exists so the demo flow stays consistent with the product that actually ships, instead of drifting into one-off manual scripts.
 

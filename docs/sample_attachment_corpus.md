@@ -1,6 +1,6 @@
 # Sample Attachment Corpus
 
-Related: [README](../README.md) | [Storage and attachment rules](storage_attachment_rules.md) | [RLS fixture verification](rls_fixture_verification.md) | [MVP to-do list](mvp_todo.md) | [Decision log](decision_log.md)
+Related: [README](../README.md) | [Portfolio golden path](portfolio_golden_path.md) | [Storage and attachment rules](storage_attachment_rules.md) | [RLS fixture verification](rls_fixture_verification.md) | [MVP to-do list](mvp_todo.md) | [Decision log](decision_log.md)
 
 ## Purpose
 

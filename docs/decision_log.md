@@ -1896,3 +1896,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Give model generation and translation a `12s` provider HTTP deadline and token counting a `5s` deadline, configure those calls for one SDK attempt, and keep the existing application policy as the explicit retry owner. Start independent student, parent, and tutor summaries concurrently, then start independent parent-language translations concurrently. Preserve deterministic fallback for the required student summary, best-effort adult variants, non-blocking memory refresh, `90s` route duration, and the SDK retry behavior for file upload and file reads.
 - Why: The completion contract should have a predictable synchronous ceiling even when Gemini is degraded. Keeping retry ownership explicit prevents multiplicative delays, while concurrency removes unnecessary serialization without changing visibility, persistence, or learner-facing semantics.
 - Follow-up: Re-run the authenticated student and adult production walkthroughs on the deployed fix. Keep broader empty-state and retry UX under `P3.3`, and use telemetry before changing the deadlines or introducing asynchronous completion.
+
+### D-20261001-01 - Retire Activity Logs And Keep Portfolio Guidance Subordinate To The Roadmap
+
+- Date: 2026-10-01
+- Status: accepted
+- Related tasks: `A0.3.7`, `P1.3`
+- Context: The work-session and prompt logs created recurring maintenance without adding enough value, while the new portfolio golden-path document was written as a narrow demo lens without the repository's full product context.
+- Decision: Stop opening or updating `docs/work_sessions.md` and `docs/work_prompt_log.md`; preserve them only as historical records. Active traceability remains in the roadmap task boards, decision log, task-ID commits, and verification notes. Keep `docs/portfolio_golden_path.md` as a temporary portfolio prioritization aid, but make the implementation plan, MVP/Pilot boards, recorded decisions, access/privacy rules, and established product contracts authoritative whenever there is a conflict.
+- Why: This removes low-value ceremony without weakening durable product traceability, and prevents presentation-focused guidance from silently overriding the original product direction.
+- Follow-up: Use the portfolio document to choose what to demonstrate and which visible defects are urgent, not to redefine product behavior or architecture.

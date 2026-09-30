@@ -55,7 +55,7 @@ Create the repo operating system first:
 - service account inventory
 - naming decisions
 - documentation spine
-- work session logging
+- durable roadmap, decision, and commit traceability
 - decision logging
 
 This phase removes the main long-term risk: future sessions building blindly from partial context.
@@ -162,7 +162,7 @@ The original brief was intentionally product-focused. For build execution, these
 - role/access matrix before RLS implementation
 - seed accounts and demo fixtures
 - smoke test checklist
-- decision log and work session log
+- decision log and linked roadmap/task records
 - artifact index so docs, SQL, prompts, and scripts are hyperlinkable
 - legal/privacy and deletion-path tasks suitable for minors
 - modular architecture rules to prevent god components and hidden logic
@@ -177,7 +177,7 @@ Risk: future sessions create code or docs without seeing the latest state.
 
 Mitigation:
 
-- keep [README](../README.md), [AGENTS](../AGENTS.md), [decision log](decision_log.md), and [work sessions log](work_sessions.md) mandatory
+- keep [README](../README.md), [AGENTS](../AGENTS.md), [decision log](decision_log.md), and the roadmap task boards mandatory
 - require task IDs in logs and updates
 - link every durable artifact from a source-of-truth doc
 

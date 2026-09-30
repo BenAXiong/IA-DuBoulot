@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Primary references: [README.md](README.md) | [Implementation plan](docs/implementation_plan.md) | [MVP to-do list](docs/mvp_todo.md) | [Pilot_todo](docs/pilot_todo.md) | [Decision log](docs/decision_log.md) | [Work sessions log](docs/work_sessions.md) | [Prompt work log](docs/work_prompt_log.md)
+Primary references: [README.md](README.md) | [Implementation plan](docs/implementation_plan.md) | [MVP to-do list](docs/mvp_todo.md) | [Pilot_todo](docs/pilot_todo.md) | [Decision log](docs/decision_log.md) | [Portfolio golden path](docs/portfolio_golden_path.md)
 
 This repository is being built as a long-term AI-assisted software project. The main failure mode is not raw coding quality. It is traceability loss: code, docs, prompts, scripts, and operating rules drifting out of sync until future sessions build on incomplete context.
 
@@ -12,7 +12,7 @@ This file defines the mandatory operating system for all future agents and sessi
 2. Never create an orphan artifact. Every new script, doc, SQL file, prompt file, or meta file must be linked from at least one existing source-of-truth document.
 3. Every meaningful change must map back to a task ID from [docs/mvp_todo.md](docs/mvp_todo.md) or [docs/pilot_todo.md](docs/pilot_todo.md) when the work is in the post-MVP pilot lane.
 4. Any change that affects architecture, schema, auth, AI behavior, billing, moderation, or operating workflow must be logged in [docs/decision_log.md](docs/decision_log.md).
-5. Every work session must appear in [docs/work_sessions.md](docs/work_sessions.md).
+5. The implementation plan, task boards, and recorded product decisions outrank temporary demo or portfolio guidance whenever they conflict.
 6. If code and docs drift, fix the drift in the same session or leave an explicit follow-up task in [docs/mvp_todo.md](docs/mvp_todo.md).
 7. Prefer explicit, boring, reviewable structure over clever abstractions.
 8. Do not create god components, god hooks, god services, or god utility files.
@@ -53,48 +53,34 @@ Read these in order before any substantial implementation work:
 28. [docs/storage_attachment_rules.md](docs/storage_attachment_rules.md)
 29. [docs/rls_fixture_verification.md](docs/rls_fixture_verification.md) when auth, schema, or RLS work is in scope
 30. [docs/smoke_checklist_v1.md](docs/smoke_checklist_v1.md) when QA, demo readiness, or launch-readiness work is in scope
-31. [docs/founder_walkthrough_v1.md](docs/founder_walkthrough_v1.md) when demo prep or external walkthrough work is in scope
-32. [docs/launch_checklist_v1.md](docs/launch_checklist_v1.md) when launch-candidate or beta-readiness work is in scope
-33. [docs/pilot_todo.md](docs/pilot_todo.md) when pilot hardening, UX polish, or post-MVP release planning is in scope
-34. [docs/sample_attachment_corpus.md](docs/sample_attachment_corpus.md) when upload, extraction, or demo fixture work is in scope
-35. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
-36. [docs/mvp_todo.md](docs/mvp_todo.md)
-37. [docs/archive/mvp_timeline.md](docs/archive/mvp_timeline.md) only when historical schedule assumptions are in scope
-38. [docs/decision_log.md](docs/decision_log.md)
-39. [docs/work_sessions.md](docs/work_sessions.md)
-40. [docs/work_prompt_log.md](docs/work_prompt_log.md) when the experimental prompt-level trace is active
-41. The relevant code, SQL, prompt, or UI files for the task being worked on
+31. [docs/portfolio_golden_path.md](docs/portfolio_golden_path.md) when the portfolio demo is explicitly in scope
+32. [docs/founder_walkthrough_v1.md](docs/founder_walkthrough_v1.md) when demo prep or external walkthrough work is in scope
+33. [docs/launch_checklist_v1.md](docs/launch_checklist_v1.md) when launch-candidate or beta-readiness work is in scope
+34. [docs/pilot_todo.md](docs/pilot_todo.md) when pilot hardening, UX polish, or post-MVP release planning is in scope
+35. [docs/sample_attachment_corpus.md](docs/sample_attachment_corpus.md) when upload, extraction, or demo fixture work is in scope
+36. [docs/minors_privacy_baseline.md](docs/minors_privacy_baseline.md)
+37. [docs/mvp_todo.md](docs/mvp_todo.md)
+38. [docs/archive/mvp_timeline.md](docs/archive/mvp_timeline.md) only when historical schedule assumptions are in scope
+39. [docs/decision_log.md](docs/decision_log.md)
+40. The relevant code, SQL, prompt, or UI files for the task being worked on
 
 If a file above is outdated, update it before or alongside the code change that depends on it.
 
-## Session Protocol
+## Work Protocol
 
-### 1. Start Or Continue The Session Log
-
-- Open [docs/work_sessions.md](docs/work_sessions.md) immediately.
-- If there is already an `OPEN` session and the user has not explicitly said `end session`, continue that row instead of creating a second open session.
-- If there is no open row, append a new row with the current date, start time, `OPEN` as the end marker, planned task IDs, and a short scope description.
-- Treat [docs/work_sessions.md](docs/work_sessions.md) as the current canonical log: keep the active `OPEN` row and recent closed rows there, and move older closed rows only by copying them verbatim into linked archive files under `docs/archive/`.
-- If the experimental prompt log is active, append or update the current prompt row in [docs/work_prompt_log.md](docs/work_prompt_log.md) in parallel.
-- Treat the prompt log as a prompt-level trace, not a merged work-slice summary. Short back-and-forth prompts are fine as separate rows as long as the timestamps stay accurate.
-- When the prompt log is active, create or update the prompt row immediately at prompt start with an `OPEN` end marker, keep that row open during the whole active handling window, and close that same row with the real end time only after the work is actually finished and just before the final response.
-- Never pre-close a prompt row during analysis, planning, or midway through a turn. If the prompt is still being handled, the row must still show `OPEN`.
-- Treat the prompt log as a prompt-driven work-slice trace, not a literal row-for-every-fast-back-and-forth transcript. Small clarification bursts that do not create a distinct implementation or audit slice should be folded into the current active row instead of creating misleading micro-rows.
-- Keep active `OPEN` prompt rows and recent closed rows in [docs/work_prompt_log.md](docs/work_prompt_log.md); move older closed rows only by copying them verbatim into linked archive files under `docs/archive/`.
-
-### 2. Rebuild Context
+### 1. Rebuild Context
 
 - Confirm the current active phase and task IDs in [docs/mvp_todo.md](docs/mvp_todo.md), and in [docs/pilot_todo.md](docs/pilot_todo.md) when pilot hardening work is in scope.
 - Review recent decisions in [docs/decision_log.md](docs/decision_log.md).
 - Check whether the intended work changes architecture, contracts, prompts, or workflow. If yes, prepare a decision log update.
 
-### 3. Implement In Vertical Slices
+### 2. Implement In Vertical Slices
 
 - Prefer completing a thin, reviewable workflow slice over scattering partial work across many areas.
 - Keep student flow first, then adult visibility, then monetization and optional polish.
 - Do not widen scope unless the to-do list and implementation plan are updated first.
 
-### 4. Close The Traceability Loop
+### 3. Close The Traceability Loop
 
 After any meaningful code or doc change:
 
@@ -105,47 +91,7 @@ After any meaningful code or doc change:
 - Update cross-links inside any new document or operating document.
 - After verification, stage only the relevant files and create a task-ID commit. Push to `origin` for implementation, schema, release-affecting, or deployment-relevant work; for doc-only maintenance slices, skip pushing unless the user asks. If unrelated local work is present, do not mix it silently; either commit a bounded subset or leave an explicit note.
 
-### 5. End The Session Only On Explicit User Instruction
-
-- Do not close a session row just because one assistant turn finished.
-- Close the active row only when the user explicitly says `end session`.
-- When closing a row, replace `OPEN` with the end time and add the computed duration.
-
-## Required Logging
-
-### Work Sessions
-
-Use [docs/work_sessions.md](docs/work_sessions.md) for chronological execution trace.
-
-Each entry must contain:
-
-- date
-- start and end time
-- duration
-- task IDs
-- a short human-readable scope summary
-
-### Prompt Work Log
-
-Use [docs/work_prompt_log.md](docs/work_prompt_log.md) only as an experimental parallel trace.
-
-Each entry should contain:
-
-- date
-- prompt handling time span
-- duration
-- task IDs
-- a short human-readable scope summary
-- Codex credits left when visible, otherwise blank for manual fill
-
-Prompt-log timing rule:
-
-- Use actual wall-clock start and end times for the individual prompt being handled.
-- Do not derive the row duration from rough commentary messages like "worked for X minutes".
-- Do not merge several prompts into one row unless the user explicitly asks for that aggregation or the exact prompt boundaries are already lost and you mark the row as approximate.
-- Prefer logging the prompt row at start with `OPEN` instead of waiting until the end; this avoids losing short prompts entirely.
-
-### Decisions
+## Required Decision Records
 
 Use [docs/decision_log.md](docs/decision_log.md) for project-shaping decisions.
 
@@ -190,7 +136,6 @@ If a new folder becomes a stable part of the project, add it to [README.md](READ
 - Use IDs exactly as written in [docs/mvp_todo.md](docs/mvp_todo.md) for launch work and in [docs/pilot_todo.md](docs/pilot_todo.md) for pilot-hardening work.
 - If new work does not fit an existing task, add the new task in the right planning document before implementing it.
 - Reference task IDs in:
-  - session log rows
   - decision entries
   - pull requests or commit messages
   - testing notes
