@@ -92,14 +92,14 @@ export function StudentChatThread({
                 }`}
               >
                 <div
-                  className={`min-w-0 text-sm leading-7 text-[color:var(--foreground)] ${
+                  className={`min-w-0 text-[0.98rem] leading-7 text-[color:var(--foreground)] ${
                     isStudent
                       ? "w-fit max-w-full rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface-strong)] px-4 py-3.5 shadow-[0_10px_30px_rgba(15,23,42,0.06)]"
                       : isSystem
                         ? "w-full rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-[color:var(--ink-soft)]"
                         : message.isPending
                           ? "student-pending-shimmer w-full rounded-[1.25rem] border border-[color:var(--line)] bg-[color:var(--surface)] px-4 py-3 text-[color:var(--ink-soft)]"
-                          : "w-full px-1 py-1.5"
+                          : "w-full max-w-[56rem] px-1 py-1.5"
                   }`}
                 >
                   {isAssistant && !message.isPending ? (

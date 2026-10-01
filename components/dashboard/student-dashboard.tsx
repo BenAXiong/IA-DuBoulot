@@ -8,7 +8,10 @@ import {
 import { loadStudentDashboardSnapshot } from "@/lib/server/student-dashboard/student-dashboard-service";
 import { listVisibleConversations } from "@/lib/server/conversations/conversation-service";
 import { listSubjectResourceLibrary } from "@/lib/server/subject-resources/service";
-import { getIntakeSubjectOptions } from "@/lib/i18n/student-flow-copy";
+import {
+  getIntakeSubjectOptions,
+  getLocalizedSubjectLabel,
+} from "@/lib/i18n/student-flow-copy";
 import type {
   AppUserRecord,
   AuthenticatedUserContext,
@@ -249,22 +252,20 @@ function DashboardActivityCard({
   badge?: string;
 }) {
   const className =
-    "grid min-h-36 gap-3 rounded-[1rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-4 text-left transition";
+    "grid min-h-36 grid-rows-[auto_auto_1fr] gap-3 rounded-[1rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-4 text-left transition";
   const content = (
     <>
       <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-3">
-          <DashboardIconFrame>{icon}</DashboardIconFrame>
-          <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
-            {title}
-          </h2>
-        </div>
+        <DashboardIconFrame>{icon}</DashboardIconFrame>
         {badge ? (
-          <span className="shrink-0 rounded-full border border-[color:var(--line)] px-2.5 py-1 text-xs font-medium text-[color:var(--ink-soft)]">
+          <span className="shrink-0 rounded-full border border-[color:var(--line)] px-2.5 py-1 text-[0.68rem] font-medium uppercase tracking-[0.08em] text-[color:var(--ink-soft)]">
             {badge}
           </span>
         ) : null}
       </div>
+      <h2 className="font-[family-name:var(--font-heading)] text-2xl leading-tight">
+        {title}
+      </h2>
       <p className="text-sm leading-6 text-[color:var(--ink-soft)]">{body}</p>
     </>
   );
@@ -285,15 +286,6 @@ function DashboardActivityCard({
       {content}
     </article>
   );
-}
-
-function formatSubjectDisplay(subject: string) {
-  const trimmed = subject.trim();
-  if (!trimmed) {
-    return subject;
-  }
-
-  return `${trimmed.charAt(0).toUpperCase()}${trimmed.slice(1)}`;
 }
 
 function DashboardHomeworkCard({
@@ -479,7 +471,7 @@ export async function StudentDashboard({
       label:
         intakeSubjectOptions.find(
           (option) => option.value.toLowerCase() === subjectTag.toLowerCase(),
-        )?.label ?? formatSubjectDisplay(subjectTag),
+        )?.label ?? getLocalizedSubjectLabel(languageCode, subjectTag),
       ...readSubjectChipStatus(subjectConversations),
     };
   });

@@ -13,6 +13,7 @@ import {
   readStoredConversationTitle,
   type ConversationTitleUpdatedDetail,
 } from "@/lib/conversations/conversation-title-sync";
+import { getLocalizedSubjectLabel } from "@/lib/i18n/student-flow-copy";
 import { withUiLanguage } from "@/lib/i18n/ui-language";
 import type { AppUserRecord } from "@/lib/server/auth/types";
 import type { StudentDashboardSnapshot } from "@/lib/server/student-dashboard/types";
@@ -176,23 +177,6 @@ function isPlainPrimaryClick(event: React.MouseEvent<HTMLAnchorElement>) {
   );
 }
 
-function formatSubjectDisplay(subject: string | null) {
-  if (!subject) {
-    return null;
-  }
-
-  const trimmed = subject.trim();
-  if (!trimmed) {
-    return null;
-  }
-
-  return `${trimmed.charAt(0).toUpperCase()}${trimmed.slice(1)}`;
-}
-
-function capitalizeSubjectLabel(subject: string) {
-  return formatSubjectDisplay(subject) ?? subject;
-}
-
 function readActiveView(
   value: string | null,
   selectedSubject: string | null,
@@ -261,6 +245,7 @@ function buildHeaderContent(input: {
   selectedSubject: string | null;
   conversationTitle: string | null;
   copy: ReturnType<typeof getStudentShellCopy>;
+  languageCode: AppUserRecord["preferred_ui_language"];
 }) {
   if (input.pathname.startsWith("/app/settings")) {
     return {
@@ -279,7 +264,9 @@ function buildHeaderContent(input: {
   if (input.pathname.startsWith("/app/conversations/")) {
     return {
       eyebrow:
-        formatSubjectDisplay(input.selectedSubject) ??
+        (input.selectedSubject
+          ? getLocalizedSubjectLabel(input.languageCode, input.selectedSubject)
+          : null) ??
         input.copy.pageTitles.homework,
       title: input.conversationTitle,
     };
@@ -587,6 +574,7 @@ export function StudentAppShell({
     selectedSubject: activeConversationSubject,
     conversationTitle: activeConversationTitle,
     copy,
+    languageCode,
   });
   const isConversationRoute = pathname.startsWith("/app/conversations/");
   const planLabel =
@@ -787,7 +775,7 @@ export function StudentAppShell({
                               }
                             >
                               <span className="truncate">
-                                {capitalizeSubjectLabel(group.subjectTag)}
+                                {getLocalizedSubjectLabel(languageCode, group.subjectTag)}
                               </span>
                               {group.activeCount > 0 ? (
                                 <span className="student-homework-active-badge ml-2 inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 text-[0.7rem] font-bold leading-none">
@@ -797,7 +785,10 @@ export function StudentAppShell({
                             </Link>
                             <button
                               aria-expanded={isSubjectExpanded}
-                              aria-label={capitalizeSubjectLabel(group.subjectTag)}
+                              aria-label={getLocalizedSubjectLabel(
+                                languageCode,
+                                group.subjectTag,
+                              )}
                               className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[color:var(--ink-muted)] transition hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--foreground)]"
                               onClick={() => {
                                 setExpandedSubjectTag((current) =>
@@ -806,7 +797,10 @@ export function StudentAppShell({
                                     : group.subjectTag,
                                 );
                               }}
-                              title={capitalizeSubjectLabel(group.subjectTag)}
+                              title={getLocalizedSubjectLabel(
+                                languageCode,
+                                group.subjectTag,
+                              )}
                               type="button"
                             >
                               <span

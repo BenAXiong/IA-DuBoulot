@@ -47,6 +47,7 @@ function getCopy(languageCode: UiLanguageCode) {
         upload: "Add source",
         uploading: "Adding...",
         selected: "Used in this chat",
+        selectedForNextChat: "Selected for this question",
         unselected: "Not used",
         unlink: "Unlink",
         delete: "Delete",
@@ -62,8 +63,7 @@ function getCopy(languageCode: UiLanguageCode) {
         currentChatTooltip:
           "This document will be accessed by Banban during the conversation. Click here to save credits if Banban doesn't need the information.",
         unsupported: (name: string) => `${name} is not a supported subject source.`,
-        tooLarge: () =>
-          "The resources files size shouldn't exceed 20MB, please upgrade your subscription to get unlimited uploads.",
+        tooLarge: () => "Subject resource files cannot exceed 20 MB.",
         uploadError: "Unable to add this subject source.",
         confirmUnlink: (name: string) => `Remove ${name} from this chat?`,
         confirmDelete: (name: string) =>
@@ -78,6 +78,7 @@ function getCopy(languageCode: UiLanguageCode) {
         upload: "新增來源",
         uploading: "正在新增...",
         selected: "此聊天會使用",
+        selectedForNextChat: "已選供這個問題使用",
         unselected: "未使用",
         unlink: "取消連結",
         delete: "刪除",
@@ -92,8 +93,7 @@ function getCopy(languageCode: UiLanguageCode) {
         currentChatTooltip:
           "Banban 會在這段對話中讀取這份文件。如果 Banban 不需要這些資訊，請點這裡以節省額度。",
         unsupported: (name: string) => `${name} 不是支援的科目資料格式。`,
-        tooLarge: () =>
-          "資料來源檔案大小不能超過 20MB；請升級訂閱以取得不限量上傳。",
+        tooLarge: () => "科目資料來源檔案不能超過 20 MB。",
         uploadError: "無法新增這個科目資料來源。",
         confirmUnlink: (name: string) => `要從這個聊天移除 ${name} 嗎？`,
         confirmDelete: (name: string) =>
@@ -108,6 +108,7 @@ function getCopy(languageCode: UiLanguageCode) {
         upload: "Ajouter",
         uploading: "Ajout...",
         selected: "Utilisée ici",
+        selectedForNextChat: "Sélectionnée pour cette question",
         unselected: "Non utilisée",
         unlink: "Détacher",
         delete: "Supprimer",
@@ -125,7 +126,7 @@ function getCopy(languageCode: UiLanguageCode) {
         unsupported: (name: string) =>
           `${name} n'est pas un format pris en charge pour les ressources.`,
         tooLarge: () =>
-          "Les fichiers de ressources ne doivent pas dépasser 20MB ; mets ton abonnement à niveau pour obtenir des uploads illimités.",
+          "Les fichiers de ressources ne peuvent pas dépasser 20 Mo.",
         uploadError: "Impossible d'ajouter cette ressource de matière.",
         confirmUnlink: (name: string) =>
           `Détacher ${name} de cette discussion ?`,
@@ -561,6 +562,9 @@ export function StudentSubjectResourceLibrary({
           {resources.map((resource) => {
             const conversationSelected = resource.selected;
             const preselected = preselectedResourceIds.includes(resource.id);
+            const selectedForUse = conversationId
+              ? conversationSelected
+              : preselected;
             const canPreselect =
               !conversationId &&
               Boolean(onPreselectedResourceIdsChange) &&
@@ -587,7 +591,11 @@ export function StudentSubjectResourceLibrary({
 
             return (
               <div
-                className="group/card grid gap-2 rounded-[0.75rem] border border-[color:var(--line)] bg-[color:var(--surface)] p-3"
+                className={`group/card grid gap-2 rounded-[0.75rem] border p-3 transition ${
+                  selectedForUse
+                    ? "border-[color:var(--accent)] bg-[color:var(--accent-quiet)] shadow-[inset_3px_0_0_var(--accent)]"
+                    : "border-[color:var(--line)] bg-[color:var(--surface)]"
+                }`}
                 key={resource.id}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -636,6 +644,12 @@ export function StudentSubjectResourceLibrary({
                       >
                         <InfoIcon />
                       </button>
+                      {preselected ||
+                      (conversationSelected && selectionVariant === "checkbox") ? (
+                        <span className="shrink-0 rounded-full border border-[color:var(--accent)]/50 bg-[color:var(--accent-soft)] px-2 py-0.5 text-[0.68rem] font-medium text-[color:var(--accent)]">
+                          {preselected ? copy.selectedForNextChat : copy.selected}
+                        </span>
+                      ) : null}
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-2 text-xs text-[color:var(--ink-soft)]">

@@ -161,13 +161,24 @@ export function StudentConversationSideRail({
     useState<ConversationAttachmentRecord | null>(null);
   const [openAttachmentDetailsId, setOpenAttachmentDetailsId] =
     useState<string | null>(null);
-  const [subjectUploadsOpen, setSubjectUploadsOpen] = useState(false);
+  const hasSelectedSubjectResource = subjectResources.some(
+    (resource) => resource.selected,
+  );
+  const [subjectUploadsOpen, setSubjectUploadsOpen] = useState(
+    hasSelectedSubjectResource,
+  );
   const [homeworkUploadsOpen, setHomeworkUploadsOpen] = useState(true);
   const [chatMaterialOpen, setChatMaterialOpen] = useState(false);
   const [summaryOpen, setSummaryOpen] = useState(false);
   const studentSummary =
     summaries.find((summary) => summary.audience === "student") ?? null;
   const showDevSummaryControls = process.env.NODE_ENV !== "production";
+
+  useEffect(() => {
+    if (hasSelectedSubjectResource) {
+      setSubjectUploadsOpen(true);
+    }
+  }, [hasSelectedSubjectResource]);
 
   useEffect(() => {
     if (!previewAttachment) {

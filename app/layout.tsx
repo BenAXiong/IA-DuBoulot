@@ -57,7 +57,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const commitLabel = resolveBuildCommitLabel();
+  const showBuildCommitLabel = process.env.NODE_ENV !== "production";
+  const commitLabel = showBuildCommitLabel ? resolveBuildCommitLabel() : null;
   const cookieStore = await cookies();
   const languageCode = resolveUiLanguageCode(
     cookieStore.get(APP_UI_LANGUAGE_COOKIE_NAME)?.value,
@@ -67,9 +68,11 @@ export default async function RootLayout({
     <html lang={languageCode} suppressHydrationWarning>
       <body className={`${bodyFont.variable} ${headingFont.variable} antialiased`}>
         <ThemeScript />
-        <div className="pointer-events-none fixed bottom-2 right-3 z-[70] translate-y-[10px] select-none text-[0.68rem] font-medium tracking-[0.18em] text-[color:var(--ink-muted)] opacity-55">
-          {commitLabel}
-        </div>
+        {commitLabel ? (
+          <div className="pointer-events-none fixed bottom-2 right-3 z-[70] translate-y-[10px] select-none text-[0.68rem] font-medium tracking-[0.18em] text-[color:var(--ink-muted)] opacity-55">
+            {commitLabel}
+          </div>
+        ) : null}
         <Suspense fallback={null}>
           <RouteViewTracker />
         </Suspense>

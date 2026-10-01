@@ -78,6 +78,8 @@ Keep this file as the canonical Pilot board: task IDs, checkboxes, and short cur
 
 Detail notes: [Pilot Interface Trust And Visual Cohesion](pilot/interface_trust.md).
 
+Status note: the 2026-10-01 hosted portfolio-path audit covers the Matt dashboard, Mathematics resource selection, and conversation workbench at `1920 x 1080`. A bounded `P1.3` slice removes the production hash, localizes raw subject tags, repairs dashboard badge overlap, clarifies selected sources, and improves transcript legibility. `P1.1`-`P1.3` remain open because the audit is intentionally limited to the recorded learner path rather than the full product surface.
+
 ### P2 Journey And UX Hardening
 
 - [ ] P2.1 Review the first-run student journey end to end from landing or auth through completed session.
@@ -103,6 +105,8 @@ Detail notes: [Pilot Interface Trust And Visual Cohesion](pilot/interface_trust.
 - [ ] P2.9 Decide whether raw pedagogical memory should return to a learner-facing surface, and if so choose a dedicated product home and explanation instead of rebuilding the removed mixed-purpose settings block.
 
 Detail notes: [Pilot Journey And UX Hardening](pilot/journey_ux.md).
+
+Status note: the same portfolio audit converted its recorded-path friction into bounded `P2.3` fixes with ignored before/after screenshots. `P2.1` and `P2.3` remain open for the signed-out, first-account, and broader student journey beyond the prepared Matt account.
 
 ### P3 Device, Accessibility, And Reliability
 
@@ -155,7 +159,7 @@ Detail notes: [Post-Pilot Candidate Backlog](pilot/post_pilot_backlog.md).
 
 - [x] P7.1 Define the durable orchestration plan, dependency gates, Supabase placement decision, agent boundaries, and stop conditions for the portfolio video.
 - [x] P7.2 Raise the ordinary paid per-subject resource-count cap to five without changing byte-size limits, then add an idempotent, non-RLS-fixture portfolio seed for Matt, the approved guardian state, believable Mathematics activity, and three selected private subject resources.
-- [ ] P7.3 Prove the deployed Matt path and live coaching contract against the selected fractions source, including bounded retry/take behavior.
+- [x] P7.3 Prove the deployed Matt path and live coaching contract against the selected fractions source, including bounded retry/take behavior.
 - [ ] P7.4 Lock a human-editable shot-level storyboard only after the demo state, visible design, and exact product path are stable.
 - [ ] P7.5 Implement the reproducible Playwright and FFmpeg recording pipeline, including fixed-viewport capture, scene timestamps, MP4 rendering, and GIF segment export.
 - [ ] P7.6 Produce and independently review the final assets, retain raw/reproducibility evidence, and stop demo development when the golden-path acceptance criteria pass.
@@ -163,6 +167,8 @@ Detail notes: [Post-Pilot Candidate Backlog](pilot/post_pilot_backlog.md).
 `P7` is a time-bounded production lane, not a replacement product roadmap. Visible product changes remain owned by `P1.1`-`P1.3`, `P2.1`, `P2.3`, and `P3.3`; `P7` tracks the demo-specific state, automation, capture, and handoff work described in the [portfolio demo production plan](portfolio_demo_production_plan.md).
 
 Status note: Wave 1 is complete. The ordinary paid subject-resource cap is five while the free cap and all byte limits remain unchanged; the hosted Matt baseline now contains the approved guardian link, `5e` Mathematics profile, artificial paid state, completed history, and three ready/chunked private resources. The seed is guarded, self-cleaning on failed extraction, bounded to two attempts per new resource, and idempotent by content hash. Its baseline survived the ordinary RLS fixture reseed and `20/20` policy verification. The recorder modules pass focused checks and a real media preflight, but `P7.5` stays open until stable UI is bound to a concrete storyboard and an end-to-end recording is rendered.
+
+`P7.3` passed on the hosted production alias on 2026-10-01. The first `25,817 ms` take used live Gemini `gemini-2.5-flash` output in thinking mode, retrieved two chunks from the one selected `fractions_add_prod.pdf` resource, and passed the shared source-use, plan, hint, and answer-withholding contract. The operator supports at most three fresh-conversation takes, removes every temporary conversation, and verified that Matt's believable history, three-resource library, and visible usage baseline were restored after the run.
 
 ## Working Method
 

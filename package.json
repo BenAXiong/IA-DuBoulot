@@ -19,6 +19,7 @@
     "seed:portfolio-demo": "node --env-file=.env.local scripts/seed-portfolio-demo.mjs --seed",
     "reset:portfolio-demo": "node --env-file=.env.local scripts/seed-portfolio-demo.mjs --reset",
     "verify:portfolio-demo": "node --env-file=.env.local scripts/seed-portfolio-demo.mjs --verify",
+    "verify:portfolio-demo-live-coaching": "node --env-file=.env.local scripts/verify-portfolio-demo-live-coaching.mjs",
     "verify:portfolio-demo-seed-safety": "node --test scripts/seed-portfolio-demo.test.mjs",
     "verify:portfolio-demo-recorder": "node --test scripts/portfolio-demo/portfolio-demo.test.mjs",
     "seed:rls-fixtures": "node --env-file=.env.local scripts/seed-rls-fixtures.mjs",

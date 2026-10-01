@@ -131,6 +131,8 @@ Deliverables:
 - bounded retry/take policy for provider failure or unsuitable output
 - recorded latency and fallback behavior sufficient to choose capture timing
 
+The durable [live-coaching proof operator](../scripts/verify-portfolio-demo-live-coaching.mjs) now executes this contract against the remote HTTPS deployment. On 2026-10-01 its first hosted take passed in `25,817 ms`: Gemini returned live `gemini-2.5-flash` output in thinking mode, the retrieval trace recorded one selected resource and two returned chunks from `fractions_add_prod.pdf`, and every shared coaching/answer-withholding check passed. The provider used its configured model fallback, not the deterministic learner-facing failure reply. Cleanup then verified that Matt's one believable baseline conversation, three private resources, and visible usage totals were restored.
+
 This lane validates the existing coaching contract. Prompt changes require evidence, remain roadmap-aligned, and must be logged if behavior changes.
 
 ### Lane D — Storyboard And Capture Automation
@@ -165,10 +167,13 @@ Current operator commands:
 npm run seed:portfolio-demo -- --confirm-hosted-write
 npm run reset:portfolio-demo -- --confirm-hosted-write
 npm run verify:portfolio-demo
+npm run verify:portfolio-demo-live-coaching -- --confirm-hosted-write
 npm run verify:portfolio-demo-recorder
 ```
 
-Mutation commands require the explicit hosted-write confirmation flag. They create or adopt only correctly tagged dedicated portfolio identities, run subject-resource uploads through the authenticated product routes, and refuse to take over unrelated accounts that happen to use the configured email. Verification is read-only. Credentials and the external resource directory live only in `.env.local` as defined by the [environment matrix](environment_matrix.md).
+Mutation commands require the explicit hosted-write confirmation flag. They create or adopt only correctly tagged dedicated portfolio identities, run subject-resource uploads through the authenticated product routes, and refuse to take over unrelated accounts that happen to use the configured email. The portfolio-state verification is read-only. Credentials and the external resource directory live only in `.env.local` as defined by the [environment matrix](environment_matrix.md).
+
+The live-coaching proof is the deliberate exception among the verification commands: it uses the tagged Matt account to create at most three fresh temporary conversations, selects `fractions_add_prod.pdf`, sends the exact agreed question once per take in thinking mode, and accepts only a live provider reply with recorded selected-source retrieval that passes the shared coaching contract. Every temporary conversation is removed after its take, and the operator restores and verifies Matt's pre-run conversation, resource-library, and visible usage baseline before returning. Its report contains only deploy origin, model/retrieval/contract evidence, timing, and the generated coaching text; credentials and auth state are never serialized.
 
 ### Lane E — Independent Final Review And Handoff
 
@@ -205,12 +210,20 @@ Verified result on 2026-10-01:
 - the destructive RLS fixture seed and its `20/20` verification leave Matt's separate portfolio baseline intact
 - a second portfolio seed preserved all three resources by hash and rebuilt the account-owned demo state without duplicates
 
-### Wave 2 — Product Lock
+### Wave 2 — Product Lock In Progress
 
 - orchestrator consolidates the audit
 - user provides or approves the overall design direction
 - Lane B implements bounded visible-path fixes
-- Lane C proves the live coaching turn on the deployed result
+- Lane C proves the live coaching turn on the deployed result — complete on 2026-10-01 against the current production alias; rerun after any relevant deployment before final capture
+
+Locked production direction:
+
+- retain the calm dark/editorial learner interface and improve only the recorded path instead of redesigning the product around the portfolio cut
+- record the authenticated English Matt experience at `1920 x 1080` in `16:9`
+- start inside Matt's account; omit the public landing page from the captured workflow and add any short title framing during editing
+
+The first deployed `1920 x 1080` audit identified three recording blockers: the production build hash watermark, untranslated raw `mathematiques` tags in English shell chrome, and overlapping `Coming soon` badges on the dashboard. The bounded polish slice also strengthens the selected-source state, opens selected subject resources in the live-chat rail, and improves transcript readability without changing the learner workflow or coaching contract. Before/after evidence lives under ignored `artifacts/portfolio-demo/wave2-visual-audit/` and `artifacts/portfolio-demo/wave2-visual-verify/`.
 
 ### Wave 3 — Storyboard And Recorder Lock
 

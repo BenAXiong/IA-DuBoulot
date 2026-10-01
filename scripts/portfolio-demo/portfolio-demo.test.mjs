@@ -23,6 +23,7 @@ import {
 } from "./render-helpers.mjs";
 import { buildRunReport, redactReportValue } from "./run-report.mjs";
 import { validateStoryboard } from "./storyboard-schema.mjs";
+import { parseMaxAttempts } from "../verify-portfolio-demo-live-coaching.mjs";
 
 function validStoryboard() {
   return {
@@ -166,6 +167,15 @@ test("capture targets require https except on loopback hosts", () => {
     () => normalizeCaptureTarget("http://example.test/app"),
     /must use https/i,
   );
+});
+
+test("live coaching proof keeps its take budget bounded", () => {
+  assert.equal(parseMaxAttempts([]), 3);
+  assert.equal(parseMaxAttempts(["--max-attempts=1"]), 1);
+  assert.equal(parseMaxAttempts(["--max-attempts=3"]), 3);
+  assert.throws(() => parseMaxAttempts(["--max-attempts=0"]), /1 to 3/);
+  assert.throws(() => parseMaxAttempts(["--max-attempts=4"]), /1 to 3/);
+  assert.throws(() => parseMaxAttempts(["--max-attempts=2junk"]), /1 to 3/);
 });
 
 test("preflight reports presence without exposing environment values", async () => {

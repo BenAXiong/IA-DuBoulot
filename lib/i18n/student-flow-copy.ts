@@ -66,6 +66,27 @@ export function getIntakeSubjectOptions(languageCode: UiLanguageCode) {
   });
 }
 
+export function getLocalizedSubjectLabel(
+  languageCode: UiLanguageCode,
+  subjectTag: string,
+) {
+  const trimmed = subjectTag.trim();
+
+  if (!trimmed) {
+    return subjectTag;
+  }
+
+  const normalized = trimmed.toLowerCase();
+  const knownSubject = getIntakeSubjectOptions(languageCode).find(
+    (option) => option.value === normalized,
+  );
+
+  return (
+    knownSubject?.label ??
+    `${trimmed.charAt(0).toUpperCase()}${trimmed.slice(1)}`
+  );
+}
+
 export function getIntakeConfigCopy(languageCode: UiLanguageCode) {
   return pickLocalizedValue(languageCode, {
     fr: {
