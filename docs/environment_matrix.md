@@ -36,6 +36,12 @@ Keep environment configuration explicit so local development, Vercel, and provid
 | `LEMON_SQUEEZY_VARIANT_ID_FAMILY_MONTHLY` | server | Lemon Squeezy | Family checkout variant mapping | local `.env.local`, Vercel |
 | `LEMON_SQUEEZY_TEST_MODE` | server | Lemon Squeezy | optional checkout test-mode toggle | local `.env.local`, Vercel |
 | `SUPABASE_FIXTURE_PASSWORD` | local-only | local operator secret | deterministic hosted RLS fixture seed/verify scripts | local `.env.local` only |
+| `PORTFOLIO_DEMO_EMAIL` | local-only | local operator input | dedicated Matt portfolio account seed, reset, verification, and recording sign-in | local `.env.local` only |
+| `PORTFOLIO_DEMO_PASSWORD` | local-only | local operator secret | dedicated Matt portfolio account seed, reset, verification, and recording sign-in | local `.env.local` only |
+| `PORTFOLIO_DEMO_GUARDIAN_EMAIL` | local-only | local operator input | dedicated approved guardian account for Matt | local `.env.local` only |
+| `PORTFOLIO_DEMO_GUARDIAN_PASSWORD` | local-only | local operator secret | dedicated approved guardian account for Matt | local `.env.local` only |
+| `PORTFOLIO_DEMO_RESOURCE_DIR` | local-only | local filesystem | external directory containing the three approved Math5 source PDFs | local `.env.local` only |
+| `PORTFOLIO_DEMO_APP_URL` | local-only | app | optional deployed HTTPS target for portfolio seeding and verification; omission uses the current local production build | local `.env.local` only |
 
 ## Storage Constants
 
@@ -55,6 +61,7 @@ Keep environment configuration explicit so local development, Vercel, and provid
 - the current repo still has no Resend mailer path; invitation flows return copy/share URLs today, so enabling `ENABLE_RESEND_EMAILS` alone will not send transactional email
 - Lemon Squeezy is now verified in deployed production with `LEMON_SQUEEZY_TEST_MODE=true`; the remaining billing follow-up is a later live-mode cutover, not missing MVP wiring
 - OpenAI is now the chosen fallback provider, but the adapter remains intentionally disabled until implemented and provisioned
+- portfolio-demo account credentials and the external Math5 source directory are operator-only inputs; they are never deployed to Vercel, committed, or written into generated media reports
 
 ## Lemon Squeezy Provisioning Names
 

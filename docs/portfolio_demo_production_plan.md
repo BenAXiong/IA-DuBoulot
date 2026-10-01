@@ -31,7 +31,7 @@ Produce a short, credible, repeatable portfolio video showing:
 
 1. the English public landing page
 2. sign-in to Matt's prepared student account
-3. the Mathematics homework surface with two subject resources, matching the existing paid account cap
+3. the Mathematics homework surface with three subject resources, leaving two spare slots under the five-resource paid account cap
 4. manual selection of `fractions_add_prod.pdf`
 5. Matt asking `what's the answer to b?? i don't get fractions`
 6. a live Gemini response that identifies the source context, proposes a plan, withholds the final answer, and gives a useful first hint
@@ -50,6 +50,15 @@ The production must also leave behind a documented command path that can regener
 - Credentials and private source paths remain outside git.
 - Private Mathematics resources may be uploaded to the prepared account, but must not be copied into the repository.
 - Visible product fixes remain mapped to `P1.1`-`P1.3`, `P2.1`, `P2.3`, or `P3.3`; the `P7` lane tracks production-specific orchestration and automation rather than replacing those roadmap tasks.
+
+Each wave handoff to the user follows the same non-technical format:
+
+1. plain-language purpose and current context
+2. what the wave changes for the demo
+3. decisions the user needs to make
+4. parallel agent lanes and their boundaries
+5. verification outcome and remaining risks
+6. one clearly named next step
 
 ## Dependency Graph
 
@@ -83,9 +92,9 @@ Deliverables:
 - environment-only Matt credentials with safe `.env.example` documentation
 - Matt student profile, English UI, `5e` Mathematics context, and already-approved guardian state consistent with current minor safeguards
 - believable existing activity without reusing or modifying destructive RLS fixtures
-- an active demo subscription state using the existing paid resource allowance
-- two uploaded private Mathematics resources, `fractions_add_prod.pdf` and `fractions.pdf`, with the first ready for explicit selection
-- reset behavior scoped to the dedicated disposable Matt account: clear its account-owned conversation/runtime state while preserving the two expected resources by content hash
+- an active demo subscription state using the five-resource paid allowance
+- three uploaded private Mathematics resources, `fractions_add_prod.pdf`, `fractions.pdf`, and `suite_d_operations.pdf`, with the first ready for explicit selection
+- reset behavior scoped to the dedicated disposable Matt account: clear its account-owned conversation/runtime state while preserving the three expected resources by content hash
 - verification proving RLS separation, resource readiness, account authentication, and repeatable reruns
 
 Constraints:
@@ -131,7 +140,7 @@ Primary tasks: `P7.4` and `P7.5`.
 Planned source locations:
 
 - human-editable storyboard: `docs/portfolio_demo_storyboard.md`
-- machine-readable scene/actions definition: `scripts/portfolio-demo/storyboard.mjs`
+- machine-readable scene/actions schema: `scripts/portfolio-demo/storyboard-schema.mjs`; the concrete storyboard is added only after the design lock
 - Playwright runner, isolated locators, acceptance checks, and preflight/render helpers: `scripts/portfolio-demo/`
 - generated, gitignored media: `artifacts/portfolio-demo/<run-id>/`
 
@@ -149,6 +158,17 @@ Deliverables:
 - concise reproduction commands and failure diagnostics
 
 The recorder should make actions reproducible, not pretend that live model wording is byte-identical across takes.
+
+Current operator commands:
+
+```bash
+npm run seed:portfolio-demo -- --confirm-hosted-write
+npm run reset:portfolio-demo -- --confirm-hosted-write
+npm run verify:portfolio-demo
+npm run verify:portfolio-demo-recorder
+```
+
+Mutation commands require the explicit hosted-write confirmation flag. They create or adopt only correctly tagged dedicated portfolio identities, run subject-resource uploads through the authenticated product routes, and refuse to take over unrelated accounts that happen to use the configured email. Verification is read-only. Credentials and the external resource directory live only in `.env.local` as defined by the [environment matrix](environment_matrix.md).
 
 ### Lane E — Independent Final Review And Handoff
 
@@ -172,6 +192,7 @@ Deliverables:
 
 ### Wave 1 — Parallel Prerequisites
 
+- raise the ordinary paid per-subject resource-count cap from two to five without changing any byte-size limit
 - Lane A implements Matt's idempotent demo seed
 - Lane B audits the exact desktop path and waits for the user's design direction before broad visual changes
 - Lane D builds only the recorder skeleton and scenario contract that do not depend on final selectors or layout

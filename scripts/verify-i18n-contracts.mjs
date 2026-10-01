@@ -75,20 +75,69 @@ function readRgbaVariable(block, variableName) {
   };
 }
 
-async function loadSummarySelectionModule() {
-  const source = await readRepoFile("lib/oversight/summary-selection.ts");
+async function loadTypescriptModule(relativePath) {
+  const source = await readRepoFile(relativePath);
   const transpiled = ts.transpileModule(source, {
     compilerOptions: {
       module: ts.ModuleKind.ESNext,
       target: ts.ScriptTarget.ES2022,
     },
-    fileName: "summary-selection.ts",
+    fileName: path.basename(relativePath),
   });
   const moduleUrl =
     "data:text/javascript;base64," +
     Buffer.from(transpiled.outputText).toString("base64");
 
   return import(moduleUrl);
+}
+
+function verifySubjectResourceQuotaPolicy(policy, getStudentUploadServerCopy) {
+  assert.equal(
+    policy.SUBJECT_RESOURCE_FREE_TOTAL_LIMIT,
+    1,
+    "Free accounts must remain capped at one subject resource across all subjects.",
+  );
+  assert.equal(
+    policy.SUBJECT_RESOURCE_PAID_PER_SUBJECT_LIMIT,
+    5,
+    "Paid accounts must allow five subject resources per subject.",
+  );
+  assert.equal(
+    policy.SUBJECT_RESOURCE_MAX_PROVIDER_DOCUMENT_BYTES,
+    20 * 1024 * 1024,
+    "Provider-extracted document uploads must remain capped at 20 MiB.",
+  );
+  assert.equal(
+    policy.SUBJECT_RESOURCE_MAX_TEXT_BYTES,
+    5 * 1024 * 1024,
+    "Direct-text uploads must remain capped at 5 MiB.",
+  );
+
+  const expectedOversizeCopy = {
+    fr: "Ce fichier dépasse la limite de 20 Mo pour les ressources.",
+    en: "This file exceeds the 20 MB limit for subject resources.",
+    zh: "這個檔案超過資料來源 20 MB 的大小上限。",
+  };
+
+  for (const languageCode of ["fr", "en", "zh"]) {
+    const validation = getStudentUploadServerCopy(languageCode).validation;
+
+    assert.match(
+      validation.subjectResourceLimitReachedPaid,
+      /5/,
+      `${languageCode} paid resource-limit copy must state the five-resource cap.`,
+    );
+    assert.match(
+      validation.subjectResourceLimitReachedFree,
+      /1/,
+      `${languageCode} free resource-limit copy must retain the one-resource cap.`,
+    );
+    assert.equal(
+      validation.subjectResourceFileTooLarge,
+      expectedOversizeCopy[languageCode],
+      `${languageCode} oversize copy must state the 20 MB limit without promising a different upgrade cap.`,
+    );
+  }
 }
 
 function verifySummarySelection(selectSummaryForLanguage) {
@@ -236,9 +285,21 @@ async function verifyCriticalTouchTargets() {
   }
 }
 
-const { selectSummaryForLanguage } = await loadSummarySelectionModule();
+const { selectSummaryForLanguage } = await loadTypescriptModule(
+  "lib/oversight/summary-selection.ts",
+);
+const subjectResourcePolicy = await loadTypescriptModule(
+  "lib/subject-resources/subject-resource-policy.ts",
+);
+const { getStudentUploadServerCopy } = await loadTypescriptModule(
+  "lib/i18n/student-flow-copy.ts",
+);
 
 verifySummarySelection(selectSummaryForLanguage);
+verifySubjectResourceQuotaPolicy(
+  subjectResourcePolicy,
+  getStudentUploadServerCopy,
+);
 await verifyLocalizedAccessibleLabels();
 await verifyCriticalTouchTargets();
 
@@ -249,6 +310,7 @@ console.info(
       checks: [
         "parent summaries prefer the adult UI language",
         "parent summaries fall back to French, then the first available variant",
+        "subject-resource count and byte-size quota contracts stay synchronized",
         "shared-route accessible labels are localized",
         "critical student controls keep 44px touch targets",
         "student controls preserve keyboard focus and reduced-motion behavior",

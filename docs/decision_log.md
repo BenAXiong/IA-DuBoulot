@@ -1916,3 +1916,23 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Keep IA DuBoulot in its restored Supabase project instead of creating a second account or migrating it solely because IndiHunt is near its own database threshold. Track production-specific work in a time-bounded `P7` lane and `docs/portfolio_demo_production_plan.md`. The root Codex agent owns orchestration, shared planning documents, cloud mutations, integration, and final acceptance; subagents receive bounded independent implementation or review slices. Keep all visible product changes under the existing Pilot roadmap tasks, and keep the portfolio plan subordinate to the original roadmap and recorded product contracts.
 - Why: Moving the small IA DuBoulot database would not reduce IndiHunt's size or remove its read-only risk, while it would introduce avoidable Auth, environment, deployment, ownership, and migration risk into a time-critical demo. A durable plan and serialized integration preserve traceability while still allowing independent prerequisites to progress in parallel.
 - Follow-up: Address IndiHunt capacity separately. Execute `P7.2` through `P7.6` in dependency order, require the user's overall design direction before locking the storyboard, and stop production work as soon as the golden-path acceptance criteria and reproducibility gate pass.
+
+### D-20261001-03 - Expand The Paid Subject Resource Count Without Raising File-Size Limits
+
+- Date: 2026-10-01
+- Status: accepted
+- Related tasks: `P2.7`, `P7.2`
+- Context: The subject-resource product contract currently permits one resource per subject on free access and two on paid access. The portfolio account should show a small but credible Mathematics library, while the selected PDFs are each far below the existing per-file byte limit and the broader upload-size decision remains intentionally deferred until after the demo.
+- Decision: Keep the free per-subject cap at one, raise the ordinary paid per-subject resource-count cap from two to five, and leave all per-file, aggregate-byte, provider, and bucket size limits unchanged. Prepare three Mathematics resources for Matt and leave two paid slots unused. Apply the same cap through the canonical service path, user-facing quota copy, and focused verification rather than bypassing it only for seeded demo data.
+- Why: Resource count and object size address different risks. Five small course resources provide a credible library without increasing large-file reliability, provider-processing, storage, or cost exposure, and the change remains a normal paid product rule rather than a hidden portfolio exception.
+- Follow-up: Reconsider large-file limits after the demo as a separate evidence-backed decision. If the paid resource count changes again, keep service enforcement, UI copy, tests, and demo data aligned.
+
+### D-20261001-04 - Run Demo Production In Explicit User-Facing Waves
+
+- Date: 2026-10-01
+- Status: accepted
+- Related tasks: `P7.1`, `P7.2`, `P7.3`, `P7.4`, `P7.5`, `P7.6`
+- Context: Demo production includes parallel technical lanes, but the user needs concise product context and timely decisions rather than implementation-level narration. Locking every detail up front would either hide important choices or force rework as the design and exact workflow evolve.
+- Decision: Proceed one dependency wave at a time. At each boundary, the orchestrator gives the user a plain-language purpose, visible demo implications, only the decisions currently required, the safe parallel lanes, the verified outcome and risks, and one named next step. Parallelize independent work inside a wave, while serializing shared documents, cloud mutations, deployment, and final acceptance under the orchestrator.
+- Why: This preserves speed without losing control or forcing the user to parse code-level details. It also makes design and narrative decisions at the latest responsible moment, after prerequisite evidence exists but before dependent work is locked.
+- Follow-up: Use this handoff structure for every remaining portfolio-production wave and update the durable plan if dependencies or gates materially change.

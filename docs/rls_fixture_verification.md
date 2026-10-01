@@ -36,6 +36,8 @@ The goal is to test the policies that are actually deployed, not just read the S
 
 These accounts are deterministic and may be recreated by rerunning the seed script.
 
+The dedicated Matt portfolio account is intentionally outside this fixture set. `npm run seed:rls-fixtures` must never create, adopt, reset, or delete Matt or the portfolio guardian. Portfolio operations use `scripts/seed-portfolio-demo.mjs`, dedicated local-only credentials, and account-scoped reset rules documented in the [portfolio demo production plan](portfolio_demo_production_plan.md).
+
 They also form the default role-demo set used by the founder walkthrough, with the billing exception documented in [Founder walkthrough V1](founder_walkthrough_v1.md).
 
 ## Seeded Data

@@ -1468,9 +1468,9 @@ export function getStudentUploadServerCopy(languageCode: UiLanguageCode) {
         fileTooLarge: (maxMb: number) =>
           `Ce fichier dépasse la limite de ${maxMb} Mo pour ce type de document.`,
         subjectResourceFileTooLarge:
-          "Les fichiers de ressources ne doivent pas dépasser 20MB ; mets ton abonnement à niveau pour obtenir des uploads illimités.",
+          "Ce fichier dépasse la limite de 20 Mo pour les ressources.",
         subjectResourceLimitReachedPaid:
-          "Tu peux garder 2 ressources par matière avec l'abonnement actuel. Supprime une ressource de cette matière avant d'en ajouter une autre.",
+          "Tu peux garder 5 ressources par matière avec l'abonnement actuel. Supprime une ressource de cette matière avant d'en ajouter une autre.",
         subjectResourceLimitReachedFree:
           "Les comptes gratuits peuvent garder 1 ressource, toutes matières confondues. Supprime la ressource existante ou mets ton abonnement à niveau.",
         attachmentLimit:
@@ -1515,9 +1515,9 @@ export function getStudentUploadServerCopy(languageCode: UiLanguageCode) {
         fileTooLarge: (maxMb: number) =>
           `This file exceeds the ${maxMb} MB limit for this file type.`,
         subjectResourceFileTooLarge:
-          "The resources files size shouldn't exceed 20MB, please upgrade your subscription to get unlimited uploads.",
+          "This file exceeds the 20 MB limit for subject resources.",
         subjectResourceLimitReachedPaid:
-          "Paid accounts can keep 2 subject sources per subject. Delete one source from this subject before adding another.",
+          "Paid accounts can keep 5 subject sources per subject. Delete one source from this subject before adding another.",
         subjectResourceLimitReachedFree:
           "Free accounts can keep 1 subject source across all subjects. Delete the existing source or upgrade your subscription.",
         attachmentLimit:
@@ -1558,9 +1558,9 @@ export function getStudentUploadServerCopy(languageCode: UiLanguageCode) {
         fileTooLarge: (maxMb: number) =>
           `這個檔案超過此類型 ${maxMb} MB 的大小上限。`,
         subjectResourceFileTooLarge:
-          "資料來源檔案大小不能超過 20MB；請升級訂閱以取得不限量上傳。",
+          "這個檔案超過資料來源 20 MB 的大小上限。",
         subjectResourceLimitReachedPaid:
-          "付費帳號每個科目最多可保留 2 份資料來源。請先刪除此科目的一份資料來源再新增。",
+          "付費帳號每個科目最多可保留 5 份資料來源。請先刪除此科目的一份資料來源再新增。",
         subjectResourceLimitReachedFree:
           "免費帳號所有科目合計最多可保留 1 份資料來源。請刪除現有資料來源或升級訂閱。",
         attachmentLimit: "這個課程已達附件數量上限。",

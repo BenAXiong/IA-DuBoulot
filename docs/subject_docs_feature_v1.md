@@ -24,7 +24,7 @@ The implementation name is `subject resources` because that is the database and 
 - A subject doc uploaded from a subject or chat resource context can be selected for that context immediately.
 - Selected subject docs are retrieved by chunks; the full file is not sent wholesale to the coach each turn.
 - Outlines and summaries are separate. If the outline is weak or unavailable, the UI should say structure is unavailable or omit it, not replace the outline with a summary.
-- Paid-access students can keep up to `2` subject docs per subject. Free/trial students can keep `1` subject doc across all subjects. Pending and failed resource shells count until deleted.
+- Paid-access students can keep up to `5` subject docs per subject. Free/trial students can keep `1` subject doc across all subjects. Pending and failed resource shells count until deleted.
 
 Ask the user before changing any of these rules:
 
@@ -51,7 +51,7 @@ Subject-doc upload support:
 Current quota behavior:
 
 - no dedicated subject-library total byte cap
-- paid-access students can keep `2` subject docs per subject
+- paid-access students can keep `5` subject docs per subject
 - free/trial students can keep `1` subject doc across all subjects
 - upload actions still count against the general usage quota
 - current general usage quotas are `40` uploads for trial and `240` uploads for paid

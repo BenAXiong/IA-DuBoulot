@@ -32,3 +32,6 @@ next-tmp-bootstrap/
 .tmp/
 .tmp_next_start*.pid
 test-results/
+
+# Generated portfolio demo media and run reports
+artifacts/portfolio-demo/

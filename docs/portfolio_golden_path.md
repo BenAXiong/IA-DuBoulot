@@ -79,7 +79,7 @@ Do not optimize this demo primarily for:
 - secondary capability: the same account and path should remain usable for a live walkthrough, but self-serve client signup/testing is not a demo requirement
 - primary viewport: desktop/laptop; existing responsive behavior remains part of product quality but is not the main recording frame
 - AI proof: the intended coaching turn must use live provider output; the deterministic fallback remains an honest operational safety net, not the planned portfolio result
-- depth signal: manually select one relevant source from a visible library of two prepared Mathematics resources, matching the existing paid subject-resource cap, then show the live coaching response use that context
+- depth signal: manually select one relevant source from a visible library of three prepared Mathematics resources, within the five-resource paid subject cap, then show the live coaching response use that context
 - portfolio learner: `Matt`, a fictional `5e` learner in the French Section of Taipei European School; the account uses the English UI and must remain separate from automated RLS fixtures
 
 ## Portfolio Account And Demo Turn
@@ -92,12 +92,12 @@ Account profile:
 - school context: French Section, Taipei European School
 - grade: `5e`, matching the proposed workbook and exercise level
 - UI language: English
-- state: believable existing Mathematics activity plus two private subject resources available for manual selection
+- state: believable existing Mathematics activity plus three private subject resources available for manual selection
 
 Resource plan:
 
 - preferred content area: `Fractions - operations`
-- prepare a visible library of two small, topic-focused Mathematics resources from the locally available `Math5` set, subject to ordinary rights and demo-safety checks
+- prepare a visible library of three small, topic-focused Mathematics resources from the locally available `Math5` set, subject to ordinary rights and demo-safety checks: `fractions_add_prod.pdf`, `fractions.pdf`, and `suite_d_operations.pdf`
 - make `fractions_add_prod.pdf` the selected source for the coaching turn; exercise `b` asks the learner to calculate `6/14 + 12/21`
 - do not commit private external resources or their local filesystem paths
 - do not upload the complete `33,460,053` byte workbook for the recording; the smaller topic resources already fit the intended flow and current product limit
