@@ -210,12 +210,12 @@ Verified result on 2026-10-01:
 - the destructive RLS fixture seed and its `20/20` verification leave Matt's separate portfolio baseline intact
 - a second portfolio seed preserved all three resources by hash and rebuilt the account-owned demo state without duplicates
 
-### Wave 2 — Product Lock In Progress
+### Wave 2 — Product Lock Complete
 
 - orchestrator consolidates the audit
 - user provides or approves the overall design direction
 - Lane B implements bounded visible-path fixes
-- Lane C proves the live coaching turn on the deployed result — complete on 2026-10-01 against the current production alias; rerun after any relevant deployment before final capture
+- Lane C proves the live coaching turn on the deployed result — complete on 2026-10-01 against application revision `fb467f8`
 
 Locked production direction:
 
@@ -224,6 +224,15 @@ Locked production direction:
 - start inside Matt's account; omit the public landing page from the captured workflow and add any short title framing during editing
 
 The first deployed `1920 x 1080` audit identified three recording blockers: the production build hash watermark, untranslated raw `mathematiques` tags in English shell chrome, and overlapping `Coming soon` badges on the dashboard. The bounded polish slice also strengthens the selected-source state, opens selected subject resources in the live-chat rail, and improves transcript readability without changing the learner workflow or coaching contract. Before/after evidence lives under ignored `artifacts/portfolio-demo/wave2-visual-audit/` and `artifacts/portfolio-demo/wave2-visual-verify/`.
+
+Final verification on deployed application revision `fb467f8`:
+
+- the stable production alias resolves to the ready deployment
+- Matt's baseline verification passes with the approved guardian, artificial paid state, completed Mathematics history, and all three ready/chunked resources
+- the first post-deploy coaching take passed in `23,641 ms` with live `gemini-2.5-pro` output, one selected source, two retrieved chunks from `fractions_add_prod.pdf`, a useful plan and first hint, and no disclosed final answer
+- cleanup preserved the one baseline conversation and three-resource library and restored the visible usage counters
+- hosted `1920 x 1080` captures confirm the production hash is absent, `Mathematics` is localized, the chosen source is unmistakable, the future-feature badges no longer collide with headings, and the completed workbench remains readable
+- the full MVP regression and tablet-emulation smoke pass; smaller secondary touch targets remain tracked post-pilot debt and are outside this recorded desktop path
 
 ### Wave 3 — Storyboard And Recorder Lock
 
