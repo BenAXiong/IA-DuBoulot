@@ -153,6 +153,12 @@ export function validateStoryboard(candidate) {
       title: scene.title.trim(),
       purpose: scene.purpose.trim(),
       enabled: scene.enabled !== false,
+      ...(typeof scene.overlay === "string" && scene.overlay.trim()
+        ? { overlay: scene.overlay.trim() }
+        : {}),
+      ...(Number.isInteger(scene.holdMs) && scene.holdMs >= 0
+        ? { holdMs: scene.holdMs }
+        : {}),
       actions,
     });
   });

@@ -23,7 +23,19 @@ import {
 } from "./render-helpers.mjs";
 import { buildRunReport, redactReportValue } from "./run-report.mjs";
 import { validateStoryboard } from "./storyboard-schema.mjs";
+import { buildAssOverlayDocument, createEditedTimeline, buildEditedMp4Command } from "./render-plan.mjs";
+import {
+  PORTFOLIO_DEMO_EDIT,
+  PORTFOLIO_DEMO_QUESTION,
+  PORTFOLIO_DEMO_STORYBOARD,
+} from "./storyboard.mjs";
 import { parseMaxAttempts } from "../verify-portfolio-demo-live-coaching.mjs";
+import { parseRecorderArgs } from "../record-portfolio-demo.mjs";
+import { parseRenderArgs } from "../render-portfolio-demo.mjs";
+import {
+  parseGifExportArgs,
+  resolveEditedSceneRange,
+} from "../export-portfolio-demo-gif.mjs";
 
 function validStoryboard() {
   return {
@@ -201,4 +213,115 @@ test("preflight reports presence without exposing environment values", async () 
   assert.equal(normalizeCaptureTarget("https://example.test/path").origin, "https://example.test");
   assert.equal(report.captureOrigin, "https://example.test");
   assert.doesNotMatch(JSON.stringify(report), /do-not-report|private=value/);
+});
+
+test("concrete silent storyboard mirrors the locked seven-shot cut", () => {
+  assert.deepEqual(
+    PORTFOLIO_DEMO_STORYBOARD.scenes.map((scene) => scene.id),
+    [
+      "s01-matt-dashboard",
+      "s02-open-mathematics",
+      "s03-choose-source",
+      "s04-ask-question",
+      "s05-live-wait",
+      "s06-plan-and-hint",
+      "s07-value-hold",
+    ],
+  );
+  assert.equal(PORTFOLIO_DEMO_QUESTION, "what's the answer to b?? i don't get fractions");
+  assert.equal(PORTFOLIO_DEMO_EDIT.minimumDurationSeconds, 42);
+  assert.equal(PORTFOLIO_DEMO_EDIT.maximumDurationSeconds, 48);
+});
+
+test("recorder and render arguments require explicit bounded intent", () => {
+  assert.deepEqual(parseRecorderArgs(["--confirm-hosted-write", "--max-attempts=2"]), { maxAttempts: 2 });
+  assert.throws(() => parseRecorderArgs([]), /hosted recording writes are disabled/i);
+  assert.throws(() => parseRecorderArgs(["--confirm-hosted-write", "--max-attempts=4"]), /1 to 3/);
+  assert.deepEqual(parseRenderArgs(["--run-id=20261001T123456Z-test"]), { runId: "20261001T123456Z-test" });
+  assert.throws(() => parseRenderArgs([]), /requires --run-id/i);
+});
+
+test("edited render plan keeps chronology while shortening only the live wait", () => {
+  const rawTimeline = {
+    rawDurationSeconds: 67,
+    wait: { startSeconds: 20, endSeconds: 40 },
+    scenes: [
+      { id: "s01-matt-dashboard", overlay: "One", rawStartSeconds: 0, rawEndSeconds: 4 },
+      { id: "s02-open-mathematics", overlay: "Two", rawStartSeconds: 4, rawEndSeconds: 9 },
+      { id: "s03-choose-source", overlay: "Three", rawStartSeconds: 9, rawEndSeconds: 15 },
+      { id: "s04-ask-question", overlay: "Four", rawStartSeconds: 15, rawEndSeconds: 20 },
+      { id: "s05-live-wait", overlay: "Wait", rawStartSeconds: 20, rawEndSeconds: 40 },
+      { id: "s06-plan-and-hint", overlay: "Six", rawStartSeconds: 40, rawEndSeconds: 64 },
+      { id: "s07-value-hold", overlay: "Seven", rawStartSeconds: 64, rawEndSeconds: 67 },
+    ],
+  };
+  const timeline = createEditedTimeline(rawTimeline, 2);
+  assert.equal(timeline.edit.durationSeconds, 46);
+  assert.equal(timeline.edit.removedWaitSeconds, 18);
+  assert.equal(timeline.edit.removedRawSeconds, 21);
+  assert.equal(timeline.scenes[5].editedStartSeconds, 26);
+  const runDir = path.join(os.tmpdir(), "portfolio-demo-edited-render");
+  const command = buildEditedMp4Command({
+    runDir,
+    inputPath: path.join(runDir, "raw", "take-1.webm"),
+    outputPath: path.join(runDir, "rendered", "demo.mp4"),
+    timeline,
+  });
+  assert.match(command.args.join(" "), /concat=n=8/);
+  assert.match(command.args.join(" "), /drawtext/);
+  const subtitles = buildAssOverlayDocument(timeline);
+  assert.match(subtitles, /Dialogue: 0,0:00:00\.00,0:00:04\.00/);
+  assert.match(subtitles, /Context-aware|Seven/);
+});
+
+test("named-scene GIF export validates intent and uses the edited range", () => {
+  assert.deepEqual(
+    parseGifExportArgs([
+      "--run-id=20261001T123456Z-test",
+      "--scene-id=s06-plan-and-hint",
+    ]),
+    {
+      runId: "20261001T123456Z-test",
+      sceneId: "s06-plan-and-hint",
+    },
+  );
+  assert.throws(
+    () => parseGifExportArgs(["--run-id=20261001T123456Z-test"]),
+    /requires --scene-id/i,
+  );
+  assert.throws(
+    () =>
+      parseGifExportArgs([
+        "--run-id=20261001T123456Z-test",
+        "--scene-id=../escape",
+      ]),
+    /requires --scene-id/i,
+  );
+
+  const range = resolveEditedSceneRange(
+    {
+      edit: { durationSeconds: 46 },
+      scenes: [
+        {
+          id: "s06-plan-and-hint",
+          editedStartSeconds: 26,
+          editedEndSeconds: 43,
+        },
+      ],
+    },
+    "s06-plan-and-hint",
+  );
+  assert.deepEqual(range, {
+    sceneId: "s06-plan-and-hint",
+    startSeconds: 26,
+    endSeconds: 43,
+  });
+  assert.throws(
+    () =>
+      resolveEditedSceneRange(
+        { edit: {}, scenes: [] },
+        "s07-value-hold",
+      ),
+    /does not exist/i,
+  );
 });

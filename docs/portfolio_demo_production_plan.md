@@ -1,6 +1,6 @@
 # Portfolio Demo Production Plan
 
-Related: [README](../README.md) | [Implementation plan](implementation_plan.md) | [Portfolio golden path](portfolio_golden_path.md) | [Pilot_todo](pilot_todo.md) | [Smoke checklist V1](smoke_checklist_v1.md) | [Decision log](decision_log.md)
+Related: [README](../README.md) | [Implementation plan](implementation_plan.md) | [Portfolio golden path](portfolio_golden_path.md) | [Portfolio demo storyboard V1](portfolio_demo_storyboard.md) | [Pilot_todo](pilot_todo.md) | [Smoke checklist V1](smoke_checklist_v1.md) | [Decision log](decision_log.md)
 
 ## Purpose And Authority
 
@@ -27,16 +27,9 @@ Revisit this decision only if the live Supabase usage model changes, IA DuBoulot
 
 ## Production Outcome
 
-Produce a short, credible, repeatable portfolio video showing:
+Produce a credible, repeatable `30–60 second` silent portfolio video with concise text overlays. The locked V1 cut starts inside Matt's authenticated English account, shows the Mathematics surface and its three prepared subject resources, manually selects `fractions_add_prod.pdf`, sends `what's the answer to b?? i don't get fractions`, honestly shortens the visible live-provider wait, and ends on an accepted response that identifies the source context, proposes a plan, withholds the final answer, and gives a useful first hint.
 
-1. the English public landing page
-2. sign-in to Matt's prepared student account
-3. the Mathematics homework surface with three subject resources, leaving two spare slots under the five-resource paid account cap
-4. manual selection of `fractions_add_prod.pdf`
-5. Matt asking `what's the answer to b?? i don't get fractions`
-6. a live Gemini response that identifies the source context, proposes a plan, withholds the final answer, and gives a useful first hint
-7. the existing completion flow and learner recap
-8. an optional short engineering-depth card or narration, without touring secondary roles
+The captured product path excludes the public landing page, sign-in, completion flow, and adult surfaces. Any optional title framing belongs to post-production rather than the browser workflow. The shot order, exact overlay copy, timing intent, and editorial acceptance rules live in the [Portfolio Demo Storyboard V1](portfolio_demo_storyboard.md).
 
 The production must also leave behind a documented command path that can regenerate the browser take and later export selected GIF segments after UI, account, copy, or workflow changes.
 
@@ -141,8 +134,8 @@ Primary tasks: `P7.4` and `P7.5`.
 
 Planned source locations:
 
-- human-editable storyboard: `docs/portfolio_demo_storyboard.md`
-- machine-readable scene/actions schema: `scripts/portfolio-demo/storyboard-schema.mjs`; the concrete storyboard is added only after the design lock
+- human-editable storyboard: [Portfolio Demo Storyboard V1](portfolio_demo_storyboard.md)
+- machine-readable scene/actions schema: `scripts/portfolio-demo/storyboard-schema.mjs`; the locked concrete cut lives in `scripts/portfolio-demo/storyboard.mjs`
 - Playwright runner, isolated locators, acceptance checks, and preflight/render helpers: `scripts/portfolio-demo/`
 - generated, gitignored media: `artifacts/portfolio-demo/<run-id>/`
 
@@ -169,6 +162,9 @@ npm run reset:portfolio-demo -- --confirm-hosted-write
 npm run verify:portfolio-demo
 npm run verify:portfolio-demo-live-coaching -- --confirm-hosted-write
 npm run verify:portfolio-demo-recorder
+npm run record:portfolio-demo -- --confirm-hosted-write --max-attempts=3
+npm run render:portfolio-demo -- --run-id=<run-id>
+npm run export:portfolio-demo-gif -- --run-id=<run-id> --scene-id=<scene-id>
 ```
 
 Mutation commands require the explicit hosted-write confirmation flag. They create or adopt only correctly tagged dedicated portfolio identities, run subject-resource uploads through the authenticated product routes, and refuse to take over unrelated accounts that happen to use the configured email. The portfolio-state verification is read-only. Credentials and the external resource directory live only in `.env.local` as defined by the [environment matrix](environment_matrix.md).
@@ -234,11 +230,22 @@ Final verification on deployed application revision `fb467f8`:
 - hosted `1920 x 1080` captures confirm the production hash is absent, `Mathematics` is localized, the chosen source is unmistakable, the future-feature badges no longer collide with headings, and the completed workbench remains readable
 - the full MVP regression and tablet-emulation smoke pass; smaller secondary touch targets remain tracked post-pilot debt and are outside this recorded desktop path
 
-### Wave 3 — Storyboard And Recorder Lock
+### Wave 3 — Storyboard And Recorder Lock Complete
 
 - write the shot-level storyboard against stable UI
 - finalize selectors, timing, narration/caption cues, acceptance rules, and output profiles
 - run one end-to-end rehearsal and repair only recording blockers
+
+Verified result on 2026-10-02:
+
+- reference rehearsal run: `20261001T155258Z-matt-demo`; generated media remains gitignored under `artifacts/portfolio-demo/`
+- the human and executable storyboards share seven stable shot IDs, exact silent-overlay copy, and a `46 second` edited timeline
+- the first hosted rehearsal accepted Gemini take 1, with one selected source and two returned chunks from `fractions_add_prod.pdf`; the shared plan, hint, source-use, and answer-withholding contract passed
+- the raw WebM retains the complete `42.901 second` provider wait while the reproducible edit presents an explicitly labelled `2 second` wait
+- the rendered MP4 is `46.233 seconds`, H.264, `1920 x 1080`, `30 fps`, `yuv420p`, silent, and fast-start compatible
+- the named `s06-plan-and-hint` GIF export passes at `960 x 540`; later GIFs can be generated from any stable edited scene without another provider call
+- the run report records redacted source, deployment, provider, retrieval, acceptance, cleanup, timing, media metadata, and hashes; Matt's one-conversation, three-resource, and usage baseline was restored
+- automated frame sampling covers all seven shots; final editorial acceptance remains `P7.6`
 
 ### Wave 4 — Final Production
 
@@ -273,9 +280,9 @@ Stop implementation and publish the demo when:
 
 ## Immediate Next Dispatch
 
-Wave 2 starts with the visible product lock:
+Wave 4 reviews the first complete cut:
 
-1. consolidate the existing visual/path audit into a short set of demo-facing design choices
-2. obtain the user's overall visual direction, capture aspect ratio/viewport, and landing-shot decision
-3. implement only the bounded visible-path fixes approved for the demo under the existing Pilot product tasks
-4. prove the live deployed coaching turn against `fractions_add_prod.pdf` before locking the storyboard
+1. user reviews the V1 MP4 for story clarity, overlay tone, response readability, and pacing
+2. revise overlay copy and timing from the retained raw take when possible; recapture only if the product action or accepted response must change
+3. run the independent final privacy, visual, reproducibility, and artifact review under `P7.6`
+4. publish the accepted MP4 and requested GIF variants, then stop portfolio-specific development
