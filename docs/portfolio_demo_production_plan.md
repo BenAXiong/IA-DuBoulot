@@ -93,7 +93,7 @@ Deliverables:
 - Matt student profile, English UI, `5e` Mathematics context, and already-approved guardian state consistent with current minor safeguards
 - believable existing activity without reusing or modifying destructive RLS fixtures
 - an active demo subscription state using the five-resource paid allowance
-- three uploaded private Mathematics resources, `fractions_add_prod.pdf`, `fractions.pdf`, and `suite_d_operations.pdf`, with the first ready for explicit selection
+- three uploaded private Mathematics resources, `fractions_add_prod.pdf`, `fractions.pdf`, and `equations.pdf`, with the first ready for explicit selection
 - reset behavior scoped to the dedicated disposable Matt account: clear its account-owned conversation/runtime state while preserving the three expected resources by content hash
 - verification proving RLS separation, resource readiness, account authentication, and repeatable reruns
 
@@ -190,12 +190,20 @@ Deliverables:
 - decide against migrating IA DuBoulot solely because IndiHunt is near its database quota
 - create this durable orchestration plan
 
-### Wave 1 — Parallel Prerequisites
+### Wave 1 — Complete
 
 - raise the ordinary paid per-subject resource-count cap from two to five without changing any byte-size limit
 - Lane A implements Matt's idempotent demo seed
 - Lane B audits the exact desktop path and waits for the user's design direction before broad visual changes
 - Lane D builds only the recorder skeleton and scenario contract that do not depend on final selectors or layout
+
+Verified result on 2026-10-01:
+
+- the hosted Matt baseline authenticates and contains the approved guardian link, `5e` Mathematics profile, active artificial paid state, believable completed history, and three ready/chunked private resources
+- `fractions_add_prod.pdf` and `fractions.pdf` were preserved by content hash on rerun; `equations.pdf` replaced `suite_d_operations.pdf` after the latter repeatedly hit Gemini extraction deadlines, then extracted successfully on its first attempt
+- failed upload/extraction attempts remove their partial product resource before retrying, and each new resource receives at most two complete attempts
+- the destructive RLS fixture seed and its `20/20` verification leave Matt's separate portfolio baseline intact
+- a second portfolio seed preserved all three resources by hash and rebuilt the account-owned demo state without duplicates
 
 ### Wave 2 — Product Lock
 
@@ -243,9 +251,9 @@ Stop implementation and publish the demo when:
 
 ## Immediate Next Dispatch
 
-After this plan is accepted:
+Wave 2 starts with the visible product lock:
 
-1. dispatch Lane A to implement `P7.2`
-2. dispatch a read-only Lane B visual/path audit while the user develops the overall design direction
-3. dispatch Lane D to scaffold the scenario and capture interfaces without locking scene selectors
-4. integrate and verify those slices before authorizing visible product changes or cloud seeding
+1. consolidate the existing visual/path audit into a short set of demo-facing design choices
+2. obtain the user's overall visual direction, capture aspect ratio/viewport, and landing-shot decision
+3. implement only the bounded visible-path fixes approved for the demo under the existing Pilot product tasks
+4. prove the live deployed coaching turn against `fractions_add_prod.pdf` before locking the storyboard

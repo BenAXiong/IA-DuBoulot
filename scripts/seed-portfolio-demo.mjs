@@ -16,7 +16,7 @@ const subjectTag = "mathematiques";
 const expectedResourceNames = [
   "fractions_add_prod.pdf",
   "fractions.pdf",
-  "suite_d_operations.pdf",
+  "equations.pdf",
 ];
 const maxResourceBytes = 20 * 1024 * 1024;
 const stableIds = {
@@ -657,64 +657,82 @@ async function deleteResourceThroughProduct(http, resourceId) {
 }
 
 async function uploadResourceThroughProduct({ http, storageClient, resource }) {
-  const createResult = await http.requestJson("/api/subject-resources", {
-    method: "POST",
-    body: JSON.stringify({
-      subjectTag,
-      originalFilename: resource.filename,
-      mimeType: resource.mimeType,
-      byteSize: resource.byteSize,
-    }),
-  });
-  const createPayload = expectOkJson(
-    createResult,
-    `Failed to create the upload target for ${resource.filename}`,
-  );
-  const resourceShell = createPayload.data?.resource;
-  const uploadTarget = createPayload.data?.uploadTarget;
+  let resourceShellId = null;
 
-  assert(resourceShell?.id, `Missing resource shell for ${resource.filename}.`);
-  assert(uploadTarget?.bucket, `Missing upload bucket for ${resource.filename}.`);
-  assert(uploadTarget?.path, `Missing upload path for ${resource.filename}.`);
-  assert(uploadTarget?.token, `Missing upload token for ${resource.filename}.`);
-
-  const fileBlob = new Blob([resource.buffer], { type: resource.mimeType });
-  const uploadResult = await storageClient.storage
-    .from(uploadTarget.bucket)
-    .uploadToSignedUrl(uploadTarget.path, uploadTarget.token, fileBlob, {
-      contentType: resource.mimeType,
+  try {
+    const createResult = await http.requestJson("/api/subject-resources", {
+      method: "POST",
+      body: JSON.stringify({
+        subjectTag,
+        originalFilename: resource.filename,
+        mimeType: resource.mimeType,
+        byteSize: resource.byteSize,
+      }),
     });
-
-  if (uploadResult.error) {
-    throw new Error(
-      `Signed upload failed for ${resource.filename}: ${uploadResult.error.message}`,
+    const createPayload = expectOkJson(
+      createResult,
+      `Failed to create the upload target for ${resource.filename}`,
     );
+    const resourceShell = createPayload.data?.resource;
+    const uploadTarget = createPayload.data?.uploadTarget;
+
+    assert(resourceShell?.id, `Missing resource shell for ${resource.filename}.`);
+    resourceShellId = resourceShell.id;
+    assert(uploadTarget?.bucket, `Missing upload bucket for ${resource.filename}.`);
+    assert(uploadTarget?.path, `Missing upload path for ${resource.filename}.`);
+    assert(uploadTarget?.token, `Missing upload token for ${resource.filename}.`);
+
+    const fileBlob = new Blob([resource.buffer], { type: resource.mimeType });
+    const uploadResult = await storageClient.storage
+      .from(uploadTarget.bucket)
+      .uploadToSignedUrl(uploadTarget.path, uploadTarget.token, fileBlob, {
+        contentType: resource.mimeType,
+      });
+
+    if (uploadResult.error) {
+      throw new Error(
+        `Signed upload failed for ${resource.filename}: ${uploadResult.error.message}`,
+      );
+    }
+
+    const confirmResult = await http.requestJson("/api/subject-resources/confirm", {
+      method: "POST",
+      body: JSON.stringify({
+        resourceId: resourceShell.id,
+        conversationId: null,
+        selected: false,
+      }),
+    });
+    const confirmPayload = expectOkJson(
+      confirmResult,
+      `Failed to confirm ${resource.filename}`,
+    );
+    const confirmed = confirmPayload.data?.resource;
+
+    assert(
+      confirmed?.extraction_status === "ready",
+      `${resource.filename} did not reach ready extraction status.`,
+    );
+    assert(
+      confirmed.sha256 === resource.sha256,
+      `${resource.filename} stored an unexpected content hash.`,
+    );
+
+    return confirmed;
+  } catch (error) {
+    if (resourceShellId) {
+      await deleteResourceThroughProduct(http, resourceShellId).catch(
+        (cleanupError) => {
+          throw new AggregateError(
+            [error, cleanupError],
+            `${resource.filename} failed and its partial resource shell could not be removed.`,
+          );
+        },
+      );
+    }
+
+    throw error;
   }
-
-  const confirmResult = await http.requestJson("/api/subject-resources/confirm", {
-    method: "POST",
-    body: JSON.stringify({
-      resourceId: resourceShell.id,
-      conversationId: null,
-      selected: false,
-    }),
-  });
-  const confirmPayload = expectOkJson(
-    confirmResult,
-    `Failed to confirm ${resource.filename}`,
-  );
-  const confirmed = confirmPayload.data?.resource;
-
-  assert(
-    confirmed?.extraction_status === "ready",
-    `${resource.filename} did not reach ready extraction status.`,
-  );
-  assert(
-    confirmed.sha256 === resource.sha256,
-    `${resource.filename} stored an unexpected content hash.`,
-  );
-
-  return confirmed;
 }
 
 async function reconcileResources({
@@ -766,12 +784,33 @@ async function reconcileResources({
       continue;
     }
 
-    const uploaded = await uploadResourceThroughProduct({
-      http,
-      storageClient,
-      resource,
-    });
-    results.push({ ...uploaded, preserved: false });
+    let uploaded = null;
+    let lastError = null;
+
+    for (let attempt = 1; attempt <= 2; attempt += 1) {
+      try {
+        uploaded = await uploadResourceThroughProduct({
+          http,
+          storageClient,
+          resource,
+        });
+        results.push({
+          ...uploaded,
+          preserved: false,
+          uploadAttempts: attempt,
+        });
+        break;
+      } catch (error) {
+        lastError = error;
+      }
+    }
+
+    if (!uploaded) {
+      throw new Error(
+        `${resource.filename} failed after two complete upload/extraction attempts: ${lastError instanceof Error ? lastError.message : String(lastError)}`,
+        { cause: lastError },
+      );
+    }
   }
 
   return results;
@@ -1076,6 +1115,9 @@ async function main() {
                 resourceActions: resourceResults.map((resource) => ({
                   filename: resource.original_filename,
                   action: resource.preserved ? "preserved_by_hash" : "uploaded",
+                  ...(!resource.preserved
+                    ? { uploadAttempts: resource.uploadAttempts }
+                    : {}),
                 })),
               }
             : {}),

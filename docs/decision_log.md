@@ -1936,3 +1936,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Proceed one dependency wave at a time. At each boundary, the orchestrator gives the user a plain-language purpose, visible demo implications, only the decisions currently required, the safe parallel lanes, the verified outcome and risks, and one named next step. Parallelize independent work inside a wave, while serializing shared documents, cloud mutations, deployment, and final acceptance under the orchestrator.
 - Why: This preserves speed without losing control or forcing the user to parse code-level details. It also makes design and narrative decisions at the latest responsible moment, after prerequisite evidence exists but before dependent work is locked.
 - Follow-up: Use this handoff structure for every remaining portfolio-production wave and update the durable plan if dependencies or gates materially change.
+
+### D-20261001-05 - Keep Portfolio Seeding Recoverable Across Provider Failures
+
+- Date: 2026-10-01
+- Status: accepted
+- Related tasks: `P7.2`, `P6.8`
+- Context: The first hosted portfolio seed created the account but Gemini attachment extraction repeatedly returned `504 DEADLINE_EXCEEDED` for `suite_d_operations.pdf`. A failed confirmation could otherwise leave a quota-consuming resource shell behind and make a later retry less predictable.
+- Decision: When a portfolio resource fails at any point after its product upload shell is created, delete that partial resource through the authenticated product route before returning the failure. Allow at most two complete upload/extraction attempts for a new resource, preserve already-ready resources by content hash, and use `equations.pdf` as the third visible Math5 resource after four extraction deadlines on `suite_d_operations.pdf`. Keep `fractions_add_prod.pdf` as the manually selected coaching source, so the demo narrative and pedagogical acceptance contract do not change.
+- Why: The demo seed must recover cleanly from a temporary provider failure without bypassing normal product access rules, consuming the five-resource allowance with failed shells, or making reruns duplicate data. Replacing an unreliable secondary library item is lower risk than weakening extraction correctness or changing the showcased fractions workflow.
+- Follow-up: Track broader PDF extraction resilience under `P6.8`; do not generalize this demo-only two-attempt operator policy into silent learner retries without separate evidence and product review.

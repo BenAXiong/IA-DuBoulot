@@ -97,7 +97,7 @@ Account profile:
 Resource plan:
 
 - preferred content area: `Fractions - operations`
-- prepare a visible library of three small, topic-focused Mathematics resources from the locally available `Math5` set, subject to ordinary rights and demo-safety checks: `fractions_add_prod.pdf`, `fractions.pdf`, and `suite_d_operations.pdf`
+- prepare a visible library of three small Mathematics resources from the locally available `Math5` set, subject to ordinary rights and demo-safety checks: `fractions_add_prod.pdf`, `fractions.pdf`, and `equations.pdf`
 - make `fractions_add_prod.pdf` the selected source for the coaching turn; exercise `b` asks the learner to calculate `6/14 + 12/21`
 - do not commit private external resources or their local filesystem paths
 - do not upload the complete `33,460,053` byte workbook for the recording; the smaller topic resources already fit the intended flow and current product limit

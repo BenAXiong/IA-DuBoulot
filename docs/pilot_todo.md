@@ -154,7 +154,7 @@ Detail notes: [Post-Pilot Candidate Backlog](pilot/post_pilot_backlog.md).
 ### P7 Portfolio Demo Production
 
 - [x] P7.1 Define the durable orchestration plan, dependency gates, Supabase placement decision, agent boundaries, and stop conditions for the portfolio video.
-- [ ] P7.2 Raise the ordinary paid per-subject resource-count cap to five without changing byte-size limits, then add an idempotent, non-RLS-fixture portfolio seed for Matt, the approved guardian state, believable Mathematics activity, and three selected private subject resources.
+- [x] P7.2 Raise the ordinary paid per-subject resource-count cap to five without changing byte-size limits, then add an idempotent, non-RLS-fixture portfolio seed for Matt, the approved guardian state, believable Mathematics activity, and three selected private subject resources.
 - [ ] P7.3 Prove the deployed Matt path and live coaching contract against the selected fractions source, including bounded retry/take behavior.
 - [ ] P7.4 Lock a human-editable shot-level storyboard only after the demo state, visible design, and exact product path are stable.
 - [ ] P7.5 Implement the reproducible Playwright and FFmpeg recording pipeline, including fixed-viewport capture, scene timestamps, MP4 rendering, and GIF segment export.
@@ -162,7 +162,7 @@ Detail notes: [Post-Pilot Candidate Backlog](pilot/post_pilot_backlog.md).
 
 `P7` is a time-bounded production lane, not a replacement product roadmap. Visible product changes remain owned by `P1.1`-`P1.3`, `P2.1`, `P2.3`, and `P3.3`; `P7` tracks the demo-specific state, automation, capture, and handoff work described in the [portfolio demo production plan](portfolio_demo_production_plan.md).
 
-Status note: Wave 1 foundations are locally implemented and verified. The ordinary paid subject-resource cap is now five while the free cap and all byte limits remain unchanged; the guarded Matt seed/reset/verify tool and selector-independent recording modules pass focused tests, lint, typecheck, build, a real media preflight, and the complete hosted `npm run regress:mvp` suite. `P7.2` stays open until the dedicated credentials are configured and the Matt baseline is seeded and verified; `P7.5` stays open until the stable UI is bound to a concrete storyboard and an end-to-end recording is rendered.
+Status note: Wave 1 is complete. The ordinary paid subject-resource cap is five while the free cap and all byte limits remain unchanged; the hosted Matt baseline now contains the approved guardian link, `5e` Mathematics profile, artificial paid state, completed history, and three ready/chunked private resources. The seed is guarded, self-cleaning on failed extraction, bounded to two attempts per new resource, and idempotent by content hash. Its baseline survived the ordinary RLS fixture reseed and `20/20` policy verification. The recorder modules pass focused checks and a real media preflight, but `P7.5` stays open until stable UI is bound to a concrete storyboard and an end-to-end recording is rendered.
 
 ## Working Method
 

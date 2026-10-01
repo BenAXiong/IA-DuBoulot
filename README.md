@@ -126,7 +126,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - the original Supabase project `dfiiujkhbuvltrlqrerd` was restored in place on 2026-09-29. DNS, CLI linkage, migration parity, fixture reseeding, hosted RLS, and the complete authenticated regression are current again, so `A0.2.1` is closed.
 - `docs/ai_ops_economics_v1.md` now also records Gemini project-level rate-limit behavior, the required dev-versus-pilot project split, and why a dedicated billed pilot project is the trustworthy path before real user traffic.
 - portfolio-video production now has a durable orchestration plan under `docs/portfolio_demo_production_plan.md`; it keeps the current IA DuBoulot Supabase project, assigns production-specific work to `P7`, and leaves visible product changes under the existing Pilot roadmap tasks.
-- Wave 1 portfolio foundations now include a five-resource paid subject cap with unchanged byte limits, a guarded Matt portfolio seed/reset/verify operator script, and selector-independent Playwright/FFmpeg recording modules under `scripts/portfolio-demo/`; hosted Matt creation and the concrete storyboard remain gated by verification and design decisions.
+- Wave 1 portfolio foundations now include a five-resource paid subject cap with unchanged byte limits, a hosted and independently verified Matt baseline, a guarded idempotent seed/reset/verify operator script, and selector-independent Playwright/FFmpeg recording modules under `scripts/portfolio-demo/`; the live coaching proof, design lock, and concrete storyboard remain next.
 
 ## Working Conventions
 
