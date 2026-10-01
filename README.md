@@ -17,6 +17,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - [RLS fixture verification](docs/rls_fixture_verification.md)
 - [Smoke checklist V1](docs/smoke_checklist_v1.md)
 - [Portfolio golden path](docs/portfolio_golden_path.md)
+- [Portfolio demo production plan](docs/portfolio_demo_production_plan.md)
 - [Founder walkthrough V1](docs/founder_walkthrough_v1.md)
 - [Launch checklist V1](docs/launch_checklist_v1.md)
 - [Pilot_todo](docs/pilot_todo.md)
@@ -124,6 +125,7 @@ Planning-first repository for a supervised AI homework coach web app built for s
 - the role dashboards on `/app` now localize their shared copy through `lib/i18n/dashboard-copy.ts`, and the deeper intake, history, workbench, linked-student-detail, adult-review, auth/profile, invitation, tutor-note, memory, deletion, quota, and current billing-management paths localize their user-facing UI or server messages through the focused copy modules; `A7.4.5` and `A7.4.6` are now closed with build-backed French, English, and Chinese route checks plus tablet-fit and parent-summary fallback evidence.
 - the original Supabase project `dfiiujkhbuvltrlqrerd` was restored in place on 2026-09-29. DNS, CLI linkage, migration parity, fixture reseeding, hosted RLS, and the complete authenticated regression are current again, so `A0.2.1` is closed.
 - `docs/ai_ops_economics_v1.md` now also records Gemini project-level rate-limit behavior, the required dev-versus-pilot project split, and why a dedicated billed pilot project is the trustworthy path before real user traffic.
+- portfolio-video production now has a durable orchestration plan under `docs/portfolio_demo_production_plan.md`; it keeps the current IA DuBoulot Supabase project, assigns production-specific work to `P7`, and leaves visible product changes under the existing Pilot roadmap tasks.
 
 ## Working Conventions
 

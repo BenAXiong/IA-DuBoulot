@@ -64,6 +64,7 @@ Source: archived [Demo Nath_0410](archive/demo_Nath_0410.md). These are unsorted
 - [P4 operations details](pilot/operations.md)
 - [P5 refactor discipline details](pilot/refactor_discipline.md)
 - [P6 post-pilot backlog details](pilot/post_pilot_backlog.md)
+- [P7 portfolio demo production plan](portfolio_demo_production_plan.md)
 
 Keep this file as the canonical Pilot board: task IDs, checkboxes, and short current status only. Put long-form evidence, historical status notes, and investigation detail in the matching detail doc above.
 
@@ -149,6 +150,17 @@ Detail notes: [Pilot Structural Audit And Refactor Discipline](pilot/refactor_di
 - [ ] P6.12 Run real iPad Safari validation and iPad-specific polish after practical device constraints clear, including upload, chat, workspace, keyboard-open behavior, tap targets, and portrait/landscape checks.
 
 Detail notes: [Post-Pilot Candidate Backlog](pilot/post_pilot_backlog.md).
+
+### P7 Portfolio Demo Production
+
+- [x] P7.1 Define the durable orchestration plan, dependency gates, Supabase placement decision, agent boundaries, and stop conditions for the portfolio video.
+- [ ] P7.2 Add an idempotent, non-RLS-fixture portfolio seed for Matt, the approved guardian state, believable Mathematics activity, and the selected private subject resources.
+- [ ] P7.3 Prove the deployed Matt path and live coaching contract against the selected fractions source, including bounded retry/take behavior.
+- [ ] P7.4 Lock a human-editable shot-level storyboard only after the demo state, visible design, and exact product path are stable.
+- [ ] P7.5 Implement the reproducible Playwright and FFmpeg recording pipeline, including fixed-viewport capture, scene timestamps, MP4 rendering, and GIF segment export.
+- [ ] P7.6 Produce and independently review the final assets, retain raw/reproducibility evidence, and stop demo development when the golden-path acceptance criteria pass.
+
+`P7` is a time-bounded production lane, not a replacement product roadmap. Visible product changes remain owned by `P1.1`-`P1.3`, `P2.1`, `P2.3`, and `P3.3`; `P7` tracks the demo-specific state, automation, capture, and handoff work described in the [portfolio demo production plan](portfolio_demo_production_plan.md).
 
 ## Working Method
 
