@@ -172,6 +172,8 @@ Status note: Wave 1 established the ordinary paid five-resource cap, unchanged b
 
 Wave 3 completed on 2026-10-02. The editable seven-shot storyboard targets a silent `46 second` authenticated learner cut and is bound to the hosted Playwright recorder. Accepted take 1 used live `gemini-2.5-flash`, one selected resource, and two returned chunks; its complete `42.901 second` provider wait remains in the raw WebM and is explicitly shortened to `2 seconds` in the edit. The first MP4 is `46.233 seconds` at `1920 x 1080`, and the `s06-plan-and-hint` GIF export passes. Cleanup restored Matt's one baseline conversation, three resources, and usage counters. `P7.6` remains open for the user's editorial response and independent final-asset review.
 
+The first `P7.6` review requested larger product text and a light demo theme. Revised run `20261002T090733Z-matt-demo` captures the app at `1440 x 810`, upscales to a `1920 x 1080` delivery file, and retains both the `46.267 second` silent-overlay cut and a clean edit without overlays for later narration or replacement copy. Frame sampling confirms the light theme and larger interface; final editorial acceptance remains open.
+
 ## Working Method
 
 For each pilot slice record:

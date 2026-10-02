@@ -40,10 +40,11 @@ async function mediaMetadata(filePath) {
   };
 }
 
-async function renderSegments(rawPath, runPaths, timeline) {
+async function renderSegments(rawPath, runPaths, timeline, viewport) {
   const segmentDir = resolveInside(runPaths.renderedDir, "segments");
   await fs.mkdir(segmentDir, { recursive: true });
   const segmentPaths = [];
+  const crop = `crop=${viewport.width}:${viewport.height}:0:0`;
   for (const [index, scene] of timeline.scenes.entries()) {
     const segmentPath = resolveInside(segmentDir, `${String(index + 1).padStart(2, "0")}-${scene.id}.mp4`);
     const rawDuration = scene.rawEndSeconds - scene.rawStartSeconds;
@@ -53,7 +54,7 @@ async function renderSegments(rawPath, runPaths, timeline) {
       filter = [
         `[0:v]trim=start=${scene.rawStartSeconds.toFixed(3)}:end=${(scene.rawStartSeconds + half).toFixed(3)},setpts=PTS-STARTPTS[a]`,
         `[0:v]trim=start=${Math.max(scene.rawStartSeconds, scene.rawEndSeconds - half).toFixed(3)}:end=${scene.rawEndSeconds.toFixed(3)},setpts=PTS-STARTPTS[b]`,
-        `[a][b]concat=n=2:v=1:a=0,scale=1920:1080,fps=30[outv]`,
+        `[a][b]concat=n=2:v=1:a=0,${crop},scale=1920:1080,fps=30[outv]`,
       ].join(";");
       await runProcess("ffmpeg", ["-y", "-i", rawPath, "-filter_complex", filter, "-map", "[outv]", "-an", "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p", segmentPath]);
     } else {
@@ -68,7 +69,7 @@ async function renderSegments(rawPath, runPaths, timeline) {
       } else if (rawDuration < scene.targetSeconds) {
         adjustment = `,tpad=stop_mode=clone:stop_duration=${(scene.targetSeconds - rawDuration).toFixed(3)}`;
       }
-      filter = `scale=1920:1080,fps=30,setpts=PTS-STARTPTS${adjustment}`;
+      filter = `${crop},scale=1920:1080,fps=30,setpts=PTS-STARTPTS${adjustment}`;
       await runProcess("ffmpeg", ["-y", "-ss", start.toFixed(3), "-t", duration.toFixed(3), "-i", rawPath, "-vf", filter, "-an", "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p", segmentPath]);
     }
     segmentPaths.push(segmentPath);
@@ -98,12 +99,15 @@ async function main() {
   }
   const rawPath = resolveInside(runPaths.runDir, `raw/take-${report.acceptedTake}.webm`);
   const outputPath = resolveInside(runPaths.runDir, "rendered/portfolio-demo-v1.mp4");
-  const { joinedPath, segmentDir } = await renderSegments(rawPath, runPaths, editedTimeline);
+  const { joinedPath, segmentDir } = await renderSegments(rawPath, runPaths, editedTimeline, report.viewport);
   const subtitlePath = resolveInside(runPaths.manifestsDir, "overlays.ass");
   await fs.writeFile(subtitlePath, buildAssOverlayDocument(editedTimeline), "utf8");
   const command = buildAssOverlayMp4Command({ runDir: runPaths.runDir, inputPath: joinedPath, outputPath, subtitlePath });
   await runProcess(command.command, command.args);
-  const metadata = await mediaMetadata(outputPath);
+  const [metadata, cleanMetadata] = await Promise.all([
+    mediaMetadata(outputPath),
+    mediaMetadata(joinedPath),
+  ]);
   if (metadata.width !== 1920 || metadata.height !== 1080) {
     throw new Error(`Rendered video is ${metadata.width}x${metadata.height}, expected 1920x1080.`);
   }
@@ -111,16 +115,31 @@ async function main() {
     type: "edited-mp4",
     ...metadata,
   });
+  const cleanArtifact = await describeArtifact(runPaths.runDir, joinedPath, {
+    type: "edited-mp4-clean",
+    ...cleanMetadata,
+  });
   await writeRunReport(runPaths.sceneTimelinePath, editedTimeline);
   await writeRunReport(runPaths.runReportPath, {
     ...report,
     timings: editedTimeline.edit,
-    artifacts: [...(report.artifacts ?? []).filter((artifact) => artifact.type !== "edited-mp4"), renderedArtifact],
+    artifacts: [
+      ...(report.artifacts ?? []).filter(
+        (artifact) => artifact.type !== "edited-mp4" && artifact.type !== "edited-mp4-clean",
+      ),
+      renderedArtifact,
+      cleanArtifact,
+    ],
     renderedAt: new Date().toISOString(),
   });
   await fs.rm(segmentDir, { recursive: true, force: true });
-  await fs.rm(joinedPath, { force: true });
-  console.log(JSON.stringify({ runId, output: renderedArtifact.name, ...metadata, sha256: renderedArtifact.sha256 }, null, 2));
+  console.log(JSON.stringify({
+    runId,
+    output: renderedArtifact.name,
+    cleanOutput: cleanArtifact.name,
+    ...metadata,
+    sha256: renderedArtifact.sha256,
+  }, null, 2));
 }
 
 const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;

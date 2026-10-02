@@ -83,12 +83,20 @@ async function captureAttempt({ attempt, browser, config, cookies, runPaths, adm
   const attemptDir = resolveInside(runPaths.rawDir, `attempt-${attempt}`);
   await fs.mkdir(attemptDir, { recursive: true });
   const context = await browser.newContext({
-    viewport: { width: PORTFOLIO_DEMO_EDIT.width, height: PORTFOLIO_DEMO_EDIT.height },
-    colorScheme: "dark",
+    viewport: { width: PORTFOLIO_DEMO_EDIT.captureWidth, height: PORTFOLIO_DEMO_EDIT.captureHeight },
+    colorScheme: PORTFOLIO_DEMO_EDIT.theme,
     locale: "en-US",
-    recordVideo: { dir: attemptDir, size: { width: PORTFOLIO_DEMO_EDIT.width, height: PORTFOLIO_DEMO_EDIT.height } },
+    recordVideo: {
+      dir: attemptDir,
+      size: { width: PORTFOLIO_DEMO_EDIT.captureWidth, height: PORTFOLIO_DEMO_EDIT.captureHeight },
+    },
   });
   await context.addCookies(cookies);
+  await context.addInitScript((theme) => {
+    window.localStorage.setItem("iadb-theme", theme);
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+  }, PORTFOLIO_DEMO_EDIT.theme);
   await context.addInitScript(CAPTURE_OVERLAY_INIT_SCRIPT);
   const page = await context.newPage();
   const video = page.video();
@@ -301,7 +309,13 @@ async function main() {
     deployRevision: sourceRevision,
     captureOrigin: config.appOrigin,
     storyboard: { id: PORTFOLIO_DEMO_STORYBOARD.id, schemaVersion: PORTFOLIO_DEMO_STORYBOARD.schemaVersion },
-    viewport: { width: PORTFOLIO_DEMO_EDIT.width, height: PORTFOLIO_DEMO_EDIT.height },
+    viewport: {
+      width: PORTFOLIO_DEMO_EDIT.captureWidth,
+      height: PORTFOLIO_DEMO_EDIT.captureHeight,
+      theme: PORTFOLIO_DEMO_EDIT.theme,
+      outputWidth: PORTFOLIO_DEMO_EDIT.width,
+      outputHeight: PORTFOLIO_DEMO_EDIT.height,
+    },
     selectedResource: PORTFOLIO_DEMO_RESOURCE,
     retryCount: accepted.attempt - 1,
     acceptedTake: accepted.attempt,

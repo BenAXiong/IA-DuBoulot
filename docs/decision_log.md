@@ -1966,3 +1966,13 @@ Use this file to record project-shaping decisions so future sessions do not reve
 - Decision: Target an approximately `43`- to `48`-second English cut with concise silent overlays. Begin inside authenticated Matt, show the Mathematics workspace, the three-source library, manual selection of `fractions_add_prod.pdf`, the exact informal question, an honestly labelled shortened live wait, and the accepted plan-and-hint response. End on that readable response; omit the public landing page, sign-in, completion, and secondary roles from this first cut. Preserve the complete uninterrupted provider wait in the raw take, store scene/checkpoint timing, and perform latency compression only in the reproducible render pass so overlays and pacing can be revised without another Gemini request.
 - Why: The shorter cut makes the source-grounded, answer-withholding coaching behavior legible to a prospective client without pretending that generation is instantaneous. Separating capture from editorial rendering preserves evidence, lowers recapture cost, and supports later GIF or overlay variants after UI changes.
 - Follow-up: Lock the human and executable storyboards to the same stable scene IDs, render and visually review a first MP4, then revise timing or overlay copy from the retained raw take before declaring the final production asset complete.
+
+### D-20261002-01 - Capture The Demo In Light Mode At A Tighter Viewport
+
+- Date: 2026-10-02
+- Status: accepted
+- Related tasks: `P7.5`, `P7.6`
+- Context: The first `1920 x 1080` dark-theme cut preserved the full desktop layout, but its product typography appeared too small at normal portfolio playback size. The user selected the light theme and supplied a desktop reference whose interface density was more legible.
+- Decision: Force the recorder to the app's light theme, capture the product at a `1440 x 810` `16:9` browser viewport, and upscale the edited delivery to `1920 x 1080`. Preserve the raw take and make every render retain both the silent-overlay MP4 and an otherwise identical clean MP4 without burnt-in overlays.
+- Why: The tighter viewport enlarges real interface typography without changing product CSS solely for the video. Retaining the clean edit makes later narration, caption, and overlay choices reversible without another live AI request.
+- Follow-up: Use the revised light cut for `P7.6` editorial review. Recapture only when product actions, accepted response content, or underlying UI change; re-render from the clean edit for narration or overlay-only revisions.

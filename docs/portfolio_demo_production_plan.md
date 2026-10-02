@@ -215,8 +215,8 @@ Verified result on 2026-10-01:
 
 Locked production direction:
 
-- retain the calm dark/editorial learner interface and improve only the recorded path instead of redesigning the product around the portfolio cut
-- record the authenticated English Matt experience at `1920 x 1080` in `16:9`
+- retain the existing learner interface and improve only the recorded path instead of redesigning the product around the portfolio cut; the final user review selected its light theme for the demo
+- record the authenticated English Matt experience in a `1440 x 810` browser viewport and upscale the `16:9` delivery file to `1920 x 1080` so the product typography remains legible
 - start inside Matt's account; omit the public landing page from the captured workflow and add any short title framing during editing
 
 The first deployed `1920 x 1080` audit identified three recording blockers: the production build hash watermark, untranslated raw `mathematiques` tags in English shell chrome, and overlapping `Coming soon` badges on the dashboard. The bounded polish slice also strengthens the selected-source state, opens selected subject resources in the live-chat rail, and improves transcript readability without changing the learner workflow or coaching contract. Before/after evidence lives under ignored `artifacts/portfolio-demo/wave2-visual-audit/` and `artifacts/portfolio-demo/wave2-visual-verify/`.
@@ -246,6 +246,14 @@ Verified result on 2026-10-02:
 - the named `s06-plan-and-hint` GIF export passes at `960 x 540`; later GIFs can be generated from any stable edited scene without another provider call
 - the run report records redacted source, deployment, provider, retrieval, acceptance, cleanup, timing, media metadata, and hashes; Matt's one-conversation, three-resource, and usage baseline was restored
 - automated frame sampling covers all seven shots; final editorial acceptance remains `P7.6`
+
+User-review revision on 2026-10-02:
+
+- revised run `20261002T090733Z-matt-demo` uses the light theme and a tighter `1440 x 810` capture viewport, upscaled to `1920 x 1080`; the interface is visibly larger without changing the product layout
+- accepted live take 1 again passed the selected-source coaching contract and cleanup restored Matt's baseline
+- the revised overlay MP4 is `46.267 seconds`, H.264, `1920 x 1080`, `30 fps`, and silent
+- the render now also retains `portfolio-demo-v1-no-overlays.mp4`, which has the same editorial cuts without burnt-in text and can receive narration or new overlays without another live capture
+- sampled frames confirm the light theme, readable resource library, exact question, selected source, and final response; `P7.6` remains open for editorial acceptance
 
 ### Wave 4 — Final Production
 

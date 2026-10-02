@@ -12,7 +12,7 @@ The implementation plan, roadmap boards, recorded decisions, and established pro
 
 - Format: silent screen recording with concise text overlays; no narration or music is required for V1.
 - Target duration: `46 seconds`; acceptable final range: `42–48 seconds`, within the broader `30–60 second` brief.
-- Capture: `1920 x 1080`, `16:9`, English UI, calm dark/editorial theme.
+- Capture: `1440 x 810` browser viewport, upscaled to a `1920 x 1080` `16:9` export, English UI, light theme. The tighter viewport deliberately enlarges product text in the delivered frame.
 - Starting state: already authenticated as Matt on the student dashboard. Authentication happens before recording and credentials never appear.
 - Story: dashboard → Mathematics → three-source library → manual selection of `fractions_add_prod.pdf` → exact vague learner question → honestly shortened live wait → accepted plan-and-hint response.
 - Ending: hold on the accepted coaching response. Do not show completion, a recap, or another product surface.
@@ -47,7 +47,7 @@ The recorder must preserve one complete chronological take from `S01` through th
 
 1. Reset and verify the dedicated Matt baseline before capture.
 2. Authenticate before recording begins.
-3. Confirm the English UI, dark theme, `1920 x 1080` viewport, three ready Mathematics resources, and no selected source carried over from a prior temporary conversation.
+3. Confirm the English UI, light theme, `1440 x 810` browser viewport, `1920 x 1080` output profile, three ready Mathematics resources, and no selected source carried over from a prior temporary conversation.
 4. Record one manual selection of only `fractions_add_prod.pdf`.
 5. Send the exact learner question once in a fresh conversation.
 6. Preserve the complete pending state and response arrival in the raw take.
@@ -62,7 +62,7 @@ The V1 cut is acceptable only when all of these are true:
 
 - duration is `42–48 seconds`
 - the first product frame is Matt's authenticated dashboard, not a title-only card, landing page, or sign-in screen
-- the UI is English at `1920 x 1080` and no deploy hash, credential, private local path, debug payload, raw provider error, or unrelated personal information is visible
+- the UI is English and light-themed, the app content is captured at `1440 x 810` and exported at `1920 x 1080`, and no deploy hash, credential, private local path, debug payload, raw provider error, or unrelated personal information is visible
 - all three approved resource filenames are visible and readable before selection
 - `fractions_add_prod.pdf` is the only manually selected source and the chosen state is visually clear
 - the exact question `what's the answer to b?? i don't get fractions` is readable before it is sent
@@ -76,11 +76,11 @@ The V1 cut is acceptable only when all of these are true:
 
 - Keep shot IDs stable after recorder binding. Revise a shot's timing or copy under the same ID when its narrative purpose is unchanged.
 - Treat this Markdown file as the editorial source. Under `P7.5`, the machine-readable storyboard must mirror its enabled shots, action order, exact question reference, and timing ranges; generated media is never the source of truth.
-- Overlay-only changes do not require a new browser take when the underlying product footage still satisfies every acceptance rule.
+- Overlay-only changes do not require a new browser take when the underlying product footage still satisfies every acceptance rule. Each render must retain a clean edited MP4 without burnt-in overlays so narration or replacement overlays can be added later.
 - Navigation, control, source-selection, question, or response-framing changes require a recorder rehearsal and locator check before rendering again.
 - A change to the learner, selected resource, learner question, core coaching claim, starting surface, or included product scope requires explicit user approval before rebinding the recorder.
 - Live wording may vary. Choose another complete accepted take rather than rewriting the model response or joining response fragments from multiple takes.
-- If the UI can no longer show all three filenames, the selected state, or the key response text legibly at `1920 x 1080`, pause the cut and resolve the mismatch under the ordinary roadmap before changing the story.
+- If the UI can no longer show all three filenames, the selected state, or the key response text legibly in the `1440 x 810` capture viewport, pause the cut and resolve the mismatch under the ordinary roadmap before changing the story.
 - Keep the final cut inside `30–60 seconds`; prefer trimming holds and transitions before removing the source-selection or answer-withholding proof.
 
 ## V1 Review Questions
